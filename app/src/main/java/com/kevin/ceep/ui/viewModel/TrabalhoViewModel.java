@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.kevin.ceep.model.Trabalho;
-import com.kevin.ceep.model.TrabalhoProducao;
 import com.kevin.ceep.repository.Resource;
 import com.kevin.ceep.repository.TrabalhoRepository;
 
@@ -29,11 +28,11 @@ public class TrabalhoViewModel extends ViewModel {
     public LiveData<Resource<ArrayList<Trabalho>>> pegaTodosTrabalhos() {
         return trabalhoRepository.pegaTodosTrabalhos();
     }
-    public Trabalho retornaTrabalhoPorChaveNome(ArrayList<Trabalho> trabalhos, TrabalhoProducao trabalhoModificado) {
-        return trabalhoRepository.retornaTrabalhoPorId(trabalhos, trabalhoModificado);
-    }
-
     public LiveData<Resource<Void>> sincronizaTrabalhos() {
         return trabalhoRepository.sincronizaTrabalhos();
+    }
+
+    public boolean trabalhoEspecificoExiste(Trabalho trabalho) {
+        return trabalhoRepository.trabalhoEspecificoExiste(trabalho);
     }
 }

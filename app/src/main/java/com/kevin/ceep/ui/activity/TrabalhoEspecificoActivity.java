@@ -87,7 +87,7 @@ public class TrabalhoEspecificoActivity extends AppCompatActivity {
     private TrabalhoEstoqueViewModel trabalhoEstoqueViewModel;
     private ProfissaoViewModel profissaoViewModel;
     private ArrayList<Trabalho> todosTrabalhos;
-    private ArrayList<TrabalhoEstoque> todosTrabalhosEstoque;
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,18 +119,23 @@ public class TrabalhoEspecificoActivity extends AppCompatActivity {
     private void verificaNovoTrabalho() {
         if (verificaCamposNovoTrabalho()) {
             Trabalho trabalho = defineNovoTrabalho();
+            if (trabalhoViewModel.trabalhoEspecificoExiste(trabalho)) {
+                Snackbar.make(binding.getRoot(), trabalho.getNome()+" já existe!", Snackbar.LENGTH_LONG).show();
+                indicadorProgresso.setVisibility(View.GONE);
+                return;
+            }
             trabalhoViewModel.adicionaTrabalho(trabalho).observe(this, resultadoAdicionaTrabalho -> {
                 indicadorProgresso.setVisibility(View.GONE);
                 if (resultadoAdicionaTrabalho.getErro() == null) {
                     Snackbar.make(binding.getRoot(), trabalho.getNome()+" adicionado!", Snackbar.LENGTH_LONG).show();
                     limpaCampos();
-                } else {
-                    Snackbar.make(binding.getRoot(), "Erro: "+resultadoAdicionaTrabalho.getErro(), Snackbar.LENGTH_LONG).show();
+                    return;
                 }
+                Snackbar.make(binding.getRoot(), "Erro: "+resultadoAdicionaTrabalho.getErro(), Snackbar.LENGTH_LONG).show();
             });
-        } else {
-            indicadorProgresso.setVisibility(View.GONE);
+            return;
         }
+        indicadorProgresso.setVisibility(View.GONE);
     }
 
     private void limpaCampos() {
@@ -172,7 +177,7 @@ public class TrabalhoEspecificoActivity extends AppCompatActivity {
                                 if (trabalhoModificado.possueTrabalhoNecessarioValido()) {
                                     String[] listaTrabalhosNecessarios = trabalhoModificado.getTrabalhoNecessario().split(",");
                                     for (String trabalhoNecessario2 : listaTrabalhosNecessarios) {
-                                        TrabalhoEstoque trabalhoEstoqueEncontrado = trabalhoEstoqueViewModel.retornaTrabalhoEspecificoEstoque(todosTrabalhosEstoque, trabalhoNecessario2);
+                                        TrabalhoEstoque trabalhoEstoqueEncontrado = trabalhoEstoqueViewModel.pegaTrabalhoEspecificoEstoque(trabalhoNecessario2);
                                         if (trabalhoEstoqueEncontrado != null) {
                                             int novaQuantidade = trabalhoEstoqueEncontrado.getQuantidade() - 1;
                                             if (novaQuantidade < 0) {
@@ -187,7 +192,7 @@ public class TrabalhoEspecificoActivity extends AppCompatActivity {
                                 break;
                             case 2:
                                 MutableLiveData<Boolean> confirmacao = new MutableLiveData<>(true);
-                                TrabalhoEstoque trabalhoEstoqueEncontrado = trabalhoEstoqueViewModel.retornaTrabalhoEspecificoEstoque(todosTrabalhosEstoque, trabalhoModificado.getNome());
+                                TrabalhoEstoque trabalhoEstoqueEncontrado = trabalhoEstoqueViewModel.pegaTrabalhoEspecificoEstoque(trabalhoModificado.getIdTrabalho());
                                 if (trabalhoEstoqueEncontrado != null) {
                                     trabalhoEstoqueEncontrado.setQuantidade(trabalhoEstoqueEncontrado.getQuantidade()+1);
                                     trabalhoEstoqueViewModel.modificaTrabalhoEstoque(trabalhoEstoqueEncontrado).observe(this, resultaModificaQuantidade -> {
@@ -197,13 +202,11 @@ public class TrabalhoEspecificoActivity extends AppCompatActivity {
                                         }
                                     });
                                 } else {
-                                    Trabalho trabalhoEncontrado = trabalhoViewModel.retornaTrabalhoPorChaveNome(todosTrabalhos, trabalhoModificado);
-                                    if (trabalhoEncontrado != null && trabalhoEncontrado.getNivel() != 3 && trabalhoEncontrado.getNivel() != 5 && trabalhoEncontrado.getNivel() != 10) {
+                                    if (!trabalhoModificado.ehProducaoDeRecursos()) {
                                         TrabalhoEstoque novoTrabalhoEstoque = new TrabalhoEstoque();
-                                        novoTrabalhoEstoque.setTrabalhoId(trabalhoEncontrado.getId());
+                                        novoTrabalhoEstoque.setTrabalhoId(trabalhoModificado.getIdTrabalho());
                                         novoTrabalhoEstoque.setQuantidade(1);
-
-                                        trabalhoEstoqueViewModel.adicionaTrabalhoEstoque(novoTrabalhoEstoque).observe(this, resultaSalvaTrabalhoEstoque -> {
+                                        trabalhoEstoqueViewModel.insereTrabalhoEstoque(novoTrabalhoEstoque).observe(this, resultaSalvaTrabalhoEstoque -> {
                                             if (resultaSalvaTrabalhoEstoque.getErro() != null){
                                                 Snackbar.make(binding.getRoot(), "Erro: "+resultaSalvaTrabalhoEstoque.getErro(), Snackbar.LENGTH_LONG).show();
                                                 confirmacao.setValue(false);
@@ -252,7 +255,6 @@ public class TrabalhoEspecificoActivity extends AppCompatActivity {
 
     private void inicializaComponentes() {
         todosTrabalhos = new ArrayList<>();
-        todosTrabalhosEstoque = new ArrayList<>();
         linearLayoutTrabalhoNecessario2 = binding.linearLayoutTrabalhoNecessario2;
         linearLayoutTrabalhoNecessario3 = binding.linearLayoutTrabalhoNecessario3;
         edtNomeTrabalho = binding.edtNomeTrabalho;
@@ -324,7 +326,6 @@ public class TrabalhoEspecificoActivity extends AppCompatActivity {
             profissaoViewModel = new ViewModelProvider(this, profissaoViewModelFactory).get(ProfissaoViewModel.class);
             trabalhoEstoqueViewModel.pegaTodosTrabalhosEstoque().observe(this, resultadoEstoque -> {
                 if (resultadoEstoque.getDado() != null) {
-                    todosTrabalhosEstoque = resultadoEstoque.getDado();
                 }
             });
             configuraComponentesAlteraTrabalhoProducao();
