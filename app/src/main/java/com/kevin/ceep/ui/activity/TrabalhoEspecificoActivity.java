@@ -193,15 +193,7 @@ public class TrabalhoEspecificoActivity extends AppCompatActivity {
                             case 2:
                                 MutableLiveData<Boolean> confirmacao = new MutableLiveData<>(true);
                                 TrabalhoEstoque trabalhoEstoqueEncontrado = trabalhoEstoqueViewModel.pegaTrabalhoEspecificoEstoque(trabalhoModificado.getIdTrabalho());
-                                if (trabalhoEstoqueEncontrado != null) {
-                                    trabalhoEstoqueEncontrado.setQuantidade(trabalhoEstoqueEncontrado.getQuantidade()+1);
-                                    trabalhoEstoqueViewModel.modificaTrabalhoEstoque(trabalhoEstoqueEncontrado).observe(this, resultaModificaQuantidade -> {
-                                        if (resultaModificaQuantidade.getErro() != null){
-                                            Snackbar.make(binding.getRoot(), "Erro: "+resultaModificaQuantidade.getErro(), Snackbar.LENGTH_LONG).show();
-                                            confirmacao.setValue(false);
-                                        }
-                                    });
-                                } else {
+                                if (trabalhoEstoqueEncontrado == null) {
                                     if (!trabalhoModificado.ehProducaoDeRecursos()) {
                                         TrabalhoEstoque novoTrabalhoEstoque = new TrabalhoEstoque();
                                         novoTrabalhoEstoque.setTrabalhoId(trabalhoModificado.getIdTrabalho());
@@ -213,7 +205,15 @@ public class TrabalhoEspecificoActivity extends AppCompatActivity {
                                             }
                                         });
                                     }
+                                    return;
                                 }
+                                trabalhoEstoqueEncontrado.setQuantidade(trabalhoEstoqueEncontrado.getQuantidade()+1);
+                                trabalhoEstoqueViewModel.modificaTrabalhoEstoque(trabalhoEstoqueEncontrado).observe(this, resultaModificaQuantidade -> {
+                                    if (resultaModificaQuantidade.getErro() != null){
+                                        Snackbar.make(binding.getRoot(), "Erro: "+resultaModificaQuantidade.getErro(), Snackbar.LENGTH_LONG).show();
+                                        confirmacao.setValue(false);
+                                    }
+                                });
                                 profissaoViewModel.pegaTodasProfissoes().observe(this, resultadoProfissoes -> {
                                     if (resultadoProfissoes.getDado() != null) {
                                         Profissao profissaoEncontrada = profissaoViewModel.retornaProfissaoModificada(resultadoProfissoes.getDado(), trabalhoModificado);
@@ -232,25 +232,25 @@ public class TrabalhoEspecificoActivity extends AppCompatActivity {
                                                     finish();
                                                 }
                                             });
-                                        } else {
-                                            finish();
+                                            return;
                                         }
-                                    } else {
                                         finish();
+                                        return;
                                     }
+                                    finish();
                                 });
                                 break;
                         }
-                    } else {
-                        finish();
+                        return;
                     }
-                } else {
-                    Snackbar.make(binding.getRoot(), "Erro: "+resultado.getErro(), Snackbar.LENGTH_LONG).show();
+                    finish();
+                    return;
                 }
+                Snackbar.make(binding.getRoot(), "Erro: "+resultado.getErro(), Snackbar.LENGTH_LONG).show();
             });
-        } else {
-            finish();
+            return;
         }
+        finish();
     }
 
     private void inicializaComponentes() {

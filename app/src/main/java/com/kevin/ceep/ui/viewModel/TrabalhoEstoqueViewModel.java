@@ -23,12 +23,12 @@ public class TrabalhoEstoqueViewModel extends ViewModel {
         return repository.modificaTrabalhoEstoque(trabalhoEstoqueModificado);
     }
 
-    public TrabalhoEstoque retornaTrabalhoEspecificoEstoque(ArrayList<TrabalhoEstoque> trabalhosEstoque, String nomeTrabalho) {
-        return repository.retornaTrabalhoEspecificoEstoque(trabalhosEstoque, nomeTrabalho);
+    public TrabalhoEstoque pegaTrabalhoEspecificoEstoque(String idTrabalho) {
+        return repository.pegaTrabalhoEspecificoEstoque(idTrabalho);
     }
 
-    public LiveData<Resource<Void>> adicionaTrabalhoEstoque(TrabalhoEstoque trabalhoEstoque) {
-        return repository.adicionaTrabalhoEstoque(trabalhoEstoque);
+    public LiveData<Resource<Void>> insereTrabalhoEstoque(TrabalhoEstoque trabalhoEstoque) {
+        return repository.insereTrabalhoEstoque(trabalhoEstoque);
     }
     public LiveData<Resource<Void>> removeTrabalhoEstoque(TrabalhoEstoque trabalhoRemovido) {
         return repository.removeTrabalhoEstoque(trabalhoRemovido);
