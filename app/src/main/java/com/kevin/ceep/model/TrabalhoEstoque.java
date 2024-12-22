@@ -1,5 +1,7 @@
 package com.kevin.ceep.model;
 
+import static com.kevin.ceep.utilitario.Utilitario.geraIdAleatorio;
+
 import java.io.Serializable;
 
 public class TrabalhoEstoque extends Trabalho implements Serializable {
@@ -7,6 +9,7 @@ public class TrabalhoEstoque extends Trabalho implements Serializable {
     private String trabalhoId;
     public TrabalhoEstoque() {
         super();
+        super.setId(geraIdAleatorio());
     }
     public Integer getQuantidade() {
         return quantidade;
