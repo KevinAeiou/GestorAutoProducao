@@ -8,9 +8,8 @@ import static com.kevin.ceep.db.contracts.EstoqueDbContract.EstoqueEntry.TABLE_N
 import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_LISTA_ESTOQUE;
 import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_LISTA_PERSONAGEM;
 import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_USUARIOS;
-import static com.kevin.ceep.utilitario.Utilitario.comparaString;
-import static com.kevin.ceep.utilitario.Utilitario.geraIdAleatorio;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -29,7 +28,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.kevin.ceep.db.DbHelper;
 import com.kevin.ceep.db.contracts.EstoqueDbContract.EstoqueEntry;
 import com.kevin.ceep.model.TrabalhoEstoque;
-import com.kevin.ceep.model.TrabalhoProducao;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -51,56 +49,28 @@ public class TrabalhoEstoqueRepository {
         this.trabalhosEstoqueEncontrados = new MutableLiveData<>();
     }
 
-    public void modificaQuantidadeTrabalhoNecessarioNoEstoque(TrabalhoProducao trabalhoProducao) {
-        String[] listaTrabalhosNecessarios = trabalhoProducao.getTrabalhoNecessario().split(",");
-        minhaReferencia.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        for (DataSnapshot dn:dataSnapshot.getChildren()){
-                            TrabalhoEstoque trabalho = dn.getValue(TrabalhoEstoque.class);
-                            if (trabalho != null) {
-                                for (String nome: listaTrabalhosNecessarios) {
-                                    if (comparaString(trabalho.getNome(), nome)) {
-                                        int novaQuantidade = trabalho.getQuantidade() - 1;
-                                        if (novaQuantidade < 0) {
-                                            novaQuantidade = 0;
-                                        }
-                                        trabalho.setQuantidade(novaQuantidade);
-                                        modificaTrabalhoEstoque(trabalho);
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                    }
-                });
-    }
-
     public LiveData<Resource<Void>> modificaTrabalhoEstoque(TrabalhoEstoque trabalho) {
         MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
-        if (trabalho.getId() != null) {
-            minhaReferencia.child(trabalho.getId()).child(COLUMN_NAME_QUANTIDADE).setValue(trabalho.getQuantidade()).addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    ContentValues values = new ContentValues();
-                    dbModificacao.beginTransaction();
-                    values.put(COLUMN_NAME_QUANTIDADE, trabalho.getQuantidade());
-                    String selection = EstoqueEntry.COLUMN_NAME_ID + " LIKE ?";
-                    String[] selectionArgs = {trabalho.getId()};
-                    long newRowId = dbModificacao.update(TABLE_NAME, values, selection, selectionArgs);
-                    if (newRowId == -1) {
-                        liveData.setValue(new Resource<>(null, "Erro ao modificar trabalho produção no banco"));
-                    } else {
-                        liveData.setValue(new Resource<>(null, null));
-                    }
-                } else if (task.isCanceled()) {
-                    liveData.setValue(new Resource<>(null, Objects.requireNonNull(task.getException()).getMessage()));
-                }
-            });
+        if (trabalho.getId() == null || trabalho.getTrabalhoId() == null || trabalho.getQuantidade() == null) {
+            liveData.setValue(new Resource<>(null, "Atributos do trabalho está nulo"));
+            return liveData;
         }
+        minhaReferencia.child(trabalho.getId()).child(COLUMN_NAME_QUANTIDADE).setValue(trabalho.getQuantidade()).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                ContentValues values = new ContentValues();
+                values.put(COLUMN_NAME_QUANTIDADE, trabalho.getQuantidade());
+                String selection = EstoqueEntry.COLUMN_NAME_ID + " LIKE ?";
+                String[] selectionArgs = {trabalho.getId()};
+                long newRowId = dbModificacao.update(TABLE_NAME, values, selection, selectionArgs);
+                if (newRowId == -1) {
+                    liveData.setValue(new Resource<>(null, "Erro ao modificar trabalho produção no banco"));
+                } else {
+                    liveData.setValue(new Resource<>(null, null));
+                }
+            } else if (task.isCanceled()) {
+                liveData.setValue(new Resource<>(null, Objects.requireNonNull(task.getException()).getMessage()));
+            }
+        });
         return liveData;
     }
     public LiveData<Resource<ArrayList<TrabalhoEstoque>>> pegaTodosTrabalhosEstoque() {
@@ -134,19 +104,29 @@ public class TrabalhoEstoqueRepository {
         trabalhosEstoqueEncontrados.setValue(new Resource<>(trabalhosEstoque, null));
         return trabalhosEstoqueEncontrados;
     }
-    public TrabalhoEstoque retornaTrabalhoEspecificoEstoque(ArrayList<TrabalhoEstoque> trabalhosEstoque, String nomeTrabalho) {
-        for (TrabalhoEstoque trabalhoEstoque : trabalhosEstoque) {
-            if (comparaString(trabalhoEstoque.getNome(), nomeTrabalho)) {
-                return trabalhoEstoque;
-            }
+    public TrabalhoEstoque pegaTrabalhoEspecificoEstoque(String idTrabalho) {
+        String selection = "SELECT *" +
+                " FROM " + TABLE_NAME +
+                " WHERE " + COLUMN_NAME_ID_TRABALHO + " == ?" +
+                " AND " + COLUMN_NAME_ID_PERSONAGEM + " == ?" +
+                " LIMIT 1";
+        String[] selectionArgs = {idTrabalho, idPersonagem};
+        @SuppressLint("Recycle") Cursor cursor = dbLeitura.rawQuery(selection, selectionArgs);
+        if (cursor.getCount() == 1) {
+            cursor.moveToFirst();
+            TrabalhoEstoque trabalhoEstoque = new TrabalhoEstoque();
+            trabalhoEstoque.setId(cursor.getString(0));
+            trabalhoEstoque.setTrabalhoId(cursor.getString(1));
+            trabalhoEstoque.setQuantidade(cursor.getInt(3));
+            cursor.close();
+            return trabalhoEstoque;
         }
+        cursor.close();
         return null;
     }
 
-    public LiveData<Resource<Void>> adicionaTrabalhoEstoque(TrabalhoEstoque novoTrabalho) {
+    public LiveData<Resource<Void>> insereTrabalhoEstoque(TrabalhoEstoque novoTrabalho) {
         MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
-        String novoId = geraIdAleatorio();
-        novoTrabalho.setId(novoId);
         minhaReferencia.child(novoTrabalho.getId()).setValue(novoTrabalho).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 ContentValues values = new ContentValues();
@@ -204,24 +184,22 @@ public class TrabalhoEstoqueRepository {
                             selectionArgs,
                             null,
                             null,
-                            null
+                            null,
+                            "1"
                     );
-                    int contadorLinhas = 0;
-                    while(cursor.moveToNext()) {
-                        contadorLinhas += 1;
-                    }
+                    int contadorLinhas = cursor.getCount();
                     cursor.close();
                     ContentValues values = new ContentValues();
-                    values.put(COLUMN_NAME_ID, trabalho.getId());
                     values.put(COLUMN_NAME_ID_PERSONAGEM, idPersonagem);
                     values.put(COLUMN_NAME_ID_TRABALHO, trabalho.getTrabalhoId());
                     values.put(COLUMN_NAME_QUANTIDADE, trabalho.getQuantidade());
-                    if (contadorLinhas == 0) {
-                        dbModificacao.insert(TABLE_NAME, null, values);
-                    } else if (contadorLinhas == 1) {
+                    if (contadorLinhas > 0) {
                         selection = COLUMN_NAME_ID + " LIKE ?";
                         selectionArgs = new String[]{trabalho.getId()};
                         dbModificacao.update(TABLE_NAME, values, selection, selectionArgs);
+                    } else {
+                        values.put(COLUMN_NAME_ID, trabalho.getId());
+                        dbModificacao.insert(TABLE_NAME, null, values);
                     }
                 }
                 String selection = "SELECT id " +
@@ -250,7 +228,7 @@ public class TrabalhoEstoqueRepository {
                 trabalhosEstoqueBanco.removeAll(novaLista);
                 for (TrabalhoEstoque trabalhoEstoque : trabalhosEstoqueBanco) {
                     String selection2 = COLUMN_NAME_ID + " LIKE ?";
-                    String[] selectionArgs2 = {trabalhoEstoque.getId(), idPersonagem};
+                    String[] selectionArgs2 = {trabalhoEstoque.getId()};
                     dbModificacao.delete(TABLE_NAME, selection2, selectionArgs2);
                 }
                 liveData.setValue(new Resource<>(null, null));
