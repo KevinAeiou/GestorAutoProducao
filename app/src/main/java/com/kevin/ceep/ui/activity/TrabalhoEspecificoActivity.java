@@ -324,10 +324,6 @@ public class TrabalhoEspecificoActivity extends AppCompatActivity {
             trabalhoEstoqueViewModel = new ViewModelProvider(this, trabalhoEstoqueViewModelFactory).get(TrabalhoEstoqueViewModel.class);
             ProfissaoViewModelFactory profissaoViewModelFactory = new ProfissaoViewModelFactory(new ProfissaoRepository(personagemId));
             profissaoViewModel = new ViewModelProvider(this, profissaoViewModelFactory).get(ProfissaoViewModel.class);
-            trabalhoEstoqueViewModel.pegaTodosTrabalhosEstoque().observe(this, resultadoEstoque -> {
-                if (resultadoEstoque.getDado() != null) {
-                }
-            });
             configuraComponentesAlteraTrabalhoProducao();
         }
     }
@@ -510,17 +506,13 @@ public class TrabalhoEspecificoActivity extends AppCompatActivity {
 
     private void configuraComponentesAlteraTrabalhoProducao() {
         setTitle(trabalhoProducaoRecebido.getNome());
-
         desativaCamposTrabalhoProducao();
-
         recorrenciaModificada = trabalhoProducaoRecebido.getRecorrencia();
         licencaModificada = trabalhoProducaoRecebido.getTipo_licenca();
         posicaoEstadoModificado = trabalhoProducaoRecebido.getEstado();
-
         if (comparaString(licencaModificada, "licença de produção do principiante")) {
             acrescimo = true;
         }
-
         defineValoresCamposTrabalhoProducao();
     }
 

@@ -249,7 +249,6 @@ public class TrabalhoRepository {
                 selection,
                 selectionArgs
         );
-        cursor.close();
         return cursor.getCount() == 1;
     }
 }
