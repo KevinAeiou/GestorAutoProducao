@@ -8,7 +8,7 @@ import static com.kevin.ceep.db.contracts.TrabalhoDbContract.TrabalhoEntry.COLUM
 import static com.kevin.ceep.db.contracts.TrabalhoDbContract.TrabalhoEntry.COLUMN_NAME_PROFISSAO;
 import static com.kevin.ceep.db.contracts.TrabalhoDbContract.TrabalhoEntry.COLUMN_NAME_RARIDADE;
 import static com.kevin.ceep.db.contracts.TrabalhoDbContract.TrabalhoEntry.COLUMN_NAME_TRABALHO_NECESSARIO;
-import static com.kevin.ceep.db.contracts.TrabalhoDbContract.TrabalhoEntry.TABLE_NAME;
+import static com.kevin.ceep.db.contracts.TrabalhoDbContract.TrabalhoEntry.TABLE_TRABALHOS;
 import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_LISTA_TRABALHO;
 
 import android.content.ContentValues;
@@ -60,7 +60,7 @@ public class TrabalhoRepository {
                 values.put(COLUMN_NAME_TRABALHO_NECESSARIO, trabalhoModificado.getTrabalhoNecessario());
                 String selection = COLUMN_NAME_ID + " LIKE ?";
                 String[] selectionArgs = {trabalhoModificado.getId()};
-                long newRowId = dbModificao.update(TABLE_NAME, values, selection, selectionArgs);
+                long newRowId = dbModificao.update(TABLE_TRABALHOS, values, selection, selectionArgs);
                 if (newRowId == -1) {
                     liveData.setValue(new Resource<>(null, "Erro ao adicionar novo trabalho a lista"));
                 } else {
@@ -86,7 +86,7 @@ public class TrabalhoRepository {
                 values.put(COLUMN_NAME_PROFISSAO, trabalho.getProfissao());
                 values.put(COLUMN_NAME_RARIDADE, trabalho.getRaridade());
                 values.put(COLUMN_NAME_TRABALHO_NECESSARIO, trabalho.getTrabalhoNecessario());
-                long newRowId = dbModificao.insert(TABLE_NAME, null, values);
+                long newRowId = dbModificao.insert(TABLE_TRABALHOS, null, values);
                 if (newRowId == -1) {
                     liveData.setValue(new Resource<>(null, "Erro ao adicionar novo trabalho a lista"));
                 } else {
@@ -105,7 +105,7 @@ public class TrabalhoRepository {
             if (task.isSuccessful()) {
                 String selection = COLUMN_NAME_ID + " LIKE ?";
                 String[] selectionArgs = {trabalhoRecebido.getId()};
-                dbModificao.delete(TABLE_NAME, selection, selectionArgs);
+                dbModificao.delete(TABLE_TRABALHOS, selection, selectionArgs);
                 liveData.setValue(new Resource<>(null, null));
             } else if (task.isCanceled()) {
                 liveData.setValue(new Resource<>(null, Objects.requireNonNull(task.getException()).toString()));
@@ -115,7 +115,7 @@ public class TrabalhoRepository {
     }
     public LiveData<Resource<ArrayList<Trabalho>>> pegaTodosTrabalhos() {
         Cursor cursor = dbLeitura.query(
-                TABLE_NAME,
+                TABLE_TRABALHOS,
                 null,
                 null,
                 null,
@@ -158,7 +158,7 @@ public class TrabalhoRepository {
                     String selection = COLUMN_NAME_ID + " LIKE ?";
                     String[] selectionArgs = {Objects.requireNonNull(trabalho).getId()};
                     Cursor cursor = dbLeitura.query(
-                            TABLE_NAME,
+                            TABLE_TRABALHOS,
                             null,
                             selection,
                             selectionArgs,
@@ -176,17 +176,17 @@ public class TrabalhoRepository {
                     values.put(COLUMN_NAME_TRABALHO_NECESSARIO, trabalho.getTrabalhoNecessario());
                     if (cursor.getCount() == 0) {
                         values.put(COLUMN_NAME_ID, trabalho.getId());
-                        dbModificao.insert(TABLE_NAME, null, values);
+                        dbModificao.insert(TABLE_TRABALHOS, null, values);
                         Log.d("onDataChange", trabalho.getNome() + " inserido com sucesso!");
                     } else {
                         String selection2 = COLUMN_NAME_ID + " LIKE ?";
                         String[] selectionArgs2 = {trabalho.getId()};
-                        dbModificao.update(TABLE_NAME, values, selection2, selectionArgs2);
+                        dbModificao.update(TABLE_TRABALHOS, values, selection2, selectionArgs2);
                     }
                     cursor.close();
                 }
                 Cursor cursor = dbLeitura.query(
-                        TABLE_NAME,
+                        TABLE_TRABALHOS,
                         null,
                         null,
                         null,
@@ -221,7 +221,7 @@ public class TrabalhoRepository {
                 for (Trabalho trabalhoBanco : trabalhosBanco) {
                     String selection = COLUMN_NAME_ID + " LIKE ?";
                     String[] selectionArgs = {trabalhoBanco.getId()};
-                    dbModificao.delete(TABLE_NAME, selection, selectionArgs);
+                    dbModificao.delete(TABLE_TRABALHOS, selection, selectionArgs);
                     Log.d("onDataChange", trabalhoBanco.getNome() + " removido com sucesso!");
                 }
                 liveData.setValue(new Resource<>(null, null));
@@ -237,7 +237,7 @@ public class TrabalhoRepository {
 
     public boolean trabalhoEspecificoExiste(Trabalho trabalho) {
         String selection = "SELECT " + COLUMN_NAME_ID +
-                " FROM " + TABLE_NAME +
+                " FROM " + TABLE_TRABALHOS +
                 " WHERE " + COLUMN_NAME_NOME + " == ?" +
                 " AND " + COLUMN_NAME_NOME_PRODUCAO + " == ?" +
                 " AND " + COLUMN_NAME_NIVEL + " == ?" +
@@ -249,6 +249,35 @@ public class TrabalhoRepository {
                 selection,
                 selectionArgs
         );
-        return cursor.getCount() == 1;
+        boolean trabalhoEncontrado = cursor.getCount() == 1;
+        cursor.close();
+        return trabalhoEncontrado;
+    }
+
+    public LiveData<Resource<ArrayList<Trabalho>>> pegaTrabalhosNecessarios(Trabalho trabalho) {
+        MutableLiveData<Resource<ArrayList<Trabalho>>> liveData = new MutableLiveData<>();
+        ArrayList<Trabalho> trabalhosEncontrados = new ArrayList<>();
+        String selection = "SELECT *"+
+                " FROM " + TABLE_TRABALHOS +
+                " WHERE " + COLUMN_NAME_PROFISSAO + " == ?" +
+                " AND " + COLUMN_NAME_NIVEL + " == ?" +
+                " AND " + COLUMN_NAME_RARIDADE + " == ?";
+        String[] selectionArgs = {trabalho.getProfissao(), String.valueOf(trabalho.getNivel()), trabalho.getRaridade()};
+        Cursor cursor = dbLeitura.rawQuery(selection, selectionArgs);
+        while (cursor.moveToNext()) {
+            Trabalho trabalhoEncontrado = new Trabalho();
+            trabalhoEncontrado.setId(cursor.getString(0));
+            trabalhoEncontrado.setNome(cursor.getString(1));
+            trabalhoEncontrado.setNomeProducao(cursor.getString(2));
+            trabalhoEncontrado.setExperiencia(cursor.getInt(3));
+            trabalhoEncontrado.setNivel(cursor.getInt(4));
+            trabalhoEncontrado.setProfissao(cursor.getString(5));
+            trabalhoEncontrado.setRaridade(cursor.getString(6));
+            trabalhoEncontrado.setTrabalhoNecessario(cursor.getString(7));
+            trabalhosEncontrados.add(trabalhoEncontrado);
+        }
+        cursor.close();
+        liveData.setValue(new Resource<>(trabalhosEncontrados, null));
+        return liveData;
     }
 }

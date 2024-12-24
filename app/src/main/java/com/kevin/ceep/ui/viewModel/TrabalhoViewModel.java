@@ -16,7 +16,7 @@ public class TrabalhoViewModel extends ViewModel {
         this.trabalhoRepository = trabalhoRepository;
     }
 
-    public LiveData<Resource<Void>> adicionaTrabalho(Trabalho trabalho) {
+    public LiveData<Resource<Void>> insereTrabalho(Trabalho trabalho) {
         return trabalhoRepository.adicionaTrabalho(trabalho);
     }
     public LiveData<Resource<Void>> modificaTrabalho(Trabalho trabalho) {
@@ -34,5 +34,9 @@ public class TrabalhoViewModel extends ViewModel {
 
     public boolean trabalhoEspecificoExiste(Trabalho trabalho) {
         return trabalhoRepository.trabalhoEspecificoExiste(trabalho);
+    }
+
+    public LiveData<Resource<ArrayList<Trabalho>>> pegaTrabalhosNecessarios(Trabalho trabalho) {
+        return trabalhoRepository.pegaTrabalhosNecessarios(trabalho);
     }
 }
