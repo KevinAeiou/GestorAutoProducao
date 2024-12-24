@@ -1,8 +1,5 @@
 package com.kevin.ceep.ui.activity;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatButton;
-
 import android.annotation.SuppressLint;
 import android.app.ActivityOptions;
 import android.content.Intent;
@@ -11,50 +8,54 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
-import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
-import com.google.firebase.auth.FirebaseAuthUserCollisionException;
-import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.kevin.ceep.R;
+import com.kevin.ceep.databinding.ActivityCadastrarUsuarioBinding;
 import com.kevin.ceep.model.Usuario;
+import com.kevin.ceep.repository.FirebaseAuthRepository;
+import com.kevin.ceep.ui.viewModel.AutenticacaoViewModel;
+import com.kevin.ceep.ui.viewModel.factory.AutenticacaoViewModelFactor;
+
+import java.util.Objects;
 
 public class CadastrarUsuarioActivity extends AppCompatActivity implements View.OnClickListener {
-
+    private ActivityCadastrarUsuarioBinding binding;
     private AppCompatButton botaoCadastrarUsuario;
     private TextInputLayout txtSenha;
-    private TextInputEditText edtNome, edtEmail, edtSenha;
+    private TextInputEditText edtNome;
+    private TextInputEditText edtSenha;
     String[] menssagens = {"Preencha todos os campos", "Usuário cadastrado com sucesso!"};
-    String usuarioId;
-
+    private AutenticacaoViewModel autenticacaoViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_cadastrar_usuario);
+        binding = ActivityCadastrarUsuarioBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
 
-        txtSenha = findViewById(R.id.txtSenha);
-        edtSenha = findViewById(R.id.edtSenha);
-
+        txtSenha = binding.txtSenha;
+        edtSenha = binding.edtSenha;
+        AutenticacaoViewModelFactor autenticacaoViewModelFactor = new AutenticacaoViewModelFactor(new FirebaseAuthRepository());
+        autenticacaoViewModel = new ViewModelProvider(this, autenticacaoViewModelFactor).get(AutenticacaoViewModel.class);
         configuraEdtSenhaRobusta();
 
-        botaoCadastrarUsuario = findViewById(R.id.botaoCadastrarUsuario);
-        TextView txtEntrar = findViewById(R.id.txtLinkEntrar);
+        botaoCadastrarUsuario = binding.botaoCadastrarUsuario;
 
         botaoCadastrarUsuario.setOnClickListener(this);
-        txtEntrar.setOnClickListener(this);
+        binding.txtLinkEntrar.setOnClickListener(this);
     }
 
     private void configuraEdtSenhaRobusta() {
@@ -66,8 +67,7 @@ public class CadastrarUsuarioActivity extends AppCompatActivity implements View.
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                String senha = edtSenha.getText().toString();
-                verificaSenhaRobusta(senha);
+                verificaSenhaRobusta();
             }
 
             @Override
@@ -78,26 +78,22 @@ public class CadastrarUsuarioActivity extends AppCompatActivity implements View.
     }
 
     @SuppressLint("ResourceAsColor")
-    private void verificaSenhaRobusta(String senha) {
+    private void verificaSenhaRobusta() {
+        String senha = Objects.requireNonNull(edtSenha.getText()).toString();
         int tamanhoSenha = senha.length();
-
         String upperCaseChars = getString(R.string.stringCasoChaMa);
         String lowerCaseChars = getString(R.string.stringCasoCharMi);
         String numbers = getString(R.string.stringCasoCharNum);
         String especial = getString(R.string.stringCasoCharS);
-
-        Log.d("SENHA", String.valueOf(tamanhoSenha));
-
         if (configuraEditSenha(tamanhoSenha>=8)
                 & configuraEditSenha(senha.matches(especial))
                 & configuraEditSenha(senha.matches(numbers))
                 & configuraEditSenha(senha.matches(lowerCaseChars))
                 & configuraEditSenha(senha.matches(upperCaseChars))){
-
             habilitaBotaoCadastro();
-        }else {
-            configuraMenssagemAjuda(senha, tamanhoSenha, upperCaseChars, lowerCaseChars, numbers, especial);
+            return;
         }
+        configuraMenssagemAjuda(senha, tamanhoSenha, upperCaseChars, lowerCaseChars, numbers, especial);
     }
 
     private void habilitaBotaoCadastro() {
@@ -127,7 +123,6 @@ public class CadastrarUsuarioActivity extends AppCompatActivity implements View.
 
     @SuppressLint("NewApi")
     private boolean configuraEditSenha(boolean senha) {
-
         if (!senha){
             txtSenha.setHintTextColor(ColorStateList.valueOf(getColor(R.color.cor_background_bordo)));
             txtSenha.setBoxStrokeColor(Color.parseColor("#A71500"));
@@ -139,6 +134,7 @@ public class CadastrarUsuarioActivity extends AppCompatActivity implements View.
         return true;
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public void onClick(View view) {
         switch (view.getId()){
@@ -152,68 +148,48 @@ public class CadastrarUsuarioActivity extends AppCompatActivity implements View.
     }
 
     private void cadastrarUsuario(View view) {
+        edtNome = binding.edtNome;
+        TextInputEditText edtEmail = binding.edtEmail;
+        Usuario usuario = new Usuario();
+        usuario.setNome(Objects.requireNonNull(edtNome.getText()).toString());
+        usuario.setEmail(Objects.requireNonNull(edtEmail.getText()).toString());
+        usuario.setSenha(Objects.requireNonNull(edtSenha.getText()).toString());
 
-        edtNome = findViewById(R.id.edtNome);
-        edtEmail = findViewById(R.id.edtEmail);
-
-        String nome = edtNome.getText().toString();
-        String email = edtEmail.getText().toString();
-        String senha = edtSenha.getText().toString();
-
-        if (!verificaCampos(nome,email,senha)){
-            Snackbar snackbar = Snackbar.make(view, menssagens[0], Snackbar.LENGTH_SHORT);
-            snackbar.setBackgroundTint(Color.WHITE);
-            snackbar.setTextColor(Color.BLACK);
-            snackbar.show();
-        }else{
-            FirebaseAuth.getInstance()
-                    .createUserWithEmailAndPassword(email,senha)
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()){
-                            salvarDadosUsuario();
-                            startActivity(new Intent(getApplicationContext(), EntrarUsuarioActivity.class),
-                                    ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
-                            finish();
-                        }else{
-                            String erro;
-                            try{
-                                throw task.getException();
-                            }catch (FirebaseAuthWeakPasswordException e){
-                                erro = "A senha deve conter no mínimo 8 caracteres!";
-                            } catch (FirebaseAuthUserCollisionException e){
-                                erro = "Conta já cadastrada!";
-                            }catch (FirebaseAuthInvalidCredentialsException e) {
-                                erro = "Email inválido!";
-                            }catch (Exception e) {
-                                erro = "Erro ao cadastrar usuário";
-                            }
-
-                            Snackbar snackbar = Snackbar.make(view, erro, Snackbar.LENGTH_SHORT);
-                            snackbar.setBackgroundTint(Color.WHITE);
-                            snackbar.setTextColor(Color.BLACK);
-                            snackbar.show();
-                        }
-                    });
+        if (verificaCampos(usuario)){
+            autenticacaoViewModel.criaUsuario(usuario).observe(this, resultadoCriaUsuario -> {
+                if (resultadoCriaUsuario.getErro() == null) {
+                    salvarDadosUsuario();
+                    return;
+                }
+                Snackbar snackbar = Snackbar.make(view, resultadoCriaUsuario.getErro(), Snackbar.LENGTH_SHORT);
+                snackbar.setBackgroundTint(Color.WHITE);
+                snackbar.setTextColor(Color.BLACK);
+                snackbar.show();
+            });
+            return;
         }
+        Snackbar snackbar = Snackbar.make(view, menssagens[0], Snackbar.LENGTH_SHORT);
+        snackbar.setBackgroundTint(Color.WHITE);
+        snackbar.setTextColor(Color.BLACK);
+        snackbar.show();
     }
 
     private void salvarDadosUsuario() {
-        String nome  = edtNome.getText().toString();
-        usuarioId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        Usuario usuario = new Usuario(usuarioId,nome);
-        Log.d("CADASTRO",usuario.getId());
-        Log.d("CADASTRO",usuario.getNome());
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference minhareferencia = database.getReference("Usuarios");
-
-        minhareferencia.child(usuarioId).setValue(usuario);
-
+        Usuario usuario = new Usuario();
+        usuario.setId(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid());
+        usuario.setNome(Objects.requireNonNull(edtNome.getText()).toString());
+        autenticacaoViewModel.insereUsuario(usuario).observe(this, resultadoInsereUsuario -> {
+            if (resultadoInsereUsuario.getErro() == null) {
+                startActivity(new Intent(getApplicationContext(), EntrarUsuarioActivity.class),
+                        ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+                finish();
+                return;
+            }
+            Snackbar.make(Objects.requireNonNull(getCurrentFocus()), resultadoInsereUsuario.getErro(), Snackbar.LENGTH_SHORT).show();
+        });
     }
 
-    private boolean verificaCampos(String nome, String email, String senha) {
-        if (nome.isEmpty() || email.isEmpty() || senha.isEmpty()){
-            return false;
-        }
-        return true;
+    private boolean verificaCampos(Usuario personagem) {
+        return personagem.getNome().isEmpty() || personagem.getEmail().isEmpty() || personagem.getSenha().isEmpty();
     }
 }
