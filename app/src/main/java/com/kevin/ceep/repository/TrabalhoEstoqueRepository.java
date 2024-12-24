@@ -4,7 +4,7 @@ import static com.kevin.ceep.db.contracts.EstoqueDbContract.EstoqueEntry.COLUMN_
 import static com.kevin.ceep.db.contracts.EstoqueDbContract.EstoqueEntry.COLUMN_NAME_ID_PERSONAGEM;
 import static com.kevin.ceep.db.contracts.EstoqueDbContract.EstoqueEntry.COLUMN_NAME_ID_TRABALHO;
 import static com.kevin.ceep.db.contracts.EstoqueDbContract.EstoqueEntry.COLUMN_NAME_QUANTIDADE;
-import static com.kevin.ceep.db.contracts.EstoqueDbContract.EstoqueEntry.TABLE_NAME;
+import static com.kevin.ceep.db.contracts.EstoqueDbContract.EstoqueEntry.TABLE_ESTOQUE;
 import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_LISTA_ESTOQUE;
 import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_LISTA_PERSONAGEM;
 import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_USUARIOS;
@@ -61,7 +61,7 @@ public class TrabalhoEstoqueRepository {
                 values.put(COLUMN_NAME_QUANTIDADE, trabalho.getQuantidade());
                 String selection = EstoqueEntry.COLUMN_NAME_ID + " LIKE ?";
                 String[] selectionArgs = {trabalho.getId()};
-                long newRowId = dbModificacao.update(TABLE_NAME, values, selection, selectionArgs);
+                long newRowId = dbModificacao.update(TABLE_ESTOQUE, values, selection, selectionArgs);
                 if (newRowId == -1) {
                     liveData.setValue(new Resource<>(null, "Erro ao modificar trabalho produção no banco"));
                 } else {
@@ -106,7 +106,7 @@ public class TrabalhoEstoqueRepository {
     }
     public TrabalhoEstoque pegaTrabalhoEspecificoEstoque(String idTrabalho) {
         String selection = "SELECT *" +
-                " FROM " + TABLE_NAME +
+                " FROM " + TABLE_ESTOQUE +
                 " WHERE " + COLUMN_NAME_ID_TRABALHO + " == ?" +
                 " AND " + COLUMN_NAME_ID_PERSONAGEM + " == ?" +
                 " LIMIT 1";
@@ -134,7 +134,7 @@ public class TrabalhoEstoqueRepository {
                 values.put(COLUMN_NAME_ID_PERSONAGEM, idPersonagem);
                 values.put(COLUMN_NAME_ID_TRABALHO, novoTrabalho.getTrabalhoId());
                 values.put(COLUMN_NAME_QUANTIDADE, novoTrabalho.getQuantidade());
-                long novaLinha = dbModificacao.insert(TABLE_NAME, null, values);
+                long novaLinha = dbModificacao.insert(TABLE_ESTOQUE, null, values);
                 if (novaLinha == -1) {
                     liveData.setValue(new Resource<>(null, "Erro ao adicionar novo trabalho no estoque"));
                 } else {
@@ -153,7 +153,7 @@ public class TrabalhoEstoqueRepository {
             if (task.isSuccessful()) {
                 String selection = COLUMN_NAME_ID + " LIKE ?";
                 String[] selectionArgs = {trabalhoRemovido.getId()};
-                long linhaRemovida = dbModificacao.delete(TABLE_NAME, selection, selectionArgs);
+                long linhaRemovida = dbModificacao.delete(TABLE_ESTOQUE, selection, selectionArgs);
                 if (linhaRemovida == -1) {
                     liveData.setValue(new Resource<>(null, "Erro ao remover trabalho do estoque"));
                 } else {
@@ -178,7 +178,7 @@ public class TrabalhoEstoqueRepository {
                     String selection = COLUMN_NAME_ID + " LIKE ?";
                     String[] selectionArgs = {Objects.requireNonNull(trabalho).getId()};
                     Cursor cursor = dbLeitura.query(
-                            TABLE_NAME,
+                            TABLE_ESTOQUE,
                             null,
                             selection,
                             selectionArgs,
@@ -196,10 +196,10 @@ public class TrabalhoEstoqueRepository {
                     if (contadorLinhas > 0) {
                         selection = COLUMN_NAME_ID + " LIKE ?";
                         selectionArgs = new String[]{trabalho.getId()};
-                        dbModificacao.update(TABLE_NAME, values, selection, selectionArgs);
+                        dbModificacao.update(TABLE_ESTOQUE, values, selection, selectionArgs);
                     } else {
                         values.put(COLUMN_NAME_ID, trabalho.getId());
-                        dbModificacao.insert(TABLE_NAME, null, values);
+                        dbModificacao.insert(TABLE_ESTOQUE, null, values);
                     }
                 }
                 String selection = "SELECT id " +
@@ -229,7 +229,7 @@ public class TrabalhoEstoqueRepository {
                 for (TrabalhoEstoque trabalhoEstoque : trabalhosEstoqueBanco) {
                     String selection2 = COLUMN_NAME_ID + " LIKE ?";
                     String[] selectionArgs2 = {trabalhoEstoque.getId()};
-                    dbModificacao.delete(TABLE_NAME, selection2, selectionArgs2);
+                    dbModificacao.delete(TABLE_ESTOQUE, selection2, selectionArgs2);
                 }
                 liveData.setValue(new Resource<>(null, null));
             }

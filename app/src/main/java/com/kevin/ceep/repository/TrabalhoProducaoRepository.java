@@ -6,7 +6,7 @@ import static com.kevin.ceep.db.contracts.TrabalhoProducaoContract.TrabalhoProdu
 import static com.kevin.ceep.db.contracts.TrabalhoProducaoContract.TrabalhoProducaoEntry.COLUMN_NAME_ID_TRABALHO;
 import static com.kevin.ceep.db.contracts.TrabalhoProducaoContract.TrabalhoProducaoEntry.COLUMN_NAME_LICENCA;
 import static com.kevin.ceep.db.contracts.TrabalhoProducaoContract.TrabalhoProducaoEntry.COLUMN_NAME_RECORRENCIA;
-import static com.kevin.ceep.db.contracts.TrabalhoProducaoContract.TrabalhoProducaoEntry.TABLE_NAME;
+import static com.kevin.ceep.db.contracts.TrabalhoProducaoContract.TrabalhoProducaoEntry.TABLE_TRABALHOS_PRODUCAO;
 import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_LISTA_DESEJO;
 import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_LISTA_PERSONAGEM;
 import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_USUARIOS;
@@ -59,7 +59,7 @@ public class TrabalhoProducaoRepository {
                         values.put(COLUMN_NAME_RECORRENCIA, trabalhoModificado.getRecorrencia());
                         String selection = COLUMN_NAME_ID + " LIKE ?";
                         String[] selectionArgs = {trabalhoModificado.getId()};
-                        long newRowId = dbModificacao.update(TABLE_NAME, values, selection, selectionArgs);
+                        long newRowId = dbModificacao.update(TABLE_TRABALHOS_PRODUCAO, values, selection, selectionArgs);
                         if (newRowId == -1) {
                             liveData.setValue(new Resource<>(null, "Erro ao modificar trabalho produção"));
                         } else {
@@ -84,7 +84,7 @@ public class TrabalhoProducaoRepository {
                         values.put(COLUMN_NAME_ESTADO, novoTrabalho.getEstado());
                         values.put(COLUMN_NAME_LICENCA, novoTrabalho.getTipo_licenca());
                         values.put(COLUMN_NAME_RECORRENCIA, novoTrabalho.getRecorrencia());
-                        long newRowId = dbModificacao.insert(TABLE_NAME, null, values);
+                        long newRowId = dbModificacao.insert(TABLE_TRABALHOS_PRODUCAO, null, values);
                         if (newRowId == -1) {
                             liveData.setValue(new Resource<>(null, "Erro ao adicionar novo trabalho a lista"));
                         } else {
@@ -102,7 +102,7 @@ public class TrabalhoProducaoRepository {
             if (task.isSuccessful()) {
                 String selection = COLUMN_NAME_ID + " LIKE ?";
                 String[] selectionArgs = {trabalhoProducao.getId()};
-                dbModificacao.delete(TABLE_NAME, selection, selectionArgs);
+                dbModificacao.delete(TABLE_TRABALHOS_PRODUCAO, selection, selectionArgs);
                 liveData.setValue(new Resource<>(null, null));
             } else if (task.isCanceled()) {
                 liveData.setValue(new Resource<>(null, Objects.requireNonNull(task.getException()).getMessage()));
@@ -158,7 +158,7 @@ public class TrabalhoProducaoRepository {
                     String selection = COLUMN_NAME_ID + " LIKE ?";
                     String[] selectionArgs = {Objects.requireNonNull(trabalhoProducao).getId()};
                     Cursor cursor = dbLeitura.query(
-                            TABLE_NAME,
+                            TABLE_TRABALHOS_PRODUCAO,
                             null,
                             selection,
                             selectionArgs,
@@ -179,15 +179,15 @@ public class TrabalhoProducaoRepository {
                     values.put(COLUMN_NAME_LICENCA, trabalhoProducao.getTipo_licenca());
                     values.put(COLUMN_NAME_RECORRENCIA, trabalhoProducao.getRecorrencia());
                     if (contadorLinhas == 0) {
-                        dbModificacao.insert(TABLE_NAME, null, values);
+                        dbModificacao.insert(TABLE_TRABALHOS_PRODUCAO, null, values);
                     } else if (contadorLinhas == 1) {
                         selection = COLUMN_NAME_ID + " LIKE ?";
                         selectionArgs = new String[]{trabalhoProducao.getId()};
-                        dbModificacao.update(TABLE_NAME, values, selection, selectionArgs);
+                        dbModificacao.update(TABLE_TRABALHOS_PRODUCAO, values, selection, selectionArgs);
                     }
                 }
                 String selection = "SELECT " + COLUMN_NAME_ID +
-                        " FROM "+ TABLE_NAME +
+                        " FROM "+ TABLE_TRABALHOS_PRODUCAO +
                         " WHERE "+ COLUMN_NAME_ID_PERSONAGEM + " == ?";
                 String[] selectionArgs = {idPersonagem};
                 Cursor cursor = dbLeitura.rawQuery(
@@ -213,7 +213,7 @@ public class TrabalhoProducaoRepository {
                 for (TrabalhoProducao trabalhoProducao : trabalhosProducaoBanco) {
                     String selection2 = COLUMN_NAME_ID + " LIKE ?";
                     String[] selectionArgs2 = {trabalhoProducao.getId()};
-                    dbModificacao.delete(TABLE_NAME, selection2, selectionArgs2);
+                    dbModificacao.delete(TABLE_TRABALHOS_PRODUCAO, selection2, selectionArgs2);
                 }
                 liveData.setValue(new Resource<>(null, null));
             }
