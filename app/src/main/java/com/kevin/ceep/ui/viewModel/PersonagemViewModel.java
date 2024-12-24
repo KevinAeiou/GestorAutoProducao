@@ -27,7 +27,7 @@ public class PersonagemViewModel extends ViewModel {
         return personagemRepository.modificaPersonagem(personagemModificado);
     }
 
-    public LiveData<Resource<Void>> adicionaPersonagem(Personagem novoPersonagem) {
-        return personagemRepository.adicionaPersonagem(novoPersonagem);
+    public LiveData<Resource<Void>> inserePersonagem(Personagem novoPersonagem) {
+        return personagemRepository.inserePersonagem(novoPersonagem);
     }
 }
