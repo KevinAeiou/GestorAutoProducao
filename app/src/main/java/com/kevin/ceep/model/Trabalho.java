@@ -17,7 +17,9 @@ public class Trabalho implements Serializable {
     private String trabalhoNecessario;
     private Integer nivel;
     private Integer experiencia;
-    public Trabalho(){}
+    public Trabalho(){
+        this.id = geraIdAleatorio();
+    }
 
     public Trabalho(String nome, String nomeProducao, String profissao, String raridade, String trabalhoNecessario, Integer nivel, Integer experiencia) {
         this.id = geraIdAleatorio();
