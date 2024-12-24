@@ -7,7 +7,7 @@ import android.provider.BaseColumns;
 public class PersoagemDbContract {
     private PersoagemDbContract() {}
     public static class PersonagemEntry implements BaseColumns {
-        public static final String TABLE_NAME = CHAVE_LISTA_PERSONAGEM;
+        public static final String TABLE_PERSONAGENS = CHAVE_LISTA_PERSONAGEM;
         public static final String COLUMN_NAME_ID = "id";
         public static final String COLUMN_NAME_ID_USUARIO = "idUsuario";
         public static final String COLUMN_NAME_NOME = "nome";

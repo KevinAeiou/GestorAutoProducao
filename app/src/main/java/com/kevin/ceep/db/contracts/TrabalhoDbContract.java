@@ -6,7 +6,7 @@ public class TrabalhoDbContract {
     private TrabalhoDbContract() {}
 
     public static class TrabalhoEntry implements BaseColumns {
-        public static final String TABLE_NAME = "trabalhos";
+        public static final String TABLE_TRABALHOS = "trabalhos";
         public static final String COLUMN_NAME_ID = "ID"; //0
         public static final String COLUMN_NAME_NOME = "nome"; //1
         public static final String COLUMN_NAME_NOME_PRODUCAO = "nomeProducao"; //2
