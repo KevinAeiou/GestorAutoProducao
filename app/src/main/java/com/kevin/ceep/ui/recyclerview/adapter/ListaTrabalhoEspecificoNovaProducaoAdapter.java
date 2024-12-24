@@ -49,9 +49,7 @@ public class ListaTrabalhoEspecificoNovaProducaoAdapter extends RecyclerView.Ada
 
     @Override
     public int getItemCount() {
-        if (trabalhos == null){
-            return 0;
-        }
+        if (trabalhos == null) return 0;
         return trabalhos.size();
     }
 
@@ -90,13 +88,29 @@ public class ListaTrabalhoEspecificoNovaProducaoAdapter extends RecyclerView.Ada
             String trabalhoNecessario = trabalho.getTrabalhoNecessario();
             if (trabalhoNecessario == null || trabalhoNecessario.isEmpty()) {
                 trabalhoNecessarioTrabalhoEspecifico.setVisibility(View.GONE);
-            } else {
-                trabalhoNecessarioTrabalhoEspecifico.setText(trabalho.getTrabalhoNecessario());
+                return;
+            }
+            String[] idTrabalhosNecessarios = trabalhoNecessario.split(",");
+            String nomeTrabalhoNecessario1 = "Não encontrado", nomeTrabalhoNecessario2 = "Não encontrado";
+            for (Trabalho trabalhoEncontrado : trabalhos) {
+                if (trabalhoEncontrado.getId().equals(idTrabalhosNecessarios[0])) {
+                    nomeTrabalhoNecessario1 = trabalhoEncontrado.getNome();
+                    break;
+                }
+            }
+            trabalhoNecessarioTrabalhoEspecifico.setText(nomeTrabalhoNecessario1);
+            if (idTrabalhosNecessarios.length > 1) {
+                for (Trabalho trabalhoEncontrado : trabalhos) {
+                    if (trabalhoEncontrado.getId().equals(idTrabalhosNecessarios[1])) {
+                        nomeTrabalhoNecessario2 = trabalhoEncontrado.getNome();
+                        break;
+                    }
+                }
+                trabalhoNecessarioTrabalhoEspecifico.setText(nomeTrabalhoNecessario1 + "," + nomeTrabalhoNecessario2);
             }
         }
         private void confiuraCorNomeTrabalho(Trabalho trabalho) {
-            String raridade = trabalho.getRaridade();
-            switch (raridade) {
+            switch (trabalho.getRaridade()) {
                 case "Comum":
                     nomeTrabalhoEspecifico.setTextColor(ContextCompat.getColor(context, R.color.cor_texto_raridade_comum));
                     break;
