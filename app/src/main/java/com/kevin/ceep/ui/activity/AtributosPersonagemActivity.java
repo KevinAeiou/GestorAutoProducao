@@ -4,7 +4,7 @@ import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_PERSONAGEM
 import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_REQUISICAO;
 import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CODIGO_REQUISICAO_ALTERA_TRABALHO;
 import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CODIGO_REQUISICAO_INSERE_TRABALHO;
-import static com.kevin.ceep.utilitario.Utilitario.geraIdAleatorio;
+import static java.lang.Integer.parseInt;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -65,12 +65,8 @@ public class AtributosPersonagemActivity extends AppCompatActivity {
         personagemEspacoProducao.setText(String.valueOf(personagemRecebido.getEspacoProducao()));
         personagemEmail.setText(personagemRecebido.getEmail());
         personagemSenha.setText(personagemRecebido.getSenha());
-        if (personagemRecebido.getUso()){
-            personagemSwUso.setChecked(true);
-        }
-        if (personagemRecebido.getEstado()){
-            personagemSwEstado.setChecked(true);
-        }
+        personagemSwUso.setChecked(personagemRecebido.getUso());
+        personagemSwEstado.setChecked(personagemRecebido.getEstado());
     }
 
     private void inicializaComponentes() {
@@ -104,77 +100,71 @@ public class AtributosPersonagemActivity extends AppCompatActivity {
                     dialogoDeAlerta.setNegativeButton("Não", ((dialogInterface, i) -> finish()));
                     dialogoDeAlerta.setPositiveButton("Sim", (dialogInterface, i) -> {
                         Personagem personagemModificado = definePersonagemModificado();
+                        personagemModificado.setId(personagemRecebido.getId());
                         modificaPersonagemServidor(personagemModificado);
                     });
                     dialogoDeAlerta.show();
-                } else {
-                    finish();
+                    return super.onOptionsItemSelected(item);
                 }
-            } else if (codigoRequisicao == CODIGO_REQUISICAO_INSERE_TRABALHO) {
-                if (verificaCampos()){
-                    String novoId = geraIdAleatorio();
-                    Personagem novoPersonagem = new Personagem(
-                            novoId,
-                            personagemNome.getText().toString(),
-                            personagemEmail.getText().toString(),
-                            personagemSenha.getText().toString(),
-                            personagemSwEstado.isChecked(),
-                            personagemSwUso.isChecked(),
-                            Integer.parseInt(personagemEspacoProducao.getText().toString())
-                    );
-                    personagemViewModel.adicionaPersonagem(novoPersonagem).observe(this, resultadoInserePersonagem -> {
+                finish();
+                return super.onOptionsItemSelected(item);
+            }
+            if (codigoRequisicao == CODIGO_REQUISICAO_INSERE_TRABALHO) {
+                if (verificaCamposValidos()){
+                    Personagem novoPersonagem = definePersonagemModificado();
+                    personagemViewModel.inserePersonagem(novoPersonagem).observe(this, resultadoInserePersonagem -> {
                         if (resultadoInserePersonagem.getErro() == null) {
                             finish();
-                        } else {
-                            Snackbar.make(getApplicationContext(), Objects.requireNonNull(getCurrentFocus()), "Erro: "+resultadoInserePersonagem.getErro(), Snackbar.LENGTH_LONG).show();
+                            return;
                         }
+                        Snackbar.make(getApplicationContext(), Objects.requireNonNull(getCurrentFocus()), "Erro: "+resultadoInserePersonagem.getErro(), Snackbar.LENGTH_LONG).show();
                     });
+                    return super.onOptionsItemSelected(item);
                 }
+                configuraMensagemCamposValidos();
             }
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private Personagem definePersonagemModificado() {
-        return new Personagem(personagemRecebido.getId(), personagemNome.getText().toString(), personagemEmail.getText().toString(), personagemSenha.getText().toString(), personagemSwEstado.isChecked(), personagemSwUso.isChecked(), Integer.parseInt(personagemEspacoProducao.getText().toString()));
+    private void configuraMensagemCamposValidos() {
+        if (configuraMensagem(personagemNome, personagemNomeTxt)) return;
+        if (configuraMensagem(personagemEspacoProducao, personagemEspacoProducaoTxt)) return;
+        if (configuraMensagem(personagemEmail, personagemEmailTxt)) return;
+        configuraMensagem(personagemSenha, personagemSenhaTxt);
     }
 
-    private boolean verificaCampos() {
-        boolean confirmacao = true;
-        if (personagemNome.getText().toString().isEmpty()){
+    private boolean configuraMensagem(EditText personagemNome, TextInputLayout personagemNomeTxt) {
+        if (personagemNome.getText().toString().isEmpty()) {
             personagemNomeTxt.setHelperText("Campo requerido!");
-            confirmacao = false;
-        }else {
-            personagemNomeTxt.setHelperTextEnabled(false);
+            return true;
         }
-        if (personagemEspacoProducao.getText().toString().isEmpty()){
-            personagemEspacoProducaoTxt.setHelperText("Campo requerido!");
-            confirmacao = false;
-        }else {
-            personagemEspacoProducaoTxt.setHelperTextEnabled(false);
-        }
-        if (personagemEmail.getText().toString().isEmpty()){
-            personagemEmailTxt.setHelperText("Campo requerido!");
-            confirmacao = false;
-        }else {
-            personagemEmailTxt.setHelperTextEnabled(false);
-        }
-        if (personagemSenha.getText().toString().isEmpty()){
-            personagemSenhaTxt.setHelperText("Campo requerido!");
-            confirmacao = false;
-        }else {
-            personagemSenhaTxt.setHelperTextEnabled(false);
-        }
-        return confirmacao;
+        personagemNomeTxt.setHelperTextEnabled(false);
+        return false;
+    }
+
+    private Personagem definePersonagemModificado() {
+        Personagem personagemModificado = new Personagem();
+        personagemModificado.setNome(personagemNome.getText().toString());
+        personagemModificado.setEmail(personagemEmail.getText().toString());
+        personagemModificado.setSenha(personagemSenha.getText().toString());
+        personagemModificado.setEstado(personagemSwEstado.isChecked());
+        personagemModificado.setUso(personagemSwUso.isChecked());
+        personagemModificado.setEspacoProducao(parseInt(personagemEspacoProducao.getText().toString()));
+        return personagemModificado;
+    }
+
+    private boolean verificaCamposValidos() {
+        return !personagemNome.getText().toString().isEmpty() || !personagemEspacoProducao.getText().toString().isEmpty() || !personagemEmail.getText().toString().isEmpty() || !personagemSenha.getText().toString().isEmpty();
     }
 
     private void modificaPersonagemServidor(Personagem personagemModificado) {
         personagemViewModel.modificaPersonagem(personagemModificado).observe(this, resultadoModificaPersonagem -> {
             if (resultadoModificaPersonagem.getErro() != null) {
                 Snackbar.make(getApplicationContext(), Objects.requireNonNull(getCurrentFocus()), "Erro: "+resultadoModificaPersonagem.getErro(), Snackbar.LENGTH_LONG).show();
-            } else {
-                finish();
+                return;
             }
+            finish();
         });
     }
 
