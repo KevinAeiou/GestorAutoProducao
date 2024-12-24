@@ -8,7 +8,7 @@ import static com.kevin.ceep.db.contracts.PersoagemDbContract.PersonagemEntry.CO
 import static com.kevin.ceep.db.contracts.PersoagemDbContract.PersonagemEntry.COLUMN_NAME_NOME;
 import static com.kevin.ceep.db.contracts.PersoagemDbContract.PersonagemEntry.COLUMN_NAME_SENHA;
 import static com.kevin.ceep.db.contracts.PersoagemDbContract.PersonagemEntry.COLUMN_NAME_USO;
-import static com.kevin.ceep.db.contracts.PersoagemDbContract.PersonagemEntry.TABLE_NAME;
+import static com.kevin.ceep.db.contracts.PersoagemDbContract.PersonagemEntry.TABLE_PERSONAGENS;
 import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_LISTA_PERSONAGEM;
 import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_USUARIOS;
 
@@ -64,7 +64,7 @@ public class PersonagemRepository {
                         String selection = COLUMN_NAME_ID + " LIKE ?";
                         String[] selectionArgs = {personagem.getId()};
                         Cursor cursor = dbLeitura.query(
-                                TABLE_NAME,
+                                TABLE_PERSONAGENS,
                                 null,
                                 selection,
                                 selectionArgs,
@@ -87,7 +87,7 @@ public class PersonagemRepository {
                             values.put(COLUMN_NAME_ESTADO, personagem.getEstado());
                             values.put(COLUMN_NAME_USO, personagem.getUso());
                             values.put(COLUMN_NAME_ESPACO_PRODUCAO, personagem.getEspacoProducao());
-                            dbModifica.insert(TABLE_NAME, null, values);
+                            dbModifica.insert(TABLE_PERSONAGENS, null, values);
                         } else if (contadorLinhas == 1) {
                             values.put(COLUMN_NAME_ID, personagem.getId());
                             values.put(COLUMN_NAME_ID_USUARIO, usuarioID);
@@ -99,11 +99,11 @@ public class PersonagemRepository {
                             values.put(COLUMN_NAME_ESPACO_PRODUCAO, personagem.getEspacoProducao());
                             selection = COLUMN_NAME_ID + " LIKE ?";
                             selectionArgs = new String[]{personagem.getId()};
-                            dbModifica.update(TABLE_NAME, values, selection, selectionArgs);
+                            dbModifica.update(TABLE_PERSONAGENS, values, selection, selectionArgs);
                         }
                     }
                     Cursor cursor = dbLeitura.query(
-                            TABLE_NAME,
+                            TABLE_PERSONAGENS,
                             null,
                             null,
                             null,
@@ -130,7 +130,7 @@ public class PersonagemRepository {
                     for (Personagem personagem1 : personagensBanco) {
                         String selection = COLUMN_NAME_ID + " LIKE ?";
                         String[] selectionArgs = {personagem1.getId()};
-                        dbModifica.delete(TABLE_NAME, selection, selectionArgs);
+                        dbModifica.delete(TABLE_PERSONAGENS, selection, selectionArgs);
                     }
                     liveData.setValue(new Resource<>(null, null));
                 }
@@ -144,31 +144,26 @@ public class PersonagemRepository {
         return liveData;
     }
     public LiveData<Resource<ArrayList<Personagem>>> pegaTodosPersonagens() {
-        String selection = COLUMN_NAME_ID_USUARIO + " LIKE ?";
+        String selection = "SELECT * " +
+                " FROM " + TABLE_PERSONAGENS +
+                " WHERE " + COLUMN_NAME_ID_USUARIO + " == ?";
         String[] selectionArgs = {usuarioID};
-        Cursor cursor = dbLeitura.query(
-                TABLE_NAME,
-                null,
+        Cursor cursor = dbLeitura.rawQuery(
                 selection,
-                selectionArgs,
-                null,
-                null,
-                null,
-                null
+                selectionArgs
         );
         ArrayList<Personagem> personagens = new ArrayList<>();
         while (cursor.moveToNext()) {
             boolean estado = cursor.getInt(5) == 1;
             boolean uso = cursor.getInt(6) == 1;
-            Personagem personagem = new Personagem (
-                    cursor.getString(0),
-                    cursor.getString(2),
-                    cursor.getString(3),
-                    cursor.getString(4),
-                    estado,
-                    uso,
-                    cursor.getInt(7)
-                    );
+            Personagem personagem = new Personagem ();
+            personagem.setId(cursor.getString(0));
+            personagem.setNome(cursor.getString(2));
+            personagem.setEmail(cursor.getString(3));
+            personagem.setSenha(cursor.getString(4));
+            personagem.setEstado(estado);
+            personagem.setUso(uso);
+            personagem.setEspacoProducao(cursor.getInt(7));
             personagens.add(personagem);
         }
         cursor.close();
@@ -183,7 +178,7 @@ public class PersonagemRepository {
                 values.put(COLUMN_NAME_NOME, personagemModificado.getNome());
                 String selection = COLUMN_NAME_ID + " LIKE ?";
                 String[] selectionArgs = {personagemModificado.getId()};
-                long newRowId = dbModifica.update(TABLE_NAME, values, selection, selectionArgs);
+                long newRowId = dbModifica.update(TABLE_PERSONAGENS, values, selection, selectionArgs);
                 if (newRowId == -1) {
                     liveData.setValue(new Resource<>(null, "Erro ao modificar "+personagemModificado.getNome()+" no banco"));
                 } else {
@@ -199,7 +194,7 @@ public class PersonagemRepository {
                 values.put(COLUMN_NAME_EMAIL, personagemModificado.getEmail());
                 String selection = COLUMN_NAME_ID + " LIKE ?";
                 String[] selectionArgs = {personagemModificado.getId()};
-                long newRowId = dbModifica.update(TABLE_NAME, values, selection, selectionArgs);
+                long newRowId = dbModifica.update(TABLE_PERSONAGENS, values, selection, selectionArgs);
                 if (newRowId == -1) {
                     liveData.setValue(new Resource<>(null, "Erro ao modificar "+personagemModificado.getNome()+" no banco"));
                 } else {
@@ -215,7 +210,7 @@ public class PersonagemRepository {
                 values.put(COLUMN_NAME_SENHA, personagemModificado.getSenha());
                 String selection = COLUMN_NAME_ID + " LIKE ?";
                 String[] selectionArgs = {personagemModificado.getId()};
-                long newRowId = dbModifica.update(TABLE_NAME, values, selection, selectionArgs);
+                long newRowId = dbModifica.update(TABLE_PERSONAGENS, values, selection, selectionArgs);
                 if (newRowId == -1) {
                     liveData.setValue(new Resource<>(null, "Erro ao modificar "+personagemModificado.getNome()+" no banco"));
                 } else {
@@ -231,7 +226,7 @@ public class PersonagemRepository {
                 values.put(COLUMN_NAME_ESTADO, personagemModificado.getEstado());
                 String selection = COLUMN_NAME_ID + " LIKE ?";
                 String[] selectionArgs = {personagemModificado.getId()};
-                long newRowId = dbModifica.update(TABLE_NAME, values, selection, selectionArgs);
+                long newRowId = dbModifica.update(TABLE_PERSONAGENS, values, selection, selectionArgs);
                 if (newRowId == -1) {
                     Log.d("modificaPersonagem", "Erro ao modificar estado para: "+personagemModificado.getEstado());
                     liveData.setValue(new Resource<>(null, "Erro ao modificar "+personagemModificado.getNome()+" no banco"));
@@ -249,7 +244,7 @@ public class PersonagemRepository {
                 values.put(COLUMN_NAME_USO, personagemModificado.getUso());
                 String selection = COLUMN_NAME_ID + " LIKE ?";
                 String[] selectionArgs = {personagemModificado.getId()};
-                long newRowId = dbModifica.update(TABLE_NAME, values, selection, selectionArgs);
+                long newRowId = dbModifica.update(TABLE_PERSONAGENS, values, selection, selectionArgs);
                 if (newRowId == -1) {
                     liveData.setValue(new Resource<>(null, "Erro ao modificar "+personagemModificado.getNome()+" no banco"));
                 } else {
@@ -265,7 +260,7 @@ public class PersonagemRepository {
                 values.put(COLUMN_NAME_ESPACO_PRODUCAO, personagemModificado.getEspacoProducao());
                 String selection = COLUMN_NAME_ID + " LIKE ?";
                 String[] selectionArgs = {personagemModificado.getId()};
-                long newRowId = dbModifica.update(TABLE_NAME, values, selection, selectionArgs);
+                long newRowId = dbModifica.update(TABLE_PERSONAGENS, values, selection, selectionArgs);
                 if (newRowId == -1) {
                     liveData.setValue(new Resource<>(null, "Erro ao modificar "+personagemModificado.getNome()+" no banco"));
                 } else {
@@ -278,7 +273,7 @@ public class PersonagemRepository {
         return liveData;
     }
 
-    public LiveData<Resource<Void>> adicionaPersonagem(Personagem novoPersonagem) {
+    public LiveData<Resource<Void>> inserePersonagem(Personagem novoPersonagem) {
         MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
         minhaReferencia.child(novoPersonagem.getId()).setValue(novoPersonagem).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -291,7 +286,7 @@ public class PersonagemRepository {
                 values.put(COLUMN_NAME_ESTADO, novoPersonagem.getEstado());
                 values.put(COLUMN_NAME_USO, novoPersonagem.getUso());
                 values.put(COLUMN_NAME_ESPACO_PRODUCAO, novoPersonagem.getEspacoProducao());
-                long newRowId = dbModifica.insert(TABLE_NAME, null, values);
+                long newRowId = dbModifica.insert(TABLE_PERSONAGENS, null, values);
                 if (newRowId == -1) {
                     liveData.setValue(new Resource<>(null, "Erro ao inserir "+novoPersonagem.getNome()+" no banco"));
                 } else {
