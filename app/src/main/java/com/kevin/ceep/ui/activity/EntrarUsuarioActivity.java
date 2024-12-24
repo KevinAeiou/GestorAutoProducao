@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
@@ -17,6 +18,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.kevin.ceep.R;
 import com.kevin.ceep.databinding.ActivityEntrarUsuarioBinding;
+import com.kevin.ceep.model.Usuario;
+import com.kevin.ceep.repository.FirebaseAuthRepository;
+import com.kevin.ceep.ui.viewModel.AutenticacaoViewModel;
+import com.kevin.ceep.ui.viewModel.factory.AutenticacaoViewModelFactor;
 
 import java.util.Objects;
 
@@ -26,6 +31,7 @@ public class EntrarUsuarioActivity extends AppCompatActivity implements View.OnC
     private TextInputLayout txtEmail, txtSenha;
     private TextView txtCadastrar, txtRecuperarSenha;
     private AppCompatButton botao_entrar;
+    private AutenticacaoViewModel autenticacaoViewModel;
     String [] menssagens = {"Campo requerido!", "Login efetuado com sucesso!"};
 
     @Override
@@ -33,13 +39,10 @@ public class EntrarUsuarioActivity extends AppCompatActivity implements View.OnC
         super.onCreate(savedInstanceState);
         binding = ActivityEntrarUsuarioBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
-
         inicializaComponentes();
-
         botao_entrar.setOnClickListener(this);
         txtCadastrar.setOnClickListener(this);
         txtRecuperarSenha.setOnClickListener(this);
@@ -53,6 +56,8 @@ public class EntrarUsuarioActivity extends AppCompatActivity implements View.OnC
         txtSenha = binding.txtSenha;
         edtEmail = binding.edtEmail;
         edtSenha = binding.edtSenha;
+        AutenticacaoViewModelFactor autenticacaoViewModelFactor = new AutenticacaoViewModelFactor(new FirebaseAuthRepository());
+        autenticacaoViewModel = new ViewModelProvider(this, autenticacaoViewModelFactor).get(AutenticacaoViewModel.class);
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -85,64 +90,64 @@ public class EntrarUsuarioActivity extends AppCompatActivity implements View.OnC
     }
 
     private void entrarUsuario() {
-        String email = Objects.requireNonNull(edtEmail.getText()).toString();
-        String senha = Objects.requireNonNull(edtSenha.getText()).toString();
-
-        if (camposVazios(email, senha)){
-            configuraErrosCampos(email, senha);
-        }else {
-            txtEmail.setHelperTextEnabled(false);
-            txtSenha.setHelperTextEnabled(false);
-            autenticarUsuario(email, senha);
+        Usuario usuario = new Usuario();
+        usuario.setEmail(Objects.requireNonNull(edtEmail.getText()).toString());
+        usuario.setSenha(Objects.requireNonNull(edtSenha.getText()).toString());
+        if (camposVazios(usuario)){
+            configuraErrosCampos(usuario);
+            return;
         }
-
+        txtEmail.setHelperTextEnabled(false);
+        txtSenha.setHelperTextEnabled(false);
+        autenticarUsuario(usuario);
     }
 
-    private void configuraErrosCampos(String email, String senha) {
-        if (email.isEmpty()) {
+    private void configuraErrosCampos(Usuario usuario) {
+        if (configuraErroCampoEmailVazio(usuario)) return;
+        if (configuraErroCampoSenhaVazia(usuario)) return;
+        botao_entrar.setEnabled(true);
+    }
+
+    private boolean configuraErroCampoEmailVazio(Usuario usuario) {
+        if (usuario.getEmail().isEmpty()) {
             txtEmail.setHelperText(menssagens[0]);
-        } else {
-            txtEmail.setHelperTextEnabled(false);
+            return true;
         }
-        if (senha.isEmpty()) {
+        txtEmail.setHelperTextEnabled(false);
+        return false;
+    }
+
+    private boolean configuraErroCampoSenhaVazia(Usuario usuario) {
+        if (usuario.getSenha().isEmpty()) {
             txtSenha.setHelperText(menssagens[0]);
-        } else {
-            txtSenha.setHelperTextEnabled(false);
+            return true;
         }
+        txtSenha.setHelperTextEnabled(false);
+        return false;
+    }
+
+    private static boolean camposVazios(Usuario personagem) {
+        return personagem.getEmail().isEmpty() || personagem.getSenha().isEmpty();
+    }
+
+    private void autenticarUsuario(Usuario usuario) {
+        autenticacaoViewModel.autenticarUsuario(usuario).observe(this, resultadoAutenticacao -> {
+            if (resultadoAutenticacao.getErro() == null) {
+                vaiParaMenuNavegacao();
+                return;
+            }
+            configuraErroExecoesCampos(resultadoAutenticacao.getErro());
+        });
+    }
+
+    private void configuraErroExecoesCampos(String mensagem) {
         botao_entrar.setEnabled(true);
-    }
-
-    private static boolean camposVazios(String email, String senha) {
-        return email.isEmpty() || senha.isEmpty();
-    }
-
-    private void autenticarUsuario(String email, String senha) {
-        FirebaseAuth.getInstance().signInWithEmailAndPassword(email,senha)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        vaiParaMenuNavegacao();
-                    } else {
-                        configuraErroExecoesCampos(Objects.requireNonNull(task.getException()));
-                    }
-                });
-    }
-
-    private void configuraErroExecoesCampos(Exception exception) {
-        botao_entrar.setEnabled(true);
-        switch (Objects.requireNonNull(exception.getMessage())){
-            case "The email address is badly formatted.":
-            case "There is no user record corresponding to this identifier. The user may have been deleted.":
-                txtEmail.setHelperText("Email inválido!");
-                txtSenha.setHelperTextEnabled(false);
-                break;
-            case "The password is invalid or the user does not have a password.":
-                txtSenha.setHelperText("Senha inválida!");
-                txtEmail.setHelperTextEnabled(false);
-                break;
-            case "A network error (such as timeout, interrupted connection or unreachable host) has occurred.":
-                Snackbar.make(binding.getRoot(), "Sem conexão com a internet!", Snackbar.LENGTH_LONG).show();
-                break;
+        if (mensagem.equals("A network error (such as timeout, interrupted connection or unreachable host) has occurred.")) {
+            Snackbar.make(binding.getRoot(), "Sem conexão com a internet!", Snackbar.LENGTH_LONG).show();
+            return;
         }
+        txtEmail.setHelperText("Email inválido!");
+        txtSenha.setHelperText("Senha inválida!");
     }
 
     private void vaiParaMenuNavegacao() {
@@ -155,9 +160,7 @@ public class EntrarUsuarioActivity extends AppCompatActivity implements View.OnC
     @Override
     protected void onStart() {
         super.onStart();
-
         FirebaseUser usuarioAtual = FirebaseAuth.getInstance().getCurrentUser();
-
         if (usuarioAtual != null){
             vaiParaMenuNavegacao();
         }
