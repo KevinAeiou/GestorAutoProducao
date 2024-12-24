@@ -94,9 +94,28 @@ public class ListaTrabalhoEspecificoAdapter extends RecyclerView.Adapter<ListaTr
             String trabalhoNecessario = trabalho.getTrabalhoNecessario();
             if (trabalhoNecessario == null || trabalhoNecessario.isEmpty()) {
                 trabalhoNecessarioTrabalhoEspecifico.setVisibility(View.GONE);
-            } else {
-                trabalhoNecessarioTrabalhoEspecifico.setText(trabalho.getTrabalhoNecessario());
+                return;
             }
+            String[] idTrabalhosNecessarios = trabalhoNecessario.split(",");
+            String nomeTrabalhoNecessario1 = "", nomeTrabalhoNecessario2 = "";
+            for (Trabalho trabalhoEncontrado : trabalhos) {
+                if (trabalhoEncontrado.getId().equals(idTrabalhosNecessarios[0])) {
+                    nomeTrabalhoNecessario1 = trabalhoEncontrado.getNome();
+                    break;
+                }
+            }
+            trabalhoNecessario = nomeTrabalhoNecessario1;
+            if (idTrabalhosNecessarios.length > 1) {
+                for (Trabalho trabalhoEncontrado : trabalhos) {
+                    if (trabalhoEncontrado.getId().equals(idTrabalhosNecessarios[1])) {
+                        nomeTrabalhoNecessario2 = trabalhoEncontrado.getNome();
+                        break;
+                    }
+                }
+                trabalhoNecessario = trabalhoNecessario + ", " + nomeTrabalhoNecessario2;
+
+            }
+            trabalhoNecessarioTrabalhoEspecifico.setText(trabalhoNecessario);
         }
 
         private void confiuraCorNomeTrabalho(Trabalho trabalho) {
