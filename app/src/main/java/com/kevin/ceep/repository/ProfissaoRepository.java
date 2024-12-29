@@ -67,7 +67,7 @@ public class ProfissaoRepository {
 
     public LiveData<Resource<Void>> modificaExperienciaProfissao(Profissao profissaoModificada) {
         MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
-        minhaReferencia.child(profissaoModificada.getId()).child("experiencia").setValue(profissaoModificada.getExperiencia()).addOnCompleteListener(task -> {
+        minhaReferencia.child(profissaoModificada.getId()).setValue(profissaoModificada).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 liveData.setValue(new Resource<>(null, null));
             } else if (task.isCanceled()) {
