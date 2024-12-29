@@ -201,15 +201,15 @@ public class TrabalhoEspecificoActivity extends AppCompatActivity {
                                             }
                                         });
                                     }
-                                    return;
+                                } else {
+                                    trabalhoEstoqueEncontrado.setQuantidade(trabalhoEstoqueEncontrado.getQuantidade()+1);
+                                    trabalhoEstoqueViewModel.modificaTrabalhoEstoque(trabalhoEstoqueEncontrado).observe(this, resultaModificaQuantidade -> {
+                                        if (resultaModificaQuantidade.getErro() != null){
+                                            Snackbar.make(binding.getRoot(), "Erro: "+resultaModificaQuantidade.getErro(), Snackbar.LENGTH_LONG).show();
+                                            confirmacao.setValue(false);
+                                        }
+                                    });
                                 }
-                                trabalhoEstoqueEncontrado.setQuantidade(trabalhoEstoqueEncontrado.getQuantidade()+1);
-                                trabalhoEstoqueViewModel.modificaTrabalhoEstoque(trabalhoEstoqueEncontrado).observe(this, resultaModificaQuantidade -> {
-                                    if (resultaModificaQuantidade.getErro() != null){
-                                        Snackbar.make(binding.getRoot(), "Erro: "+resultaModificaQuantidade.getErro(), Snackbar.LENGTH_LONG).show();
-                                        confirmacao.setValue(false);
-                                    }
-                                });
                                 profissaoViewModel.pegaTodasProfissoes().observe(this, resultadoProfissoes -> {
                                     if (resultadoProfissoes.getDado() != null) {
                                         Profissao profissaoEncontrada = profissaoViewModel.retornaProfissaoModificada(resultadoProfissoes.getDado(), trabalhoModificado);
