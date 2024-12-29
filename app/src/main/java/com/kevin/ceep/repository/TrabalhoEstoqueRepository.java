@@ -26,7 +26,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.kevin.ceep.db.DbHelper;
-import com.kevin.ceep.db.contracts.EstoqueDbContract.EstoqueEntry;
 import com.kevin.ceep.model.TrabalhoEstoque;
 
 import java.util.ArrayList;
@@ -55,11 +54,11 @@ public class TrabalhoEstoqueRepository {
             liveData.setValue(new Resource<>(null, "Atributos do trabalho está nulo"));
             return liveData;
         }
-        minhaReferencia.child(trabalho.getId()).child(COLUMN_NAME_QUANTIDADE).setValue(trabalho.getQuantidade()).addOnCompleteListener(task -> {
+        minhaReferencia.child(trabalho.getId()).setValue(trabalho).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 ContentValues values = new ContentValues();
                 values.put(COLUMN_NAME_QUANTIDADE, trabalho.getQuantidade());
-                String selection = EstoqueEntry.COLUMN_NAME_ID + " LIKE ?";
+                String selection = COLUMN_NAME_ID + " LIKE ?";
                 String[] selectionArgs = {trabalho.getId()};
                 long newRowId = dbModificacao.update(TABLE_ESTOQUE, values, selection, selectionArgs);
                 if (newRowId == -1) {
