@@ -5,6 +5,7 @@ import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_LISTA_PROF
 import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_USUARIOS;
 import static com.kevin.ceep.utilitario.Utilitario.comparaString;
 
+import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -21,6 +22,7 @@ import com.kevin.ceep.model.Profissao;
 import com.kevin.ceep.model.TrabalhoProducao;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Objects;
 
 public class ProfissaoRepository {
@@ -51,8 +53,12 @@ public class ProfissaoRepository {
                 ArrayList<Profissao> profissoes = new ArrayList<>();
                 for (DataSnapshot dn:dataSnapshot.getChildren()){
                     Profissao profissao = dn.getValue(Profissao.class);
+                    assert profissao != null;
                     profissao.setId(dn.getKey());
                     profissoes.add(profissao);
+                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    profissoes.sort(Comparator.comparing(Profissao::getExperiencia).reversed());
                 }
                 liveData.setValue(new Resource<>(profissoes, null));
             }
@@ -65,7 +71,7 @@ public class ProfissaoRepository {
         return liveData;
     }
 
-    public LiveData<Resource<Void>> modificaExperienciaProfissao(Profissao profissaoModificada) {
+    public LiveData<Resource<Void>> modificaProfissao(Profissao profissaoModificada) {
         MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
         minhaReferencia.child(profissaoModificada.getId()).setValue(profissaoModificada).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {

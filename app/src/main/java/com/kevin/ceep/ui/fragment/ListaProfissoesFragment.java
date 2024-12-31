@@ -23,6 +23,7 @@ import com.kevin.ceep.model.Profissao;
 import com.kevin.ceep.repository.ProfissaoRepository;
 import com.kevin.ceep.ui.recyclerview.adapter.ListaProfissaoAdapter;
 import com.kevin.ceep.ui.recyclerview.adapter.listener.AddTextChangedListenerInterface;
+import com.kevin.ceep.ui.recyclerview.adapter.listener.OnItemClickListenerProfissao;
 import com.kevin.ceep.ui.viewModel.ProfissaoViewModel;
 import com.kevin.ceep.ui.viewModel.factory.ProfissaoViewModelFactory;
 
@@ -82,37 +83,13 @@ public class ListaProfissoesFragment extends Fragment {
     private void configuraAdapter(RecyclerView meuRecycler) {
         listaProfissaoAdapter = new ListaProfissaoAdapter(getContext(), todasProfissoes);
         meuRecycler.setAdapter(listaProfissaoAdapter);
-        listaProfissaoAdapter.setAddTextChangedListener(new AddTextChangedListenerInterface() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-
-            @Override
-            public void afterTextChangedMeu(Profissao profissao, Editable text) {
-                if (!text.toString().isEmpty()) {
-                    int novaExperiencia = Integer.parseInt(text.toString());
-                    if (novaExperiencia > 830000) {
-                        novaExperiencia = 830000;
-                    }
-                    profissao.setExperiencia(novaExperiencia);
-                    profissaoViewModel.modificaExperienciaProfissao(profissao).observe(getViewLifecycleOwner(), resultadoModificacao -> {
-                        if (resultadoModificacao.getErro() != null) {
-                            Snackbar.make(binding.getRoot(), "Erro: "+resultadoModificacao.getErro(), Snackbar.LENGTH_LONG).show();
-                        }
-                    });
-                }
-            }
+        listaProfissaoAdapter.setOnItemClickListener((profissao, adapterPosition) -> {
+            ProfissaoFragment profissaoFragment = new ProfissaoFragment();
+            Bundle argumento = new Bundle();
+            argumento.putString(CHAVE_PERSONAGEM, personagemId);
+            argumento.putSerializable("profissao", profissao);
+            profissaoFragment.setArguments(argumento);
+            profissaoFragment.show(getChildFragmentManager(), "profissaoFragment");
         });
     }
     private void pegaTodasProfissoes() {

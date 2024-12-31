@@ -26,6 +26,6 @@ public class ProfissaoViewModel extends ViewModel {
     }
 
     public LiveData<Resource<Void>> modificaExperienciaProfissao(Profissao profissaoModificada) {
-        return repository.modificaExperienciaProfissao(profissaoModificada);
+        return repository.modificaProfissao(profissaoModificada);
     }
 }
