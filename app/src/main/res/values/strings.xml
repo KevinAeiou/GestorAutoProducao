@@ -210,4 +210,5 @@
     <string name="teste">teste</string>
     <string name="stringPrioridade">Prioridade</string>
     <string name="stringListaVazia">Lista vazia</string>
+    <string name="stringNomeProducao">Nome produção</string>
 </resources>
