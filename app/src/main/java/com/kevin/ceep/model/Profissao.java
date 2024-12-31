@@ -95,4 +95,12 @@ public class Profissao implements Serializable {
     public void setExperiencia(int experiencia) {
         this.experiencia = experiencia;
     }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public void setPrioridade(boolean prioridade) {
+        this.prioridade = prioridade;
+    }
 }

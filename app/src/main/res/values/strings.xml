@@ -33,7 +33,7 @@
         <item>720000</item>
         <item>875000</item>
         <item>1050000</item>
-</integer-array>
+    </integer-array>
     <string-array name="raridades">
         <item>Comum</item>
         <item>Melhorado</item>
@@ -208,5 +208,6 @@
     <string name="stringUsoValor">Uso: %1$s</string>
     <string name="stringEspacoProducaoValor">Espaço de produção: %1$d</string>
     <string name="teste">teste</string>
+    <string name="stringPrioridade">Prioridade</string>
     <string name="stringListaVazia">Lista vazia</string>
 </resources>

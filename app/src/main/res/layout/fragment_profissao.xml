@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <TextView
+        android:id="@+id/txtNomeProfissaoFragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_margin="16dp"
+        android:paddingTop="8dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:textSize="24sp"
+        tools:text="Profissão"
+        />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/txtExperienciaProfissaoFragment"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+        app:layout_constraintStart_toStartOf="@id/txtNomeProfissaoFragment"
+        app:layout_constraintEnd_toEndOf="@id/txtNomeProfissaoFragment"
+        app:layout_constraintTop_toBottomOf="@id/txtNomeProfissaoFragment"
+        tools:layout_editor_absoluteX="1dp"
+        tools:layout_editor_absoluteY="178dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/edtExperienciaProfissaoFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberSigned"
+            android:gravity="center"
+            android:textSize="24sp"
+            android:hint="@string/stringExperiencia" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/swtPrioridadeProfissaoFragment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:textSize="24sp"
+        android:layout_marginBottom="16dp"
+        android:text="@string/stringPrioridade"
+        app:layout_constraintStart_toStartOf="@id/txtExperienciaProfissaoFragment"
+        app:layout_constraintEnd_toEndOf="@id/txtExperienciaProfissaoFragment"
+        app:layout_constraintTop_toBottomOf="@id/txtExperienciaProfissaoFragment"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+</androidx.constraintlayout.widget.ConstraintLayout>
