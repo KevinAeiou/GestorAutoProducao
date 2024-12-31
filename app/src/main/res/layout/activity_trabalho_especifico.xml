@@ -32,7 +32,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            android:lines="1"
             android:hint="@string/string_nome"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -52,8 +51,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:lines="1"
-            android:hint="Nome produção"
+            android:hint="@string/stringNomeProducao"
             app:layout_constraintTop_toBottomOf="@+id/txtLayoutNomeTrabalho"
             app:layout_constraintEnd_toEndOf="@+id/txtLayoutNomeTrabalho"
             app:layout_constraintStart_toStartOf="@+id/txtLayoutNomeTrabalho">

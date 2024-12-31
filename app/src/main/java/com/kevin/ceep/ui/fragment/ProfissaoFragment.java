@@ -4,11 +4,9 @@ import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_PERSONAGEM
 
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -71,7 +69,7 @@ public class ProfissaoFragment extends DialogFragment {
     public void onDismiss(@NonNull DialogInterface dialog) {
         super.onDismiss(dialog);
         String experiencia = Objects.requireNonNull(edtExperiencia.getText()).toString();
-        if (experiencia.equals(String.valueOf(profissaoRecebido.getExperiencia())) && swtPrioridade.isChecked() == profissaoRecebido.isPrioridade()) {
+        if (experiencia.isEmpty() || experiencia.equals(String.valueOf(profissaoRecebido.getExperiencia())) && swtPrioridade.isChecked() == profissaoRecebido.isPrioridade()) {
             return;
         }
         Profissao profissaoModificada = new Profissao();
@@ -79,10 +77,6 @@ public class ProfissaoFragment extends DialogFragment {
         profissaoModificada.setNome(profissaoRecebido.getNome());
         profissaoModificada.setExperiencia(Integer.parseInt(experiencia));
         profissaoModificada.setPrioridade(swtPrioridade.isChecked());
-        profissaoViewModel.modificaExperienciaProfissao(profissaoModificada).observe(getViewLifecycleOwner(), resultadoModificaProfissao -> {
-            if (resultadoModificaProfissao.getErro() != null) {
-
-            }
-        });
+        profissaoViewModel.modificaExperienciaProfissao(profissaoModificada);
     }
 }
