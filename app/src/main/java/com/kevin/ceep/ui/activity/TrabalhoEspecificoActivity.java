@@ -443,14 +443,14 @@ public class TrabalhoEspecificoActivity extends AppCompatActivity {
                             break;
                         }
                     }
-                    for (Trabalho trabalhoEncontrado : trabalhosNecessarios) {
-                        if (trabalhoEncontrado.getId().equals(idTrabalhosNecessarios[1])) {
-                            nomeTrabalhoNecessario2 = trabalhoEncontrado.getNome();
-                            break;
-                        }
-                    }
                     autoCompleteTrabalhoNecessario1.setText(nomeTrabalhoNecessario1);
                     if (idTrabalhosNecessarios.length > 1) {
+                        for (Trabalho trabalhoEncontrado : trabalhosNecessarios) {
+                            if (trabalhoEncontrado.getId().equals(idTrabalhosNecessarios[1])) {
+                                nomeTrabalhoNecessario2 = trabalhoEncontrado.getNome();
+                                break;
+                            }
+                        }
                         binding.linearLayoutTrabalhoNecessario3.setVisibility(View.VISIBLE);
                         autoCompleteTrabalhoNecessario2.setText(nomeTrabalhoNecessario2);
                     }
