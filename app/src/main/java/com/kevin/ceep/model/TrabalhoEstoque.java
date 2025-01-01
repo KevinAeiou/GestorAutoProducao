@@ -15,6 +15,7 @@ public class TrabalhoEstoque extends Trabalho implements Serializable {
         return quantidade;
     }
     public void setQuantidade(int novaQuantidade) {
+        if (novaQuantidade < 0) novaQuantidade = 0;
         this.quantidade = novaQuantidade;
     }
     public String getTrabalhoId() {
