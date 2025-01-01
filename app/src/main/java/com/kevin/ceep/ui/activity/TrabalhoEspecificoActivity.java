@@ -171,17 +171,15 @@ public class TrabalhoEspecificoActivity extends AppCompatActivity {
                                 break;
                             case 1:
                                 if (trabalhoModificado.possueTrabalhoNecessarioValido()) {
-                                    String[] listaTrabalhosNecessarios = trabalhoModificado.getTrabalhoNecessario().split(",");
-                                    for (String trabalhoNecessario2 : listaTrabalhosNecessarios) {
-                                        TrabalhoEstoque trabalhoEstoqueEncontrado = trabalhoEstoqueViewModel.pegaTrabalhoEspecificoEstoque(trabalhoNecessario2);
-                                        if (trabalhoEstoqueEncontrado != null) {
-                                            int novaQuantidade = trabalhoEstoqueEncontrado.getQuantidade() - 1;
-                                            if (novaQuantidade < 0) {
-                                                novaQuantidade = 0;
-                                            }
-                                            trabalhoEstoqueEncontrado.setQuantidade(novaQuantidade);
-                                            trabalhoEstoqueViewModel.modificaTrabalhoEstoque(trabalhoEstoqueEncontrado);
+                                    String[] listaIdsTrabalhosNecessarios = trabalhoModificado.getTrabalhoNecessario().split(",");
+                                    for (String idTrabalho : listaIdsTrabalhosNecessarios) {
+                                        TrabalhoEstoque trabalhoEstoqueEncontrado = trabalhoEstoqueViewModel.pegaTrabalhoEspecificoEstoque(idTrabalho);
+                                        if (trabalhoEstoqueEncontrado == null) {
+                                            finish();
+                                            break;
                                         }
+                                        trabalhoEstoqueEncontrado.setQuantidade(trabalhoEstoqueEncontrado.getQuantidade() - 1);
+                                        trabalhoEstoqueViewModel.modificaTrabalhoEstoque(trabalhoEstoqueEncontrado);
                                     }
                                 }
                                 finish();
