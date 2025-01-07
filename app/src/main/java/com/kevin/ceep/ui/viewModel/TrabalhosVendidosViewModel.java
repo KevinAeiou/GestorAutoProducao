@@ -9,10 +9,10 @@ import com.kevin.ceep.repository.Resource;
 
 import java.util.ArrayList;
 
-public class ProdutosVendidosViewModel extends ViewModel {
+public class TrabalhosVendidosViewModel extends ViewModel {
     private final TrabalhoVendidoRepository repository;
 
-    public ProdutosVendidosViewModel(TrabalhoVendidoRepository repository) {
+    public TrabalhosVendidosViewModel(TrabalhoVendidoRepository repository) {
         this.repository = repository;
     }
 
