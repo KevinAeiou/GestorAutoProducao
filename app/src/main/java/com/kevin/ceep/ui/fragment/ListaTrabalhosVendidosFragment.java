@@ -23,33 +23,29 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.kevin.ceep.R;
-import com.kevin.ceep.databinding.FragmentListaProdutosVendidosBinding;
-import com.kevin.ceep.model.ProdutoVendido;
-import com.kevin.ceep.model.Trabalho;
-import com.kevin.ceep.model.TrabalhoEstoque;
-import com.kevin.ceep.repository.ProdutosVendidosRepository;
+import com.kevin.ceep.databinding.FragmentListaTrabalhosVendidosBinding;
+import com.kevin.ceep.model.TrabalhoVendido;
+import com.kevin.ceep.repository.TrabalhoVendidoRepository;
 import com.kevin.ceep.ui.activity.AtributosProdutoVendidoActivity;
-import com.kevin.ceep.ui.recyclerview.adapter.ListaProdutosVendidosAdapter;
-import com.kevin.ceep.ui.recyclerview.adapter.ListaTrabalhoEspecificoAdapter;
-import com.kevin.ceep.ui.recyclerview.adapter.listener.OnItemClickListener;
-import com.kevin.ceep.ui.viewModel.ProdutosVendidosViewModel;
-import com.kevin.ceep.ui.viewModel.factory.ProdutosVendidosViewModelFactory;
+import com.kevin.ceep.ui.recyclerview.adapter.ListaTrabalhosVendidosAdapter;
+import com.kevin.ceep.ui.viewModel.TrabalhosVendidosViewModel;
+import com.kevin.ceep.ui.viewModel.factory.TrabalhosVendidosViewModelFactory;
 
 import java.util.ArrayList;
 
-public class ListaProdutosVendidosFragment extends Fragment {
-    private FragmentListaProdutosVendidosBinding binding;
-    private ListaProdutosVendidosAdapter produtosVendidosAdapter;
+public class ListaTrabalhosVendidosFragment extends Fragment {
+    private FragmentListaTrabalhosVendidosBinding binding;
+    private ListaTrabalhosVendidosAdapter trabalhosVendidosAdapter;
     private String personagemId;
-    private ArrayList<ProdutoVendido> produtosVendidos;
+    private ArrayList<TrabalhoVendido> trabalhosVendidos;
     private RecyclerView meuRecycler;
     private SwipeRefreshLayout swipeRefreshLayout;
     private ProgressBar indicadorProgresso;
-    private ProdutosVendidosViewModel produtosVendidosViewModel;
+    private TrabalhosVendidosViewModel trabalhosVendidosViewModel;
     private ImageView iconeListaVazia;
     private TextView txtListaVazia;
 
-    public ListaProdutosVendidosFragment() {
+    public ListaTrabalhosVendidosFragment() {
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -63,8 +59,8 @@ public class ListaProdutosVendidosFragment extends Fragment {
             if (argumento.containsKey(CHAVE_PERSONAGEM)) {
                 personagemId = argumento.getString(CHAVE_PERSONAGEM);
                 if (personagemId != null) {
-                    ProdutosVendidosViewModelFactory produtosVendidosViewModelFactory = new ProdutosVendidosViewModelFactory(new ProdutosVendidosRepository(personagemId));
-                    produtosVendidosViewModel = new ViewModelProvider(this, produtosVendidosViewModelFactory).get(ProdutosVendidosViewModel.class);
+                    TrabalhosVendidosViewModelFactory trabalhosVendidosViewModelFactory = new TrabalhosVendidosViewModelFactory(new TrabalhoVendidoRepository(getContext(), personagemId));
+                    trabalhosVendidosViewModel = new ViewModelProvider(this, trabalhosVendidosViewModelFactory).get(TrabalhosVendidosViewModel.class);
                 }
             }
         }
@@ -73,7 +69,7 @@ public class ListaProdutosVendidosFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        binding = FragmentListaProdutosVendidosBinding.inflate(inflater, container, false);
+        binding = FragmentListaTrabalhosVendidosBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
@@ -95,22 +91,22 @@ public class ListaProdutosVendidosFragment extends Fragment {
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 int itemPosicao = viewHolder.getAdapterPosition();
-                produtosVendidosAdapter = (ListaProdutosVendidosAdapter) meuRecycler.getAdapter();
-                if (produtosVendidosAdapter != null) {
-                    ProdutoVendido produtoVendidoRemovido = produtosVendidos.get(itemPosicao);
-                    produtosVendidosAdapter.remove(itemPosicao);
-                    Snackbar snackbarDesfazer = Snackbar.make(binding.getRoot(), produtoVendidoRemovido.getNomeProduto()+ " excluido", Snackbar.LENGTH_LONG);
+                trabalhosVendidosAdapter = (ListaTrabalhosVendidosAdapter) meuRecycler.getAdapter();
+                if (trabalhosVendidosAdapter != null) {
+                    TrabalhoVendido trabalhoVendidoRemovido = trabalhosVendidos.get(itemPosicao);
+                    trabalhosVendidosAdapter.remove(itemPosicao);
+                    Snackbar snackbarDesfazer = Snackbar.make(binding.getRoot(), trabalhoVendidoRemovido.getDescricao()+ " excluido", Snackbar.LENGTH_LONG);
                     snackbarDesfazer.addCallback(new Snackbar.Callback(){
                         @Override
                         public void onDismissed(Snackbar transientBottomBar, int event) {
                             super.onDismissed(transientBottomBar, event);
                             if (event != DISMISS_EVENT_ACTION){
-                                removeTrabalhoDoBanco(produtoVendidoRemovido);
-                                removeTrabalhoDaLista(produtoVendidoRemovido);
+                                removeTrabalhoDoBanco(trabalhoVendidoRemovido);
+                                removeTrabalhoDaLista(trabalhoVendidoRemovido);
                             }
                         }
                     });
-                    snackbarDesfazer.setAction(getString(R.string.stringDesfazer), v -> produtosVendidosAdapter.adiciona(produtoVendidoRemovido, itemPosicao));
+                    snackbarDesfazer.setAction(getString(R.string.stringDesfazer), v -> trabalhosVendidosAdapter.adiciona(trabalhoVendidoRemovido, itemPosicao));
                     snackbarDesfazer.show();
                 }
             }
@@ -119,12 +115,12 @@ public class ListaProdutosVendidosFragment extends Fragment {
         itemTouchHelper.attachToRecyclerView(meuRecycler);
     }
 
-    private void removeTrabalhoDaLista(ProdutoVendido produtoVendidoRemovido) {
-        produtosVendidos.remove(produtoVendidoRemovido);
+    private void removeTrabalhoDaLista(TrabalhoVendido trabalhoVendidoRemovido) {
+        trabalhosVendidos.remove(trabalhoVendidoRemovido);
     }
 
-    private void removeTrabalhoDoBanco(ProdutoVendido trabalhoRemovido) {
-        produtosVendidosViewModel.deletaProduto(trabalhoRemovido).observe(getViewLifecycleOwner(), resultadoRemoveTrabalho -> {
+    private void removeTrabalhoDoBanco(TrabalhoVendido trabalhoRemovido) {
+        trabalhosVendidosViewModel.removeTrabalhoVendido(trabalhoRemovido).observe(getViewLifecycleOwner(), resultadoRemoveTrabalho -> {
             if (resultadoRemoveTrabalho.getErro() != null) {
                 Snackbar.make(binding.getRoot(), "Erro: "+resultadoRemoveTrabalho.getErro(), Snackbar.LENGTH_LONG).show();
             }
@@ -132,18 +128,18 @@ public class ListaProdutosVendidosFragment extends Fragment {
     }
     private void configuraSwipeRefreshLayout() {
         swipeRefreshLayout.setOnRefreshListener(() -> {
-            produtosVendidosAdapter.limpaLista();
+            trabalhosVendidosAdapter.limpaLista();
             if (personagemId != null){
-                pegaTodosProdutosVendidos();
+                sincronizaTrabalhos();
             }
         });
     }
 
     private void pegaTodosProdutosVendidos() {
-        produtosVendidosViewModel.pegaTodosProdutosVendidos().observe(getViewLifecycleOwner(), resultadoTodosProdutos -> {
-            if (resultadoTodosProdutos.getDado() != null) {
-                produtosVendidos = resultadoTodosProdutos.getDado();
-                if (produtosVendidos.isEmpty()) {
+        trabalhosVendidosViewModel.pegaTodosTrabalhosVendidos().observe(getViewLifecycleOwner(), resultadoTodosTrabalhos -> {
+            if (resultadoTodosTrabalhos.getDado() != null) {
+                trabalhosVendidos = resultadoTodosTrabalhos.getDado();
+                if (trabalhosVendidos.isEmpty()) {
                     iconeListaVazia.setVisibility(View.VISIBLE);
                     txtListaVazia.setVisibility(View.VISIBLE);
                 } else {
@@ -152,10 +148,10 @@ public class ListaProdutosVendidosFragment extends Fragment {
                 }
                 indicadorProgresso.setVisibility(View.GONE);
                 swipeRefreshLayout.setRefreshing(false);
-                produtosVendidosAdapter.atualiza(produtosVendidos);
+                trabalhosVendidosAdapter.atualiza(trabalhosVendidos);
             }
-            if (resultadoTodosProdutos.getErro() != null) {
-                Snackbar.make(binding.getRoot(), "Erro: "+resultadoTodosProdutos.getErro(), Snackbar.LENGTH_LONG).show();
+            if (resultadoTodosTrabalhos.getErro() != null) {
+                Snackbar.make(binding.getRoot(), "Erro: "+resultadoTodosTrabalhos.getErro(), Snackbar.LENGTH_LONG).show();
             }
         });
     }
@@ -167,40 +163,20 @@ public class ListaProdutosVendidosFragment extends Fragment {
     }
 
     private void configuraAdapter(RecyclerView meuRecycler) {
-        produtosVendidosAdapter = new ListaProdutosVendidosAdapter(produtosVendidos, getContext());
-        meuRecycler.setAdapter(produtosVendidosAdapter);
-        produtosVendidosAdapter.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(Trabalho trabalho, int adapterPosition) {
-
-            }
-
-            @Override
-            public void onItemClick(ListaTrabalhoEspecificoAdapter trabalhoEspecificoAdapter) {
-
-            }
-
-            @Override
-            public void onItemClick(TrabalhoEstoque trabalhoEstoque, int adapterPosition, int botaoId) {
-
-            }
-
-            @Override
-            public void onItemClick(ProdutoVendido produtoVendido) {
-                vaiParaAtributoProdutoVendido(produtoVendido);
-            }
-        });
+        trabalhosVendidosAdapter = new ListaTrabalhosVendidosAdapter(trabalhosVendidos, getContext());
+        meuRecycler.setAdapter(trabalhosVendidosAdapter);
+        trabalhosVendidosAdapter.setOnItemClickListener(this::vaiParaAtributoProdutoVendido);
     }
 
-    private void vaiParaAtributoProdutoVendido(ProdutoVendido produtoVendido) {
+    private void vaiParaAtributoProdutoVendido(TrabalhoVendido trabalhoVendido) {
         Intent iniciaVaiParaAtributosProdutoVendido = new Intent(getContext(), AtributosProdutoVendidoActivity.class);
-        iniciaVaiParaAtributosProdutoVendido.putExtra(CHAVE_TRABALHO, produtoVendido);
+        iniciaVaiParaAtributosProdutoVendido.putExtra(CHAVE_TRABALHO, trabalhoVendido);
         iniciaVaiParaAtributosProdutoVendido.putExtra(CHAVE_PERSONAGEM, personagemId);
         startActivity(iniciaVaiParaAtributosProdutoVendido);
     }
 
     private void inicializaComponentes() {
-        produtosVendidos = new ArrayList<>();
+        trabalhosVendidos = new ArrayList<>();
         meuRecycler = binding.recyclerViewListaProdutosVendidos;
         swipeRefreshLayout = binding.swipeRefreshLayoutProdutosVendidos;
         indicadorProgresso = binding.indicadorProgressoListaProdutosVendidosFragment;
@@ -212,8 +188,17 @@ public class ListaProdutosVendidosFragment extends Fragment {
     public void onResume() {
         super.onResume();
         if (personagemId != null) {
-            pegaTodosProdutosVendidos();
+            sincronizaTrabalhos();
+//            pegaTodosProdutosVendidos();
         }
+    }
+
+    private void sincronizaTrabalhos() {
+        trabalhosVendidosViewModel.sincronizaTrabalhos().observe(getViewLifecycleOwner(), resultadoSincronizaTrabalhos -> {
+            if (resultadoSincronizaTrabalhos.getErro() == null) {
+                pegaTodosProdutosVendidos();
+            }
+        });
     }
 
     @Override
