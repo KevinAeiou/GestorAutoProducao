@@ -19,7 +19,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
 import com.kevin.ceep.R;
-import com.kevin.ceep.model.ProdutoVendido;
 import com.kevin.ceep.model.ProfissaoTrabalho;
 import com.kevin.ceep.model.Trabalho;
 import com.kevin.ceep.model.TrabalhoEstoque;
@@ -86,11 +85,6 @@ public class ListaTodosTrabalhosAdapter extends RecyclerView.Adapter<ListaTodosT
 
             @Override
             public void onItemClick(TrabalhoEstoque trabalhoEstoque, int adapterPosition, int botaoId) {
-
-            }
-
-            @Override
-            public void onItemClick(ProdutoVendido produtoVendido) {
 
             }
         });
