@@ -10,7 +10,7 @@
         android:layout_height="wrap_content">
 
         <TextView
-            android:id="@+id/itemNomeProdutoVendido"
+            android:id="@+id/itemNomeTrabalhoVendido"
             style="@style/txtTituloCard"
             android:gravity="start"
             app:layout_constraintEnd_toEndOf="parent"
@@ -19,7 +19,7 @@
             tools:text="Nome" />
 
         <TextView
-            android:id="@+id/itemDataProdutoVendido"
+            android:id="@+id/itemDataTrabalhoVendido"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:maxLines="1"
@@ -27,9 +27,9 @@
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
             android:textSize="18sp"
-            app:layout_constraintEnd_toEndOf="@+id/itemNomeProdutoVendido"
-            app:layout_constraintStart_toStartOf="@id/itemNomeProdutoVendido"
-            app:layout_constraintTop_toBottomOf="@id/itemNomeProdutoVendido"
+            app:layout_constraintEnd_toEndOf="@+id/itemNomeTrabalhoVendido"
+            app:layout_constraintStart_toStartOf="@id/itemNomeTrabalhoVendido"
+            app:layout_constraintTop_toBottomOf="@id/itemNomeTrabalhoVendido"
             tools:text="Data" />
 
         <androidx.appcompat.widget.LinearLayoutCompat
@@ -38,13 +38,13 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginBottom="8dp"
-            app:layout_constraintStart_toStartOf="@id/itemDataProdutoVendido"
+            app:layout_constraintStart_toStartOf="@id/itemDataTrabalhoVendido"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@id/itemDataProdutoVendido"
-            app:layout_constraintTop_toBottomOf="@id/itemDataProdutoVendido">
+            app:layout_constraintEnd_toEndOf="@id/itemDataTrabalhoVendido"
+            app:layout_constraintTop_toBottomOf="@id/itemDataTrabalhoVendido">
 
             <TextView
-                android:id="@+id/itemValorProdutoVendido"
+                android:id="@+id/itemValorTrabalhoVendido"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -53,7 +53,7 @@
                 tools:text="Valor" />
 
             <TextView
-                android:id="@+id/itemQuantidadeProdutoVendido"
+                android:id="@+id/itemQuantidadeTrabalhoVendido"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="0"
