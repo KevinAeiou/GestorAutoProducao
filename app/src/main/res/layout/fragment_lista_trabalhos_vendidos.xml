@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".ui.fragment.ListaProdutosVendidosFragment">
+    tools:context=".ui.fragment.ListaTrabalhosVendidosFragment">
 
     <ProgressBar
         android:id="@+id/indicadorProgressoListaProdutosVendidosFragment"
@@ -31,7 +31,7 @@
             android:id="@+id/recyclerViewListaProdutosVendidos"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:listitem="@layout/item_produto_vendido" />
+            tools:listitem="@layout/item_trabalho_vendido" />
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 

@@ -21,7 +21,7 @@
         android:id="@+id/listaEstoque"
         android:name="com.kevin.ceep.ui.fragment.ListaEstoqueFragment"
         android:label="Estoque"
-        tools:layout="@layout/fragment_lista_estoque">
+        tools:layout="@layout/fragment_lista_trabalhos_estoque">
         <action
             android:id="@+id/action_listaEstoqueFragment_to_listaProdutosVendidosFragment"
             app:destination="@id/listaProdutosVendidos" />
@@ -34,9 +34,9 @@
     </fragment>
     <fragment
         android:id="@+id/listaProdutosVendidos"
-        android:name="com.kevin.ceep.ui.fragment.ListaProdutosVendidosFragment"
+        android:name="com.kevin.ceep.ui.fragment.ListaTrabalhosVendidosFragment"
         android:label="Produtos vendidos"
-        tools:layout="@layout/fragment_lista_produtos_vendidos">
+        tools:layout="@layout/fragment_lista_trabalhos_vendidos">
         <action
             android:id="@+id/action_listaProdutosVendidosFragment_to_listaProfissoesFragment"
             app:destination="@id/listaProfissoes" />
