@@ -37,7 +37,7 @@ import com.kevin.ceep.databinding.ActivityMainBinding;
 import com.kevin.ceep.model.Personagem;
 import com.kevin.ceep.repository.PersonagemRepository;
 import com.kevin.ceep.ui.fragment.ListaEstoqueFragment;
-import com.kevin.ceep.ui.fragment.ListaProdutosVendidosFragment;
+import com.kevin.ceep.ui.fragment.ListaTrabalhosVendidosFragment;
 import com.kevin.ceep.ui.fragment.ListaProfissoesFragment;
 import com.kevin.ceep.ui.fragment.ListaTrabalhosProducaoFragment;
 import com.kevin.ceep.ui.viewModel.PersonagemViewModel;
@@ -155,7 +155,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 fragmentoSelecionado.setArguments(argumento);
                 break;
             case R.id.listaProdutosVendidos:
-                fragmentoSelecionado = new ListaProdutosVendidosFragment();
+                fragmentoSelecionado = new ListaTrabalhosVendidosFragment();
                 fragmentoSelecionado.setArguments(argumento);
                 break;
             case R.id.listaProfissoes:
