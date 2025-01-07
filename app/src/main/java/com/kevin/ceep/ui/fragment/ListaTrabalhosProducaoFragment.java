@@ -28,7 +28,6 @@ import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.snackbar.Snackbar;
 import com.kevin.ceep.R;
 import com.kevin.ceep.databinding.FragmentListaTrabalhosProducaoBinding;
-import com.kevin.ceep.model.ProdutoVendido;
 import com.kevin.ceep.model.Trabalho;
 import com.kevin.ceep.model.TrabalhoEstoque;
 import com.kevin.ceep.model.TrabalhoProducao;
@@ -235,11 +234,6 @@ public class ListaTrabalhosProducaoFragment extends Fragment {
 
             @Override
             public void onItemClick(TrabalhoEstoque trabalhoEstoque, int adapterPosition, int botaoId) {
-
-            }
-
-            @Override
-            public void onItemClick(ProdutoVendido produtoVendido) {
 
             }
         });
