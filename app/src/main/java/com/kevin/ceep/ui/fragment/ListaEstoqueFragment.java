@@ -27,8 +27,7 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.snackbar.Snackbar;
 import com.kevin.ceep.R;
-import com.kevin.ceep.databinding.FragmentListaEstoqueBinding;
-import com.kevin.ceep.model.ProdutoVendido;
+import com.kevin.ceep.databinding.FragmentListaTrabalhosEstoqueBinding;
 import com.kevin.ceep.model.Trabalho;
 import com.kevin.ceep.model.TrabalhoEstoque;
 import com.kevin.ceep.repository.TrabalhoEstoqueRepository;
@@ -43,7 +42,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ListaEstoqueFragment extends Fragment {
-    private FragmentListaEstoqueBinding binding;
+    private FragmentListaTrabalhosEstoqueBinding binding;
     private ListaTrabalhoEstoqueAdapter trabalhoEstoqueAdapter;
     private RecyclerView recyclerView;
     private ArrayList<TrabalhoEstoque> todosTrabalhosEstoque, listaTrabalhosEstoqueFiltrada;
@@ -79,7 +78,7 @@ public class ListaEstoqueFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        binding = FragmentListaEstoqueBinding.inflate(inflater, container, false);
+        binding = FragmentListaTrabalhosEstoqueBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
@@ -228,11 +227,6 @@ public class ListaEstoqueFragment extends Fragment {
             @Override
             public void onItemClick(TrabalhoEstoque trabalhoEstoque, int adapterPosition, int botaoId) {
                 alteraQuantidade(trabalhoEstoque, adapterPosition, botaoId);
-            }
-
-            @Override
-            public void onItemClick(ProdutoVendido produtoVendido) {
-
             }
         });
     }
