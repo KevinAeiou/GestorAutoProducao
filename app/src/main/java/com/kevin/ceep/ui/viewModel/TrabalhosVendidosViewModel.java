@@ -25,4 +25,8 @@ public class TrabalhosVendidosViewModel extends ViewModel {
     public LiveData<Resource<Void>> sincronizaTrabalhos() {
         return repository.sincronizaTrabalhos();
     }
+
+    public LiveData<Resource<Void>> modificaTrabalhoVendido(TrabalhoVendido trabalho) {
+        return repository.modificaTrabalhoVendido(trabalho);
+    }
 }

@@ -56,7 +56,7 @@ public class TrabalhoVendidoRepository {
         String selection = "" +
         "SELECT Lista_vendas.id, Lista_vendas.idPersonagem, Lista_vendas.idTrabalho, trabalhos.nome, Lista_vendas.descricao, Lista_vendas.dataVenda, Lista_vendas.quantidade, Lista_vendas.valor, trabalhos.raridade\n" +
         "FROM Lista_vendas\n" +
-        "INNER JOIN trabalhos\n" +
+        "LEFT JOIN trabalhos\n" +
         "ON Lista_vendas.idTrabalho == trabalhos.id\n" +
         "WHERE Lista_vendas.idPersonagem == ?\n" +
         "ORDER BY Lista_vendas.dataVenda DESC";
@@ -120,7 +120,6 @@ public class TrabalhoVendidoRepository {
                     values.put(COLUMN_NAME_DATA_VENDA, trabalho.getDataVenda());
                     values.put(COLUMN_NAME_QUANTIDADE, trabalho.getQuantidade());
                     values.put(COLUMN_NAME_VALOR, trabalho.getValor());
-                    cursor.close();
                     if (cursor.getCount() == 0) {
                         values.put(COLUMN_NAME_ID, trabalho.getId());
                         dbModificacao.insert(TABLE_TRABALHOS_VENDIDOS, null, values);
@@ -129,6 +128,7 @@ public class TrabalhoVendidoRepository {
                         String[] selectionArgs2 = new String[]{trabalho.getId()};
                         dbModificacao.update(TABLE_TRABALHOS_VENDIDOS, values, selection2, selectionArgs2);
                     }
+                    cursor.close();
                 }
                 String selection = "SELECT " + COLUMN_NAME_ID +
                         " FROM " + TABLE_TRABALHOS_VENDIDOS +
@@ -165,6 +165,32 @@ public class TrabalhoVendidoRepository {
                 liveData.setValue(new Resource<>(null, error.getMessage()));
             }
         });
+        return liveData;
+    }
+
+    public LiveData<Resource<Void>> modificaTrabalhoVendido(TrabalhoVendido trabalho) {
+        MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
+        minhaReferencia.child(trabalho.getId()).setValue(trabalho).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                ContentValues values = new ContentValues();
+                values.put(COLUMN_NAME_ID_PERSONAGEM, idPersonagem);
+                values.put(COLUMN_NAME_ID_TRABALHO, trabalho.getIdTrabalho());
+                values.put(COLUMN_NAME_DESCRICAO, trabalho.getDescricao());
+                values.put(COLUMN_NAME_DATA_VENDA, trabalho.getDataVenda());
+                values.put(COLUMN_NAME_QUANTIDADE, trabalho.getQuantidade());
+                values.put(COLUMN_NAME_VALOR, trabalho.getValor());
+                String selection = COLUMN_NAME_ID + " LIKE ?";
+                String[] selectionArgs = {trabalho.getId()};
+                dbModificacao.update(TABLE_TRABALHOS_VENDIDOS, values, selection, selectionArgs);
+                liveData.setValue(new Resource<>(null, null));
+            } else if (task.isCanceled()) {
+                Exception exception = task.getException();
+                if (exception != null) {
+                    liveData.setValue(new Resource<>(null, exception.getMessage()));
+                }
+            }
+        });
+        liveData.setValue(new Resource<>(null, "Erro teste!"));
         return liveData;
     }
 }

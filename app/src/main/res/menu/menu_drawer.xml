@@ -7,7 +7,7 @@
         android:id="@+id/grupo1">
         <item
             android:id="@+id/nav_lista_personagem"
-            android:title="Lista personagens">
+            android:title="@string/personagens">
             <menu></menu>
         </item>
     </group>
@@ -23,7 +23,7 @@
             android:title="@string/estoque"/>
         <item
             android:id="@+id/listaProdutosVendidos"
-            android:title="@string/stringProdutosVendidos"/>
+            android:title="@string/stringVendas"/>
         <item
             android:id="@+id/listaProfissoes"
             android:title="@string/stringProfissoes"/>

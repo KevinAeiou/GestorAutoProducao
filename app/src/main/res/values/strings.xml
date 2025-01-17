@@ -198,17 +198,18 @@
     <string name="stringProduzindo">Produzindo</string>
     <string name="stringPronto">Pronto</string>
     <string name="stringDesfazer">Desfazer</string>
-    <string name="stringProdutosVendidos">Produtos vendidos</string>
+    <string name="stringVendas">Vendas</string>
     <string name="stringExcluir">Excluir</string>
     <string name="stringExperienciaValor">Experiência %1$d</string>
     <string name="stringNivelValor">Nível %1$d</string>
     <string name="stringOuroValor">%1$d ouros</string>
     <string name="stringQuantidadeValor">x %1$d</string>
-    <string name="stringEstadoValor">Estado: %1$b</string>
-    <string name="stringUsoValor">Uso: %1$b</string>
-    <string name="stringEspacoProducaoValor">Espaço de produção: %1$d</string>
+    <string name="stringEstadoValor">Estado: %1$s</string>
+    <string name="stringUsoValor">Uso: %1$s</string>
+    <string name="stringEspacoProducaoValor">Espaço para produção: %1$d</string>
     <string name="teste">teste</string>
     <string name="stringPrioridade">Prioridade</string>
     <string name="stringListaVazia">Lista vazia</string>
     <string name="stringNomeProducao">Nome produção</string>
+    <string name="stringProducao">Produção</string>
 </resources>

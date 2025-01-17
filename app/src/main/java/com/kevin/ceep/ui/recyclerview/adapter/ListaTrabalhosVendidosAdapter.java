@@ -92,7 +92,9 @@ public class ListaTrabalhosVendidosAdapter extends RecyclerView.Adapter<ListaTra
 
         private void preencheCampos(TrabalhoVendido trabalho) {
             configuraCorNomeTrabalhoProducao(trabalho);
-            itemNome.setText(trabalho.getNome());
+            String nome = trabalho.getNome();
+            if (nome == null) nome = "Indefinido";
+            itemNome.setText(nome);
             itemData.setText(trabalho.getDataVenda());
             itemValor.setText(context.getString(R.string.stringOuroValor, trabalho.getValor()));
             itemQuantidade.setText(context.getString(R.string.stringQuantidadeValor, trabalho.getQuantidade()));
@@ -100,19 +102,21 @@ public class ListaTrabalhosVendidosAdapter extends RecyclerView.Adapter<ListaTra
 
         private void configuraCorNomeTrabalhoProducao(TrabalhoVendido trabalhoProducao) {
             String raridade = trabalhoProducao.getRaridade();
-            switch (raridade) {
-                case "Comum":
-                    itemNome.setTextColor(ContextCompat.getColor(context, R.color.cor_texto_raridade_comum));
-                    break;
-                case "Raro":
-                    itemNome.setTextColor(ContextCompat.getColor(context, R.color.cor_texto_raridade_raro));
-                    break;
-                case "Melhorado":
-                    itemNome.setTextColor(ContextCompat.getColor(context, R.color.cor_texto_raridade_melhorado));
-                    break;
-                case "Especial":
-                    itemNome.setTextColor(ContextCompat.getColor(context, R.color.cor_texto_raridade_especial));
-                    break;
+            if (raridade != null) {
+                switch (raridade) {
+                    case "Comum":
+                        itemNome.setTextColor(ContextCompat.getColor(context, R.color.cor_texto_raridade_comum));
+                        break;
+                    case "Raro":
+                        itemNome.setTextColor(ContextCompat.getColor(context, R.color.cor_texto_raridade_raro));
+                        break;
+                    case "Melhorado":
+                        itemNome.setTextColor(ContextCompat.getColor(context, R.color.cor_texto_raridade_melhorado));
+                        break;
+                    case "Especial":
+                        itemNome.setTextColor(ContextCompat.getColor(context, R.color.cor_texto_raridade_especial));
+                        break;
+                }
             }
         }
     }
