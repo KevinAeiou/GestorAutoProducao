@@ -26,7 +26,7 @@ import com.kevin.ceep.R;
 import com.kevin.ceep.databinding.FragmentListaTrabalhosVendidosBinding;
 import com.kevin.ceep.model.TrabalhoVendido;
 import com.kevin.ceep.repository.TrabalhoVendidoRepository;
-import com.kevin.ceep.ui.activity.AtributosProdutoVendidoActivity;
+import com.kevin.ceep.ui.activity.AtributosTrabalhoVendidoActivity;
 import com.kevin.ceep.ui.recyclerview.adapter.ListaTrabalhosVendidosAdapter;
 import com.kevin.ceep.ui.viewModel.TrabalhosVendidosViewModel;
 import com.kevin.ceep.ui.viewModel.factory.TrabalhosVendidosViewModelFactory;
@@ -169,7 +169,7 @@ public class ListaTrabalhosVendidosFragment extends Fragment {
     }
 
     private void vaiParaAtributoProdutoVendido(TrabalhoVendido trabalhoVendido) {
-        Intent iniciaVaiParaAtributosProdutoVendido = new Intent(getContext(), AtributosProdutoVendidoActivity.class);
+        Intent iniciaVaiParaAtributosProdutoVendido = new Intent(getContext(), AtributosTrabalhoVendidoActivity.class);
         iniciaVaiParaAtributosProdutoVendido.putExtra(CHAVE_TRABALHO, trabalhoVendido);
         iniciaVaiParaAtributosProdutoVendido.putExtra(CHAVE_PERSONAGEM, personagemId);
         startActivity(iniciaVaiParaAtributosProdutoVendido);

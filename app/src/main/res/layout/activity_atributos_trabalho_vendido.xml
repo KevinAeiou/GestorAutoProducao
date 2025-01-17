@@ -4,12 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.activity.AtributosProdutoVendidoActivity">
+    tools:context=".ui.activity.AtributosTrabalhoVendidoActivity">
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/txtNomeProdutoVendido"
+        android:id="@+id/txtDescricaoTrabalhoVendido"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        app:layout_constraintWidth_max="488dp"
         android:padding="8dp"
         android:layout_marginTop="32dp"
         android:layout_marginStart="16dp"
@@ -18,21 +19,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Nome produto vendido"/>
+        tools:text="Descrição"/>
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/txtLayoutIdPersonagemProdutoVendido"
+        android:id="@+id/txtLayoutNomeTrabalhoVendido"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:hint="ID personagem"
+        android:hint="@string/string_nome"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-        app:layout_constraintStart_toStartOf="@id/txtNomeProdutoVendido"
-        app:layout_constraintEnd_toEndOf="@id/txtNomeProdutoVendido"
-        app:layout_constraintTop_toBottomOf="@id/txtNomeProdutoVendido">
+        app:layout_constraintStart_toStartOf="@id/txtDescricaoTrabalhoVendido"
+        app:layout_constraintEnd_toEndOf="@id/txtDescricaoTrabalhoVendido"
+        app:layout_constraintTop_toBottomOf="@id/txtDescricaoTrabalhoVendido">
 
         <com.google.android.material.textfield.MaterialAutoCompleteTextView
-            android:id="@+id/autoCompleteIdPersonagemProdutoVendido"
+            android:id="@+id/autoCompleteNomeTrabalhoVendido"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="8dp"
@@ -42,15 +43,15 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/txtDataProdutoVendido"
+        android:id="@+id/txtDataTrabalhoVendido"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textSize="22sp"
         android:padding="8dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintStart_toStartOf="@+id/txtLayoutIdPersonagemProdutoVendido"
-        app:layout_constraintEnd_toEndOf="@+id/txtLayoutIdPersonagemProdutoVendido"
-        app:layout_constraintTop_toBottomOf="@+id/txtLayoutIdPersonagemProdutoVendido"
+        app:layout_constraintStart_toStartOf="@+id/txtLayoutNomeTrabalhoVendido"
+        app:layout_constraintEnd_toEndOf="@+id/txtLayoutNomeTrabalhoVendido"
+        app:layout_constraintTop_toBottomOf="@+id/txtLayoutNomeTrabalhoVendido"
         tools:text="aaaa/MM/dd"/>
 
     <androidx.appcompat.widget.LinearLayoutCompat
@@ -58,12 +59,12 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginTop="8dp"
-        app:layout_constraintStart_toStartOf="@id/txtDataProdutoVendido"
-        app:layout_constraintEnd_toEndOf="@id/txtDataProdutoVendido"
-        app:layout_constraintTop_toBottomOf="@id/txtDataProdutoVendido">
+        app:layout_constraintStart_toStartOf="@id/txtDataTrabalhoVendido"
+        app:layout_constraintEnd_toEndOf="@id/txtDataTrabalhoVendido"
+        app:layout_constraintTop_toBottomOf="@id/txtDataTrabalhoVendido">
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/txtValorProdutoVendido"
+            android:id="@+id/txtValorTrabalhoVendido"
             android:textSize="20sp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -72,7 +73,7 @@
             android:layout_weight="1"/>
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/txtQuantidadeProdutoVendido"
+            android:id="@+id/txtQuantidadeTrabalhoVendido"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="20sp"
