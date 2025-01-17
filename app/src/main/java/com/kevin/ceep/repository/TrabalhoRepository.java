@@ -36,14 +36,14 @@ import java.util.Objects;
 
 public class TrabalhoRepository {
     private final DatabaseReference minhaReferencia;
-    private final SQLiteDatabase dbLeitura, dbModificao;
+    private final SQLiteDatabase dbLeitura, dbModificacao;
     private final MutableLiveData<Resource<ArrayList<Trabalho>>> trabalhosEncontrados;
 
     public TrabalhoRepository(Context context) {
         this.minhaReferencia = FirebaseDatabase.getInstance().getReference(CHAVE_LISTA_TRABALHO);
         DbHelper dbHelper = DbHelper.getInstance(context);
         this.dbLeitura = dbHelper.getReadableDatabase();
-        this.dbModificao = dbHelper.getWritableDatabase();
+        this.dbModificacao = dbHelper.getWritableDatabase();
         this.trabalhosEncontrados = new MutableLiveData<>();
     }
     public LiveData<Resource<Void>> modificaTrabalho(Trabalho trabalhoModificado) {
@@ -60,7 +60,7 @@ public class TrabalhoRepository {
                 values.put(COLUMN_NAME_TRABALHO_NECESSARIO, trabalhoModificado.getTrabalhoNecessario());
                 String selection = COLUMN_NAME_ID + " LIKE ?";
                 String[] selectionArgs = {trabalhoModificado.getId()};
-                long newRowId = dbModificao.update(TABLE_TRABALHOS, values, selection, selectionArgs);
+                long newRowId = dbModificacao.update(TABLE_TRABALHOS, values, selection, selectionArgs);
                 if (newRowId == -1) {
                     liveData.setValue(new Resource<>(null, "Erro ao adicionar novo trabalho a lista"));
                 } else {
@@ -86,7 +86,7 @@ public class TrabalhoRepository {
                 values.put(COLUMN_NAME_PROFISSAO, trabalho.getProfissao());
                 values.put(COLUMN_NAME_RARIDADE, trabalho.getRaridade());
                 values.put(COLUMN_NAME_TRABALHO_NECESSARIO, trabalho.getTrabalhoNecessario());
-                long newRowId = dbModificao.insert(TABLE_TRABALHOS, null, values);
+                long newRowId = dbModificacao.insert(TABLE_TRABALHOS, null, values);
                 if (newRowId == -1) {
                     liveData.setValue(new Resource<>(null, "Erro ao adicionar novo trabalho a lista"));
                 } else {
@@ -105,7 +105,7 @@ public class TrabalhoRepository {
             if (task.isSuccessful()) {
                 String selection = COLUMN_NAME_ID + " LIKE ?";
                 String[] selectionArgs = {trabalhoRecebido.getId()};
-                dbModificao.delete(TABLE_TRABALHOS, selection, selectionArgs);
+                dbModificacao.delete(TABLE_TRABALHOS, selection, selectionArgs);
                 liveData.setValue(new Resource<>(null, null));
             } else if (task.isCanceled()) {
                 liveData.setValue(new Resource<>(null, Objects.requireNonNull(task.getException()).toString()));
@@ -176,12 +176,12 @@ public class TrabalhoRepository {
                     values.put(COLUMN_NAME_TRABALHO_NECESSARIO, trabalho.getTrabalhoNecessario());
                     if (cursor.getCount() == 0) {
                         values.put(COLUMN_NAME_ID, trabalho.getId());
-                        dbModificao.insert(TABLE_TRABALHOS, null, values);
+                        dbModificacao.insert(TABLE_TRABALHOS, null, values);
                         Log.d("onDataChange", trabalho.getNome() + " inserido com sucesso!");
                     } else {
                         String selection2 = COLUMN_NAME_ID + " LIKE ?";
                         String[] selectionArgs2 = {trabalho.getId()};
-                        dbModificao.update(TABLE_TRABALHOS, values, selection2, selectionArgs2);
+                        dbModificacao.update(TABLE_TRABALHOS, values, selection2, selectionArgs2);
                     }
                     cursor.close();
                 }
@@ -221,7 +221,7 @@ public class TrabalhoRepository {
                 for (Trabalho trabalhoBanco : trabalhosBanco) {
                     String selection = COLUMN_NAME_ID + " LIKE ?";
                     String[] selectionArgs = {trabalhoBanco.getId()};
-                    dbModificao.delete(TABLE_TRABALHOS, selection, selectionArgs);
+                    dbModificacao.delete(TABLE_TRABALHOS, selection, selectionArgs);
                     Log.d("onDataChange", trabalhoBanco.getNome() + " removido com sucesso!");
                 }
                 liveData.setValue(new Resource<>(null, null));
