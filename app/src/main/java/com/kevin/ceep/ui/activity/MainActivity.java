@@ -15,6 +15,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -48,36 +50,39 @@ import java.util.List;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+    private ActivityMainBinding binding;
     private DrawerLayout drawerLayout;
     private List<Personagem> personagens;
-    private String idPersonagemRecebido;
     private NavigationView navigationView;
     private Personagem personagemSelecionado;
+    private TextView txtCabecalhoEstado, txtCabecalhoUso, txtCabecalhoEspacoProducao;
+    private AutoCompleteTextView autoCompleteCabecalhoNome;
     private PersonagemViewModel personagemViewModel;
-    private TextView txtCabecalhoNome, txtCabecalhoEstado, txtCabecalhoUso, txtCabecalhoEspacoProducao;
     private int itemNavegacao, posicaoPersonagemSelecionado;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        com.kevin.ceep.databinding.ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         inicializaComponentes();
         configuraToolbar();
+        configuraClickAutoComplete();
         navigationView.bringToFront();
         configuraToogle();
         navigationView.setNavigationItemSelectedListener(this);
         navigationView.setCheckedItem(itemNavegacao);
     }
 
+    private void configuraClickAutoComplete() {
+        autoCompleteCabecalhoNome.setOnItemClickListener((adapterView, view, i, l) -> {
+            atualizaCabecalhoPersonagemSelecionado();
+        });
+    }
+
     @Override
     protected void onResume() {
         sincronizaPersonagens();
-        pegaTodosPersonagens();
-        if (!personagens.isEmpty()) {
-            personagemSelecionado = personagens.get(posicaoPersonagemSelecionado);
-            atualizaPersonagemSelecionado();
-        }
         super.onResume();
     }
 
@@ -88,15 +93,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         assert subItens != null;
         subItens.clear();
         int indice = 0;
-        if (!personagens.isEmpty()) {
-            for (Personagem personagem : personagens) {
-                subItens.add(0, indice, indice, personagem.getNome());
-                indice += 1;
-            }
-            if (personagemSelecionado == null) {
-                MenuItem itemMenu = subItens.getItem(0);
-                personagemSelecionado = personagens.get(itemMenu.getOrder());
-            }
+        if (personagens.isEmpty()) return;
+        for (Personagem personagem : personagens) {
+            subItens.add(0, indice, indice, personagem.getNome());
+            indice += 1;
+        }
+        if (personagemSelecionado == null) {
+            posicaoPersonagemSelecionado = subItens.getItem(0).getOrder();
         }
     }
 
@@ -119,32 +122,35 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.navegacao_view);
         View cabecalho = navigationView.getHeaderView(0);
-        txtCabecalhoNome = cabecalho.findViewById(R.id.txtCabecalhoNomePersonagem);
+        autoCompleteCabecalhoNome = cabecalho.findViewById(R.id.autoCompleteCabecalhoNomePersonagem);
         txtCabecalhoEstado = cabecalho.findViewById(R.id.txtCabecalhoEstadoPersonagem);
         txtCabecalhoUso = cabecalho.findViewById(R.id.txtCabecalhoUsoPersonagem);
         txtCabecalhoEspacoProducao = cabecalho.findViewById(R.id.txtCabecalhoEspacoProducaoPersonagem);
         personagemSelecionado = null;
         posicaoPersonagemSelecionado = 0;
+        personagens = new ArrayList<>();
         PersonagemViewModelFactory personagemViewModelFactory = new PersonagemViewModelFactory(new PersonagemRepository(getApplicationContext()));
         personagemViewModel = new ViewModelProvider(this, personagemViewModelFactory).get(PersonagemViewModel.class);
     }
 
-    private void atualizaPersonagemSelecionado() {
-        if (personagemSelecionado != null) {
-            txtCabecalhoNome.setText(personagemSelecionado.getNome());
-            txtCabecalhoEstado.setText(getString(R.string.stringEstadoValor,personagemSelecionado.getEstado()));
-            txtCabecalhoUso.setText(getString(R.string.stringUsoValor,personagemSelecionado.getUso()));
-            txtCabecalhoEspacoProducao.setText(getString(R.string.stringEspacoProducaoValor,personagemSelecionado.getEspacoProducao()));
-            idPersonagemRecebido = personagemSelecionado.getId();
-            mostraFragmentSelecionado(Objects.requireNonNull(navigationView.getCheckedItem()));
-        }
+    private void atualizaCabecalhoPersonagemSelecionado() {
+        if (personagemSelecionado == null) return;
+        autoCompleteCabecalhoNome.setText(personagemSelecionado.getNome());
+        String estado= "Inativo";
+        String uso= "Inativo";
+        if (personagemSelecionado.getEstado()) estado = "Ativo";
+        if (personagemSelecionado.getUso()) uso = "Ativo";
+        txtCabecalhoEstado.setText(getString(R.string.stringEstadoValor,estado));
+        txtCabecalhoUso.setText(getString(R.string.stringUsoValor,uso));
+        txtCabecalhoEspacoProducao.setText(getString(R.string.stringEspacoProducaoValor,personagemSelecionado.getEspacoProducao()));
+        mostraFragmentSelecionado(Objects.requireNonNull(navigationView.getCheckedItem()));
     }
 
     @SuppressLint("NonConstantResourceId")
     private void mostraFragmentSelecionado(MenuItem itemNavegacao) {
         Fragment fragmentoSelecionado = null;
         Bundle argumento = new Bundle();
-        argumento.putString(CHAVE_PERSONAGEM, idPersonagemRecebido);
+        argumento.putString(CHAVE_PERSONAGEM, personagemSelecionado.getId());
         switch (itemNavegacao.getItemId()){
             case R.id.listaTrabalhosProducao:
                 fragmentoSelecionado = new ListaTrabalhosProducaoFragment();
@@ -195,10 +201,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private int recebeDadosIntent(int itemNavegacao) {
         Intent dadosRecebidos = getIntent();
-        idPersonagemRecebido = null;
+        String idPersonagemRecebido;
         if (dadosRecebidos.hasExtra(CHAVE_PERSONAGEM)){
             idPersonagemRecebido = (String) dadosRecebidos.getSerializableExtra(CHAVE_PERSONAGEM);
-            Log.d("menuNavegacao", "String id personagem recebido: "+ idPersonagemRecebido);
             if (idPersonagemRecebido != null){
                 itemNavegacao = R.id.listaTrabalhosProducao;
             }
@@ -219,8 +224,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         if (item.getGroupId() == 0) {
             posicaoPersonagemSelecionado = item.getOrder();
-            personagemSelecionado = personagens.get(posicaoPersonagemSelecionado);
-            atualizaPersonagemSelecionado();
+            definePersonagemSelecionado();
+            atualizaCabecalhoPersonagemSelecionado();
         } else {
             drawerLayout.closeDrawer(GravityCompat.START);
         }
@@ -242,11 +247,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         transicaoDeFragmento.commit();
     }
     private void pegaTodosPersonagens() {
-        personagens = new ArrayList<>();
+        personagens.clear();
         personagemViewModel.pegaTodosPersonagens().observe(this, resultadoPersonagens -> {
             if (resultadoPersonagens.getDado() != null) {
                 personagens = resultadoPersonagens.getDado();
-                configuraSubMenuPersonagem();
             }
             if (resultadoPersonagens.getErro() != null) {
                 Snackbar.make(getApplicationContext(), Objects.requireNonNull(getCurrentFocus()), "Erro: "+resultadoPersonagens.getErro(), Snackbar.LENGTH_LONG).show();
@@ -259,6 +263,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (resultadoSincroniza.getErro() != null) {
                 Snackbar.make(getApplicationContext(), Objects.requireNonNull(getCurrentFocus()), "Erro: "+resultadoSincroniza.getErro(), Snackbar.LENGTH_LONG).show();
             }
+            pegaTodosPersonagens();
+            configuraSubMenuPersonagem();
+            atualizaDropDownPersonagens();
+            definePersonagemSelecionado();
+            atualizaCabecalhoPersonagemSelecionado();
         });
+    }
+
+    private void definePersonagemSelecionado() {
+        if (personagens.size() <= posicaoPersonagemSelecionado) return;
+        personagemSelecionado = personagens.get(posicaoPersonagemSelecionado);
+    }
+
+    private void atualizaDropDownPersonagens() {
+        ArrayList<String> nomesPersonagens = new ArrayList<>();
+        for (Personagem personagem : personagens) {
+            nomesPersonagens.add(personagem.getNome());
+            Log.d("atualizaDropDownPersonagens", "Nome personagem: " + personagem.getNome());
+        }
+        ArrayAdapter<String> adapterPersonagens = new ArrayAdapter<>(this, R.layout.item_dropdrown, nomesPersonagens);
+        adapterPersonagens.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        autoCompleteCabecalhoNome.setAdapter(adapterPersonagens);
+//        autoCompleteCabecalhoNome.setText(nomesPersonagens.get(0));
     }
 }
