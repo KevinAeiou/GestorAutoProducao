@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private TextView txtCabecalhoEstado, txtCabecalhoUso, txtCabecalhoEspacoProducao;
     private AutoCompleteTextView autoCompleteCabecalhoNome;
     private PersonagemViewModel personagemViewModel;
-    private int itemNavegacao, posicaoPersonagemSelecionado;
+    private int itemNavegacao;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void configuraClickAutoComplete() {
         autoCompleteCabecalhoNome.setOnItemClickListener((adapterView, view, i, l) -> {
             drawerLayout.closeDrawer(GravityCompat.START);
-            posicaoPersonagemSelecionado = i;
+            personagemViewModel.definePersonagemSelecionado(personagens.get(i));
             definePersonagemSelecionado();
             atualizaCabecalhoPersonagemSelecionado();
         });
@@ -110,22 +110,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         txtCabecalhoUso = cabecalho.findViewById(R.id.txtCabecalhoUsoPersonagem);
         txtCabecalhoEspacoProducao = cabecalho.findViewById(R.id.txtCabecalhoEspacoProducaoPersonagem);
         personagemSelecionado = null;
-        posicaoPersonagemSelecionado = 0;
         personagens = new ArrayList<>();
         PersonagemViewModelFactory personagemViewModelFactory = new PersonagemViewModelFactory(new PersonagemRepository(getApplicationContext()));
         personagemViewModel = new ViewModelProvider(this, personagemViewModelFactory).get(PersonagemViewModel.class);
     }
 
     private void atualizaCabecalhoPersonagemSelecionado() {
-        if (personagemSelecionado == null) return;
-        String estado= "Inativo";
-        String uso= "Inativo";
-        if (personagemSelecionado.getEstado()) estado = "Ativo";
-        if (personagemSelecionado.getUso()) uso = "Ativo";
-        txtCabecalhoEstado.setText(getString(R.string.stringEstadoValor,estado));
-        txtCabecalhoUso.setText(getString(R.string.stringUsoValor,uso));
-        txtCabecalhoEspacoProducao.setText(getString(R.string.stringEspacoProducaoValor,personagemSelecionado.getEspacoProducao()));
-        mostraFragmentSelecionado(Objects.requireNonNull(navigationView.getCheckedItem()));
+        personagemViewModel.pegaPersonagemSelecionado().observe(this, personagem -> {
+            if (personagem == null) return;
+            String estado= "Inativo";
+            String uso= "Inativo";
+            if (personagem.getEstado()) estado = "Ativo";
+            if (personagem.getUso()) uso = "Ativo";
+            txtCabecalhoEstado.setText(getString(R.string.stringEstadoValor,estado));
+            txtCabecalhoUso.setText(getString(R.string.stringUsoValor,uso));
+            txtCabecalhoEspacoProducao.setText(getString(R.string.stringEspacoProducaoValor,personagem.getEspacoProducao()));
+            personagemSelecionado = personagem;
+            mostraFragmentSelecionado(Objects.requireNonNull(navigationView.getCheckedItem()));
+        });
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -240,25 +242,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Snackbar.make(getApplicationContext(), Objects.requireNonNull(getCurrentFocus()), "Erro: "+resultadoSincroniza.getErro(), Snackbar.LENGTH_LONG).show();
             }
             pegaTodosPersonagens();
-            definePersonagemSelecionado();
+            if (personagemSelecionado == null) personagemViewModel.definePersonagemSelecionado(personagens.get(0));
             atualizaCabecalhoPersonagemSelecionado();
-            atualizaDropDownPersonagens();
+            configuraDropDownPersonagens();
         });
     }
 
     private void definePersonagemSelecionado() {
-        if (personagens.size() <= posicaoPersonagemSelecionado) return;
-        personagemSelecionado = personagens.get(posicaoPersonagemSelecionado);
+        personagemViewModel.pegaPersonagemSelecionado().observe(this, personagem -> personagemSelecionado = personagem);
     }
 
-    private void atualizaDropDownPersonagens() {
+    private void configuraDropDownPersonagens() {
         ArrayList<String> nomesPersonagens = new ArrayList<>();
         for (Personagem personagem : personagens) {
             nomesPersonagens.add(personagem.getNome());
         }
         ArrayAdapter<String> adapterPersonagens = new ArrayAdapter<>(this, R.layout.item_dropdrown, nomesPersonagens);
         adapterPersonagens.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        autoCompleteCabecalhoNome.setText(nomesPersonagens.get(0));
+        autoCompleteCabecalhoNome.setText(personagemSelecionado.getNome());
         autoCompleteCabecalhoNome.setAdapter(adapterPersonagens);
     }
 }
