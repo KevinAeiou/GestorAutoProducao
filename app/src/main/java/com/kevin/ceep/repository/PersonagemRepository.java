@@ -28,6 +28,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.kevin.ceep.dao.PersonagemDao;
 import com.kevin.ceep.db.DbHelper;
 import com.kevin.ceep.model.Personagem;
 
@@ -252,15 +253,7 @@ public class PersonagemRepository {
         MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
         minhaReferencia.child(novoPersonagem.getId()).setValue(novoPersonagem).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                ContentValues values = new ContentValues();
-                values.put(COLUMN_NAME_ID, novoPersonagem.getId());
-                values.put(COLUMN_NAME_ID_USUARIO, usuarioID);
-                values.put(COLUMN_NAME_NOME, novoPersonagem.getNome());
-                values.put(COLUMN_NAME_EMAIL, novoPersonagem.getEmail());
-                values.put(COLUMN_NAME_SENHA, novoPersonagem.getSenha());
-                values.put(COLUMN_NAME_ESTADO, novoPersonagem.getEstado());
-                values.put(COLUMN_NAME_USO, novoPersonagem.getUso());
-                values.put(COLUMN_NAME_ESPACO_PRODUCAO, novoPersonagem.getEspacoProducao());
+                ContentValues values = getContentValues(novoPersonagem);
                 long newRowId = dbModifica.insert(TABLE_PERSONAGENS, null, values);
                 if (newRowId == -1) {
                     liveData.setValue(new Resource<>(null, "Erro ao inserir "+novoPersonagem.getNome()+" no banco"));
@@ -272,5 +265,19 @@ public class PersonagemRepository {
             }
         });
         return liveData;
+    }
+
+    @NonNull
+    private ContentValues getContentValues(Personagem novoPersonagem) {
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_NAME_ID, novoPersonagem.getId());
+        values.put(COLUMN_NAME_ID_USUARIO, usuarioID);
+        values.put(COLUMN_NAME_NOME, novoPersonagem.getNome());
+        values.put(COLUMN_NAME_EMAIL, novoPersonagem.getEmail());
+        values.put(COLUMN_NAME_SENHA, novoPersonagem.getSenha());
+        values.put(COLUMN_NAME_ESTADO, novoPersonagem.getEstado());
+        values.put(COLUMN_NAME_USO, novoPersonagem.getUso());
+        values.put(COLUMN_NAME_ESPACO_PRODUCAO, novoPersonagem.getEspacoProducao());
+        return values;
     }
 }
