@@ -9,18 +9,28 @@
     android:padding="20dp"
     android:id="@+id/linearLayoutCabecalho">
 
-    <TextView
-        android:id="@+id/txtCabecalhoNomePersonagem"
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:text="Nome"
-        android:textColor="@color/white"
-        android:textSize="24sp" />
+        android:layout_marginBottom="8dp"
+        >
+
+        <AutoCompleteTextView
+            android:id="@+id/autoCompleteCabecalhoNomePersonagem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="Nome"
+            android:inputType="none"
+            android:textColor="@color/white"
+            android:textSize="24sp" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <TextView
         android:id="@+id/txtCabecalhoEstadoPersonagem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         tools:text="Estado"
         android:textSize="14sp"
         android:textColor="@color/white"/>
@@ -29,6 +39,7 @@
         android:id="@+id/txtCabecalhoUsoPersonagem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         tools:text="Uso"
         android:textSize="14sp"
         android:textColor="@color/white"/>
@@ -37,6 +48,7 @@
         android:id="@+id/txtCabecalhoEspacoProducaoPersonagem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         tools:text="Espaço de produção"
         android:textSize="14sp"
         android:textColor="@color/white"/>
