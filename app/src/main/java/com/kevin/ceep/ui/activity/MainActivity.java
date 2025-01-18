@@ -10,10 +10,7 @@ import android.annotation.SuppressLint;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
-import android.view.SubMenu;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -76,6 +73,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void configuraClickAutoComplete() {
         autoCompleteCabecalhoNome.setOnItemClickListener((adapterView, view, i, l) -> {
+            drawerLayout.closeDrawer(GravityCompat.START);
+            posicaoPersonagemSelecionado = i;
+            definePersonagemSelecionado();
             atualizaCabecalhoPersonagemSelecionado();
         });
     }
@@ -84,23 +84,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onResume() {
         sincronizaPersonagens();
         super.onResume();
-    }
-
-    private void configuraSubMenuPersonagem() {
-        Menu menuNavigation = navigationView.getMenu();
-        MenuItem menuPersonagens = menuNavigation.findItem(R.id.nav_lista_personagem);
-        SubMenu subItens = menuPersonagens.getSubMenu();
-        assert subItens != null;
-        subItens.clear();
-        int indice = 0;
-        if (personagens.isEmpty()) return;
-        for (Personagem personagem : personagens) {
-            subItens.add(0, indice, indice, personagem.getNome());
-            indice += 1;
-        }
-        if (personagemSelecionado == null) {
-            posicaoPersonagemSelecionado = subItens.getItem(0).getOrder();
-        }
     }
 
     private void configuraToogle() {
@@ -135,7 +118,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void atualizaCabecalhoPersonagemSelecionado() {
         if (personagemSelecionado == null) return;
-        autoCompleteCabecalhoNome.setText(personagemSelecionado.getNome());
         String estado= "Inativo";
         String uso= "Inativo";
         if (personagemSelecionado.getEstado()) estado = "Ativo";
@@ -222,13 +204,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        if (item.getGroupId() == 0) {
-            posicaoPersonagemSelecionado = item.getOrder();
-            definePersonagemSelecionado();
-            atualizaCabecalhoPersonagemSelecionado();
-        } else {
-            drawerLayout.closeDrawer(GravityCompat.START);
-        }
+        drawerLayout.closeDrawer(GravityCompat.START);
         item.setChecked(true);
         mostraFragmentSelecionado(item);
         return true;
@@ -264,10 +240,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Snackbar.make(getApplicationContext(), Objects.requireNonNull(getCurrentFocus()), "Erro: "+resultadoSincroniza.getErro(), Snackbar.LENGTH_LONG).show();
             }
             pegaTodosPersonagens();
-            configuraSubMenuPersonagem();
-            atualizaDropDownPersonagens();
             definePersonagemSelecionado();
             atualizaCabecalhoPersonagemSelecionado();
+            atualizaDropDownPersonagens();
         });
     }
 
@@ -280,11 +255,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ArrayList<String> nomesPersonagens = new ArrayList<>();
         for (Personagem personagem : personagens) {
             nomesPersonagens.add(personagem.getNome());
-            Log.d("atualizaDropDownPersonagens", "Nome personagem: " + personagem.getNome());
         }
         ArrayAdapter<String> adapterPersonagens = new ArrayAdapter<>(this, R.layout.item_dropdrown, nomesPersonagens);
         adapterPersonagens.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        autoCompleteCabecalhoNome.setText(nomesPersonagens.get(0));
         autoCompleteCabecalhoNome.setAdapter(adapterPersonagens);
-//        autoCompleteCabecalhoNome.setText(nomesPersonagens.get(0));
     }
 }
