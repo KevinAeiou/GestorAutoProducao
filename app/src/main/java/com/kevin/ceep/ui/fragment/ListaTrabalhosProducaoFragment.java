@@ -231,11 +231,6 @@ public class ListaTrabalhosProducaoFragment extends Fragment {
             public void onItemClick(ListaTrabalhoEspecificoAdapter trabalhoEspecificoAdapter) {
 
             }
-
-            @Override
-            public void onItemClick(TrabalhoEstoque trabalhoEstoque, int adapterPosition, int botaoId) {
-
-            }
         });
     }
     private void vaiParaTrabalhoEspecificoActivity(Trabalho trabalho) {
@@ -273,7 +268,7 @@ public class ListaTrabalhosProducaoFragment extends Fragment {
     public void onResume() {
         super.onResume();
         if (personagemId != null){
-            sincronizaTrabalhos();
+            pegaTodosTrabalhos();
         }
     }
 

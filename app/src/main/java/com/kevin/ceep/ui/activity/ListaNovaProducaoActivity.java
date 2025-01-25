@@ -214,11 +214,6 @@ public class ListaNovaProducaoActivity extends AppCompatActivity {
             public void onItemClick(ListaTrabalhoEspecificoAdapter trabalhoEspecificoAdapter) {
 
             }
-
-            @Override
-            public void onItemClick(TrabalhoEstoque trabalhoEstoque, int adapterPosition, int botaoId) {
-
-            }
         });
     }
 

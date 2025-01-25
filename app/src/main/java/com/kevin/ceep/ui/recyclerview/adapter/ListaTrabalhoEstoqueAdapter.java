@@ -13,9 +13,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.textview.MaterialTextView;
 import com.kevin.ceep.R;
-import com.kevin.ceep.model.Trabalho;
 import com.kevin.ceep.model.TrabalhoEstoque;
-import com.kevin.ceep.ui.recyclerview.adapter.listener.OnItemClickListener;
+import com.kevin.ceep.ui.recyclerview.adapter.listener.OnItemClickListenerTrabalhoEstoque;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,13 +23,13 @@ public class ListaTrabalhoEstoqueAdapter extends RecyclerView.Adapter<ListaTraba
 
     private List<TrabalhoEstoque> trabalhosEstoque;
     private final Context context;
-    private OnItemClickListener onItemClickListener;
+    private OnItemClickListenerTrabalhoEstoque onItemClickListener;
 
     public ListaTrabalhoEstoqueAdapter(List<TrabalhoEstoque> trabalhosEstoque, Context context) {
         this.trabalhosEstoque = trabalhosEstoque;
         this.context = context;
     }
-    public void setOnItemClickListener(OnItemClickListener onItemClickListener){
+    public void setOnItemClickListener(OnItemClickListenerTrabalhoEstoque onItemClickListener){
         this.onItemClickListener = onItemClickListener;
     }
     @NonNull

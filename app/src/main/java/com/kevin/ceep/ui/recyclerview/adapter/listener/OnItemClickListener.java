@@ -8,5 +8,4 @@ public interface OnItemClickListener {
 
     void onItemClick(Trabalho trabalho, int adapterPosition);
     void onItemClick(ListaTrabalhoEspecificoAdapter trabalhoEspecificoAdapter);
-    void onItemClick(TrabalhoEstoque trabalhoEstoque, int adapterPosition, int botaoId);
 }

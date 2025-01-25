@@ -28,12 +28,9 @@ import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.snackbar.Snackbar;
 import com.kevin.ceep.R;
 import com.kevin.ceep.databinding.FragmentListaTrabalhosEstoqueBinding;
-import com.kevin.ceep.model.Trabalho;
 import com.kevin.ceep.model.TrabalhoEstoque;
 import com.kevin.ceep.repository.TrabalhoEstoqueRepository;
-import com.kevin.ceep.ui.recyclerview.adapter.ListaTrabalhoEspecificoAdapter;
 import com.kevin.ceep.ui.recyclerview.adapter.ListaTrabalhoEstoqueAdapter;
-import com.kevin.ceep.ui.recyclerview.adapter.listener.OnItemClickListener;
 import com.kevin.ceep.ui.viewModel.TrabalhoEstoqueViewModel;
 import com.kevin.ceep.ui.viewModel.factory.TrabalhoEstoqueViewModelFactory;
 
@@ -102,16 +99,17 @@ public class ListaEstoqueFragment extends Fragment {
     private void filtraTrabalhoPorProfissaoSelecionada(List<Integer> listaIDS) {
         listaTrabalhosEstoqueFiltrada.clear();
         List<String> profissoesSelecionadas = defineListaDeProfissoesSelecionadas(listaIDS);
-        if (!profissoesSelecionadas.isEmpty()) {
-            ArrayList<TrabalhoEstoque> listaProfissaoEspecifica;
-            for (String profissao : profissoesSelecionadas) {
-                listaProfissaoEspecifica = (ArrayList<TrabalhoEstoque>) todosTrabalhosEstoque.stream().filter(
-                                trabalho -> stringContemString(trabalho.getProfissao(), profissao))
-                        .collect(Collectors.toList());
-                listaTrabalhosEstoqueFiltrada.addAll(listaProfissaoEspecifica);
-            }
-        } else {
+        if (profissoesSelecionadas.isEmpty()) {
             listaTrabalhosEstoqueFiltrada = (ArrayList<TrabalhoEstoque>) todosTrabalhosEstoque.clone();
+            trabalhoEstoqueAdapter.atualiza(listaTrabalhosEstoqueFiltrada);
+            return;
+        }
+        ArrayList<TrabalhoEstoque> listaProfissaoEspecifica;
+        for (String profissao : profissoesSelecionadas) {
+            listaProfissaoEspecifica = (ArrayList<TrabalhoEstoque>) todosTrabalhosEstoque.stream().filter(
+                            trabalho -> stringContemString(trabalho.getProfissao(), profissao))
+                    .collect(Collectors.toList());
+            listaTrabalhosEstoqueFiltrada.addAll(listaProfissaoEspecifica);
         }
         trabalhoEstoqueAdapter.atualiza(listaTrabalhosEstoqueFiltrada);
     }
@@ -125,10 +123,8 @@ public class ListaEstoqueFragment extends Fragment {
     }
 
     private void configuraSwipeRefreshLayout() {
-        swipeRefreshLayout.setOnRefreshListener(()->{
-            if (personagemId != null){
-                sincronizaTrabalhosEstoque();
-            }
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+            if (personagemId != null) sincronizaTrabalhosEstoque();
         });
     }
 
@@ -143,13 +139,13 @@ public class ListaEstoqueFragment extends Fragment {
                     iconeListaVazia.setVisibility(View.VISIBLE);
                     txtListaVazia.setVisibility(View.VISIBLE);
                     txtListaVazia.setVisibility(View.VISIBLE);
-                } else {
-                    iconeListaVazia.setVisibility(View.GONE);
-                    txtListaVazia.setVisibility(View.GONE);
-                    trabalhoEstoqueAdapter.atualiza(listaTrabalhosEstoqueFiltrada);
-                    configuraListaDeProfissoes();
-                    configuraGrupoChipsProfissoes();
+                    return;
                 }
+                iconeListaVazia.setVisibility(View.GONE);
+                txtListaVazia.setVisibility(View.GONE);
+                trabalhoEstoqueAdapter.atualiza(listaTrabalhosEstoqueFiltrada);
+                configuraListaDeProfissoes();
+                configuraGrupoChipsProfissoes();
             }
             if (resultadoPegaTodosTrabalhos.getErro() != null) {
                 Snackbar.make(binding.getRoot(), "Erro: "+resultadoPegaTodosTrabalhos.getErro(), Snackbar.LENGTH_LONG).show();
@@ -166,17 +162,15 @@ public class ListaEstoqueFragment extends Fragment {
         });
     }
 
+    @SuppressLint("ResourceType")
     private void configuraGrupoChipsProfissoes() {
         grupoChipsProfissoes.removeAllViews();
-        if (!profissoes.isEmpty() && profissoes.size() > 1) {
-            int idProfissao = 0;
-            for (String profissao : profissoes) {
-                Chip chipProfissao = (Chip) LayoutInflater.from(getContext()).inflate(R.layout.item_chip, null);
-                chipProfissao.setText(profissao);
-                chipProfissao.setId(idProfissao);
-                grupoChipsProfissoes.addView(chipProfissao);
-                idProfissao += 1;
-            }
+        if (profissoes.isEmpty() || profissoes.size() < 2) return;
+        for (String profissao : profissoes) {
+            Chip chipProfissao = (Chip) LayoutInflater.from(getContext()).inflate(R.layout.item_chip, grupoChipsProfissoes, false);
+            chipProfissao.setText(profissao);
+            chipProfissao.setId(profissoes.indexOf(profissao));
+            grupoChipsProfissoes.addView(chipProfissao);
         }
     }
 
@@ -185,14 +179,15 @@ public class ListaEstoqueFragment extends Fragment {
         for (TrabalhoEstoque trabalhoEstoque : todosTrabalhosEstoque) {
             if (profissoes.isEmpty() && !trabalhoEstoque.getProfissao().isEmpty()) {
                 profissoes.add(trabalhoEstoque.getProfissao());
-            } else if (profissaoNaoExiste(trabalhoEstoque) && !trabalhoEstoque.getProfissao().isEmpty()){
-                profissoes.add(trabalhoEstoque.getProfissao());
+                continue;
             }
+            if (profissaoExiste(trabalhoEstoque) || trabalhoEstoque.getProfissao().isEmpty()) continue;
+            profissoes.add(trabalhoEstoque.getProfissao());
         }
     }
 
-    private boolean profissaoNaoExiste(TrabalhoEstoque trabalhoEstoque) {
-        return !profissoes.contains(trabalhoEstoque.getProfissao());
+    private boolean profissaoExiste(TrabalhoEstoque trabalhoEstoque) {
+        return profissoes.contains(trabalhoEstoque.getProfissao());
     }
 
     private void inicializaComponentes() {
@@ -213,22 +208,7 @@ public class ListaEstoqueFragment extends Fragment {
     private void configuraAdapter(RecyclerView listaTrabalhos) {
         trabalhoEstoqueAdapter = new ListaTrabalhoEstoqueAdapter(listaTrabalhosEstoqueFiltrada,getContext());
         listaTrabalhos.setAdapter(trabalhoEstoqueAdapter);
-        trabalhoEstoqueAdapter.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(Trabalho trabalho, int adapterPosition) {
-
-            }
-
-            @Override
-            public void onItemClick(ListaTrabalhoEspecificoAdapter trabalhoEspecificoAdapter) {
-
-            }
-
-            @Override
-            public void onItemClick(TrabalhoEstoque trabalhoEstoque, int adapterPosition, int botaoId) {
-                alteraQuantidade(trabalhoEstoque, adapterPosition, botaoId);
-            }
-        });
+        trabalhoEstoqueAdapter.setOnItemClickListener(this::alteraQuantidade);
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -236,20 +216,13 @@ public class ListaEstoqueFragment extends Fragment {
         int novaQuantidade = trabalhoEstoqueModificado.getQuantidade();
         switch (botaoId) {
             case R.id.itemBotaoMenosUm:
-                if (trabalhoEstoqueModificado.getQuantidade() > 0) {
-                    novaQuantidade -= 1;
-                }
+                novaQuantidade -= 1;
                 break;
             case R.id.itemBotaoMaisUm:
                 novaQuantidade += 1;
                 break;
             case R.id.itemBotaoMenosCinquenta:
-                if (trabalhoEstoqueModificado.getQuantidade() > 0) {
-                    novaQuantidade -= 50;
-                    if (novaQuantidade < 0) {
-                        novaQuantidade = 0;
-                    }
-                }
+                novaQuantidade -= 50;
                 break;
             case R.id.itemBotaoMaisCinquenta:
                 novaQuantidade += 50;
@@ -258,10 +231,10 @@ public class ListaEstoqueFragment extends Fragment {
         trabalhoEstoqueModificado.setQuantidade(novaQuantidade);
         trabalhoEstoqueViewModel.modificaTrabalhoEstoque(trabalhoEstoqueModificado).observe(this, resultadoModificaQuantidade -> {
             if (resultadoModificaQuantidade.getErro() != null) {
-                Snackbar.make(binding.getRoot(),resultadoModificaQuantidade.getErro(),Snackbar.LENGTH_SHORT).show();
-            } else {
-                trabalhoEstoqueAdapter.altera(adapterPosition,trabalhoEstoqueModificado);
+                Snackbar.make(binding.getRoot(), resultadoModificaQuantidade.getErro(), Snackbar.LENGTH_SHORT).show();
+                return;
             }
+            trabalhoEstoqueAdapter.altera(adapterPosition, trabalhoEstoqueModificado);
         });
     }
     private void configuraDeslizeItem() {
@@ -304,18 +277,14 @@ public class ListaEstoqueFragment extends Fragment {
 
     private void removeTrabalhoDoBanco(TrabalhoEstoque trabalhoremovido) {
         trabalhoEstoqueViewModel.removeTrabalhoEstoque(trabalhoremovido).observe(this, resultadoRemoveTrabalho -> {
-            if (resultadoRemoveTrabalho.getErro() != null) {
-                Snackbar.make(binding.getRoot(), "Erro: "+resultadoRemoveTrabalho.getErro(), Snackbar.LENGTH_LONG).show();
-            }
+            if (resultadoRemoveTrabalho.getErro() != null) Snackbar.make(binding.getRoot(), "Erro: "+resultadoRemoveTrabalho.getErro(), Snackbar.LENGTH_LONG).show();
         });
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if (personagemId != null){
-            sincronizaTrabalhosEstoque();
-        }
+        if (personagemId != null) pegaTodosTrabalhosEstoque();
     }
 
     @Override

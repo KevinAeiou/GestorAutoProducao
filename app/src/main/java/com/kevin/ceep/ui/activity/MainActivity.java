@@ -73,7 +73,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void configuraClickAutoComplete() {
         autoCompleteCabecalhoNome.setOnItemClickListener((adapterView, view, i, l) -> {
-            drawerLayout.closeDrawer(GravityCompat.START);
             personagemViewModel.definePersonagemSelecionado(personagens.get(i));
             definePersonagemSelecionado();
             atualizaCabecalhoPersonagemSelecionado();

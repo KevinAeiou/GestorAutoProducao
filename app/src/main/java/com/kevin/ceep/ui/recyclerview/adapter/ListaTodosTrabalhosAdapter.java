@@ -82,11 +82,6 @@ public class ListaTodosTrabalhosAdapter extends RecyclerView.Adapter<ListaTodosT
             public void onItemClick(ListaTrabalhoEspecificoAdapter trabalhoEspecificoAdapter) {
 
             }
-
-            @Override
-            public void onItemClick(TrabalhoEstoque trabalhoEstoque, int adapterPosition, int botaoId) {
-
-            }
         });
         boolean isExpandable = profissaoTrabalho.isExpandable();
         holder.constraintLayoutItemProfissaoTrabalho.setVisibility(isExpandable ? View.VISIBLE : View.GONE);

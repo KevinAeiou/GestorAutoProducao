@@ -188,8 +188,7 @@ public class ListaTrabalhosVendidosFragment extends Fragment {
     public void onResume() {
         super.onResume();
         if (personagemId != null) {
-            sincronizaTrabalhos();
-//            pegaTodosProdutosVendidos();
+            pegaTodosProdutosVendidos();
         }
     }
 
