@@ -22,7 +22,7 @@ import com.kevin.ceep.db.contracts.TrabalhoDbContract.TrabalhoEntry;
 import com.kevin.ceep.db.contracts.TrabalhoProducaoContract.TrabalhoProducaoEntry;
 
 public class DbHelper extends SQLiteOpenHelper {
-    public static final int DATABASE_VERSION = 8;
+    public static final int DATABASE_VERSION = 9;
     public static final String DATABASE_NAME = "autoProducao.db";
     private static DbHelper minhaInstancia = null;
 
@@ -59,6 +59,7 @@ public class DbHelper extends SQLiteOpenHelper {
                 PersonagemEntry.COLUMN_NAME_SENHA + " TEXT," +
                 PersonagemEntry.COLUMN_NAME_ESTADO + " BOOLEAN," +
                 PersonagemEntry.COLUMN_NAME_USO + " BOOLEAN," +
+                PersonagemEntry.COLUMN_NAME_AUTO_PRODUCAO + " BOOLEAN," +
                 PersonagemEntry.COLUMN_NAME_ESPACO_PRODUCAO + " INTEGER" +
                 ")"
         );

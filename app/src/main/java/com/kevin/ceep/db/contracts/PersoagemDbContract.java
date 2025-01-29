@@ -15,6 +15,7 @@ public class PersoagemDbContract {
         public static final String COLUMN_NAME_SENHA = "senha";
         public static final String COLUMN_NAME_ESTADO = "estado";
         public static final String COLUMN_NAME_USO = "uso";
+        public static final String COLUMN_NAME_AUTO_PRODUCAO = "autoProducao";
         public static final String COLUMN_NAME_ESPACO_PRODUCAO = "espacoProducao";
     }
 }

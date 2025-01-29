@@ -7,7 +7,8 @@ import java.io.Serializable;
 public class Personagem extends Usuario implements Serializable {
 
     private boolean estado;
-    private boolean  uso;
+    private boolean uso;
+    private boolean autoProducao;
     private int espacoProducao;
 
     public Personagem(){
@@ -35,5 +36,13 @@ public class Personagem extends Usuario implements Serializable {
 
     public void setEspacoProducao(int espacoProducao) {
         this.espacoProducao = espacoProducao;
+    }
+
+    public boolean isAutoProducao() {
+        return autoProducao;
+    }
+
+    public void setAutoProducao(boolean autoProducao) {
+        this.autoProducao = autoProducao;
     }
 }

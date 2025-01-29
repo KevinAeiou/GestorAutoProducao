@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private List<Personagem> personagens;
     private NavigationView navigationView;
     private Personagem personagemSelecionado;
-    private TextView txtCabecalhoEstado, txtCabecalhoUso, txtCabecalhoEspacoProducao;
+    private TextView txtCabecalhoEstado, txtCabecalhoUso, txtCabecalhoEspacoProducao, txtCabecalhoAutoProducao;
     private AutoCompleteTextView autoCompleteCabecalhoNome;
     private PersonagemViewModel personagemViewModel;
     private int itemNavegacao;
@@ -107,6 +107,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         autoCompleteCabecalhoNome = cabecalho.findViewById(R.id.autoCompleteCabecalhoNomePersonagem);
         txtCabecalhoEstado = cabecalho.findViewById(R.id.txtCabecalhoEstadoPersonagem);
         txtCabecalhoUso = cabecalho.findViewById(R.id.txtCabecalhoUsoPersonagem);
+        txtCabecalhoAutoProducao = cabecalho.findViewById(R.id.txtCabecalhoAutoProducaoPersonagem);
         txtCabecalhoEspacoProducao = cabecalho.findViewById(R.id.txtCabecalhoEspacoProducaoPersonagem);
         personagemSelecionado = null;
         personagens = new ArrayList<>();
@@ -117,12 +118,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void atualizaCabecalhoPersonagemSelecionado() {
         personagemViewModel.pegaPersonagemSelecionado().observe(this, personagem -> {
             if (personagem == null) return;
-            String estado= "Inativo";
-            String uso= "Inativo";
-            if (personagem.getEstado()) estado = "Ativo";
-            if (personagem.getUso()) uso = "Ativo";
+            String estado= getString(R.string.stringInativo);
+            String uso= getString(R.string.stringInativo);
+            String autoProducao= getString(R.string.stringInativo);
+            if (personagem.getEstado()) estado = getString(R.string.stringAtivo);
+            if (personagem.getUso()) uso = getString(R.string.stringAtivo);
+            if (personagem.isAutoProducao()) autoProducao = getString(R.string.stringAtivo);
             txtCabecalhoEstado.setText(getString(R.string.stringEstadoValor,estado));
             txtCabecalhoUso.setText(getString(R.string.stringUsoValor,uso));
+            txtCabecalhoAutoProducao.setText(getString(R.string.stringAutoProducaoValor, autoProducao));
             txtCabecalhoEspacoProducao.setText(getString(R.string.stringEspacoProducaoValor,personagem.getEspacoProducao()));
             personagemSelecionado = personagem;
             mostraFragmentSelecionado(Objects.requireNonNull(navigationView.getCheckedItem()));

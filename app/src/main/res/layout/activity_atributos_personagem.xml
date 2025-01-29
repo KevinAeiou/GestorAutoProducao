@@ -55,6 +55,19 @@
         app:layout_constraintStart_toStartOf="@+id/swUsoPersonagem"
         app:layout_constraintTop_toBottomOf="@+id/swUsoPersonagem" />
 
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/swAutoProducaoPersonagem"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:minHeight="48dp"
+        android:textSize="20sp"
+        android:text="@string/stringAutoProducao"
+        app:switchPadding="8dp"
+        app:layout_constraintEnd_toEndOf="@+id/swEstadoPersonagem"
+        app:layout_constraintStart_toStartOf="@+id/swEstadoPersonagem"
+        app:layout_constraintTop_toBottomOf="@+id/swEstadoPersonagem" />
+
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/txtEspacoProducaoPersonagem"
         android:layout_width="0dp"
@@ -64,7 +77,7 @@
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
         app:layout_constraintEnd_toEndOf="@id/txtNomePersonagem"
         app:layout_constraintStart_toStartOf="@id/txtNomePersonagem"
-        app:layout_constraintTop_toBottomOf="@id/swEstadoPersonagem">
+        app:layout_constraintTop_toBottomOf="@id/swAutoProducaoPersonagem">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/edtEspacoProducaoPersonagem"

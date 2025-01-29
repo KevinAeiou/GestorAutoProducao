@@ -1,7 +1,13 @@
 package com.kevin.ceep.dao;
 
+import static com.kevin.ceep.db.contracts.PersoagemDbContract.PersonagemEntry.COLUMN_NAME_AUTO_PRODUCAO;
+import static com.kevin.ceep.db.contracts.PersoagemDbContract.PersonagemEntry.COLUMN_NAME_EMAIL;
+import static com.kevin.ceep.db.contracts.PersoagemDbContract.PersonagemEntry.COLUMN_NAME_ESPACO_PRODUCAO;
+import static com.kevin.ceep.db.contracts.PersoagemDbContract.PersonagemEntry.COLUMN_NAME_ESTADO;
 import static com.kevin.ceep.db.contracts.PersoagemDbContract.PersonagemEntry.COLUMN_NAME_ID;
 import static com.kevin.ceep.db.contracts.PersoagemDbContract.PersonagemEntry.COLUMN_NAME_NOME;
+import static com.kevin.ceep.db.contracts.PersoagemDbContract.PersonagemEntry.COLUMN_NAME_SENHA;
+import static com.kevin.ceep.db.contracts.PersoagemDbContract.PersonagemEntry.COLUMN_NAME_USO;
 import static com.kevin.ceep.db.contracts.PersoagemDbContract.PersonagemEntry.TABLE_PERSONAGENS;
 
 import android.content.ContentValues;
@@ -37,16 +43,18 @@ public class PersonagemDao {
         );
         ArrayList<Personagem> personagens = new ArrayList<>();
         while (cursor.moveToNext()) {
-            boolean estado = cursor.getInt(5) == 1;
-            boolean uso = cursor.getInt(6) == 1;
+            boolean estado = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_ESTADO)) == 1;
+            boolean uso = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_USO)) == 1;
+            boolean autoProducao = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_AUTO_PRODUCAO)) == 1;
             Personagem personagem = new Personagem ();
-            personagem.setId(cursor.getString(0));
-            personagem.setNome(cursor.getString(2));
-            personagem.setEmail(cursor.getString(3));
-            personagem.setSenha(cursor.getString(4));
+            personagem.setId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID)));
+            personagem.setNome(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME)));
+            personagem.setEmail(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_EMAIL)));
+            personagem.setSenha(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_SENHA)));
             personagem.setEstado(estado);
             personagem.setUso(uso);
-            personagem.setEspacoProducao(cursor.getInt(7));
+            personagem.setAutoProducao(autoProducao);
+            personagem.setEspacoProducao(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_ESPACO_PRODUCAO)));
             personagens.add(personagem);
         }
         cursor.close();

@@ -1,5 +1,6 @@
 package com.kevin.ceep.repository;
 
+import static com.kevin.ceep.db.contracts.PersoagemDbContract.PersonagemEntry.COLUMN_NAME_AUTO_PRODUCAO;
 import static com.kevin.ceep.db.contracts.PersoagemDbContract.PersonagemEntry.COLUMN_NAME_EMAIL;
 import static com.kevin.ceep.db.contracts.PersoagemDbContract.PersonagemEntry.COLUMN_NAME_ESPACO_PRODUCAO;
 import static com.kevin.ceep.db.contracts.PersoagemDbContract.PersonagemEntry.COLUMN_NAME_ESTADO;
@@ -89,6 +90,7 @@ public class PersonagemRepository {
                             values.put(COLUMN_NAME_SENHA, personagem.getSenha());
                             values.put(COLUMN_NAME_ESTADO, personagem.getEstado());
                             values.put(COLUMN_NAME_USO, personagem.getUso());
+                            values.put(COLUMN_NAME_AUTO_PRODUCAO, personagem.isAutoProducao());
                             values.put(COLUMN_NAME_ESPACO_PRODUCAO, personagem.getEspacoProducao());
                             dbModifica.insert(TABLE_PERSONAGENS, null, values);
                         } else if (contadorLinhas == 1) {
@@ -99,6 +101,7 @@ public class PersonagemRepository {
                             values.put(COLUMN_NAME_SENHA, personagem.getSenha());
                             values.put(COLUMN_NAME_ESTADO, personagem.getEstado());
                             values.put(COLUMN_NAME_USO, personagem.getUso());
+                            values.put(COLUMN_NAME_AUTO_PRODUCAO, personagem.isAutoProducao());
                             values.put(COLUMN_NAME_ESPACO_PRODUCAO, personagem.getEspacoProducao());
                             selection = COLUMN_NAME_ID + " LIKE ?";
                             selectionArgs = new String[]{personagem.getId()};
@@ -230,6 +233,22 @@ public class PersonagemRepository {
                 liveData.setValue(new Resource<>(null, Objects.requireNonNull(task.getException()).toString()));
             }
         });
+        minhaReferencia.child(personagemModificado.getId()).child(COLUMN_NAME_AUTO_PRODUCAO).setValue(personagemModificado.isAutoProducao()).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                ContentValues values = new ContentValues();
+                values.put(COLUMN_NAME_AUTO_PRODUCAO, personagemModificado.isAutoProducao());
+                String selection = COLUMN_NAME_ID + " LIKE ?";
+                String[] selectionArgs = {personagemModificado.getId()};
+                long newRowId = dbModifica.update(TABLE_PERSONAGENS, values, selection, selectionArgs);
+                if (newRowId == -1) {
+                    liveData.setValue(new Resource<>(null, "Erro ao modificar "+personagemModificado.getNome()+" no banco"));
+                } else {
+                    liveData.setValue(new Resource<>(null, null));
+                }
+            } else if (task.isCanceled()) {
+                liveData.setValue(new Resource<>(null, Objects.requireNonNull(task.getException()).toString()));
+            }
+        });
         minhaReferencia.child(personagemModificado.getId()).child(COLUMN_NAME_ESPACO_PRODUCAO).setValue(personagemModificado.getEspacoProducao()).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 ContentValues values = new ContentValues();
@@ -277,6 +296,7 @@ public class PersonagemRepository {
         values.put(COLUMN_NAME_SENHA, novoPersonagem.getSenha());
         values.put(COLUMN_NAME_ESTADO, novoPersonagem.getEstado());
         values.put(COLUMN_NAME_USO, novoPersonagem.getUso());
+        values.put(COLUMN_NAME_AUTO_PRODUCAO, novoPersonagem.isAutoProducao());
         values.put(COLUMN_NAME_ESPACO_PRODUCAO, novoPersonagem.getEspacoProducao());
         return values;
     }

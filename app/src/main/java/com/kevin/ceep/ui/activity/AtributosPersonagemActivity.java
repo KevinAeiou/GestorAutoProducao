@@ -34,7 +34,7 @@ public class AtributosPersonagemActivity extends AppCompatActivity {
     private Personagem personagemRecebido;
     private TextInputLayout personagemNomeTxt, personagemEspacoProducaoTxt, personagemEmailTxt, personagemSenhaTxt;
     private EditText personagemNome, personagemEspacoProducao, personagemEmail, personagemSenha;
-    private SwitchCompat personagemSwUso, personagemSwEstado;
+    private SwitchCompat personagemSwUso, personagemSwEstado, personagemSwAutoProducao;
     private ActivityAtributosPersonagemBinding binding;
     private int codigoRequisicao;
     private PersonagemViewModel personagemViewModel;
@@ -67,6 +67,7 @@ public class AtributosPersonagemActivity extends AppCompatActivity {
         personagemSenha.setText(personagemRecebido.getSenha());
         personagemSwUso.setChecked(personagemRecebido.getUso());
         personagemSwEstado.setChecked(personagemRecebido.getEstado());
+        personagemSwAutoProducao.setChecked(personagemRecebido.isAutoProducao());
     }
 
     private void inicializaComponentes() {
@@ -76,6 +77,7 @@ public class AtributosPersonagemActivity extends AppCompatActivity {
         personagemEspacoProducaoTxt = binding.txtEspacoProducaoPersonagem;
         personagemSwUso = binding.swUsoPersonagem;
         personagemSwEstado = binding.swEstadoPersonagem;
+        personagemSwAutoProducao = binding.swAutoProducaoPersonagem;
         personagemEmail = binding.edtEmailPersonagem;
         personagemEmailTxt = binding.txtEmailPersonagem;
         personagemSenha = binding.edtSenhaPersonagem;
@@ -149,6 +151,7 @@ public class AtributosPersonagemActivity extends AppCompatActivity {
         personagemModificado.setEmail(personagemEmail.getText().toString());
         personagemModificado.setSenha(personagemSenha.getText().toString());
         personagemModificado.setEstado(personagemSwEstado.isChecked());
+        personagemModificado.setAutoProducao(personagemSwAutoProducao.isChecked());
         personagemModificado.setUso(personagemSwUso.isChecked());
         personagemModificado.setEspacoProducao(parseInt(personagemEspacoProducao.getText().toString()));
         return personagemModificado;
@@ -172,6 +175,7 @@ public class AtributosPersonagemActivity extends AppCompatActivity {
         return !(personagemNome.getText().toString().equals(personagemRecebido.getNome()))||
                 personagemSwUso.isChecked()!=personagemRecebido.getUso()||
                 personagemSwEstado.isChecked()!=personagemRecebido.getEstado()||
+                personagemSwAutoProducao.isChecked()!=personagemRecebido.isAutoProducao()||
                 !(personagemEspacoProducao.getText().toString().equals(String.valueOf(personagemRecebido.getEspacoProducao())))||
                 !(personagemEmail.getText().toString().equals(personagemRecebido.getEmail()))||
                 !(personagemSenha.getText().toString().equals(personagemRecebido.getSenha()));

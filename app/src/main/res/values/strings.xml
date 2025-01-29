@@ -176,7 +176,7 @@
 
     <string name="abre_menu_navegacao">Abre menu de navegação</string>
     <string name="fecha_menu_navegacao">Fecha menu de navegação</string>
-    <string name="string_espaco_producao">Espaço de produção</string>
+    <string name="string_espaco_producao">Espaço para produção</string>
     <string name="string_estado">Estado</string>
     <string name="string_uso">Uso</string>
     <string name="stringConfiguracao">Configuração</string>
@@ -206,10 +206,12 @@
     <string name="stringQuantidadeValor">x %1$d</string>
     <string name="stringEstadoValor">Estado: %1$s</string>
     <string name="stringUsoValor">Uso: %1$s</string>
+    <string name="stringAutoProducaoValor">Auto produção: %1$s</string>
     <string name="stringEspacoProducaoValor">Espaço para produção: %1$d</string>
     <string name="teste">teste</string>
     <string name="stringPrioridade">Prioridade</string>
     <string name="stringListaVazia">Lista vazia</string>
     <string name="stringNomeProducao">Nome produção</string>
     <string name="stringProducao">Produção</string>
+    <string name="stringAutoProducao">Auto produção</string>
 </resources>
