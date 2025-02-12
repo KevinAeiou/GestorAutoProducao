@@ -39,4 +39,8 @@ public class TrabalhoViewModel extends ViewModel {
     public LiveData<Resource<ArrayList<Trabalho>>> pegaTrabalhosNecessarios(Trabalho trabalho) {
         return trabalhoRepository.pegaTrabalhosNecessarios(trabalho);
     }
+
+    public LiveData<Resource<Trabalho>> pegaTrabalhoPorId(String id) {
+        return trabalhoRepository.pegaTrabalhoPorId(id);
+    }
 }

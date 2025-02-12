@@ -50,14 +50,7 @@ public class TrabalhoRepository {
         MutableLiveData<Resource<Void>> liveData = new  MutableLiveData<>();
         minhaReferencia.child(trabalhoModificado.getId()).setValue(trabalhoModificado).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                ContentValues values = new ContentValues();
-                values.put(COLUMN_NAME_NOME, trabalhoModificado.getNome());
-                values.put(COLUMN_NAME_NOME_PRODUCAO, trabalhoModificado.getNomeProducao());
-                values.put(COLUMN_NAME_EXPERIENCIA, trabalhoModificado.getExperiencia());
-                values.put(COLUMN_NAME_NIVEL, trabalhoModificado.getNivel());
-                values.put(COLUMN_NAME_PROFISSAO, trabalhoModificado.getProfissao());
-                values.put(COLUMN_NAME_RARIDADE, trabalhoModificado.getRaridade());
-                values.put(COLUMN_NAME_TRABALHO_NECESSARIO, trabalhoModificado.getTrabalhoNecessario());
+                ContentValues values = defineTrabalhoModificado(trabalhoModificado);
                 String selection = COLUMN_NAME_ID + " LIKE ?";
                 String[] selectionArgs = {trabalhoModificado.getId()};
                 long newRowId = dbModificacao.update(TABLE_TRABALHOS, values, selection, selectionArgs);
@@ -73,19 +66,24 @@ public class TrabalhoRepository {
         return liveData;
     }
 
+    @NonNull
+    private static ContentValues defineTrabalhoModificado(Trabalho trabalhoModificado) {
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_NAME_NOME, trabalhoModificado.getNome());
+        values.put(COLUMN_NAME_NOME_PRODUCAO, trabalhoModificado.getNomeProducao());
+        values.put(COLUMN_NAME_EXPERIENCIA, trabalhoModificado.getExperiencia());
+        values.put(COLUMN_NAME_NIVEL, trabalhoModificado.getNivel());
+        values.put(COLUMN_NAME_PROFISSAO, trabalhoModificado.getProfissao());
+        values.put(COLUMN_NAME_RARIDADE, trabalhoModificado.getRaridade());
+        values.put(COLUMN_NAME_TRABALHO_NECESSARIO, trabalhoModificado.getTrabalhoNecessario());
+        return values;
+    }
+
     public LiveData<Resource<Void>> adicionaTrabalho(Trabalho trabalho) {
         MutableLiveData<Resource<Void>> liveData = new  MutableLiveData<>();
         minhaReferencia.child(trabalho.getId()).setValue(trabalho).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                ContentValues values = new ContentValues();
-                values.put(COLUMN_NAME_ID, trabalho.getId());
-                values.put(COLUMN_NAME_NOME, trabalho.getNome());
-                values.put(COLUMN_NAME_NOME_PRODUCAO, trabalho.getNomeProducao());
-                values.put(COLUMN_NAME_EXPERIENCIA, trabalho.getExperiencia());
-                values.put(COLUMN_NAME_NIVEL, trabalho.getNivel());
-                values.put(COLUMN_NAME_PROFISSAO, trabalho.getProfissao());
-                values.put(COLUMN_NAME_RARIDADE, trabalho.getRaridade());
-                values.put(COLUMN_NAME_TRABALHO_NECESSARIO, trabalho.getTrabalhoNecessario());
+                ContentValues values = defineNovoTrabalho(trabalho);
                 long newRowId = dbModificacao.insert(TABLE_TRABALHOS, null, values);
                 if (newRowId == -1) {
                     liveData.setValue(new Resource<>(null, "Erro ao adicionar novo trabalho a lista"));
@@ -97,6 +95,20 @@ public class TrabalhoRepository {
             }
         });
         return liveData;
+    }
+
+    @NonNull
+    private static ContentValues defineNovoTrabalho(Trabalho trabalho) {
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_NAME_ID, trabalho.getId());
+        values.put(COLUMN_NAME_NOME, trabalho.getNome());
+        values.put(COLUMN_NAME_NOME_PRODUCAO, trabalho.getNomeProducao());
+        values.put(COLUMN_NAME_EXPERIENCIA, trabalho.getExperiencia());
+        values.put(COLUMN_NAME_NIVEL, trabalho.getNivel());
+        values.put(COLUMN_NAME_PROFISSAO, trabalho.getProfissao());
+        values.put(COLUMN_NAME_RARIDADE, trabalho.getRaridade());
+        values.put(COLUMN_NAME_TRABALHO_NECESSARIO, trabalho.getTrabalhoNecessario());
+        return values;
     }
 
     public LiveData<Resource<Void>> removeTrabalho(Trabalho trabalhoRecebido) {
@@ -166,14 +178,7 @@ public class TrabalhoRepository {
                             null,
                             null
                     );
-                    ContentValues values = new ContentValues();
-                    values.put(COLUMN_NAME_NOME, trabalho.getNome());
-                    values.put(COLUMN_NAME_NOME_PRODUCAO, trabalho.getNomeProducao());
-                    values.put(COLUMN_NAME_EXPERIENCIA, trabalho.getExperiencia());
-                    values.put(COLUMN_NAME_NIVEL, trabalho.getNivel());
-                    values.put(COLUMN_NAME_PROFISSAO, trabalho.getProfissao());
-                    values.put(COLUMN_NAME_RARIDADE, trabalho.getRaridade());
-                    values.put(COLUMN_NAME_TRABALHO_NECESSARIO, trabalho.getTrabalhoNecessario());
+                    ContentValues values = defineTrabalhoModificado(trabalho);
                     if (cursor.getCount() == 0) {
                         values.put(COLUMN_NAME_ID, trabalho.getId());
                         dbModificacao.insert(TABLE_TRABALHOS, null, values);
@@ -278,6 +283,34 @@ public class TrabalhoRepository {
         }
         cursor.close();
         liveData.setValue(new Resource<>(trabalhosEncontrados, null));
+        return liveData;
+    }
+
+    public LiveData<Resource<Trabalho>> pegaTrabalhoPorId(String id) {
+        MutableLiveData<Resource<Trabalho>> liveData = new MutableLiveData<>();
+        String selection = "SELECT *"+
+                " FROM " + TABLE_TRABALHOS +
+                " WHERE " + COLUMN_NAME_ID + " == ?" +
+                " LIMIT 1";
+        String[] selectionArgs = {id};
+        Cursor cursor = dbLeitura.rawQuery(selection, selectionArgs);
+        if (cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            Trabalho trabalhoEncontrado = new Trabalho();
+            trabalhoEncontrado.setId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID)));
+            trabalhoEncontrado.setNome(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME)));
+            trabalhoEncontrado.setNomeProducao(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME_PRODUCAO)));
+            trabalhoEncontrado.setExperiencia(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_EXPERIENCIA)));
+            trabalhoEncontrado.setNivel(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_NIVEL)));
+            trabalhoEncontrado.setProfissao(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_PROFISSAO)));
+            trabalhoEncontrado.setRaridade(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_RARIDADE)));
+            trabalhoEncontrado.setTrabalhoNecessario(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_TRABALHO_NECESSARIO)));
+            liveData.setValue(new Resource<>(trabalhoEncontrado, null));
+            cursor.close();
+            return liveData;
+        }
+        cursor.close();
+        liveData.setValue(new Resource<>(null, "Não encontrado"));
         return liveData;
     }
 }

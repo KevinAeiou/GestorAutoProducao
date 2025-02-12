@@ -14,27 +14,57 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.kevin.ceep.R;
+import com.kevin.ceep.databinding.ActivityConfirmaTrabalhoBinding;
 import com.kevin.ceep.model.Trabalho;
 import com.kevin.ceep.model.TrabalhoProducao;
 import com.kevin.ceep.repository.TrabalhoProducaoRepository;
+import com.kevin.ceep.repository.TrabalhoRepository;
 import com.kevin.ceep.ui.viewModel.TrabalhoProducaoViewModel;
+import com.kevin.ceep.ui.viewModel.TrabalhoViewModel;
 import com.kevin.ceep.ui.viewModel.factory.TrabalhoProducaoViewModelFactory;
+import com.kevin.ceep.ui.viewModel.factory.TrabalhoViewModelFactory;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class ConfirmaTrabalhoActivity extends AppCompatActivity {
-
+    private ActivityConfirmaTrabalhoBinding binding;
     private AutoCompleteTextView autoCompleteLicenca,autoCompleteQuantidade;
     private String idPersonagem;
     private Trabalho trabalhoRecebido;
     private int contador;
+    private String nomesTrabalhosNecessarios;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_confirma_trabalho);
+        binding = ActivityConfirmaTrabalhoBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
         setTitle(CHAVE_TITULO_CONFIRMA);
         recebeDadosIntent();
+        preencheCampos();
         configuraBotaoCadastraTrabalho();
+    }
+
+    private void preencheCampos() {
+        binding.txtProfissaoConfirmaTrabalho.setText(trabalhoRecebido.getProfissao());
+        TrabalhoViewModelFactory trabalhoViewModelFactory = new TrabalhoViewModelFactory(new TrabalhoRepository(getApplicationContext()));
+        TrabalhoViewModel trabalhoViewModel = new ViewModelProvider(this, trabalhoViewModelFactory).get(TrabalhoViewModel.class);
+        List<String> idsTrabalhosNecessarios = Arrays.asList(trabalhoRecebido.getTrabalhoNecessario().split(","));
+        nomesTrabalhosNecessarios = "";
+        for (String id : idsTrabalhosNecessarios) {
+            trabalhoViewModel.pegaTrabalhoPorId(id).observe(this, resultadoPegaTrabalho -> {
+                if (resultadoPegaTrabalho.getErro() == null) {
+                    nomesTrabalhosNecessarios += resultadoPegaTrabalho.getDado().getNome();
+                } else {
+                    Snackbar.make(binding.getRoot(), id + " " + resultadoPegaTrabalho.getErro(), Snackbar.LENGTH_LONG).show();
+                }
+                if (!nomesTrabalhosNecessarios.isEmpty())
+                    binding.txtTrabalhoNecessarioConfirmaTrabalho.setText(nomesTrabalhosNecessarios);
+            });
+        }
     }
 
     private void recebeDadosIntent() {
@@ -107,5 +137,11 @@ public class ConfirmaTrabalhoActivity extends AppCompatActivity {
         trabalhoProducao.setRecorrencia(checkRecorrencia.isChecked());
         trabalhoProducao.setEstado(0);
         return trabalhoProducao;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        binding = null;
     }
 }
