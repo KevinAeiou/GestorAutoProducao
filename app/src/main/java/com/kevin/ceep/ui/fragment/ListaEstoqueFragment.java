@@ -1,6 +1,8 @@
 package com.kevin.ceep.ui.fragment;
 
 import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_PERSONAGEM;
+import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_TRABALHO;
+import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CODIGO_REQUISICAO_INSERE_TRABALHO_ESTOQUE;
 import static com.kevin.ceep.utilitario.Utilitario.stringContemString;
 
 import android.annotation.SuppressLint;
@@ -17,6 +19,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -88,6 +92,21 @@ public class ListaEstoqueFragment extends Fragment {
         configuraDeslizeItem();
         configuraSwipeRefreshLayout();
         configuraChipSelecionado();
+        configuraBotaoInsereTrabalho();
+    }
+
+    private void configuraBotaoInsereTrabalho() {
+        binding.floatingButtonFragmentTrabalhosEstoque.setOnClickListener(view -> {
+            Bundle argumento = new Bundle();
+            argumento.putString(CHAVE_PERSONAGEM, personagemId);
+            argumento.putInt(CHAVE_TRABALHO, CODIGO_REQUISICAO_INSERE_TRABALHO_ESTOQUE);
+            ListaTrabalhosInsereNovoTrabalhoFragment listaNovoTrabalhoEstoqueFragment = new ListaTrabalhosInsereNovoTrabalhoFragment();
+            listaNovoTrabalhoEstoqueFragment.setArguments(argumento);
+            FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.nav_host_fragment_content_main, listaNovoTrabalhoEstoqueFragment);
+            fragmentTransaction.commit();
+        });
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -262,6 +281,7 @@ public class ListaEstoqueFragment extends Fragment {
                             }
                         }
                     });
+                    snackbarDesfazer.setAnchorView(binding.floatingButtonFragmentTrabalhosEstoque);
                     snackbarDesfazer.setAction(getString(R.string.stringDesfazer), v -> trabalhoEstoqueAdapter.adiciona(trabalhoremovido, itemPosicao));
                     snackbarDesfazer.show();
                 }

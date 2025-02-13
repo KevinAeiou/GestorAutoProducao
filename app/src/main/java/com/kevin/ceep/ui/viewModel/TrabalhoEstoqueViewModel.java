@@ -23,8 +23,8 @@ public class TrabalhoEstoqueViewModel extends ViewModel {
         return repository.modificaTrabalhoEstoque(trabalhoEstoqueModificado);
     }
 
-    public TrabalhoEstoque pegaTrabalhoEspecificoEstoque(String idTrabalho) {
-        return repository.pegaTrabalhoEspecificoEstoque(idTrabalho);
+    public TrabalhoEstoque pegaTrabalhoEstoquePorIdTrabalho(String idTrabalho) {
+        return repository.pegaTrabalhoEstoquePorIdTrabalho(idTrabalho);
     }
 
     public LiveData<Resource<Void>> insereTrabalhoEstoque(TrabalhoEstoque trabalhoEstoque) {

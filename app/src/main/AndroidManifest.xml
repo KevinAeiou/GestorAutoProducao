@@ -14,9 +14,6 @@
             android:name=".ui.activity.AtributosTrabalhoVendidoActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.activity.ListaNovaProducaoActivity"
-            android:exported="false" />
-        <activity
             android:name=".ui.activity.SplashscreenActivity"
             android:exported="true"
             android:theme="@style/TelaCheia">

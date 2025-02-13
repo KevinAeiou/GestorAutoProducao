@@ -173,7 +173,7 @@ public class TrabalhoEspecificoActivity extends AppCompatActivity {
                                 if (trabalhoModificado.possueTrabalhoNecessarioValido()) {
                                     String[] listaIdsTrabalhosNecessarios = trabalhoModificado.getTrabalhoNecessario().split(",");
                                     for (String idTrabalho : listaIdsTrabalhosNecessarios) {
-                                        TrabalhoEstoque trabalhoEstoqueEncontrado = trabalhoEstoqueViewModel.pegaTrabalhoEspecificoEstoque(idTrabalho);
+                                        TrabalhoEstoque trabalhoEstoqueEncontrado = trabalhoEstoqueViewModel.pegaTrabalhoEstoquePorIdTrabalho(idTrabalho);
                                         if (trabalhoEstoqueEncontrado == null) {
                                             finish();
                                             break;
@@ -186,7 +186,7 @@ public class TrabalhoEspecificoActivity extends AppCompatActivity {
                                 break;
                             case 2:
                                 MutableLiveData<Boolean> confirmacao = new MutableLiveData<>(true);
-                                TrabalhoEstoque trabalhoEstoqueEncontrado = trabalhoEstoqueViewModel.pegaTrabalhoEspecificoEstoque(trabalhoModificado.getIdTrabalho());
+                                TrabalhoEstoque trabalhoEstoqueEncontrado = trabalhoEstoqueViewModel.pegaTrabalhoEstoquePorIdTrabalho(trabalhoModificado.getIdTrabalho());
                                 if (trabalhoEstoqueEncontrado == null) {
                                     if (!trabalhoModificado.ehProducaoDeRecursos()) {
                                         TrabalhoEstoque novoTrabalhoEstoque = new TrabalhoEstoque();

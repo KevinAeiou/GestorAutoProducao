@@ -103,7 +103,7 @@ public class TrabalhoEstoqueRepository {
         trabalhosEstoqueEncontrados.setValue(new Resource<>(trabalhosEstoque, null));
         return trabalhosEstoqueEncontrados;
     }
-    public TrabalhoEstoque pegaTrabalhoEspecificoEstoque(String idTrabalho) {
+    public TrabalhoEstoque pegaTrabalhoEstoquePorIdTrabalho(String idTrabalho) {
         String selection = "SELECT *" +
                 " FROM " + TABLE_ESTOQUE +
                 " WHERE " + COLUMN_NAME_ID_TRABALHO + " == ?" +
@@ -114,9 +114,9 @@ public class TrabalhoEstoqueRepository {
         if (cursor.getCount() == 1) {
             cursor.moveToFirst();
             TrabalhoEstoque trabalhoEstoque = new TrabalhoEstoque();
-            trabalhoEstoque.setId(cursor.getString(0));
-            trabalhoEstoque.setTrabalhoId(cursor.getString(1));
-            trabalhoEstoque.setQuantidade(cursor.getInt(3));
+            trabalhoEstoque.setId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID)));
+            trabalhoEstoque.setTrabalhoId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID_TRABALHO)));
+            trabalhoEstoque.setQuantidade(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_QUANTIDADE)));
             cursor.close();
             return trabalhoEstoque;
         }

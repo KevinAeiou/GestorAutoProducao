@@ -4,6 +4,7 @@ import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_NOME_TRABA
 import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_PERSONAGEM;
 import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_TRABALHO;
 import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CODIGO_REQUISICAO_ALTERA_TRABALHO_PRODUCAO;
+import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CODIGO_REQUISICAO_INSERE_TRABALHO_PRODUCAO;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -18,6 +19,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -29,10 +32,8 @@ import com.google.android.material.snackbar.Snackbar;
 import com.kevin.ceep.R;
 import com.kevin.ceep.databinding.FragmentListaTrabalhosProducaoBinding;
 import com.kevin.ceep.model.Trabalho;
-import com.kevin.ceep.model.TrabalhoEstoque;
 import com.kevin.ceep.model.TrabalhoProducao;
 import com.kevin.ceep.repository.TrabalhoProducaoRepository;
-import com.kevin.ceep.ui.activity.ListaNovaProducaoActivity;
 import com.kevin.ceep.ui.activity.TrabalhoEspecificoActivity;
 import com.kevin.ceep.ui.recyclerview.adapter.ListaTrabalhoEspecificoAdapter;
 import com.kevin.ceep.ui.recyclerview.adapter.ListaTrabalhoProducaoAdapter;
@@ -191,13 +192,18 @@ public class ListaTrabalhosProducaoFragment extends Fragment {
         });
     }
     private void configuraBotaoInsereTrabalho() {
-        binding.floatingActionButton.setOnClickListener(v -> vaiParaListaNovaProducaoActivity());
+        binding.floatingActionButton.setOnClickListener(v -> vaiParaListaTrabalhosNovoTrabalhoFragmento());
     }
-    private void vaiParaListaNovaProducaoActivity() {
-        Intent iniciaVaiParaListaNovaProducaoActivity =
-                new Intent(getContext(), ListaNovaProducaoActivity.class);
-        iniciaVaiParaListaNovaProducaoActivity.putExtra(CHAVE_PERSONAGEM, personagemId);
-        startActivity(iniciaVaiParaListaNovaProducaoActivity);
+    private void vaiParaListaTrabalhosNovoTrabalhoFragmento() {
+        Bundle argumento = new Bundle();
+        argumento.putString(CHAVE_PERSONAGEM, personagemId);
+        argumento.putInt(CHAVE_TRABALHO, CODIGO_REQUISICAO_INSERE_TRABALHO_PRODUCAO);
+        ListaTrabalhosInsereNovoTrabalhoFragment listaTrabalhosInsereNovoTrabalho = new ListaTrabalhosInsereNovoTrabalhoFragment();
+        listaTrabalhosInsereNovoTrabalho.setArguments(argumento);
+        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.nav_host_fragment_content_main, listaTrabalhosInsereNovoTrabalho);
+        fragmentTransaction.commit();
     }
 
     private void inicializaComponentes() {

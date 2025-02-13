@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/constrintLayoutListaNovaProducao"
-    tools:context=".ui.activity.ListaNovaProducaoActivity">
+    tools:context=".ui.fragment.ListaTrabalhosInsereNovoTrabalhoFragment">
 
     <ProgressBar
         android:id="@+id/indicadorProgressoListaNovaProducao"
@@ -29,7 +29,7 @@
 
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/grupoProfissoesChipListaNovaProducao"
-            android:tooltipText="@string/stringProfissoes"
+            tools:text="@string/stringProfissoes"
             app:singleLine="true"
             android:padding="8dp"
             android:layout_width="wrap_content"
