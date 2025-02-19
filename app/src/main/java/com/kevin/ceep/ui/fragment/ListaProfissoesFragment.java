@@ -1,9 +1,8 @@
 package com.kevin.ceep.ui.fragment;
 
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_PERSONAGEM;
+import static com.kevin.ceep.ui.activity.Constantes.CHAVE_PERSONAGEM;
 
 import android.os.Bundle;
-import android.text.Editable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,11 +19,14 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.google.android.material.snackbar.Snackbar;
 import com.kevin.ceep.databinding.FragmentListaProfissoesBinding;
 import com.kevin.ceep.model.Profissao;
+import com.kevin.ceep.repository.PersonagemRepository;
 import com.kevin.ceep.repository.ProfissaoRepository;
 import com.kevin.ceep.ui.recyclerview.adapter.ListaProfissaoAdapter;
-import com.kevin.ceep.ui.recyclerview.adapter.listener.AddTextChangedListenerInterface;
-import com.kevin.ceep.ui.recyclerview.adapter.listener.OnItemClickListenerProfissao;
+import com.kevin.ceep.ui.viewModel.ComponentesVisuais;
+import com.kevin.ceep.ui.viewModel.EstadoAppViewModel;
+import com.kevin.ceep.ui.viewModel.PersonagemViewModel;
 import com.kevin.ceep.ui.viewModel.ProfissaoViewModel;
+import com.kevin.ceep.ui.viewModel.factory.PersonagemViewModelFactory;
 import com.kevin.ceep.ui.viewModel.factory.ProfissaoViewModelFactory;
 
 import java.util.ArrayList;
@@ -38,26 +40,13 @@ public class ListaProfissoesFragment extends Fragment {
     private SwipeRefreshLayout swipeRefreshLayout;
     private ProgressBar indicadorProgresso;
     private ProfissaoViewModel profissaoViewModel;
+    private PersonagemViewModel personagemViewModel;
 
     public ListaProfissoesFragment() {
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        recebeDadosIntent();
-    }
-
-    private void recebeDadosIntent() {
-        Bundle argumento = getArguments();
-        if (argumento != null) {
-            if (argumento.containsKey(CHAVE_PERSONAGEM)) {
-                personagemId = argumento.getString(CHAVE_PERSONAGEM);
-                if (personagemId != null) {
-                    ProfissaoViewModelFactory profissaoViewModelFactory = new ProfissaoViewModelFactory(new ProfissaoRepository(personagemId));
-                    profissaoViewModel = new ViewModelProvider(this, profissaoViewModelFactory).get(ProfissaoViewModel.class);
-                }
-            }
-        }
     }
 
     @Override
@@ -70,6 +59,11 @@ public class ListaProfissoesFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        EstadoAppViewModel estadoAppViewModel = new ViewModelProvider(requireActivity()).get(EstadoAppViewModel.class);
+        ComponentesVisuais componentesVisuais = new ComponentesVisuais();
+        componentesVisuais.appBar = true;
+        componentesVisuais.navigationMenu = true;
+        estadoAppViewModel.componentes.setValue(componentesVisuais);
         inicializaComponentes();
         configuraRecyclerView();
         configuraSwipeRefreshLayout();
@@ -118,14 +112,20 @@ public class ListaProfissoesFragment extends Fragment {
         meuRecycler = binding.recyclerViewListaProfissoesFragment;
         swipeRefreshLayout = binding.swipeRefreshLayoutListaProfissoesFragment;
         indicadorProgresso = binding.indicadorProgressoListaProfissoesFragment;
+        PersonagemViewModelFactory personagemViewModelFactory = new PersonagemViewModelFactory(new PersonagemRepository(getContext()));
+        personagemViewModel = new ViewModelProvider(requireActivity(), personagemViewModelFactory).get(PersonagemViewModel.class);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if (personagemId != null) {
+        personagemViewModel.pegaPersonagemSelecionado().observe(getViewLifecycleOwner(), resultadoPegaPersonagem -> {
+            if (resultadoPegaPersonagem == null) return;
+            personagemId = resultadoPegaPersonagem.getId();
+            ProfissaoViewModelFactory profissaoViewModelFactory = new ProfissaoViewModelFactory(new ProfissaoRepository(personagemId));
+            profissaoViewModel = new ViewModelProvider(this, profissaoViewModelFactory).get(ProfissaoViewModel.class);
             pegaTodasProfissoes();
-        }
+        });
     }
 
     @Override

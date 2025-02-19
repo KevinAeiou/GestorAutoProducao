@@ -1,15 +1,20 @@
-package com.kevin.ceep.ui.activity;
+package com.kevin.ceep.ui.fragment;
 
 import android.annotation.SuppressLint;
-import android.app.ActivityOptions;
-import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatButton;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
@@ -17,32 +22,46 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.kevin.ceep.R;
-import com.kevin.ceep.databinding.ActivityEntrarUsuarioBinding;
+import com.kevin.ceep.databinding.FragmentEntrarUsuarioBinding;
 import com.kevin.ceep.model.Usuario;
 import com.kevin.ceep.repository.FirebaseAuthRepository;
 import com.kevin.ceep.ui.viewModel.AutenticacaoViewModel;
+import com.kevin.ceep.ui.viewModel.ComponentesVisuais;
+import com.kevin.ceep.ui.viewModel.EstadoAppViewModel;
 import com.kevin.ceep.ui.viewModel.factory.AutenticacaoViewModelFactor;
 
 import java.util.Objects;
 
-public class EntrarUsuarioActivity extends AppCompatActivity implements View.OnClickListener {
-    private ActivityEntrarUsuarioBinding binding;
+public class EntrarUsuarioFragment extends Fragment implements View.OnClickListener {
+    private FragmentEntrarUsuarioBinding binding;
     private TextInputEditText edtEmail, edtSenha;
     private TextInputLayout txtEmail, txtSenha;
     private TextView txtCadastrar, txtRecuperarSenha;
     private AppCompatButton botao_entrar;
     private AutenticacaoViewModel autenticacaoViewModel;
+    private EstadoAppViewModel estadoAppViewModel;
     String [] menssagens = {"Campo requerido!", "Login efetuado com sucesso!"};
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        binding = FragmentEntrarUsuarioBinding.inflate(inflater, container, false);
+        Log.d("fluxo", "onCreateView");
+
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityEntrarUsuarioBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().hide();
-        }
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         inicializaComponentes();
+        ComponentesVisuais componentesVisuais = new ComponentesVisuais();
+        estadoAppViewModel.componentes.setValue(componentesVisuais);
         botao_entrar.setOnClickListener(this);
         txtCadastrar.setOnClickListener(this);
         txtRecuperarSenha.setOnClickListener(this);
@@ -58,6 +77,7 @@ public class EntrarUsuarioActivity extends AppCompatActivity implements View.OnC
         edtSenha = binding.edtSenha;
         AutenticacaoViewModelFactor autenticacaoViewModelFactor = new AutenticacaoViewModelFactor(new FirebaseAuthRepository());
         autenticacaoViewModel = new ViewModelProvider(this, autenticacaoViewModelFactor).get(AutenticacaoViewModel.class);
+        estadoAppViewModel = new ViewModelProvider(requireActivity()).get(EstadoAppViewModel.class);
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -78,15 +98,13 @@ public class EntrarUsuarioActivity extends AppCompatActivity implements View.OnC
     }
 
     private void vaiParaRecuperarSenhaActivity() {
-        Intent iniciaVaiParaRecuperarSenhaActivity = new Intent(this, RecuperarSenhaActivity.class);
-        startActivity(iniciaVaiParaRecuperarSenhaActivity,
-                ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+        NavDirections acao = EntrarUsuarioFragmentDirections.vaiDeEntrarParaRecuperarSenha();
+        Navigation.findNavController(binding.getRoot()).navigate(acao);
     }
 
     private void vaiParaCadastroUsuarioActivity() {
-        Intent iniciaVaiParaCadastroUsuarioActivity = new Intent(this, CadastrarUsuarioActivity.class);
-        startActivity(iniciaVaiParaCadastroUsuarioActivity,
-                ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+        NavDirections acao = EntrarUsuarioFragmentDirections.vaiDeEntrarParaCadastrar();
+        Navigation.findNavController(binding.getRoot()).navigate(acao);
     }
 
     private void entrarUsuario() {
@@ -103,9 +121,9 @@ public class EntrarUsuarioActivity extends AppCompatActivity implements View.OnC
     }
 
     private void configuraErrosCampos(Usuario usuario) {
-        if (configuraErroCampoEmailVazio(usuario)) return;
-        if (configuraErroCampoSenhaVazia(usuario)) return;
         botao_entrar.setEnabled(true);
+        configuraErroCampoEmailVazio(usuario);
+        configuraErroCampoSenhaVazia(usuario);
     }
 
     private boolean configuraErroCampoEmailVazio(Usuario usuario) {
@@ -133,6 +151,7 @@ public class EntrarUsuarioActivity extends AppCompatActivity implements View.OnC
     private void autenticarUsuario(Usuario usuario) {
         autenticacaoViewModel.autenticarUsuario(usuario).observe(this, resultadoAutenticacao -> {
             if (resultadoAutenticacao.getErro() == null) {
+                Log.d("fluxo", "USUARIO AUTENTICADO");
                 vaiParaMenuNavegacao();
                 return;
             }
@@ -151,18 +170,16 @@ public class EntrarUsuarioActivity extends AppCompatActivity implements View.OnC
     }
 
     private void vaiParaMenuNavegacao() {
-        Intent vaiParaMenuNavegacao =  new Intent(getApplicationContext(), MainActivity.class);
-        startActivity(vaiParaMenuNavegacao,
-                ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
-        finish();
+        NavDirections acao = EntrarUsuarioFragmentDirections.vaiParaListaTrabalhosProducao();
+        Navigation.findNavController(binding.getRoot()).navigate(acao);
     }
 
     @Override
-    protected void onStart() {
+    public void onStart() {
         super.onStart();
         FirebaseUser usuarioAtual = FirebaseAuth.getInstance().getCurrentUser();
-        if (usuarioAtual != null){
-            vaiParaMenuNavegacao();
-        }
+        Log.d("fluxo", "USUARIO ATUAL: " + usuarioAtual);
+        if (usuarioAtual == null) return;
+        vaiParaMenuNavegacao();
     }
 }

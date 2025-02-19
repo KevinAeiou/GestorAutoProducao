@@ -3,11 +3,9 @@ package com.kevin.ceep.ui.viewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-
 import com.kevin.ceep.model.Personagem;
 import com.kevin.ceep.repository.PersonagemRepository;
 import com.kevin.ceep.repository.Resource;
-
 import java.util.ArrayList;
 
 public class PersonagemViewModel extends ViewModel {
@@ -40,5 +38,9 @@ public class PersonagemViewModel extends ViewModel {
 
     public LiveData<Resource<Void>> inserePersonagem(Personagem novoPersonagem) {
         return personagemRepository.inserePersonagem(novoPersonagem);
+    }
+
+    public LiveData<Resource<Void>> removePersonagem(Personagem personagemRecebido) {
+        return personagemRepository.removePersonagem(personagemRecebido);
     }
 }

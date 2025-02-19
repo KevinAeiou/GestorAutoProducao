@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/constraintLayoutAtributosPersonagem"
-    tools:context=".ui.activity.AtributosPersonagemActivity">
+    tools:context=".ui.fragment.AtributosPersonagemFragment">
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/txtNomePersonagem"
@@ -129,4 +129,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
     </com.google.android.material.textfield.TextInputLayout>
+
+    <Button
+        android:id="@+id/btnExcluiPersonagem"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/stringExcluir"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/txtSenhaPersonagem"
+        app:layout_constraintStart_toStartOf="@+id/txtSenhaPersonagem"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

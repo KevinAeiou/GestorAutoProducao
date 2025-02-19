@@ -15,20 +15,21 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.kevin.ceep.R;
 import com.kevin.ceep.model.TrabalhoProducao;
 import com.kevin.ceep.ui.recyclerview.adapter.listener.OnItemClickListener;
+import com.kevin.ceep.ui.recyclerview.adapter.listener.OnItemClickListenerTrabalhoProducao;
 
 import java.util.List;
 
 public class ListaTrabalhoProducaoAdapter extends RecyclerView.Adapter<ListaTrabalhoProducaoAdapter.TrabalhoProducaoViewHolder> {
     private List<TrabalhoProducao> trabalhosProducao;
     private final Context context;
-    private OnItemClickListener onItemClickListener;
+    private OnItemClickListenerTrabalhoProducao onItemClickListener;
 
     public ListaTrabalhoProducaoAdapter(Context context,List<TrabalhoProducao> trabalhosProducao) {
         this.trabalhosProducao = trabalhosProducao;
         this.context = context;
     }
 
-    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+    public void setOnItemClickListener(OnItemClickListenerTrabalhoProducao onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
     }
     public void atualiza(List<TrabalhoProducao> listaFiltrada){
@@ -89,7 +90,7 @@ public class ListaTrabalhoProducaoAdapter extends RecyclerView.Adapter<ListaTrab
             tipo_licenca = itemView.findViewById(R.id.itemTipoLicenca);
             profissao_trabalho = itemView.findViewById(R.id.itemProfissaoTrabalho);
             nivel_trabalho = itemView.findViewById(R.id.itemNivelTrabalho);
-            itemView.setOnClickListener(view -> onItemClickListener.onItemClick(trabalhoProducao, getAdapterPosition()));
+            itemView.setOnClickListener(view -> onItemClickListener.onItemClick(trabalhoProducao));
         }
 
         public void vincula(TrabalhoProducao trabalhoProducao) {

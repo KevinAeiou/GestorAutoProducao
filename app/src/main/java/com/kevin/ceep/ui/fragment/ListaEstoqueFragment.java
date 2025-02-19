@@ -1,8 +1,6 @@
 package com.kevin.ceep.ui.fragment;
 
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_PERSONAGEM;
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_TRABALHO;
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CODIGO_REQUISICAO_INSERE_TRABALHO_ESTOQUE;
+import static com.kevin.ceep.ui.activity.Constantes.CODIGO_REQUISICAO_INSERE_TRABALHO_ESTOQUE;
 import static com.kevin.ceep.utilitario.Utilitario.stringContemString;
 
 import android.annotation.SuppressLint;
@@ -19,9 +17,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -33,9 +30,14 @@ import com.google.android.material.snackbar.Snackbar;
 import com.kevin.ceep.R;
 import com.kevin.ceep.databinding.FragmentListaTrabalhosEstoqueBinding;
 import com.kevin.ceep.model.TrabalhoEstoque;
+import com.kevin.ceep.repository.PersonagemRepository;
 import com.kevin.ceep.repository.TrabalhoEstoqueRepository;
 import com.kevin.ceep.ui.recyclerview.adapter.ListaTrabalhoEstoqueAdapter;
+import com.kevin.ceep.ui.viewModel.ComponentesVisuais;
+import com.kevin.ceep.ui.viewModel.EstadoAppViewModel;
+import com.kevin.ceep.ui.viewModel.PersonagemViewModel;
 import com.kevin.ceep.ui.viewModel.TrabalhoEstoqueViewModel;
+import com.kevin.ceep.ui.viewModel.factory.PersonagemViewModelFactory;
 import com.kevin.ceep.ui.viewModel.factory.TrabalhoEstoqueViewModelFactory;
 
 import java.util.ArrayList;
@@ -55,25 +57,12 @@ public class ListaEstoqueFragment extends Fragment {
     private TrabalhoEstoqueViewModel trabalhoEstoqueViewModel;
     private ImageView iconeListaVazia;
     private TextView txtListaVazia;
+    private PersonagemViewModel personagemViewModel;
     public ListaEstoqueFragment() {
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        recebeDadosIntent();
-    }
-
-    private void recebeDadosIntent() {
-        Bundle argumento = getArguments();
-        if (argumento != null) {
-            if (argumento.containsKey(CHAVE_PERSONAGEM)){
-                personagemId = argumento.getString(CHAVE_PERSONAGEM);
-                if (personagemId != null) {
-                    TrabalhoEstoqueViewModelFactory trabalhoEstoqueViewModelFactory = new TrabalhoEstoqueViewModelFactory(new TrabalhoEstoqueRepository(getContext(), personagemId));
-                    trabalhoEstoqueViewModel = new ViewModelProvider(this, trabalhoEstoqueViewModelFactory).get(TrabalhoEstoqueViewModel.class);
-                }
-            }
-        }
     }
 
     @Override
@@ -87,6 +76,11 @@ public class ListaEstoqueFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        EstadoAppViewModel estadoAppViewModel = new ViewModelProvider(requireActivity()).get(EstadoAppViewModel.class);
+        ComponentesVisuais componentesVisuais = new ComponentesVisuais();
+        componentesVisuais.appBar = true;
+        componentesVisuais.navigationMenu = true;
+        estadoAppViewModel.componentes.setValue(componentesVisuais);
         inicializaComponentes();
         configuraRecyclerView();
         configuraDeslizeItem();
@@ -97,15 +91,9 @@ public class ListaEstoqueFragment extends Fragment {
 
     private void configuraBotaoInsereTrabalho() {
         binding.floatingButtonFragmentTrabalhosEstoque.setOnClickListener(view -> {
-            Bundle argumento = new Bundle();
-            argumento.putString(CHAVE_PERSONAGEM, personagemId);
-            argumento.putInt(CHAVE_TRABALHO, CODIGO_REQUISICAO_INSERE_TRABALHO_ESTOQUE);
-            ListaTrabalhosInsereNovoTrabalhoFragment listaNovoTrabalhoEstoqueFragment = new ListaTrabalhosInsereNovoTrabalhoFragment();
-            listaNovoTrabalhoEstoqueFragment.setArguments(argumento);
-            FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.replace(R.id.nav_host_fragment_content_main, listaNovoTrabalhoEstoqueFragment);
-            fragmentTransaction.commit();
+            ListaEstoqueFragmentDirections.VaiDeEstoqueParaTrabalhos acao = ListaEstoqueFragmentDirections.vaiDeEstoqueParaTrabalhos(personagemId);
+            acao.setRequisicao(CODIGO_REQUISICAO_INSERE_TRABALHO_ESTOQUE);
+            Navigation.findNavController(view).navigate(acao);
         });
     }
 
@@ -218,6 +206,9 @@ public class ListaEstoqueFragment extends Fragment {
         indicadorDeProgresso = binding.indicadorProgressoListaEstoqueFragment;
         iconeListaVazia = binding.iconeVazia;
         txtListaVazia = binding.txtListaVazia;
+
+        PersonagemViewModelFactory personagemViewModelFactory = new PersonagemViewModelFactory(new PersonagemRepository(getContext()));
+        personagemViewModel = new ViewModelProvider(requireActivity(), personagemViewModelFactory).get(PersonagemViewModel.class);
     }
     private void configuraRecyclerView() {
         recyclerView.setHasFixedSize(true);
@@ -304,7 +295,13 @@ public class ListaEstoqueFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (personagemId != null) pegaTodosTrabalhosEstoque();
+        personagemViewModel.pegaPersonagemSelecionado().observe(getViewLifecycleOwner(), personagemSelecionado -> {
+            if (personagemSelecionado == null) return;
+            personagemId = personagemSelecionado.getId();
+            TrabalhoEstoqueViewModelFactory trabalhoEstoqueViewModelFactory = new TrabalhoEstoqueViewModelFactory(new TrabalhoEstoqueRepository(getContext(), personagemId));
+            trabalhoEstoqueViewModel = new ViewModelProvider(this, trabalhoEstoqueViewModelFactory).get(TrabalhoEstoqueViewModel.class);
+            pegaTodosTrabalhosEstoque();
+        });
     }
 
     @Override

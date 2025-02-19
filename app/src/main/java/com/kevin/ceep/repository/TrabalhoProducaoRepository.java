@@ -7,14 +7,16 @@ import static com.kevin.ceep.db.contracts.TrabalhoProducaoContract.TrabalhoProdu
 import static com.kevin.ceep.db.contracts.TrabalhoProducaoContract.TrabalhoProducaoEntry.COLUMN_NAME_LICENCA;
 import static com.kevin.ceep.db.contracts.TrabalhoProducaoContract.TrabalhoProducaoEntry.COLUMN_NAME_RECORRENCIA;
 import static com.kevin.ceep.db.contracts.TrabalhoProducaoContract.TrabalhoProducaoEntry.TABLE_TRABALHOS_PRODUCAO;
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_LISTA_DESEJO;
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_LISTA_PERSONAGEM;
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_USUARIOS;
+import static com.kevin.ceep.ui.activity.Constantes.CHAVE_LISTA_DESEJO;
+import static com.kevin.ceep.ui.activity.Constantes.CHAVE_LISTA_PERSONAGEM;
+import static com.kevin.ceep.ui.activity.Constantes.CHAVE_USUARIOS;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -36,7 +38,13 @@ public class TrabalhoProducaoRepository {
     private final SQLiteDatabase dbLeitura, dbModificacao;
     private final String idPersonagem;
     private final MutableLiveData<Resource<ArrayList<TrabalhoProducao>>> trabalhosProducaoEncontrados;
-
+    private static TrabalhoProducaoRepository minhaInstancia = null;
+    public static TrabalhoProducaoRepository getMinhaInstancia(Context context, String idPersonagem) {
+        if (minhaInstancia == null) {
+            minhaInstancia = new TrabalhoProducaoRepository(context.getApplicationContext(), idPersonagem);
+        }
+        return minhaInstancia;
+    }
     public TrabalhoProducaoRepository(Context context, String personagemID) {
         String usuarioID = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
         this.minhaReferenciaListaDeDesejos = FirebaseDatabase.getInstance().getReference(CHAVE_USUARIOS)
@@ -45,7 +53,8 @@ public class TrabalhoProducaoRepository {
         DbHelper dbHelper = DbHelper.getInstance(context);
         this.dbLeitura = dbHelper.getReadableDatabase();
         this.dbModificacao = dbHelper.getWritableDatabase();
-        this.idPersonagem = personagemID;
+        idPersonagem = personagemID;
+        Log.d("trabalhos", "ID PERSONAGEM instanciado: " + idPersonagem);
         this.trabalhosProducaoEncontrados = new MutableLiveData<>();
     }
 
@@ -118,6 +127,7 @@ public class TrabalhoProducaoRepository {
                 "ON Lista_desejo.idTrabalho == trabalhos.id\n" +
                 "WHERE Lista_desejo.idPersonagem == ?" +
                 "ORDER BY trabalhos.profissao, Lista_desejo.estado, trabalhos.raridade, trabalhos.nivel;";
+        Log.d("trabalhos", "ID PERSONAGEM pegaTodosTrabalhosProducao: " + idPersonagem);
         String[] selectionArgs = {idPersonagem};
         Cursor cursor = dbLeitura.rawQuery(
                 sql,

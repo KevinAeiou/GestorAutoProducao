@@ -5,9 +5,9 @@ import static com.kevin.ceep.db.contracts.EstoqueDbContract.EstoqueEntry.COLUMN_
 import static com.kevin.ceep.db.contracts.EstoqueDbContract.EstoqueEntry.COLUMN_NAME_ID_TRABALHO;
 import static com.kevin.ceep.db.contracts.EstoqueDbContract.EstoqueEntry.COLUMN_NAME_QUANTIDADE;
 import static com.kevin.ceep.db.contracts.EstoqueDbContract.EstoqueEntry.TABLE_ESTOQUE;
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_LISTA_ESTOQUE;
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_LISTA_PERSONAGEM;
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_USUARIOS;
+import static com.kevin.ceep.ui.activity.Constantes.CHAVE_LISTA_ESTOQUE;
+import static com.kevin.ceep.ui.activity.Constantes.CHAVE_LISTA_PERSONAGEM;
+import static com.kevin.ceep.ui.activity.Constantes.CHAVE_USUARIOS;
 
 import android.annotation.SuppressLint;
 import android.content.ContentValues;

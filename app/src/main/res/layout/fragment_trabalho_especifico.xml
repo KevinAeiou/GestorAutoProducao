@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/scrollViewTrabalhoEspecifico"
-    tools:context=".ui.activity.TrabalhoEspecificoActivity">
+    tools:context=".ui.fragment.TrabalhoEspecificoFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -109,11 +109,12 @@
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/edtExperienciaTrabalho"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:gravity="start"
                     android:inputType="numberSigned"
-                    android:textSize="24sp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    android:text="0"
+                    android:textSize="24sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -127,11 +128,12 @@
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/edtNivelTrabalho"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:gravity="start"
                     android:inputType="numberSigned"
-                    android:textSize="24sp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    android:text="0"
+                    android:textSize="24sp" />
             </com.google.android.material.textfield.TextInputLayout>
         </androidx.appcompat.widget.LinearLayoutCompat>
 

@@ -1,5 +1,7 @@
 package com.kevin.ceep.ui.viewModel;
 
+import android.content.Context;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
@@ -10,11 +12,19 @@ import com.kevin.ceep.repository.TrabalhoProducaoRepository;
 import java.util.ArrayList;
 
 public class TrabalhoProducaoViewModel extends ViewModel {
+    private static TrabalhoProducaoViewModel minhaInstancia = null;
     private final TrabalhoProducaoRepository repository;
-
     public TrabalhoProducaoViewModel(TrabalhoProducaoRepository repository) {
         this.repository = repository;
     }
+
+    public static TrabalhoProducaoViewModel getMinhaInstancia(TrabalhoProducaoRepository repository) {
+        if (minhaInstancia == null) {
+            minhaInstancia = new TrabalhoProducaoViewModel(repository);
+        }
+        return minhaInstancia;
+    }
+
     public LiveData<Resource<Void>> modificaTrabalhoProducao(TrabalhoProducao trabalhoModificado) {
         return repository.modificaTrabalhoProducao(trabalhoModificado);
     }

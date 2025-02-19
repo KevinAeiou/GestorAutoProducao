@@ -1,8 +1,8 @@
 package com.kevin.ceep.repository;
 
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_LISTA_PERSONAGEM;
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_LISTA_PROFISSAO;
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_USUARIOS;
+import static com.kevin.ceep.ui.activity.Constantes.CHAVE_LISTA_PERSONAGEM;
+import static com.kevin.ceep.ui.activity.Constantes.CHAVE_LISTA_PROFISSAO;
+import static com.kevin.ceep.ui.activity.Constantes.CHAVE_USUARIOS;
 import static com.kevin.ceep.utilitario.Utilitario.comparaString;
 
 import android.os.Build;

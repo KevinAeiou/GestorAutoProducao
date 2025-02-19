@@ -1,22 +1,18 @@
 package com.kevin.ceep.ui.fragment;
 
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_PERSONAGEM;
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_TRABALHO;
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CODIGO_REQUISICAO_INSERE_TRABALHO_ESTOQUE;
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CODIGO_REQUISICAO_INSERE_TRABALHO_PRODUCAO;
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CODIGO_REQUISICAO_INVALIDA;
+import static com.kevin.ceep.ui.activity.Constantes.CODIGO_REQUISICAO_INSERE_TRABALHO_ESTOQUE;
+import static com.kevin.ceep.ui.activity.Constantes.CODIGO_REQUISICAO_INSERE_TRABALHO_PRODUCAO;
+import static com.kevin.ceep.ui.activity.Constantes.CODIGO_REQUISICAO_INVALIDA;
 import static com.kevin.ceep.utilitario.Utilitario.stringContemString;
 
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -25,10 +21,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.SearchView;
+import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -41,10 +38,12 @@ import com.kevin.ceep.model.Trabalho;
 import com.kevin.ceep.model.TrabalhoEstoque;
 import com.kevin.ceep.repository.TrabalhoEstoqueRepository;
 import com.kevin.ceep.repository.TrabalhoRepository;
-import com.kevin.ceep.ui.activity.ConfirmaTrabalhoActivity;
+import com.kevin.ceep.ui.fragment.ListaTrabalhosInsereNovoTrabalhoFragmentDirections.VaiParaConfirmaTrabalho;
 import com.kevin.ceep.ui.recyclerview.adapter.ListaTrabalhoEspecificoAdapter;
 import com.kevin.ceep.ui.recyclerview.adapter.ListaTrabalhoEspecificoNovaProducaoAdapter;
 import com.kevin.ceep.ui.recyclerview.adapter.listener.OnItemClickListener;
+import com.kevin.ceep.ui.viewModel.ComponentesVisuais;
+import com.kevin.ceep.ui.viewModel.EstadoAppViewModel;
 import com.kevin.ceep.ui.viewModel.ListaNovaProducaoViewModel;
 import com.kevin.ceep.ui.viewModel.TrabalhoEstoqueViewModel;
 import com.kevin.ceep.ui.viewModel.factory.ListaNovaProducaoViewModelFactory;
@@ -60,7 +59,6 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment {
     private RecyclerView meuRecycler;
     private ListaTrabalhoEspecificoNovaProducaoAdapter listaTrabalhoEspecificoAdapter;
     private String personagemId, textoFiltro;
-    private HorizontalScrollView linearLayoutGruposChips;
     private ChipGroup grupoChipsProfissoes;
     private ArrayList<String> listaProfissoes;
     private ArrayList<Trabalho> todosTrabalhos, listaTrabalhosFiltrada;
@@ -84,10 +82,29 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        EstadoAppViewModel estadoAppViewModel = new ViewModelProvider(requireActivity()).get(EstadoAppViewModel.class);
+        ComponentesVisuais componentesVisuais = new ComponentesVisuais();
+        componentesVisuais.appBar = true;
+        componentesVisuais.itemMenuBusca = true;
+        estadoAppViewModel.componentes.setValue(componentesVisuais);
         inicializaComponentes();
         recebeDadosIntent();
         configuraMeuRecycler();
         configuraChipSelecionado();
+        requireActivity().addMenuProvider(new MenuProvider() {
+            @Override
+            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+
+            }
+
+            @Override
+            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+                if (menuItem.getItemId() == R.id.itemMenuBusca) {
+                    configuraCampoDeBusca(menuItem);
+                }
+                return true;
+            }
+        });
     }
 
     private void configuraChipSelecionado() {
@@ -154,26 +171,6 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment {
         return !listaProfissoes.contains(trabalho.getProfissao());
     }
 
-    @Override
-    public void onCreateContextMenu(@NonNull ContextMenu menu, @NonNull View v, @Nullable ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-    }
-
-    @Override
-    public boolean onContextItemSelected(@NonNull MenuItem item) {
-        return super.onContextItemSelected(item);
-    }
-
-    @NonNull
-    private MenuItem configuraItemDeBusca(Menu menu) {
-        MenuItem itemBusca = menu.findItem(R.id.itemMenuBusca);
-        itemBusca.setOnMenuItemClickListener(item -> {
-            linearLayoutGruposChips.setVisibility(View.VISIBLE);
-            return true;
-        });
-        return itemBusca;
-    }
-
     private void configuraCampoDeBusca(MenuItem itemBusca) {
         androidx.appcompat.widget.SearchView busca = (androidx.appcompat.widget.SearchView) itemBusca.getActionView();
         assert busca != null;
@@ -215,12 +212,8 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment {
     }
 
     private void recebeDadosIntent() {
-        Bundle dadosRecebidos = getArguments();
-        assert dadosRecebidos != null;
-        if (dadosRecebidos.containsKey(CHAVE_PERSONAGEM)) {
-            personagemId = (String) dadosRecebidos.getSerializable(CHAVE_PERSONAGEM);
-        }
-        if (dadosRecebidos.containsKey(CHAVE_TRABALHO)) codigoRequisicao = dadosRecebidos.getInt(CHAVE_TRABALHO);
+        personagemId = ListaTrabalhosInsereNovoTrabalhoFragmentArgs.fromBundle(getArguments()).getIdPersonagem();
+        codigoRequisicao = ListaTrabalhosInsereNovoTrabalhoFragmentArgs.fromBundle(getArguments()).getRequisicao();
     }
 
     private void configuraMeuRecycler() {
@@ -235,9 +228,8 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment {
         listaTrabalhoEspecificoAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(Trabalho trabalho, int adapterPosition) {
-                if (codigoRequisicao == CODIGO_REQUISICAO_INSERE_TRABALHO_PRODUCAO) vaiParaConfirmaTrabalhoActivity(trabalho);
+                if (codigoRequisicao == CODIGO_REQUISICAO_INSERE_TRABALHO_PRODUCAO) vaiParaConfirmaTrabalhoFragment(trabalho);
                 if (codigoRequisicao == CODIGO_REQUISICAO_INSERE_TRABALHO_ESTOQUE) {
-//                    Inserir trabalho selecionado ao estoque
                     TrabalhoEstoqueViewModelFactory trabalhoEstoqueViewModelFactory = new TrabalhoEstoqueViewModelFactory(new TrabalhoEstoqueRepository(getContext(), personagemId));
                     TrabalhoEstoqueViewModel trabalhoEstoqueViewModel = new ViewModelProvider(getViewModelStore(), trabalhoEstoqueViewModelFactory).get(TrabalhoEstoqueViewModel.class);
                     TrabalhoEstoque trabalhoEstoque = new TrabalhoEstoque();
@@ -273,27 +265,19 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment {
     }
 
     private void voltaParaListaEstoqueFragment() {
-        Bundle argumento = new Bundle();
-        argumento.putString(CHAVE_PERSONAGEM, personagemId);
-        ListaEstoqueFragment listaEstoqueFragment = new ListaEstoqueFragment();
-        listaEstoqueFragment.setArguments(argumento);
-        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.nav_host_fragment_content_main, listaEstoqueFragment);
-        fragmentTransaction.commit();
+        NavDirections acao = ListaTrabalhosInsereNovoTrabalhoFragmentDirections.vaiDeTrabalhosParaEstoque();
+        Navigation.findNavController(binding.getRoot()).navigate(acao);
     }
 
-    private void vaiParaConfirmaTrabalhoActivity(Trabalho trabalho) {
-        Intent iniciaVaiParaConfirmaTrabalhoActivity = new Intent(getContext(), ConfirmaTrabalhoActivity.class);
-        iniciaVaiParaConfirmaTrabalhoActivity.putExtra(CHAVE_TRABALHO, trabalho);
-        iniciaVaiParaConfirmaTrabalhoActivity.putExtra(CHAVE_PERSONAGEM, personagemId);
-        startActivity(iniciaVaiParaConfirmaTrabalhoActivity);
+    private void vaiParaConfirmaTrabalhoFragment(Trabalho trabalho) {
+        VaiParaConfirmaTrabalho acao = ListaTrabalhosInsereNovoTrabalhoFragmentDirections.vaiParaConfirmaTrabalho(personagemId);
+        acao.setTrabalho(trabalho);
+        Navigation.findNavController(requireView()).navigate(acao);
     }
 
     private void inicializaComponentes() {
         indicadorProgresso = binding.indicadorProgressoListaNovaProducao;
         meuRecycler = binding.recyclerViewListaNovaProducao;
-        linearLayoutGruposChips = binding.linearLayoutGrupoChipsListaNovaProducao;
         grupoChipsProfissoes = binding.grupoProfissoesChipListaNovaProducao;
         listaProfissoes = new ArrayList<>();
         todosTrabalhos = new ArrayList<>();
@@ -302,6 +286,7 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment {
         novaProducaoViewModel = new ViewModelProvider(this, listaNovaProducaoViewModelFactory).get(ListaNovaProducaoViewModel.class);
         iconeListaVazia = binding.iconeVazia;
         txtListaVazia = binding.txtListaVazia;
+        textoFiltro = "";
     }
 
     private void pegaTodosTrabalhos() {

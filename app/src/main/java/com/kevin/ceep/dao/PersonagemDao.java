@@ -29,7 +29,7 @@ public class PersonagemDao {
 
     public PersonagemDao(Context context) {
         this.idUsuario = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
-        DbHelper dbHelper = new DbHelper(context);
+        DbHelper dbHelper = DbHelper.getInstance(context);
         this.erro = null;
         this.dbLeitura = dbHelper.getReadableDatabase();
         this.dbModifica = dbHelper.getWritableDatabase();

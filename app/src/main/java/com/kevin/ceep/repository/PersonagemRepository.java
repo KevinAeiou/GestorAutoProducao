@@ -10,8 +10,8 @@ import static com.kevin.ceep.db.contracts.PersoagemDbContract.PersonagemEntry.CO
 import static com.kevin.ceep.db.contracts.PersoagemDbContract.PersonagemEntry.COLUMN_NAME_SENHA;
 import static com.kevin.ceep.db.contracts.PersoagemDbContract.PersonagemEntry.COLUMN_NAME_USO;
 import static com.kevin.ceep.db.contracts.PersoagemDbContract.PersonagemEntry.TABLE_PERSONAGENS;
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_LISTA_PERSONAGEM;
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_USUARIOS;
+import static com.kevin.ceep.ui.activity.Constantes.CHAVE_LISTA_PERSONAGEM;
+import static com.kevin.ceep.ui.activity.Constantes.CHAVE_USUARIOS;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -31,6 +31,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.kevin.ceep.dao.PersonagemDao;
 import com.kevin.ceep.db.DbHelper;
+import com.kevin.ceep.db.contracts.EstoqueDbContract;
 import com.kevin.ceep.model.Personagem;
 
 import java.util.ArrayList;
@@ -45,9 +46,10 @@ public class PersonagemRepository {
 
     public PersonagemRepository(Context context) {
         this.usuarioID = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+        Log.d("fluxo", "ID USUARIO: " + usuarioID);
         this.minhaReferencia = FirebaseDatabase.getInstance().getReference(CHAVE_USUARIOS)
                 .child(usuarioID).child(CHAVE_LISTA_PERSONAGEM);
-        DbHelper dbHelper = new DbHelper(context);
+        DbHelper dbHelper = DbHelper.getInstance(context);
         this.dbModifica = dbHelper.getWritableDatabase();
         this.dbLeitura = dbHelper.getReadableDatabase();
         this.personagensEncontrados = new MutableLiveData<>();
@@ -299,5 +301,24 @@ public class PersonagemRepository {
         values.put(COLUMN_NAME_AUTO_PRODUCAO, novoPersonagem.isAutoProducao());
         values.put(COLUMN_NAME_ESPACO_PRODUCAO, novoPersonagem.getEspacoProducao());
         return values;
+    }
+
+    public LiveData<Resource<Void>> removePersonagem(Personagem personagem) {
+        MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
+        minhaReferencia.child(personagem.getId()).removeValue().addOnCompleteListener(task -> {
+           if (task.isSuccessful()) {
+               String selection = EstoqueDbContract.EstoqueEntry.COLUMN_NAME_ID + " LIKE ?";
+               String[] selectionArgs = {personagem.getId()};
+               long linhaRemovida = dbModifica.delete(TABLE_PERSONAGENS, selection, selectionArgs);
+               if (linhaRemovida == -1) {
+                   liveData.setValue(new Resource<>(null, "Erro ao remover personagem"));
+               } else {
+                   liveData.setValue(new Resource<>(null, null));
+               }
+           } else if (task.isCanceled()) {
+               liveData.setValue(new Resource<>(null, Objects.requireNonNull(task.getException()).toString()));
+           }
+        });
+        return liveData;
     }
 }

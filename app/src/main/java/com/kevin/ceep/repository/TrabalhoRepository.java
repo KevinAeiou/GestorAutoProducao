@@ -9,7 +9,7 @@ import static com.kevin.ceep.db.contracts.TrabalhoDbContract.TrabalhoEntry.COLUM
 import static com.kevin.ceep.db.contracts.TrabalhoDbContract.TrabalhoEntry.COLUMN_NAME_RARIDADE;
 import static com.kevin.ceep.db.contracts.TrabalhoDbContract.TrabalhoEntry.COLUMN_NAME_TRABALHO_NECESSARIO;
 import static com.kevin.ceep.db.contracts.TrabalhoDbContract.TrabalhoEntry.TABLE_TRABALHOS;
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_LISTA_TRABALHO;
+import static com.kevin.ceep.ui.activity.Constantes.CHAVE_LISTA_TRABALHO;
 
 import android.content.ContentValues;
 import android.content.Context;

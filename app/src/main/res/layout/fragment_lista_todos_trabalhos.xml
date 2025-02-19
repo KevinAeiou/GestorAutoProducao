@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/constraintLayoutProfissoesTrabalhos"
-    tools:context=".ui.activity.ListaTodosTrabalhosActivity">
+    tools:context=".ui.fragment.ListaTodosTrabalhosFragment">
 
     <ProgressBar
         android:id="@+id/indicadorProgressoProfissoesTrabalhos"

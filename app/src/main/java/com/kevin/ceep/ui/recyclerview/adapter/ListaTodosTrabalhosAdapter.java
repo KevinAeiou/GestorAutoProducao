@@ -1,8 +1,8 @@
 package com.kevin.ceep.ui.recyclerview.adapter;
 
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_NOME_TRABALHO;
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_TRABALHO;
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CODIGO_REQUISICAO_ALTERA_TRABALHO;
+import static com.kevin.ceep.ui.activity.Constantes.CHAVE_NOME_TRABALHO;
+import static com.kevin.ceep.ui.activity.Constantes.CHAVE_TRABALHO;
+import static com.kevin.ceep.ui.activity.Constantes.CODIGO_REQUISICAO_ALTERA_TRABALHO;
 
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,9 +22,11 @@ import com.google.android.material.textview.MaterialTextView;
 import com.kevin.ceep.R;
 import com.kevin.ceep.model.ProfissaoTrabalho;
 import com.kevin.ceep.model.Trabalho;
-import com.kevin.ceep.model.TrabalhoEstoque;
-import com.kevin.ceep.ui.activity.TrabalhoEspecificoActivity;
+import com.kevin.ceep.ui.fragment.ListaTodosTrabalhosFragmentDirections;
+import com.kevin.ceep.ui.fragment.ListaTodosTrabalhosFragmentDirections.ActionListaTodosTrabalhosFragmentToTrabalhoEspecificoFragment;
+import com.kevin.ceep.ui.fragment.TrabalhoEspecificoFragment;
 import com.kevin.ceep.ui.recyclerview.adapter.listener.OnItemClickListener;
+import com.kevin.ceep.ui.recyclerview.adapter.listener.OnItemClickListenerTrabalho;
 
 import java.util.List;
 
@@ -50,7 +53,7 @@ public class ListaTodosTrabalhosAdapter extends RecyclerView.Adapter<ListaTodosT
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ListaTodosTrabalhosAdapter.ProfissaoTrabalhoViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ProfissaoTrabalhoViewHolder holder, int position) {
         ProfissaoTrabalho profissaoTrabalho = profissoes.get(position);
         trabalhos = profissaoTrabalho.getTrabalhos();
         holder.vincula(profissaoTrabalho);
@@ -67,21 +70,11 @@ public class ListaTodosTrabalhosAdapter extends RecyclerView.Adapter<ListaTodosT
             profissaoTrabalho.setExpandable(!profissaoTrabalho.isExpandable());
             notifyItemChanged(holder.getAdapterPosition());
         });
-        trabalhoEspecificoAdapter.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(Trabalho trabalho, int adapterPosition) {
-                Intent iniciaVaiParaCadastraNovoTrabalho = new Intent(context,
-                        TrabalhoEspecificoActivity.class);
-                iniciaVaiParaCadastraNovoTrabalho.putExtra(CHAVE_TRABALHO, CODIGO_REQUISICAO_ALTERA_TRABALHO);
-                iniciaVaiParaCadastraNovoTrabalho.putExtra(CHAVE_NOME_TRABALHO, trabalho);
-                iniciaVaiParaCadastraNovoTrabalho.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                context.startActivity(iniciaVaiParaCadastraNovoTrabalho);
-            }
-
-            @Override
-            public void onItemClick(ListaTrabalhoEspecificoAdapter trabalhoEspecificoAdapter) {
-
-            }
+        trabalhoEspecificoAdapter.setOnItemClickListener((view, trabalho, posicao) -> {
+            ActionListaTodosTrabalhosFragmentToTrabalhoEspecificoFragment acao = ListaTodosTrabalhosFragmentDirections.actionListaTodosTrabalhosFragmentToTrabalhoEspecificoFragment(null);
+            acao.setCodigoRequisicao(CODIGO_REQUISICAO_ALTERA_TRABALHO);
+            acao.setTrabalho(trabalho);
+            Navigation.findNavController(view).navigate(acao);
         });
         boolean isExpandable = profissaoTrabalho.isExpandable();
         holder.constraintLayoutItemProfissaoTrabalho.setVisibility(isExpandable ? View.VISIBLE : View.GONE);

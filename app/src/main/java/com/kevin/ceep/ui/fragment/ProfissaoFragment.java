@@ -1,6 +1,6 @@
 package com.kevin.ceep.ui.fragment;
 
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_PERSONAGEM;
+import static com.kevin.ceep.ui.activity.Constantes.CHAVE_PERSONAGEM;
 
 import android.content.DialogInterface;
 import android.os.Bundle;

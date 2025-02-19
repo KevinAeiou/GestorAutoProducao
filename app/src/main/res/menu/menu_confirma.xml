@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/itemMenuSalvaTrabalho"
+        android:id="@+id/itemMenuConfirma"
         android:title="Salva trabalho"
         android:icon="@drawable/ic_action_salva_nota"
         app:showAsAction="always"/>

@@ -8,7 +8,7 @@ import com.kevin.ceep.repository.ProfissaoRepository;
 import com.kevin.ceep.ui.viewModel.ProfissaoViewModel;
 
 public class ProfissaoViewModelFactory implements ViewModelProvider.Factory {
-    private ProfissaoRepository repository;
+    private final ProfissaoRepository repository;
 
     public ProfissaoViewModelFactory(ProfissaoRepository repository) {
         this.repository = repository;

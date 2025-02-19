@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/ic_launcher_background"
     android:theme="@style/ThemeOverlay.Ceep.FullscreenContainer"
-    tools:context=".ui.activity.SplashscreenActivity">
+    tools:context=".ui.fragment.SplashscreenFragment">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/appCompatImageView"

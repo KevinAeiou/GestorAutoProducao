@@ -1,15 +1,18 @@
 package com.kevin.ceep.ui.activity;
 
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_PERSONAGEM;
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_REQUISICAO;
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_TITULO_TRABALHO;
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CODIGO_REQUISICAO_ALTERA_TRABALHO;
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CODIGO_REQUISICAO_INSERE_TRABALHO;
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
+import static com.kevin.ceep.ui.activity.Constantes.CHAVE_REQUISICAO;
+import static com.kevin.ceep.ui.activity.Constantes.CHAVE_TRABALHO;
+import static com.kevin.ceep.ui.activity.Constantes.CODIGO_REQUISICAO_ALTERA_TRABALHO;
+import static com.kevin.ceep.ui.activity.Constantes.CODIGO_REQUISICAO_INSERE_TRABALHO;
 
 import android.annotation.SuppressLint;
-import android.app.ActivityOptions;
-import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -18,35 +21,42 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
+import androidx.core.view.MenuProvider;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavArgument;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
+import androidx.navigation.ui.AppBarConfiguration;
+import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.kevin.ceep.NavGraphDirections;
 import com.kevin.ceep.R;
 import com.kevin.ceep.databinding.ActivityMainBinding;
 import com.kevin.ceep.model.Personagem;
+import com.kevin.ceep.model.Trabalho;
 import com.kevin.ceep.repository.PersonagemRepository;
-import com.kevin.ceep.ui.fragment.ListaEstoqueFragment;
-import com.kevin.ceep.ui.fragment.ListaTrabalhosVendidosFragment;
-import com.kevin.ceep.ui.fragment.ListaProfissoesFragment;
-import com.kevin.ceep.ui.fragment.ListaTrabalhosProducaoFragment;
+import com.kevin.ceep.ui.fragment.AtributosPersonagemFragmentDirections;
+import com.kevin.ceep.ui.fragment.ConfirmaTrabalhoFragmentArgs;
+import com.kevin.ceep.ui.viewModel.ComponentesVisuais;
+import com.kevin.ceep.ui.viewModel.EstadoAppViewModel;
 import com.kevin.ceep.ui.viewModel.PersonagemViewModel;
 import com.kevin.ceep.ui.viewModel.factory.PersonagemViewModelFactory;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private DrawerLayout drawerLayout;
     private List<Personagem> personagens;
@@ -55,52 +65,110 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private TextView txtCabecalhoEstado, txtCabecalhoUso, txtCabecalhoEspacoProducao, txtCabecalhoAutoProducao;
     private AutoCompleteTextView autoCompleteCabecalhoNome;
     private PersonagemViewModel personagemViewModel;
-    private int itemNavegacao;
+    private AppBarConfiguration appBarConfiguration;
+    private NavController controlador;
+    private Toolbar toolbar;
+    private EstadoAppViewModel estadoAppViewModel;
 
+    @SuppressLint("RestrictedApi")
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         inicializaComponentes();
-        configuraToolbar();
         configuraClickAutoComplete();
-        navigationView.bringToFront();
-        configuraToogle();
-        navigationView.setNavigationItemSelectedListener(this);
-        navigationView.setCheckedItem(itemNavegacao);
+        configuraToolbar();
+        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_content_main);
+        assert navHostFragment != null;
+        controlador = navHostFragment.getNavController();
+        appBarConfiguration = new AppBarConfiguration.Builder(R.id.listaTrabalhosProducao, R.id.listaTrabalhosEstoque, R.id.listaTrabalhosVendidos, R.id.listaProfissoes).setOpenableLayout(drawerLayout).build();
+        NavigationUI.setupWithNavController(toolbar, controlador, appBarConfiguration);
+        NavigationUI.setupWithNavController(navigationView, controlador);
+        controlador.addOnDestinationChangedListener((navController, navDestination, bundle) -> {
+            if (navDestination.getId() == R.id.splashscreenFragment) {
+                FirebaseAuth.getInstance().signOut();
+            }
+            if (navDestination.getId() == R.id.confirmaTrabalhoFragment) {
+                assert bundle != null;
+                Trabalho trabalho = ConfirmaTrabalhoFragmentArgs.fromBundle(bundle).getTrabalho();
+                navDestination.setLabel(trabalho.getNome());
+            }
+            configuraComponentesVisuais();
+        });
+    }
+
+    private void configuraComponentesVisuais() {
+        estadoAppViewModel.componentes.observe(this, componentes -> {
+            if (componentes.appBar) {
+                getSupportActionBar().show();
+            } else {
+                getSupportActionBar().hide();
+            }
+            if (componentes.navigationMenu) {
+                binding.navegacaoView.setVisibility(VISIBLE);
+            } else {
+                binding.navegacaoView.setVisibility(GONE);
+            }
+            configuraMenu(componentes);
+        });
+    }
+
+    private void configuraMenu(ComponentesVisuais componentes) {
+        if (componentes.itemMenuBusca || componentes.itemMenuConfirma) {
+            addMenuProvider(new MenuProvider() {
+                @Override
+                public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+                    menu.clear();
+                    if (componentes.itemMenuBusca) menuInflater.inflate(R.menu.menu_busca, menu);
+                    if (componentes.itemMenuConfirma) menuInflater.inflate(R.menu.menu_confirma, menu);
+                }
+
+                @Override
+                public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+                    return false;
+                }
+            });
+        } else {
+            addMenuProvider(new MenuProvider() {
+                @Override
+                public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+                    menu.clear();
+                }
+
+                @Override
+                public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+                    return false;
+                }
+            });
+        }
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        return NavigationUI.navigateUp(controlador, appBarConfiguration) || super.onSupportNavigateUp();
     }
 
     private void configuraClickAutoComplete() {
         autoCompleteCabecalhoNome.setOnItemClickListener((adapterView, view, i, l) -> {
             personagemViewModel.definePersonagemSelecionado(personagens.get(i));
-            definePersonagemSelecionado();
             atualizaCabecalhoPersonagemSelecionado();
+            controlador.navigate(controlador.getCurrentDestination().getId());
         });
     }
 
     @Override
     protected void onResume() {
-        sincronizaPersonagens();
         super.onResume();
+        sincronizaPersonagens();
     }
-
-    private void configuraToogle() {
-        ActionBarDrawerToggle toogle = new ActionBarDrawerToggle(this, drawerLayout, R.string.abre_menu_navegacao, R.string.fecha_menu_navegacao);
-        drawerLayout.addDrawerListener(toogle);
-        toogle.syncState();
-    }
-
     private void configuraToolbar() {
-        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setNavigationOnClickListener(view -> drawerLayout.openDrawer(GravityCompat.START));
     }
 
     private void inicializaComponentes() {
-        setTitle(CHAVE_TITULO_TRABALHO);
-        itemNavegacao = R.id.listaTrabalhosProducao;
-        itemNavegacao = recebeDadosIntent(itemNavegacao);
+        toolbar = findViewById(R.id.toolbar);
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.navegacao_view);
         View cabecalho = navigationView.getHeaderView(0);
@@ -111,124 +179,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         txtCabecalhoEspacoProducao = cabecalho.findViewById(R.id.txtCabecalhoEspacoProducaoPersonagem);
         personagemSelecionado = null;
         personagens = new ArrayList<>();
-        PersonagemViewModelFactory personagemViewModelFactory = new PersonagemViewModelFactory(new PersonagemRepository(getApplicationContext()));
-        personagemViewModel = new ViewModelProvider(this, personagemViewModelFactory).get(PersonagemViewModel.class);
+        estadoAppViewModel = new ViewModelProvider(this).get(EstadoAppViewModel.class);
     }
 
     private void atualizaCabecalhoPersonagemSelecionado() {
+        PersonagemViewModelFactory personagemViewModelFactory = new PersonagemViewModelFactory(new PersonagemRepository(getApplicationContext()));
+        personagemViewModel = new ViewModelProvider(this, personagemViewModelFactory).get(PersonagemViewModel.class);
         personagemViewModel.pegaPersonagemSelecionado().observe(this, personagem -> {
             if (personagem == null) return;
-            String estado= getString(R.string.stringInativo);
-            String uso= getString(R.string.stringInativo);
-            String autoProducao= getString(R.string.stringInativo);
-            if (personagem.getEstado()) estado = getString(R.string.stringAtivo);
-            if (personagem.getUso()) uso = getString(R.string.stringAtivo);
-            if (personagem.isAutoProducao()) autoProducao = getString(R.string.stringAtivo);
-            txtCabecalhoEstado.setText(getString(R.string.stringEstadoValor,estado));
-            txtCabecalhoUso.setText(getString(R.string.stringUsoValor,uso));
-            txtCabecalhoAutoProducao.setText(getString(R.string.stringAutoProducaoValor, autoProducao));
-            txtCabecalhoEspacoProducao.setText(getString(R.string.stringEspacoProducaoValor,personagem.getEspacoProducao()));
+//            String estado= getString(R.string.stringInativo);
+//            String uso= getString(R.string.stringInativo);
+//            String autoProducao= getString(R.string.stringInativo);
+//            if (personagem.getEstado()) estado = getString(R.string.stringAtivo);
+//            if (personagem.getUso()) uso = getString(R.string.stringAtivo);
+//            if (personagem.isAutoProducao()) autoProducao = getString(R.string.stringAtivo);
+//            txtCabecalhoEstado.setText(getString(R.string.stringEstadoValor,estado));
+//            txtCabecalhoUso.setText(getString(R.string.stringUsoValor,uso));
+//            txtCabecalhoAutoProducao.setText(getString(R.string.stringAutoProducaoValor, autoProducao));
+//            txtCabecalhoEspacoProducao.setText(getString(R.string.stringEspacoProducaoValor,personagem.getEspacoProducao()));
             personagemSelecionado = personagem;
-            mostraFragmentSelecionado(Objects.requireNonNull(navigationView.getCheckedItem()));
+//            mostraFragmentSelecionado(Objects.requireNonNull(navigationView.getCheckedItem()));
         });
-    }
-
-    @SuppressLint("NonConstantResourceId")
-    private void mostraFragmentSelecionado(MenuItem itemNavegacao) {
-        Fragment fragmentoSelecionado = null;
-        Bundle argumento = new Bundle();
-        argumento.putString(CHAVE_PERSONAGEM, personagemSelecionado.getId());
-        switch (itemNavegacao.getItemId()){
-            case R.id.listaTrabalhosProducao:
-                fragmentoSelecionado = new ListaTrabalhosProducaoFragment();
-                fragmentoSelecionado.setArguments(argumento);
-                break;
-            case R.id.listaEstoque:
-                fragmentoSelecionado = new ListaEstoqueFragment();
-                fragmentoSelecionado.setArguments(argumento);
-                break;
-            case R.id.listaProdutosVendidos:
-                fragmentoSelecionado = new ListaTrabalhosVendidosFragment();
-                fragmentoSelecionado.setArguments(argumento);
-                break;
-            case R.id.listaProfissoes:
-                fragmentoSelecionado = new ListaProfissoesFragment();
-                fragmentoSelecionado.setArguments(argumento);
-                break;
-            case R.id.nav_configuracao:
-                vaiParaAtributosPersonagem(CODIGO_REQUISICAO_ALTERA_TRABALHO);
-                break;
-            case R.id.nav_novo_personagem:
-                vaiParaAtributosPersonagem(CODIGO_REQUISICAO_INSERE_TRABALHO);
-                break;
-            case R.id.nav_novo_trabalho:
-                vaiParaListaTodosTrabalhos();
-                break;
-            case R.id.nav_sair:
-                FirebaseAuth.getInstance().signOut();
-                vaiParaEntraActivity();
-                break;
-        }
-        if (fragmentoSelecionado != null) {
-            reposicionaFragmento(fragmentoSelecionado);
-        }
-    }
-
-    private void vaiParaListaTodosTrabalhos() {
-        Intent iniciaVaiParaListaTodosTrabalhos = new Intent(getApplicationContext(), ListaTodosTrabalhosActivity.class);
-        startActivity(iniciaVaiParaListaTodosTrabalhos);
-    }
-
-    private void vaiParaAtributosPersonagem(int codigoRequisicao) {
-        Intent iniciaVaiParaAtributosPersonagem = new Intent(getApplicationContext(), AtributosPersonagemActivity.class);
-        iniciaVaiParaAtributosPersonagem.putExtra(CHAVE_PERSONAGEM, personagemSelecionado);
-        iniciaVaiParaAtributosPersonagem.putExtra(CHAVE_REQUISICAO, codigoRequisicao);
-        startActivity(iniciaVaiParaAtributosPersonagem);
-    }
-
-    private int recebeDadosIntent(int itemNavegacao) {
-        Intent dadosRecebidos = getIntent();
-        String idPersonagemRecebido;
-        if (dadosRecebidos.hasExtra(CHAVE_PERSONAGEM)){
-            idPersonagemRecebido = (String) dadosRecebidos.getSerializableExtra(CHAVE_PERSONAGEM);
-            if (idPersonagemRecebido != null){
-                itemNavegacao = R.id.listaTrabalhosProducao;
-            }
-        }
-        return itemNavegacao;
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (drawerLayout.isDrawerOpen(GravityCompat.START)){
-            drawerLayout.closeDrawer(GravityCompat.START);
-        }else {
-            super.onBackPressed();
-        }
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        drawerLayout.closeDrawer(GravityCompat.START);
-        item.setChecked(true);
-        mostraFragmentSelecionado(item);
-        return true;
-    }
-
-    private void vaiParaEntraActivity() {
-        Intent vaiParaEntraActivity = new Intent(getApplicationContext(),
-                EntrarUsuarioActivity.class);
-        startActivity(vaiParaEntraActivity, ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
-        finish();
-    }
-    private void reposicionaFragmento(Fragment fragmento) {
-        FragmentManager gerenciadorDeFragmento = getSupportFragmentManager();
-        FragmentTransaction transicaoDeFragmento = gerenciadorDeFragmento.beginTransaction();
-        transicaoDeFragmento.replace(R.id.nav_host_fragment_content_main, fragmento);
-        transicaoDeFragmento.commit();
     }
     private void pegaTodosPersonagens() {
         personagens.clear();
+        FirebaseUser usuarioID = FirebaseAuth.getInstance().getCurrentUser();
+        if (usuarioID == null) return;
+        PersonagemViewModelFactory personagemViewModelFactory = new PersonagemViewModelFactory(new PersonagemRepository(getApplicationContext()));
+        personagemViewModel = new ViewModelProvider(this, personagemViewModelFactory).get(PersonagemViewModel.class);
         personagemViewModel.pegaTodosPersonagens().observe(this, resultadoPersonagens -> {
             if (resultadoPersonagens.getDado() != null) {
                 personagens = resultadoPersonagens.getDado();
@@ -240,6 +218,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void sincronizaPersonagens() {
+        FirebaseUser usuarioID = FirebaseAuth.getInstance().getCurrentUser();
+        if (usuarioID == null) return;
+        PersonagemViewModelFactory personagemViewModelFactory = new PersonagemViewModelFactory(new PersonagemRepository(getApplicationContext()));
+        personagemViewModel = new ViewModelProvider(this, personagemViewModelFactory).get(PersonagemViewModel.class);
         personagemViewModel.sincronizaPersonagens().observe(this, resultadoSincroniza -> {
             if (resultadoSincroniza.getErro() != null) {
                 Snackbar.make(getApplicationContext(), Objects.requireNonNull(getCurrentFocus()), "Erro: "+resultadoSincroniza.getErro(), Snackbar.LENGTH_LONG).show();
@@ -249,10 +231,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             atualizaCabecalhoPersonagemSelecionado();
             configuraDropDownPersonagens();
         });
-    }
-
-    private void definePersonagemSelecionado() {
-        personagemViewModel.pegaPersonagemSelecionado().observe(this, personagem -> personagemSelecionado = personagem);
     }
 
     private void configuraDropDownPersonagens() {

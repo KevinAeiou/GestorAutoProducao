@@ -8,12 +8,12 @@
         android:id="@+id/grupo2">
         <item
             android:id="@+id/listaTrabalhosProducao"
-            android:title="@string/trabalhos"/>
+            android:title="@string/stringProducao" />
         <item
-            android:id="@+id/listaEstoque"
+            android:id="@+id/listaTrabalhosEstoque"
             android:title="@string/estoque"/>
         <item
-            android:id="@+id/listaProdutosVendidos"
+            android:id="@+id/listaTrabalhosVendidos"
             android:title="@string/stringVendas"/>
         <item
             android:id="@+id/listaProfissoes"
@@ -23,19 +23,19 @@
     <group
         android:id="@+id/grupo3">
         <item
-            android:id="@+id/nav_novo_personagem"
+            android:id="@+id/inserePersonagem"
             android:title="@string/stringNovoPersonagem"/>
 
         <item
-            android:id="@+id/nav_novo_trabalho"
-            android:title="@string/stringNovoTrabalho"/>
+            android:id="@+id/nav_trabalhos"
+            android:title="@string/trabalhos" />
 
         <item
-            android:id="@+id/nav_configuracao"
+            android:id="@+id/atributosPersonagem"
             android:title="@string/stringConfiguracao"/>
 
         <item
-            android:id="@+id/nav_sair"
+            android:id="@+id/splashscreenFragment"
             android:title="@string/sair"/>
     </group>
 

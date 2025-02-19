@@ -1,37 +1,41 @@
-package com.kevin.ceep.ui.activity;
+package com.kevin.ceep.ui.fragment;
 
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_TITULO_TRABALHO;
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_TRABALHO;
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CODIGO_REQUISICAO_INSERE_TRABALHO;
+import static com.kevin.ceep.ui.activity.Constantes.CODIGO_REQUISICAO_INSERE_TRABALHO;
 import static com.kevin.ceep.utilitario.Utilitario.comparaString;
 
-import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
-import com.kevin.ceep.R;
-import com.kevin.ceep.databinding.ActivityListaTodosTrabalhosBinding;
+import com.kevin.ceep.databinding.FragmentListaTodosTrabalhosBinding;
 import com.kevin.ceep.model.ProfissaoTrabalho;
 import com.kevin.ceep.model.Trabalho;
 import com.kevin.ceep.repository.TrabalhoRepository;
+import com.kevin.ceep.ui.fragment.ListaTodosTrabalhosFragmentDirections.ActionListaTodosTrabalhosFragmentToTrabalhoEspecificoFragment;
 import com.kevin.ceep.ui.recyclerview.adapter.ListaTodosTrabalhosAdapter;
+import com.kevin.ceep.ui.viewModel.ComponentesVisuais;
+import com.kevin.ceep.ui.viewModel.EstadoAppViewModel;
 import com.kevin.ceep.ui.viewModel.TrabalhoViewModel;
 import com.kevin.ceep.ui.viewModel.factory.TrabalhoViewModelFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ListaTodosTrabalhosActivity extends AppCompatActivity {
-    private ActivityListaTodosTrabalhosBinding binding;
+public class ListaTodosTrabalhosFragment extends Fragment {
+    private FragmentListaTodosTrabalhosBinding binding;
     private ListaTodosTrabalhosAdapter listaTodosTrabalhosAdapter;
     private FloatingActionButton botaoNovoTrabalho;
     private RecyclerView meuRecycler;
@@ -39,23 +43,38 @@ public class ListaTodosTrabalhosActivity extends AppCompatActivity {
     private List<Trabalho> todosTrabalhos;
     private ProgressBar indicadorProgresso;
     private TrabalhoViewModel trabalhoViewModel;
+
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        binding = FragmentListaTodosTrabalhosBinding.inflate(inflater, container, false);
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityListaTodosTrabalhosBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+        }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        EstadoAppViewModel estadoAppViewModel = new ViewModelProvider(requireActivity()).get(EstadoAppViewModel.class);
+        ComponentesVisuais componentesVisuais = new ComponentesVisuais();
+        componentesVisuais.appBar = true;
+        estadoAppViewModel.componentes.setValue(componentesVisuais);
         inicializaComponentes();
-        configuraRecyclerView(profissoesTrabalhos);
+        configuraRecyclerView();
         configuraBotaoCadastraNovoTrabalho();
         configuraSwipeRefreshLayout();
-        }
+    }
+
     private void inicializaComponentes() {
-        setTitle(CHAVE_TITULO_TRABALHO);
         profissoesTrabalhos = new ArrayList<>();
         botaoNovoTrabalho = binding.floatingButtonProfissoesTrabalhos;
         indicadorProgresso = binding.indicadorProgressoProfissoesTrabalhos;
         meuRecycler = binding.recyclerViewProfissoesTrabalhos;
-        TrabalhoViewModelFactory trabalhoViewModelFactory = new TrabalhoViewModelFactory(new TrabalhoRepository(getApplicationContext()));
+        TrabalhoViewModelFactory trabalhoViewModelFactory = new TrabalhoViewModelFactory(new TrabalhoRepository(getContext()));
         trabalhoViewModel = new ViewModelProvider(this, trabalhoViewModelFactory).get(TrabalhoViewModel.class);
     }
     private void configuraBotaoCadastraNovoTrabalho() {
@@ -63,14 +82,13 @@ public class ListaTodosTrabalhosActivity extends AppCompatActivity {
     }
 
     private void vaiParaCadastraNovoTrabalhoActivity() {
-        Intent iniciaVaiParaCadastraNovoTrabalho = new Intent(getApplicationContext(),
-                        TrabalhoEspecificoActivity.class);
-        iniciaVaiParaCadastraNovoTrabalho.putExtra(CHAVE_TRABALHO, CODIGO_REQUISICAO_INSERE_TRABALHO);
-        startActivity(iniciaVaiParaCadastraNovoTrabalho);
+        ActionListaTodosTrabalhosFragmentToTrabalhoEspecificoFragment acao = ListaTodosTrabalhosFragmentDirections.actionListaTodosTrabalhosFragmentToTrabalhoEspecificoFragment(null);
+        acao.setCodigoRequisicao(CODIGO_REQUISICAO_INSERE_TRABALHO);
+        Navigation.findNavController(binding.getRoot()).navigate(acao);
     }
 
     private void configuraSwipeRefreshLayout() {
-        SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.swipeRefreshProfissoesTrabalhos);
+        SwipeRefreshLayout swipeRefreshLayout = binding.swipeRefreshProfissoesTrabalhos;
         swipeRefreshLayout.setOnRefreshListener(() -> {
             swipeRefreshLayout.setRefreshing(false);
             sincronizaTrabalhos();
@@ -111,7 +129,7 @@ public class ListaTodosTrabalhosActivity extends AppCompatActivity {
 
     private void pegaTodosTrabalhos() {
         todosTrabalhos = new ArrayList<>();
-        trabalhoViewModel.pegaTodosTrabalhos().observe(this, resultadoPegaTodosTrabalhos -> {
+        trabalhoViewModel.pegaTodosTrabalhos().observe(getViewLifecycleOwner(), resultadoPegaTodosTrabalhos -> {
             if (resultadoPegaTodosTrabalhos.getDado() != null) {
                 todosTrabalhos = resultadoPegaTodosTrabalhos.getDado();
                 filtraTrabalhosProfissao();
@@ -123,34 +141,34 @@ public class ListaTodosTrabalhosActivity extends AppCompatActivity {
     }
 
     private void sincronizaTrabalhos() {
-        trabalhoViewModel.sincronizaTrabalhos().observe(this, resultadoSincroniza -> {
+        trabalhoViewModel.sincronizaTrabalhos().observe(getViewLifecycleOwner(), resultadoSincroniza -> {
             if (resultadoSincroniza.getErro() != null) {
                 Snackbar.make(binding.getRoot(), "Erro: "+resultadoSincroniza.getErro(), Snackbar.LENGTH_LONG).show();
             }
         });
     }
 
-    private void configuraRecyclerView(List<ProfissaoTrabalho> profissoesTrabalhos) {
+    private void configuraRecyclerView() {
         meuRecycler.setHasFixedSize(true);
-        meuRecycler.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-        configuraAdapter(profissoesTrabalhos, meuRecycler);
+        meuRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        configuraAdapter();
     }
 
-    private void configuraAdapter(List<ProfissaoTrabalho> profissoesTrabalhos, RecyclerView listaTrabalhos) {
-        listaTodosTrabalhosAdapter = new ListaTodosTrabalhosAdapter(profissoesTrabalhos, getApplicationContext());
-        listaTrabalhos.setAdapter(listaTodosTrabalhosAdapter);
+    private void configuraAdapter() {
+        listaTodosTrabalhosAdapter = new ListaTodosTrabalhosAdapter(profissoesTrabalhos, getContext());
+        meuRecycler.setAdapter(listaTodosTrabalhosAdapter);
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         sincronizaTrabalhos();
         pegaTodosTrabalhos();
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    public void onDestroy() {
+        super.onDestroy();
         binding = null;
     }
 }

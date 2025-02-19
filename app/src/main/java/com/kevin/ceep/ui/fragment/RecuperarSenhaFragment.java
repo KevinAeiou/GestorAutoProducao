@@ -1,49 +1,64 @@
-package com.kevin.ceep.ui.activity;
-
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_TITULO_RECUPERA_SENHA;
+package com.kevin.ceep.ui.fragment;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatButton;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
 
 import android.annotation.SuppressLint;
-import android.app.ActivityOptions;
-import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.util.Patterns;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Toast;
+import android.view.ViewGroup;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
-import com.kevin.ceep.R;
+import com.kevin.ceep.databinding.FragmentRecuperarSenhaBinding;
+import com.kevin.ceep.ui.viewModel.ComponentesVisuais;
+import com.kevin.ceep.ui.viewModel.EstadoAppViewModel;
 
-public class RecuperarSenhaActivity extends AppCompatActivity {
+import java.util.Objects;
 
+public class RecuperarSenhaFragment extends Fragment {
+    private FragmentRecuperarSenhaBinding binding;
     private TextInputLayout txtRecuperaSenha;
     private TextInputEditText edtRecuperaSenha;
     private AppCompatButton botaoRecuperarSenha;
     private FirebaseAuth autenticacao;
     private String email;
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_recuperar_senha);
-        setTitle(CHAVE_TITULO_RECUPERA_SENHA);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        binding = FragmentRecuperarSenhaBinding.inflate(inflater, container, false);
+        return binding.getRoot();
+    }
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        EstadoAppViewModel estadoAppViewModel = new ViewModelProvider(requireActivity()).get(EstadoAppViewModel.class);
+        ComponentesVisuais componentesVisuais = new ComponentesVisuais();
+        estadoAppViewModel.componentes.setValue(componentesVisuais);
         autenticacao = FirebaseAuth.getInstance();
-        botaoRecuperarSenha = findViewById(R.id.botaoRecuperarSenha);
-        txtRecuperaSenha = findViewById(R.id.txtRecuperarSenha);
-        edtRecuperaSenha = findViewById(R.id.edtRecuperarSenha);
+        botaoRecuperarSenha = binding.botaoRecuperarSenha;
+        txtRecuperaSenha = binding.txtRecuperarSenha;
+        edtRecuperaSenha = binding.edtRecuperarSenha;
         edtRecuperaSenha.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -52,8 +67,7 @@ public class RecuperarSenhaActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                email = edtRecuperaSenha.getText().toString().trim();
-                Log.d("EMAIL",email);
+                email = Objects.requireNonNull(edtRecuperaSenha.getText()).toString().trim();
                 verificaEmailValido(email);
             }
 
@@ -63,8 +77,7 @@ public class RecuperarSenhaActivity extends AppCompatActivity {
             }
         });
 
-        botaoRecuperarSenha.setOnClickListener(view -> recuperaSenha());
-
+        botaoRecuperarSenha.setOnClickListener(v -> recuperaSenha());
     }
 
     @SuppressLint("NewApi")
@@ -81,7 +94,7 @@ public class RecuperarSenhaActivity extends AppCompatActivity {
         if (!configuraEditEmail(Patterns.EMAIL_ADDRESS.matcher(email).matches())){
             txtRecuperaSenha.setHelperText("Por favor, informe um email válido!");
         }
-        if (!configuraEditEmail(!email.isEmpty()) & email.length()<1){
+        if (!configuraEditEmail(!email.isEmpty()) & email.isEmpty()){
             txtRecuperaSenha.setHelperText("Campo requerido!");
         }
     }
@@ -96,9 +109,9 @@ public class RecuperarSenhaActivity extends AppCompatActivity {
     @SuppressLint("NewApi")
     private boolean configuraEditEmail(boolean email) {
         if (!email){
-            txtRecuperaSenha.setHintTextColor(ColorStateList.valueOf(getColor(R.color.cor_background_bordo)));
+//            txtRecuperaSenha.setHintTextColor(ColorStateList.valueOf(getColor(R.color.cor_background_bordo)));
             txtRecuperaSenha.setBoxStrokeColor(Color.parseColor("#A71500"));
-            txtRecuperaSenha.setHelperTextColor(ColorStateList.valueOf(getColor(R.color.cor_background_bordo)));
+//            txtRecuperaSenha.setHelperTextColor(ColorStateList.valueOf(getColor(R.color.cor_background_bordo)));
             txtRecuperaSenha.setHelperTextEnabled(true);
             botaoRecuperarSenha.setEnabled(false);
             return false;
@@ -110,18 +123,16 @@ public class RecuperarSenhaActivity extends AppCompatActivity {
         autenticacao.sendPasswordResetEmail(email).
                 addOnCompleteListener(task -> {
                     if (task.isSuccessful()){
-                        Toast.makeText(getApplicationContext(),
+                        Snackbar.make(binding.getRoot(),
                                 "Confira seu email.",
-                                Toast.LENGTH_LONG).show();
-                        Intent vaiParaEntrarUsuarioActivity = new Intent(getApplicationContext(),EntrarUsuarioActivity.class);
-                        startActivity(vaiParaEntrarUsuarioActivity,
-                                ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
-                        finish();
-                    }else {
-                        Toast.makeText(getApplicationContext(),
-                                "Confira se seu email está correto e tente novamente.",
-                                Toast.LENGTH_LONG).show();
+                                Snackbar.LENGTH_LONG).show();
+                        NavDirections acao = CadastrarUsuarioFragmentDirections.vaiParaSlashScreen();
+                        Navigation.findNavController(binding.getRoot()).navigate(acao);
+                        return;
                     }
+                    Snackbar.make(binding.getRoot(),
+                            "Confira se seu email está correto e tente novamente.",
+                            Snackbar.LENGTH_LONG).show();
                 });
     }
 }

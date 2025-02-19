@@ -1,7 +1,7 @@
 package com.kevin.ceep.ui.fragment;
 
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_PERSONAGEM;
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_TRABALHO;
+import static com.kevin.ceep.ui.activity.Constantes.CHAVE_PERSONAGEM;
+import static com.kevin.ceep.ui.activity.Constantes.CHAVE_TRABALHO;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -25,10 +26,15 @@ import com.google.android.material.snackbar.Snackbar;
 import com.kevin.ceep.R;
 import com.kevin.ceep.databinding.FragmentListaTrabalhosVendidosBinding;
 import com.kevin.ceep.model.TrabalhoVendido;
+import com.kevin.ceep.repository.PersonagemRepository;
 import com.kevin.ceep.repository.TrabalhoVendidoRepository;
-import com.kevin.ceep.ui.activity.AtributosTrabalhoVendidoActivity;
+import com.kevin.ceep.ui.fragment.ListaTrabalhosVendidosFragmentDirections.VaiDeTrabalhosVendidosParaDetalhesTrabalhoVendido;
 import com.kevin.ceep.ui.recyclerview.adapter.ListaTrabalhosVendidosAdapter;
+import com.kevin.ceep.ui.viewModel.ComponentesVisuais;
+import com.kevin.ceep.ui.viewModel.EstadoAppViewModel;
+import com.kevin.ceep.ui.viewModel.PersonagemViewModel;
 import com.kevin.ceep.ui.viewModel.TrabalhosVendidosViewModel;
+import com.kevin.ceep.ui.viewModel.factory.PersonagemViewModelFactory;
 import com.kevin.ceep.ui.viewModel.factory.TrabalhosVendidosViewModelFactory;
 
 import java.util.ArrayList;
@@ -44,26 +50,13 @@ public class ListaTrabalhosVendidosFragment extends Fragment {
     private TrabalhosVendidosViewModel trabalhosVendidosViewModel;
     private ImageView iconeListaVazia;
     private TextView txtListaVazia;
+    private PersonagemViewModel personagemViewModel;
 
     public ListaTrabalhosVendidosFragment() {
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        recebeDadosIntent();
-    }
-
-    private void recebeDadosIntent() {
-        Bundle argumento = getArguments();
-        if (argumento != null) {
-            if (argumento.containsKey(CHAVE_PERSONAGEM)) {
-                personagemId = argumento.getString(CHAVE_PERSONAGEM);
-                if (personagemId != null) {
-                    TrabalhosVendidosViewModelFactory trabalhosVendidosViewModelFactory = new TrabalhosVendidosViewModelFactory(new TrabalhoVendidoRepository(getContext(), personagemId));
-                    trabalhosVendidosViewModel = new ViewModelProvider(this, trabalhosVendidosViewModelFactory).get(TrabalhosVendidosViewModel.class);
-                }
-            }
-        }
     }
 
     @Override
@@ -76,6 +69,10 @@ public class ListaTrabalhosVendidosFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        EstadoAppViewModel estadoAppViewModel = new ViewModelProvider(requireActivity()).get(EstadoAppViewModel.class);
+        ComponentesVisuais componentesVisuais = new ComponentesVisuais();
+        componentesVisuais.appBar = true;
+        estadoAppViewModel.componentes.setValue(componentesVisuais);
         inicializaComponentes();
         configuraRecyclerView();
         configuraSwipeRefreshLayout();
@@ -159,20 +156,20 @@ public class ListaTrabalhosVendidosFragment extends Fragment {
     private void configuraRecyclerView() {
         meuRecycler.setHasFixedSize(true);
         meuRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
-        configuraAdapter(meuRecycler);
+        configuraAdapter();
     }
 
-    private void configuraAdapter(RecyclerView meuRecycler) {
+    private void configuraAdapter() {
         trabalhosVendidosAdapter = new ListaTrabalhosVendidosAdapter(trabalhosVendidos, getContext());
         meuRecycler.setAdapter(trabalhosVendidosAdapter);
-        trabalhosVendidosAdapter.setOnItemClickListener(this::vaiParaAtributoProdutoVendido);
+        trabalhosVendidosAdapter.setOnItemClickListener(this::vaiParaDetalhesTrabalhoVendido);
     }
 
-    private void vaiParaAtributoProdutoVendido(TrabalhoVendido trabalhoVendido) {
-        Intent iniciaVaiParaAtributosProdutoVendido = new Intent(getContext(), AtributosTrabalhoVendidoActivity.class);
-        iniciaVaiParaAtributosProdutoVendido.putExtra(CHAVE_TRABALHO, trabalhoVendido);
-        iniciaVaiParaAtributosProdutoVendido.putExtra(CHAVE_PERSONAGEM, personagemId);
-        startActivity(iniciaVaiParaAtributosProdutoVendido);
+    private void vaiParaDetalhesTrabalhoVendido(TrabalhoVendido trabalhoVendido) {
+        VaiDeTrabalhosVendidosParaDetalhesTrabalhoVendido acao = ListaTrabalhosVendidosFragmentDirections.vaiDeTrabalhosVendidosParaDetalhesTrabalhoVendido(
+                trabalhoVendido,
+                personagemId);
+        Navigation.findNavController(binding.getRoot()).navigate(acao);
     }
 
     private void inicializaComponentes() {
@@ -182,14 +179,20 @@ public class ListaTrabalhosVendidosFragment extends Fragment {
         indicadorProgresso = binding.indicadorProgressoListaProdutosVendidosFragment;
         iconeListaVazia = binding.iconeVazia;
         txtListaVazia = binding.txtListaVazia;
+        PersonagemViewModelFactory personagemViewModelFactory = new PersonagemViewModelFactory(new PersonagemRepository(getContext()));
+        personagemViewModel = new ViewModelProvider(requireActivity(), personagemViewModelFactory).get(PersonagemViewModel.class);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if (personagemId != null) {
+        personagemViewModel.pegaPersonagemSelecionado().observe(getViewLifecycleOwner(), resultadoPegaPersonagem -> {
+            if (resultadoPegaPersonagem == null) return;
+            personagemId = resultadoPegaPersonagem.getId();
+            TrabalhosVendidosViewModelFactory trabalhosVendidosViewModelFactory = new TrabalhosVendidosViewModelFactory(new TrabalhoVendidoRepository(getContext(), personagemId));
+            trabalhosVendidosViewModel = new ViewModelProvider(this, trabalhosVendidosViewModelFactory).get(TrabalhosVendidosViewModel.class);
             pegaTodosProdutosVendidos();
-        }
+        });
     }
 
     private void sincronizaTrabalhos() {

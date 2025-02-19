@@ -214,4 +214,6 @@
     <string name="stringNomeProducao">Nome produção</string>
     <string name="stringProducao">Produção</string>
     <string name="stringAutoProducao">Auto produção</string>
+    <string name="stringBusca">Buscar</string>
+    <string name="stringImagemIndiceConteudoExpandido">Imagem indice de conteúdo expandido</string>
 </resources>

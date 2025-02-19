@@ -1,6 +1,6 @@
 package com.kevin.ceep.db.contracts;
 
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_LISTA_PERSONAGEM;
+import static com.kevin.ceep.ui.activity.Constantes.CHAVE_LISTA_PERSONAGEM;
 
 import android.provider.BaseColumns;
 

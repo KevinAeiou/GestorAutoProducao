@@ -1,34 +1,40 @@
-package com.kevin.ceep.ui.activity;
+package com.kevin.ceep.ui.fragment;
 
 import android.annotation.SuppressLint;
-import android.app.ActivityOptions;
-import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatButton;
+import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.kevin.ceep.R;
-import com.kevin.ceep.databinding.ActivityCadastrarUsuarioBinding;
+import com.kevin.ceep.databinding.FragmentCadastrarUsuarioBinding;
 import com.kevin.ceep.model.Usuario;
 import com.kevin.ceep.repository.FirebaseAuthRepository;
 import com.kevin.ceep.ui.viewModel.AutenticacaoViewModel;
+import com.kevin.ceep.ui.viewModel.ComponentesVisuais;
+import com.kevin.ceep.ui.viewModel.EstadoAppViewModel;
 import com.kevin.ceep.ui.viewModel.factory.AutenticacaoViewModelFactor;
 
 import java.util.Objects;
 
-public class CadastrarUsuarioActivity extends AppCompatActivity implements View.OnClickListener {
-    private ActivityCadastrarUsuarioBinding binding;
+public class CadastrarUsuarioFragment extends Fragment implements View.OnClickListener {
+    private FragmentCadastrarUsuarioBinding binding;
     private AppCompatButton botaoCadastrarUsuario;
     private TextInputLayout txtSenha;
     private TextInputEditText edtNome;
@@ -36,24 +42,30 @@ public class CadastrarUsuarioActivity extends AppCompatActivity implements View.
     String[] menssagens = {"Preencha todos os campos", "Usuário cadastrado com sucesso!"};
     private AutenticacaoViewModel autenticacaoViewModel;
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        binding = FragmentCadastrarUsuarioBinding.inflate(inflater, container, false);
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityCadastrarUsuarioBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
+    }
 
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().hide();
-        }
-
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        EstadoAppViewModel estadoAppViewModel = new ViewModelProvider(requireActivity()).get(EstadoAppViewModel.class);
+        ComponentesVisuais componentesVisuais = new ComponentesVisuais();
+        estadoAppViewModel.componentes.setValue(componentesVisuais);
         txtSenha = binding.txtSenha;
         edtSenha = binding.edtSenha;
         AutenticacaoViewModelFactor autenticacaoViewModelFactor = new AutenticacaoViewModelFactor(new FirebaseAuthRepository());
         autenticacaoViewModel = new ViewModelProvider(this, autenticacaoViewModelFactor).get(AutenticacaoViewModel.class);
         configuraEdtSenhaRobusta();
-
         botaoCadastrarUsuario = binding.botaoCadastrarUsuario;
-
         botaoCadastrarUsuario.setOnClickListener(this);
         binding.txtLinkEntrar.setOnClickListener(this);
     }
@@ -124,9 +136,9 @@ public class CadastrarUsuarioActivity extends AppCompatActivity implements View.
     @SuppressLint("NewApi")
     private boolean configuraEditSenha(boolean senha) {
         if (!senha){
-            txtSenha.setHintTextColor(ColorStateList.valueOf(getColor(R.color.cor_background_bordo)));
+//            txtSenha.setHintTextColor(ColorStateList.valueOf(getColor(R.color.cor_background_bordo)));
             txtSenha.setBoxStrokeColor(Color.parseColor("#A71500"));
-            txtSenha.setHelperTextColor(ColorStateList.valueOf(getColor(R.color.cor_background_bordo)));
+//            txtSenha.setHelperTextColor(ColorStateList.valueOf(getColor(R.color.cor_background_bordo)));
             txtSenha.setHelperTextEnabled(true);
             botaoCadastrarUsuario.setEnabled(false);
             return false;
@@ -139,15 +151,15 @@ public class CadastrarUsuarioActivity extends AppCompatActivity implements View.
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.txtLinkEntrar:
-                startActivity(new Intent(this,EntrarUsuarioActivity.class),
-                        ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
+                NavDirections acao = CadastrarUsuarioFragmentDirections.vaiParaSlashScreen();
+                Navigation.findNavController(binding.getRoot()).navigate(acao);
                 break;
             case R.id.botaoCadastrarUsuario:
-                cadastrarUsuario(view);
+                cadastrarUsuario();
         }
     }
 
-    private void cadastrarUsuario(View view) {
+    private void cadastrarUsuario() {
         edtNome = binding.edtNome;
         TextInputEditText edtEmail = binding.edtEmail;
         Usuario usuario = new Usuario();
@@ -161,14 +173,14 @@ public class CadastrarUsuarioActivity extends AppCompatActivity implements View.
                     salvarDadosUsuario();
                     return;
                 }
-                Snackbar snackbar = Snackbar.make(view, resultadoCriaUsuario.getErro(), Snackbar.LENGTH_SHORT);
+                Snackbar snackbar = Snackbar.make(binding.getRoot(), resultadoCriaUsuario.getErro(), Snackbar.LENGTH_SHORT);
                 snackbar.setBackgroundTint(Color.WHITE);
                 snackbar.setTextColor(Color.BLACK);
                 snackbar.show();
             });
             return;
         }
-        Snackbar snackbar = Snackbar.make(view, menssagens[0], Snackbar.LENGTH_SHORT);
+        Snackbar snackbar = Snackbar.make(binding.getRoot(), menssagens[0], Snackbar.LENGTH_SHORT);
         snackbar.setBackgroundTint(Color.WHITE);
         snackbar.setTextColor(Color.BLACK);
         snackbar.show();
@@ -180,12 +192,11 @@ public class CadastrarUsuarioActivity extends AppCompatActivity implements View.
         usuario.setNome(Objects.requireNonNull(edtNome.getText()).toString());
         autenticacaoViewModel.insereUsuario(usuario).observe(this, resultadoInsereUsuario -> {
             if (resultadoInsereUsuario.getErro() == null) {
-                startActivity(new Intent(getApplicationContext(), EntrarUsuarioActivity.class),
-                        ActivityOptions.makeSceneTransitionAnimation(this).toBundle());
-                finish();
+                NavDirections acao = CadastrarUsuarioFragmentDirections.vaiParaSlashScreen();
+                Navigation.findNavController(binding.getRoot()).navigate(acao);
                 return;
             }
-            Snackbar.make(Objects.requireNonNull(getCurrentFocus()), resultadoInsereUsuario.getErro(), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(binding.getRoot(), resultadoInsereUsuario.getErro(), Snackbar.LENGTH_SHORT).show();
         });
     }
 

@@ -1,6 +1,6 @@
 package com.kevin.ceep.repository;
 
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_USUARIOS;
+import static com.kevin.ceep.ui.activity.Constantes.CHAVE_USUARIOS;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
