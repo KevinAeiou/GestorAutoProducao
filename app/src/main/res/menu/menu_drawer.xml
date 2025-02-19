@@ -4,23 +4,6 @@
     tools:showIn="nav">
 
     <group
-        android:checkableBehavior="single"
-        android:id="@+id/grupo2">
-        <item
-            android:id="@+id/listaTrabalhosProducao"
-            android:title="@string/stringProducao" />
-        <item
-            android:id="@+id/listaTrabalhosEstoque"
-            android:title="@string/estoque"/>
-        <item
-            android:id="@+id/listaTrabalhosVendidos"
-            android:title="@string/stringVendas"/>
-        <item
-            android:id="@+id/listaProfissoes"
-            android:title="@string/stringProfissoes"/>
-    </group>
-
-    <group
         android:id="@+id/grupo3">
         <item
             android:id="@+id/inserePersonagem"

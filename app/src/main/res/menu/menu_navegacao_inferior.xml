@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/listaTrabalhosProducao"
+        android:icon="@drawable/ic_producao"
+        android:title="@string/stringProducao" />
+    <item
+        android:id="@+id/listaTrabalhosEstoque"
+        android:icon="@drawable/ic_estoque"
+        android:title="@string/estoque"/>
+    <item
+        android:id="@+id/listaTrabalhosVendidos"
+        android:icon="@drawable/ic_vendas"
+        android:title="@string/stringVendas"/>
+    <item
+        android:id="@+id/listaProfissoes"
+        android:icon="@drawable/ic_profissoes"
+        android:title="@string/stringProfissoes"/>
+</menu>

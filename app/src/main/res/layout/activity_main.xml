@@ -16,7 +16,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/navegacaoInferior"
         tools:context=".ui.activity.MainActivity"
         android:fitsSystemWindows="true"
         tools:openDrawer="start">
@@ -36,4 +36,13 @@
             app:headerLayout="@layout/cabecalho"
             app:menu="@menu/menu_drawer" />
     </androidx.drawerlayout.widget.DrawerLayout>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/navegacaoInferior"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:menu="@menu/menu_navegacao_inferior"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

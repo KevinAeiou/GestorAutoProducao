@@ -3,14 +3,8 @@ package com.kevin.ceep.ui.activity;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
-import static com.kevin.ceep.ui.activity.Constantes.CHAVE_REQUISICAO;
-import static com.kevin.ceep.ui.activity.Constantes.CHAVE_TRABALHO;
-import static com.kevin.ceep.ui.activity.Constantes.CODIGO_REQUISICAO_ALTERA_TRABALHO;
-import static com.kevin.ceep.ui.activity.Constantes.CODIGO_REQUISICAO_INSERE_TRABALHO;
-
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -27,7 +21,6 @@ import androidx.core.view.GravityCompat;
 import androidx.core.view.MenuProvider;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavArgument;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -37,23 +30,19 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.kevin.ceep.NavGraphDirections;
 import com.kevin.ceep.R;
 import com.kevin.ceep.databinding.ActivityMainBinding;
 import com.kevin.ceep.model.Personagem;
 import com.kevin.ceep.model.Trabalho;
 import com.kevin.ceep.repository.PersonagemRepository;
-import com.kevin.ceep.ui.fragment.AtributosPersonagemFragmentDirections;
 import com.kevin.ceep.ui.fragment.ConfirmaTrabalhoFragmentArgs;
 import com.kevin.ceep.ui.viewModel.ComponentesVisuais;
 import com.kevin.ceep.ui.viewModel.EstadoAppViewModel;
 import com.kevin.ceep.ui.viewModel.PersonagemViewModel;
 import com.kevin.ceep.ui.viewModel.factory.PersonagemViewModelFactory;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
@@ -85,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
         appBarConfiguration = new AppBarConfiguration.Builder(R.id.listaTrabalhosProducao, R.id.listaTrabalhosEstoque, R.id.listaTrabalhosVendidos, R.id.listaProfissoes).setOpenableLayout(drawerLayout).build();
         NavigationUI.setupWithNavController(toolbar, controlador, appBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, controlador);
+        NavigationUI.setupWithNavController(binding.navegacaoInferior, controlador);
         controlador.addOnDestinationChangedListener((navController, navDestination, bundle) -> {
             if (navDestination.getId() == R.id.splashscreenFragment) {
                 FirebaseAuth.getInstance().signOut();
@@ -100,21 +90,38 @@ public class MainActivity extends AppCompatActivity {
 
     private void configuraComponentesVisuais() {
         estadoAppViewModel.componentes.observe(this, componentes -> {
-            if (componentes.appBar) {
-                getSupportActionBar().show();
-            } else {
-                getSupportActionBar().hide();
-            }
-            if (componentes.navigationMenu) {
-                binding.navegacaoView.setVisibility(VISIBLE);
-            } else {
-                binding.navegacaoView.setVisibility(GONE);
-            }
-            configuraMenu(componentes);
+            mostraBarraAcao(componentes);
+            mostraMenuNavegacaoLateral(componentes);
+            mostraMenuNavegacaoInferior(componentes);
+            configuraMenuBarraAcao(componentes);
         });
     }
 
-    private void configuraMenu(ComponentesVisuais componentes) {
+    private void mostraMenuNavegacaoInferior(ComponentesVisuais componentes) {
+        if (componentes.menuNavegacaoInferior) {
+            binding.navegacaoInferior.setVisibility(VISIBLE);
+            return;
+        }
+        binding.navegacaoInferior.setVisibility(GONE);
+    }
+
+    private void mostraMenuNavegacaoLateral(ComponentesVisuais componentes) {
+        if (componentes.menuNavegacaoLateral) {
+            binding.navegacaoView.setVisibility(VISIBLE);
+            return;
+        }
+        binding.navegacaoView.setVisibility(GONE);
+    }
+
+    private void mostraBarraAcao(ComponentesVisuais componentes) {
+        if (componentes.appBar) {
+            getSupportActionBar().show();
+            return;
+        }
+        getSupportActionBar().hide();
+    }
+
+    private void configuraMenuBarraAcao(ComponentesVisuais componentes) {
         if (componentes.itemMenuBusca || componentes.itemMenuConfirma) {
             addMenuProvider(new MenuProvider() {
                 @Override
@@ -129,19 +136,19 @@ public class MainActivity extends AppCompatActivity {
                     return false;
                 }
             });
-        } else {
-            addMenuProvider(new MenuProvider() {
-                @Override
-                public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-                    menu.clear();
-                }
-
-                @Override
-                public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-                    return false;
-                }
-            });
+            return;
         }
+        addMenuProvider(new MenuProvider() {
+            @Override
+            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+                menu.clear();
+            }
+
+            @Override
+            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+                return false;
+            }
+        });
     }
 
     @Override

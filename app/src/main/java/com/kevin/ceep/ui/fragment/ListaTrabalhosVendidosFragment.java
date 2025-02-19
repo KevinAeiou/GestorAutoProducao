@@ -72,6 +72,7 @@ public class ListaTrabalhosVendidosFragment extends Fragment {
         EstadoAppViewModel estadoAppViewModel = new ViewModelProvider(requireActivity()).get(EstadoAppViewModel.class);
         ComponentesVisuais componentesVisuais = new ComponentesVisuais();
         componentesVisuais.appBar = true;
+        componentesVisuais.menuNavegacaoInferior = true;
         estadoAppViewModel.componentes.setValue(componentesVisuais);
         inicializaComponentes();
         configuraRecyclerView();

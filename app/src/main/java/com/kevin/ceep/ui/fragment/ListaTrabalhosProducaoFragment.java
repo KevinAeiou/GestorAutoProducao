@@ -81,7 +81,6 @@ public class ListaTrabalhosProducaoFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         FirebaseUser usuarioID = FirebaseAuth.getInstance().getCurrentUser();
         if (usuarioID == null) {
-            Log.d("fluxo", "Vai para splashscreen");
             NavDirections acao = ListaTrabalhosProducaoFragmentDirections.vaiParaSlashScreen();
             Navigation.findNavController(binding.getRoot()).navigate(acao);
             return;
@@ -89,7 +88,8 @@ public class ListaTrabalhosProducaoFragment extends Fragment {
         inicializaComponentes();
         ComponentesVisuais componentesVisuais = new ComponentesVisuais();
         componentesVisuais.appBar = true;
-        componentesVisuais.navigationMenu = true;
+        componentesVisuais.menuNavegacaoLateral = true;
+        componentesVisuais.menuNavegacaoInferior = true;
         estadoAppViewModel.componentes.setValue(componentesVisuais);
         configuraRecyclerView();
         configuraSwipeRefreshLayout();

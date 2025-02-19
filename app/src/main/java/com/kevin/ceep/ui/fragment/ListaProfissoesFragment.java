@@ -62,7 +62,8 @@ public class ListaProfissoesFragment extends Fragment {
         EstadoAppViewModel estadoAppViewModel = new ViewModelProvider(requireActivity()).get(EstadoAppViewModel.class);
         ComponentesVisuais componentesVisuais = new ComponentesVisuais();
         componentesVisuais.appBar = true;
-        componentesVisuais.navigationMenu = true;
+        componentesVisuais.menuNavegacaoLateral = true;
+        componentesVisuais.menuNavegacaoInferior = true;
         estadoAppViewModel.componentes.setValue(componentesVisuais);
         inicializaComponentes();
         configuraRecyclerView();
