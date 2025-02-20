@@ -194,18 +194,18 @@ public class MainActivity extends AppCompatActivity {
         personagemViewModel = new ViewModelProvider(this, personagemViewModelFactory).get(PersonagemViewModel.class);
         personagemViewModel.pegaPersonagemSelecionado().observe(this, personagem -> {
             if (personagem == null) return;
-//            String estado= getString(R.string.stringInativo);
-//            String uso= getString(R.string.stringInativo);
-//            String autoProducao= getString(R.string.stringInativo);
-//            if (personagem.getEstado()) estado = getString(R.string.stringAtivo);
-//            if (personagem.getUso()) uso = getString(R.string.stringAtivo);
-//            if (personagem.isAutoProducao()) autoProducao = getString(R.string.stringAtivo);
-//            txtCabecalhoEstado.setText(getString(R.string.stringEstadoValor,estado));
-//            txtCabecalhoUso.setText(getString(R.string.stringUsoValor,uso));
-//            txtCabecalhoAutoProducao.setText(getString(R.string.stringAutoProducaoValor, autoProducao));
-//            txtCabecalhoEspacoProducao.setText(getString(R.string.stringEspacoProducaoValor,personagem.getEspacoProducao()));
+            String estado= getString(R.string.stringInativo);
+            String uso= getString(R.string.stringInativo);
+            String autoProducao= getString(R.string.stringInativo);
+            if (personagem.getEstado()) estado = getString(R.string.stringAtivo);
+            if (personagem.getUso()) uso = getString(R.string.stringAtivo);
+            if (personagem.isAutoProducao()) autoProducao = getString(R.string.stringAtivo);
+            txtCabecalhoEstado.setText(getString(R.string.stringEstadoValor,estado));
+            txtCabecalhoUso.setText(getString(R.string.stringUsoValor,uso));
+            txtCabecalhoAutoProducao.setText(getString(R.string.stringAutoProducaoValor, autoProducao));
+            txtCabecalhoEspacoProducao.setText(getString(R.string.stringEspacoProducaoValor,personagem.getEspacoProducao()));
             personagemSelecionado = personagem;
-//            mostraFragmentSelecionado(Objects.requireNonNull(navigationView.getCheckedItem()));
+
         });
     }
     private void pegaTodosPersonagens() {
