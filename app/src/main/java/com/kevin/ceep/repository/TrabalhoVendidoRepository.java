@@ -21,7 +21,6 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -31,7 +30,6 @@ import com.kevin.ceep.db.DbHelper;
 import com.kevin.ceep.model.TrabalhoVendido;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class TrabalhoVendidoRepository {
     private static final String CHAVE_VENDAS = "Vendas";
@@ -41,7 +39,6 @@ public class TrabalhoVendidoRepository {
 
     public TrabalhoVendidoRepository(Context context, String idPersonagem) {
         this.idPersonagem = idPersonagem;
-        String usuarioID = Objects.requireNonNull(FirebaseAuth.getInstance().getUid());
         this.referenciaVendas = FirebaseDatabase.getInstance().getReference(CHAVE_VENDAS)
                 .child(idPersonagem);
         DbHelper dbHelper = DbHelper.getInstance(context);

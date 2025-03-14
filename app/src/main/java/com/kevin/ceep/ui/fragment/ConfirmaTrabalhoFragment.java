@@ -69,7 +69,7 @@ public class ConfirmaTrabalhoFragment extends Fragment {
         binding.txtProfissaoConfirmaTrabalho.setText(trabalhoRecebido.getProfissao());
         TrabalhoViewModelFactory trabalhoViewModelFactory = new TrabalhoViewModelFactory(new TrabalhoRepository(getContext()));
         TrabalhoViewModel trabalhoViewModel = new ViewModelProvider(this, trabalhoViewModelFactory).get(TrabalhoViewModel.class);
-        List<String> idsTrabalhosNecessarios = Arrays.asList(trabalhoRecebido.getTrabalhoNecessario().split(","));
+        String[] idsTrabalhosNecessarios = trabalhoRecebido.getTrabalhoNecessario().split(",");
         nomesTrabalhosNecessarios = "";
         for (String id : idsTrabalhosNecessarios) {
             trabalhoViewModel.pegaTrabalhoPorId(id).observe(getViewLifecycleOwner(), resultadoPegaTrabalho -> {

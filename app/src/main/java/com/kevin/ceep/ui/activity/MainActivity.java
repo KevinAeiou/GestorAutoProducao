@@ -84,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
             if (navDestination.getId() == R.id.confirmaTrabalhoFragment) {
                 assert bundle != null;
                 Trabalho trabalho = ConfirmaTrabalhoFragmentArgs.fromBundle(bundle).getTrabalho();
+                assert trabalho != null;
                 navDestination.setLabel(trabalho.getNome());
             }
             configuraComponentesVisuais();
@@ -162,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
         autoCompleteCabecalhoNome.setOnItemClickListener((adapterView, view, i, l) -> {
             personagemViewModel.definePersonagemSelecionado(personagens.get(i));
             atualizaCabecalhoPersonagemSelecionado();
-            controlador.navigate(controlador.getCurrentDestination().getId());
+            controlador.navigate(Objects.requireNonNull(controlador.getCurrentDestination()).getId());
         });
     }
 

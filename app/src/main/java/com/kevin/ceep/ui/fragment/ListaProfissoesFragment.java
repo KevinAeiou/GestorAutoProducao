@@ -2,7 +2,6 @@ package com.kevin.ceep.ui.fragment;
 
 import static com.kevin.ceep.ui.activity.Constantes.CHAVE_PERSONAGEM;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,7 +30,6 @@ import com.kevin.ceep.ui.viewModel.factory.PersonagemViewModelFactory;
 import com.kevin.ceep.ui.viewModel.factory.ProfissaoViewModelFactory;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 
 public class ListaProfissoesFragment extends Fragment {
     private FragmentListaProfissoesBinding binding;
