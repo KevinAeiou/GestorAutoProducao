@@ -29,9 +29,6 @@ import com.kevin.ceep.ui.viewModel.factory.TrabalhoProducaoViewModelFactory;
 import com.kevin.ceep.ui.viewModel.factory.TrabalhoViewModelFactory;
 import com.kevin.ceep.databinding.FragmentConfirmaTrabalhoBinding;
 
-import java.util.Arrays;
-import java.util.List;
-
 public class ConfirmaTrabalhoFragment extends Fragment {
     private FragmentConfirmaTrabalhoBinding binding;
     private AutoCompleteTextView autoCompleteLicenca,autoCompleteQuantidade;
