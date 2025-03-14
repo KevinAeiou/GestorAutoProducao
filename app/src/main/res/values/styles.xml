@@ -120,4 +120,7 @@
         <item name="android:windowFullscreen">true</item>
     </style>
 
+    <style name="estiloChip" parent="Widget.MaterialComponents.Chip.Filter">
+    </style>
+
 </resources>

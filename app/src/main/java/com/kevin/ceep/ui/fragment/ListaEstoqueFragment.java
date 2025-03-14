@@ -6,6 +6,7 @@ import static com.kevin.ceep.utilitario.Utilitario.stringContemString;
 import android.annotation.SuppressLint;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,15 +30,19 @@ import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.snackbar.Snackbar;
 import com.kevin.ceep.R;
 import com.kevin.ceep.databinding.FragmentListaTrabalhosEstoqueBinding;
+import com.kevin.ceep.model.Profissao;
 import com.kevin.ceep.model.TrabalhoEstoque;
 import com.kevin.ceep.repository.PersonagemRepository;
+import com.kevin.ceep.repository.ProfissaoRepository;
 import com.kevin.ceep.repository.TrabalhoEstoqueRepository;
 import com.kevin.ceep.ui.recyclerview.adapter.ListaTrabalhoEstoqueAdapter;
 import com.kevin.ceep.ui.viewModel.ComponentesVisuais;
 import com.kevin.ceep.ui.viewModel.EstadoAppViewModel;
 import com.kevin.ceep.ui.viewModel.PersonagemViewModel;
+import com.kevin.ceep.ui.viewModel.ProfissaoViewModel;
 import com.kevin.ceep.ui.viewModel.TrabalhoEstoqueViewModel;
 import com.kevin.ceep.ui.viewModel.factory.PersonagemViewModelFactory;
+import com.kevin.ceep.ui.viewModel.factory.ProfissaoViewModelFactory;
 import com.kevin.ceep.ui.viewModel.factory.TrabalhoEstoqueViewModelFactory;
 
 import java.util.ArrayList;
@@ -153,7 +158,6 @@ public class ListaEstoqueFragment extends Fragment {
                 txtListaVazia.setVisibility(View.GONE);
                 trabalhoEstoqueAdapter.atualiza(listaTrabalhosEstoqueFiltrada);
                 configuraListaDeProfissoes();
-                configuraGrupoChipsProfissoes();
             }
             if (resultadoPegaTodosTrabalhos.getErro() != null) {
                 Snackbar.make(binding.getRoot(), "Erro: "+resultadoPegaTodosTrabalhos.getErro(), Snackbar.LENGTH_LONG).show();
@@ -170,37 +174,41 @@ public class ListaEstoqueFragment extends Fragment {
         });
     }
 
-    @SuppressLint("ResourceType")
     private void configuraGrupoChipsProfissoes() {
         grupoChipsProfissoes.removeAllViews();
-        if (profissoes.isEmpty() || profissoes.size() < 2) return;
         for (String profissao : profissoes) {
-            Chip chipProfissao = (Chip) LayoutInflater.from(getContext()).inflate(R.layout.item_chip, grupoChipsProfissoes, false);
-            chipProfissao.setText(profissao);
-            chipProfissao.setId(profissoes.indexOf(profissao));
-            grupoChipsProfissoes.addView(chipProfissao);
+            adicionaChip(profissao);
         }
+    }
+
+    private void adicionaChip(String profissao) {
+        Chip novoChip= new Chip(new ContextThemeWrapper(requireContext(), R.style.estiloChip), null, 0);
+        novoChip.setText(profissao);
+        novoChip.setId(profissoes.indexOf(profissao));
+        novoChip.setCheckable(true);
+        grupoChipsProfissoes.addView(novoChip);
     }
 
     private void configuraListaDeProfissoes() {
-        profissoes = new ArrayList<>();
-        for (TrabalhoEstoque trabalhoEstoque : todosTrabalhosEstoque) {
-            if (profissoes.isEmpty() && !trabalhoEstoque.getProfissao().isEmpty()) {
-                profissoes.add(trabalhoEstoque.getProfissao());
-                continue;
+        profissoes.clear();
+        ProfissaoViewModelFactory profissaoViewModelFactory = new ProfissaoViewModelFactory(new ProfissaoRepository(personagemId));
+        ProfissaoViewModel profissaoViewModel = new ViewModelProvider(this, profissaoViewModelFactory).get(ProfissaoViewModel.class);
+        profissaoViewModel.pegaTodasProfissoes().observe(getViewLifecycleOwner(), resultadoProfissoes -> {
+            if (resultadoProfissoes.getErro() == null) {
+                for (Profissao profissao : resultadoProfissoes.getDado()) {
+                    profissoes.add(profissao.getNome());
+                }
+                configuraGrupoChipsProfissoes();
+                return;
             }
-            if (profissaoExiste(trabalhoEstoque) || trabalhoEstoque.getProfissao().isEmpty()) continue;
-            profissoes.add(trabalhoEstoque.getProfissao());
-        }
-    }
-
-    private boolean profissaoExiste(TrabalhoEstoque trabalhoEstoque) {
-        return profissoes.contains(trabalhoEstoque.getProfissao());
+            Snackbar.make(binding.getRoot(), "Erro ao buscar profissões: "+ resultadoProfissoes.getErro(), Snackbar.LENGTH_LONG).show();
+        });
     }
 
     private void inicializaComponentes() {
         todosTrabalhosEstoque = new ArrayList<>();
         listaTrabalhosEstoqueFiltrada = new ArrayList<>();
+        profissoes= new ArrayList<>();
         recyclerView = binding.listaTrabalhoEstoqueRecyclerView;
         grupoChipsProfissoes = binding.grupoProfissoesChipListaEstoque;
         swipeRefreshLayout = binding.swipeRefreshLayoutTrabalhosEstoque;

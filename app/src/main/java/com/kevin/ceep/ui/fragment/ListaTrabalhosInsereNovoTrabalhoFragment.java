@@ -7,6 +7,7 @@ import static com.kevin.ceep.utilitario.Utilitario.stringContemString;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -34,8 +35,10 @@ import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.snackbar.Snackbar;
 import com.kevin.ceep.R;
 import com.kevin.ceep.databinding.FragmentListaTrabalhosInsereNovoTrabalhoBinding;
+import com.kevin.ceep.model.Profissao;
 import com.kevin.ceep.model.Trabalho;
 import com.kevin.ceep.model.TrabalhoEstoque;
+import com.kevin.ceep.repository.ProfissaoRepository;
 import com.kevin.ceep.repository.TrabalhoEstoqueRepository;
 import com.kevin.ceep.repository.TrabalhoRepository;
 import com.kevin.ceep.ui.fragment.ListaTrabalhosInsereNovoTrabalhoFragmentDirections.VaiParaConfirmaTrabalho;
@@ -45,8 +48,10 @@ import com.kevin.ceep.ui.recyclerview.adapter.listener.OnItemClickListener;
 import com.kevin.ceep.ui.viewModel.ComponentesVisuais;
 import com.kevin.ceep.ui.viewModel.EstadoAppViewModel;
 import com.kevin.ceep.ui.viewModel.ListaNovaProducaoViewModel;
+import com.kevin.ceep.ui.viewModel.ProfissaoViewModel;
 import com.kevin.ceep.ui.viewModel.TrabalhoEstoqueViewModel;
 import com.kevin.ceep.ui.viewModel.factory.ListaNovaProducaoViewModelFactory;
+import com.kevin.ceep.ui.viewModel.factory.ProfissaoViewModelFactory;
 import com.kevin.ceep.ui.viewModel.factory.TrabalhoEstoqueViewModelFactory;
 
 import java.util.ArrayList;
@@ -137,33 +142,33 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment implement
 
     private void configuraGrupoChipsProfissoes() {
         grupoChipsProfissoes.removeAllViews();
-        if (!listaProfissoes.isEmpty()) {
-            int idProfissao = 0;
-            for (String profissao : listaProfissoes) {
-                Chip chipProfissao = (Chip) LayoutInflater.from(getContext()).inflate(R.layout.item_chip, null);
-                chipProfissao.setText(profissao);
-                chipProfissao.setId(idProfissao);
-                grupoChipsProfissoes.addView(chipProfissao);
-                idProfissao += 1;
-            }
+        for (String profissao : listaProfissoes) {
+            adicionaChip(profissao);
         }
+    }
+
+    private void adicionaChip(String profissao) {
+        Chip novoChip= new Chip(new ContextThemeWrapper(requireContext(), R.style.estiloChip), null, 0);
+        novoChip.setText(profissao);
+        novoChip.setId(listaProfissoes.indexOf(profissao));
+        novoChip.setCheckable(true);
+        grupoChipsProfissoes.addView(novoChip);
     }
 
     private void configuraListaDeProfissoes() {
         listaProfissoes.clear();
-        for (Trabalho trabalho : todosTrabalhos) {
-            if (listaProfissoes.isEmpty()) {
-                listaProfissoes.add(trabalho.getProfissao());
-            } else {
-                if (profissaoNaoExiste(trabalho)) {
-                    listaProfissoes.add(trabalho.getProfissao());
+        ProfissaoViewModelFactory profissaoViewModelFactory = new ProfissaoViewModelFactory(new ProfissaoRepository(personagemId));
+        ProfissaoViewModel profissaoViewModel = new ViewModelProvider(this, profissaoViewModelFactory).get(ProfissaoViewModel.class);
+        profissaoViewModel.pegaTodasProfissoes().observe(getViewLifecycleOwner(), resultadoProfissoes -> {
+            if (resultadoProfissoes.getErro() == null) {
+                for (Profissao profissao : resultadoProfissoes.getDado()) {
+                    listaProfissoes.add(profissao.getNome());
                 }
+                configuraGrupoChipsProfissoes();
+                return;
             }
-        }
-    }
-
-    private boolean profissaoNaoExiste(Trabalho trabalho) {
-        return !listaProfissoes.contains(trabalho.getProfissao());
+            Snackbar.make(binding.getRoot(), "Erro ao buscar profissões: "+ resultadoProfissoes.getErro(), Snackbar.LENGTH_LONG).show();
+        });
     }
 
     private void configuraCampoDeBusca(MenuItem itemBusca) {
@@ -298,7 +303,6 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment implement
                     iconeListaVazia.setVisibility(View.GONE);
                 }
                 configuraListaDeProfissoes();
-                configuraGrupoChipsProfissoes();
                 listaTrabalhoEspecificoAdapter.atualizaLista(listaTrabalhosFiltrada);
             }
             if (resultadoPegaTodosTrabalhos.getErro() != null) {
