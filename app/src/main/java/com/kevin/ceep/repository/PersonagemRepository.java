@@ -10,16 +10,16 @@ import static com.kevin.ceep.db.contracts.PersoagemDbContract.PersonagemEntry.CO
 import static com.kevin.ceep.db.contracts.PersoagemDbContract.PersonagemEntry.COLUMN_NAME_SENHA;
 import static com.kevin.ceep.db.contracts.PersoagemDbContract.PersonagemEntry.COLUMN_NAME_USO;
 import static com.kevin.ceep.db.contracts.PersoagemDbContract.PersonagemEntry.TABLE_PERSONAGENS;
-import static com.kevin.ceep.ui.activity.Constantes.CHAVE_LISTA_PERSONAGEM;
-import static com.kevin.ceep.ui.activity.Constantes.CHAVE_USUARIOS;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
@@ -38,7 +38,10 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class PersonagemRepository {
-    private final DatabaseReference minhaReferencia;
+    private static final String CHAVE_PERSONAGENS = "Personagens";
+    private static final String CHAVE_USUARIOS2 = "Usuarios2";
+    private final DatabaseReference referenciaPersonagens;
+    private final DatabaseReference referenciaUsuarios;
     private final String usuarioID;
     private final SQLiteDatabase dbModifica, dbLeitura;
     private final PersonagemDao personagemDao;
@@ -46,9 +49,8 @@ public class PersonagemRepository {
 
     public PersonagemRepository(Context context) {
         this.usuarioID = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
-        Log.d("fluxo", "ID USUARIO: " + usuarioID);
-        this.minhaReferencia = FirebaseDatabase.getInstance().getReference(CHAVE_USUARIOS)
-                .child(usuarioID).child(CHAVE_LISTA_PERSONAGEM);
+        this.referenciaPersonagens = FirebaseDatabase.getInstance().getReference(CHAVE_PERSONAGENS);
+        this.referenciaUsuarios = FirebaseDatabase.getInstance().getReference(CHAVE_USUARIOS2).child(usuarioID).child(CHAVE_PERSONAGENS);
         DbHelper dbHelper = DbHelper.getInstance(context);
         this.dbModifica = dbHelper.getWritableDatabase();
         this.dbLeitura = dbHelper.getReadableDatabase();
@@ -56,92 +58,90 @@ public class PersonagemRepository {
         this.personagemDao = new PersonagemDao(context);
     }
 
-    public LiveData<Resource<Void>> sincronizaPersonagens() {
-        ArrayList<Personagem> personagensServidor = new ArrayList<>();
+
+
+    public LiveData<Resource<Void>> sincronizaPersonagens(ArrayList<Personagem> personagensServidor) {
         MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
-        minhaReferencia.addListenerForSingleValueEvent(new ValueEventListener() {
+        for (Personagem personagem: personagensServidor) {
+            String sql= "SELECT " + COLUMN_NAME_ID + " FROM " + TABLE_PERSONAGENS + " WHERE " + COLUMN_NAME_ID + " == ?";
+            String[] argumentos= {personagem.getId()};
+            Cursor cursor = dbLeitura.rawQuery(
+                    sql,
+                    argumentos
+            );
+            ContentValues values = defineValorPersonagem(personagem);
+            Log.d("personagem", "Resultado consulta sql: "+cursor.getCount());
+            if (cursor.getCount() == 0) {
+                Log.d("personagem", "Personagem inserido: "+personagem.getNome());
+                dbModifica.insert(TABLE_PERSONAGENS, null, values);
+            } else if (cursor.getCount() == 1) {
+                String selection = COLUMN_NAME_ID + " LIKE ?";
+                String[] selectionArgs = new String[]{personagem.getId()};
+                Log.d("personagem", "Personagem modificado: "+personagem.getNome());
+                dbModifica.update(TABLE_PERSONAGENS, values, selection, selectionArgs);
+            }
+            cursor.close();
+            removePersonagens(personagensServidor);
+            liveData.setValue(new Resource<>(null, null));
+        }
+        return liveData;
+    }
+
+    private void removePersonagens(ArrayList<Personagem> personagensServidor) {
+        String sql= "SELECT " + COLUMN_NAME_ID + " FROM " + TABLE_PERSONAGENS;
+        Cursor cursor = dbLeitura.rawQuery(sql, null);
+        ArrayList<Personagem> personagensBanco = new ArrayList<>();
+        ArrayList<Personagem> novaLista = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            Personagem personagem = new Personagem();
+            personagem.setId(cursor.getString(0));
+            personagensBanco.add(personagem);
+            for (Personagem personagemServidor : personagensServidor) {
+                if (personagem.getId().equals(personagemServidor.getId())) {
+                    novaLista.add(personagem);
+                }
+            }
+        }
+        cursor.close();
+        personagensBanco.removeAll(novaLista);
+        for (Personagem personagem : personagensBanco) {
+            String selection = COLUMN_NAME_ID + " LIKE ?";
+            String[] selectionArgs = {personagem.getId()};
+            Log.d("personagem", "Personagem removido: "+personagem.getNome());
+            dbModifica.delete(TABLE_PERSONAGENS, selection, selectionArgs);
+        }
+    }
+
+    @NonNull
+    private ContentValues defineValorPersonagem(Personagem personagem) {
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_NAME_ID, personagem.getId());
+        values.put(COLUMN_NAME_ID_USUARIO, usuarioID);
+        values.put(COLUMN_NAME_NOME, personagem.getNome());
+        values.put(COLUMN_NAME_EMAIL, personagem.getEmail());
+        values.put(COLUMN_NAME_SENHA, personagem.getSenha());
+        values.put(COLUMN_NAME_ESTADO, personagem.getEstado());
+        values.put(COLUMN_NAME_USO, personagem.getUso());
+        values.put(COLUMN_NAME_AUTO_PRODUCAO, personagem.isAutoProducao());
+        values.put(COLUMN_NAME_ESPACO_PRODUCAO, personagem.getEspacoProducao());
+        return values;
+    }
+
+    @NonNull
+    public MutableLiveData<Resource<ArrayList<Personagem>>> pegaPersonagensServidor(ArrayList<String> idsPersonagens) {
+        ArrayList<Personagem> personagensServidor = new ArrayList<>();
+        MutableLiveData<Resource<ArrayList<Personagem>>> liveData = new MutableLiveData<>();
+        referenciaPersonagens.addListenerForSingleValueEvent(new ValueEventListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                personagensServidor.clear();
-                for (DataSnapshot dn:snapshot.getChildren()){
+                for (DataSnapshot dn: snapshot.getChildren()) {
                     Personagem personagem = dn.getValue(Personagem.class);
-                    if (personagem != null){
-                        personagensServidor.add(personagem);
-                        String selection = COLUMN_NAME_ID + " LIKE ?";
-                        String[] selectionArgs = {personagem.getId()};
-                        Cursor cursor = dbLeitura.query(
-                                TABLE_PERSONAGENS,
-                                null,
-                                selection,
-                                selectionArgs,
-                                null,
-                                null,
-                                null
-                        );
-                        int contadorLinhas = 0;
-                        while(cursor.moveToNext()) {
-                            contadorLinhas += 1;
-                        }
-                        cursor.close();
-                        ContentValues values = new ContentValues();
-                        if (contadorLinhas == 0) {
-                            values.put(COLUMN_NAME_ID, personagem.getId());
-                            values.put(COLUMN_NAME_ID_USUARIO, usuarioID);
-                            values.put(COLUMN_NAME_NOME, personagem.getNome());
-                            values.put(COLUMN_NAME_EMAIL, personagem.getEmail());
-                            values.put(COLUMN_NAME_SENHA, personagem.getSenha());
-                            values.put(COLUMN_NAME_ESTADO, personagem.getEstado());
-                            values.put(COLUMN_NAME_USO, personagem.getUso());
-                            values.put(COLUMN_NAME_AUTO_PRODUCAO, personagem.isAutoProducao());
-                            values.put(COLUMN_NAME_ESPACO_PRODUCAO, personagem.getEspacoProducao());
-                            dbModifica.insert(TABLE_PERSONAGENS, null, values);
-                        } else if (contadorLinhas == 1) {
-                            values.put(COLUMN_NAME_ID, personagem.getId());
-                            values.put(COLUMN_NAME_ID_USUARIO, usuarioID);
-                            values.put(COLUMN_NAME_NOME, personagem.getNome());
-                            values.put(COLUMN_NAME_EMAIL, personagem.getEmail());
-                            values.put(COLUMN_NAME_SENHA, personagem.getSenha());
-                            values.put(COLUMN_NAME_ESTADO, personagem.getEstado());
-                            values.put(COLUMN_NAME_USO, personagem.getUso());
-                            values.put(COLUMN_NAME_AUTO_PRODUCAO, personagem.isAutoProducao());
-                            values.put(COLUMN_NAME_ESPACO_PRODUCAO, personagem.getEspacoProducao());
-                            selection = COLUMN_NAME_ID + " LIKE ?";
-                            selectionArgs = new String[]{personagem.getId()};
-                            dbModifica.update(TABLE_PERSONAGENS, values, selection, selectionArgs);
-                        }
-                    }
-                    Cursor cursor = dbLeitura.query(
-                            TABLE_PERSONAGENS,
-                            null,
-                            null,
-                            null,
-                            null,
-                            null,
-                            null
-                    );
-                    ArrayList<Personagem> personagensBanco = new ArrayList<>();
-                    while (cursor.moveToNext()) {
-                        Personagem personagem1 = new Personagem();
-                        personagem1.setId(cursor.getString(0));
-                        personagensBanco.add(personagem1);
-                    }
-                    cursor.close();
-                    ArrayList<Personagem> novaLista = new ArrayList<>();
-                    for (Personagem personagemBanco : personagensBanco) {
-                        for (Personagem personagemServidor : personagensServidor) {
-                            if (personagemBanco.getId().equals(personagemServidor.getId())) {
-                                novaLista.add(personagemBanco);
-                            }
-                        }
-                    }
-                    personagensBanco.removeAll(novaLista);
-                    for (Personagem personagem1 : personagensBanco) {
-                        String selection = COLUMN_NAME_ID + " LIKE ?";
-                        String[] selectionArgs = {personagem1.getId()};
-                        dbModifica.delete(TABLE_PERSONAGENS, selection, selectionArgs);
-                    }
+                    if (personagem == null) return;
+                    boolean encontrado= idsPersonagens.stream().anyMatch(personagem.getId()::equals);
+                    if (encontrado) personagensServidor.add(personagem);
                 }
-                liveData.setValue(new Resource<>(null, null));
+                liveData.setValue(new Resource<>(personagensServidor, null));
             }
 
             @Override
@@ -151,14 +151,35 @@ public class PersonagemRepository {
         });
         return liveData;
     }
-    public LiveData<Resource<ArrayList<Personagem>>> pegaTodosPersonagens() {
+
+    public LiveData<Resource<ArrayList<String>>> pegaIdsPersonagens() {
+        MutableLiveData<Resource<ArrayList<String>>> livedata = new MutableLiveData<>();
+        ArrayList<String> ids= new ArrayList<>();
+        referenciaUsuarios.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dn: snapshot.getChildren()) {
+                    Log.d("personagem", "ID PERSONAGEM: " + dn.getKey());
+                    ids.add(dn.getKey());
+                }
+                livedata.setValue(new Resource<>(ids, null));
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                livedata.setValue(new Resource<>(null, error.getMessage()));
+            }
+        });
+        return livedata;
+    }
+
+    public LiveData<Resource<ArrayList<Personagem>>> pegaPersonagensBanco() {
         ArrayList<Personagem> personagens = personagemDao.pegaPersonagens();
         personagensEncontrados.setValue(new Resource<>(personagens, null));
         return personagensEncontrados;
     }
     public LiveData<Resource<Void>> modificaPersonagem(Personagem personagemModificado) {
         MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
-        minhaReferencia.child(personagemModificado.getId()).child(COLUMN_NAME_NOME).setValue(personagemModificado.getNome()).addOnCompleteListener(task -> {
+        referenciaPersonagens.child(personagemModificado.getId()).child(COLUMN_NAME_NOME).setValue(personagemModificado.getNome()).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 if (personagemDao.modificaNomePersonagem(personagemModificado)) {
                     liveData.setValue(new Resource<>(null, null));
@@ -169,7 +190,7 @@ public class PersonagemRepository {
                 liveData.setValue(new Resource<>(null, Objects.requireNonNull(task.getException()).toString()));
             }
         });
-        minhaReferencia.child(personagemModificado.getId()).child(COLUMN_NAME_EMAIL).setValue(personagemModificado.getEmail()).addOnCompleteListener(task -> {
+        referenciaPersonagens.child(personagemModificado.getId()).child(COLUMN_NAME_EMAIL).setValue(personagemModificado.getEmail()).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 ContentValues values = new ContentValues();
                 values.put(COLUMN_NAME_EMAIL, personagemModificado.getEmail());
@@ -185,7 +206,7 @@ public class PersonagemRepository {
                 liveData.setValue(new Resource<>(null, Objects.requireNonNull(task.getException()).toString()));
             }
         });
-        minhaReferencia.child(personagemModificado.getId()).child(COLUMN_NAME_SENHA).setValue(personagemModificado.getSenha()).addOnCompleteListener(task -> {
+        referenciaPersonagens.child(personagemModificado.getId()).child(COLUMN_NAME_SENHA).setValue(personagemModificado.getSenha()).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 ContentValues values = new ContentValues();
                 values.put(COLUMN_NAME_SENHA, personagemModificado.getSenha());
@@ -201,7 +222,7 @@ public class PersonagemRepository {
                 liveData.setValue(new Resource<>(null, Objects.requireNonNull(task.getException()).toString()));
             }
         });
-        minhaReferencia.child(personagemModificado.getId()).child(COLUMN_NAME_ESTADO).setValue(personagemModificado.getEstado()).addOnCompleteListener(task -> {
+        referenciaPersonagens.child(personagemModificado.getId()).child(COLUMN_NAME_ESTADO).setValue(personagemModificado.getEstado()).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 ContentValues values = new ContentValues();
                 values.put(COLUMN_NAME_ESTADO, personagemModificado.getEstado());
@@ -219,7 +240,7 @@ public class PersonagemRepository {
                 liveData.setValue(new Resource<>(null, Objects.requireNonNull(task.getException()).toString()));
             }
         });
-        minhaReferencia.child(personagemModificado.getId()).child(COLUMN_NAME_USO).setValue(personagemModificado.getUso()).addOnCompleteListener(task -> {
+        referenciaPersonagens.child(personagemModificado.getId()).child(COLUMN_NAME_USO).setValue(personagemModificado.getUso()).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 ContentValues values = new ContentValues();
                 values.put(COLUMN_NAME_USO, personagemModificado.getUso());
@@ -235,7 +256,7 @@ public class PersonagemRepository {
                 liveData.setValue(new Resource<>(null, Objects.requireNonNull(task.getException()).toString()));
             }
         });
-        minhaReferencia.child(personagemModificado.getId()).child(COLUMN_NAME_AUTO_PRODUCAO).setValue(personagemModificado.isAutoProducao()).addOnCompleteListener(task -> {
+        referenciaPersonagens.child(personagemModificado.getId()).child(COLUMN_NAME_AUTO_PRODUCAO).setValue(personagemModificado.isAutoProducao()).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 ContentValues values = new ContentValues();
                 values.put(COLUMN_NAME_AUTO_PRODUCAO, personagemModificado.isAutoProducao());
@@ -251,7 +272,7 @@ public class PersonagemRepository {
                 liveData.setValue(new Resource<>(null, Objects.requireNonNull(task.getException()).toString()));
             }
         });
-        minhaReferencia.child(personagemModificado.getId()).child(COLUMN_NAME_ESPACO_PRODUCAO).setValue(personagemModificado.getEspacoProducao()).addOnCompleteListener(task -> {
+        referenciaPersonagens.child(personagemModificado.getId()).child(COLUMN_NAME_ESPACO_PRODUCAO).setValue(personagemModificado.getEspacoProducao()).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 ContentValues values = new ContentValues();
                 values.put(COLUMN_NAME_ESPACO_PRODUCAO, personagemModificado.getEspacoProducao());
@@ -272,9 +293,9 @@ public class PersonagemRepository {
 
     public LiveData<Resource<Void>> inserePersonagem(Personagem novoPersonagem) {
         MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
-        minhaReferencia.child(novoPersonagem.getId()).setValue(novoPersonagem).addOnCompleteListener(task -> {
+        referenciaPersonagens.child(novoPersonagem.getId()).setValue(novoPersonagem).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                ContentValues values = getContentValues(novoPersonagem);
+                ContentValues values = defineValorPersonagem(novoPersonagem);
                 long newRowId = dbModifica.insert(TABLE_PERSONAGENS, null, values);
                 if (newRowId == -1) {
                     liveData.setValue(new Resource<>(null, "Erro ao inserir "+novoPersonagem.getNome()+" no banco"));
@@ -288,24 +309,9 @@ public class PersonagemRepository {
         return liveData;
     }
 
-    @NonNull
-    private ContentValues getContentValues(Personagem novoPersonagem) {
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_NAME_ID, novoPersonagem.getId());
-        values.put(COLUMN_NAME_ID_USUARIO, usuarioID);
-        values.put(COLUMN_NAME_NOME, novoPersonagem.getNome());
-        values.put(COLUMN_NAME_EMAIL, novoPersonagem.getEmail());
-        values.put(COLUMN_NAME_SENHA, novoPersonagem.getSenha());
-        values.put(COLUMN_NAME_ESTADO, novoPersonagem.getEstado());
-        values.put(COLUMN_NAME_USO, novoPersonagem.getUso());
-        values.put(COLUMN_NAME_AUTO_PRODUCAO, novoPersonagem.isAutoProducao());
-        values.put(COLUMN_NAME_ESPACO_PRODUCAO, novoPersonagem.getEspacoProducao());
-        return values;
-    }
-
     public LiveData<Resource<Void>> removePersonagem(Personagem personagem) {
         MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
-        minhaReferencia.child(personagem.getId()).removeValue().addOnCompleteListener(task -> {
+        referenciaPersonagens.child(personagem.getId()).removeValue().addOnCompleteListener(task -> {
            if (task.isSuccessful()) {
                String selection = EstoqueDbContract.EstoqueEntry.COLUMN_NAME_ID + " LIKE ?";
                String[] selectionArgs = {personagem.getId()};

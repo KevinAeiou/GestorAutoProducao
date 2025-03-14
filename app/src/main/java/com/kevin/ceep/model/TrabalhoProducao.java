@@ -6,7 +6,7 @@ import java.io.Serializable;
 
 public class TrabalhoProducao extends Trabalho implements Serializable {
     private String idTrabalho;
-    private String tipo_licenca;
+    private String tipoLicenca;
     private Integer estado;
     private Boolean recorrencia;
 
@@ -22,12 +22,12 @@ public class TrabalhoProducao extends Trabalho implements Serializable {
         return estado;
     }
 
-    public String getTipo_licenca() {
-        return tipo_licenca;
+    public String getTipoLicenca() {
+        return tipoLicenca;
     }
 
-    public void setTipo_licenca(String tipo_licenca) {
-        this.tipo_licenca = tipo_licenca;
+    public void setTipoLicenca(String tipoLicenca) {
+        this.tipoLicenca = tipoLicenca;
     }
 
     public void setEstado(Integer estado) {

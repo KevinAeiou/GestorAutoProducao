@@ -14,6 +14,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.kevin.ceep.db.DbHelper;
@@ -55,6 +56,7 @@ public class PersonagemDao {
             personagem.setUso(uso);
             personagem.setAutoProducao(autoProducao);
             personagem.setEspacoProducao(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_ESPACO_PRODUCAO)));
+            Log.d("personagem", "PERSONAGEM ENCONTRADO NO BANCO: " + personagem.getNome());
             personagens.add(personagem);
         }
         cursor.close();

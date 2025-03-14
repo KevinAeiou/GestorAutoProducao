@@ -42,7 +42,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-public class DetalhesTrabalhoVendidoFragment extends Fragment {
+public class DetalhesTrabalhoVendidoFragment extends Fragment implements MenuProvider{
     private FragmentDetalhesTrabalhoVendidoBinding binding;
     private MaterialTextView txtDescricaoTrabalhoVendido, txtDataTrabalhoVendido, txtValorTrabalhoVendido, txtQuantidadeTrabalhoVendido;
     private AutoCompleteTextView autoCompleteNomeTrabalhoVendido;
@@ -56,12 +56,8 @@ public class DetalhesTrabalhoVendidoFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentDetalhesTrabalhoVendidoBinding.inflate(inflater, container, false);
+        requireActivity().addMenuProvider(this, getViewLifecycleOwner(), androidx.lifecycle.Lifecycle.State.RESUMED);
         return binding.getRoot();
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -75,32 +71,28 @@ public class DetalhesTrabalhoVendidoFragment extends Fragment {
         recebeDados();
         inicializaComponentes();
         preencheCampos();
-        configuraMenu();
     }
 
-    private void configuraMenu() {
-        requireActivity().addMenuProvider(new MenuProvider() {
-            @Override
-            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-            }
+    @Override
+    public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
 
-            @Override
-            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-                if (menuItem.getItemId() == R.id.itemMenuConfirma) {
-                    TrabalhoVendido trabalhoVendido = defineTrabalhoModificado();
-                    if (camposTrabalhoModificado(trabalhoVendido)) {
-                        MaterialAlertDialogBuilder dialogoDeAlerta = new MaterialAlertDialogBuilder(requireContext());
-                        dialogoDeAlerta.setMessage("Deseja confirmar alterações?");
-                        dialogoDeAlerta.setNegativeButton("Não", ((dialogInterface, i) -> voltaParaTrabalhosVendidos()));
-                        dialogoDeAlerta.setPositiveButton("Sim", (dialogInterface, i) -> modificaTrabalho(trabalhoVendido));
-                        dialogoDeAlerta.show();
-                        return true;
-                    }
-                    voltaParaTrabalhosVendidos();
-                }
+    }
+
+    @Override
+    public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+        if (menuItem.getItemId() == R.id.itemMenuConfirma) {
+            TrabalhoVendido trabalhoVendido = defineTrabalhoModificado();
+            if (camposTrabalhoModificado(trabalhoVendido)) {
+                MaterialAlertDialogBuilder dialogoDeAlerta = new MaterialAlertDialogBuilder(requireContext());
+                dialogoDeAlerta.setMessage("Deseja confirmar alterações?");
+                dialogoDeAlerta.setNegativeButton("Não", ((dialogInterface, i) -> voltaParaTrabalhosVendidos()));
+                dialogoDeAlerta.setPositiveButton("Sim", (dialogInterface, i) -> modificaTrabalho(trabalhoVendido));
+                dialogoDeAlerta.show();
                 return true;
             }
-        });
+            voltaParaTrabalhosVendidos();
+        }
+        return false;
     }
 
     private TrabalhoVendido defineTrabalhoModificado() {

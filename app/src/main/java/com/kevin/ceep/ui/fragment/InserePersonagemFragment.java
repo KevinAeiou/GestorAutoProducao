@@ -1,5 +1,6 @@
 package com.kevin.ceep.ui.fragment;
 
+import static android.view.View.GONE;
 import static java.lang.Integer.parseInt;
 
 import android.os.Bundle;
@@ -31,7 +32,7 @@ import com.kevin.ceep.ui.viewModel.EstadoAppViewModel;
 import com.kevin.ceep.ui.viewModel.PersonagemViewModel;
 import com.kevin.ceep.ui.viewModel.factory.PersonagemViewModelFactory;
 
-public class InserePersonagemFragment extends Fragment {
+public class InserePersonagemFragment extends Fragment implements MenuProvider{
 
     private TextInputLayout personagemNomeTxt, personagemEspacoProducaoTxt, personagemEmailTxt, personagemSenhaTxt;
     private EditText personagemNome, personagemEspacoProducao, personagemEmail, personagemSenha;
@@ -62,31 +63,27 @@ public class InserePersonagemFragment extends Fragment {
         componentesVisuais.itemMenuConfirma = true;
         estadoAppViewModel.componentes.setValue(componentesVisuais);
         inicializaComponentes();
-        configuraMenu();
     }
 
-    private void configuraMenu() {
-        requireActivity().addMenuProvider(new MenuProvider() {
-            @Override
-            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+    @Override
+    public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
 
-            }
+    }
 
-            @Override
-            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-                if (menuItem.getItemId() == R.id.itemMenuConfirma) {
-                    if (verificaCamposValidos()){
-                        Personagem novoPersonagem = definePersonagemModificado();
-                        inserePersonagemServidor(novoPersonagem);
-                        return true;
-                    }
-                    configuraMensagemCamposValidos();
-                }
+    @Override
+    public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+        if (menuItem.getItemId() == R.id.itemMenuConfirma) {
+            if (verificaCamposValidos()){
+                Personagem novoPersonagem = definePersonagemModificado();
+                inserePersonagemServidor(novoPersonagem);
                 return true;
             }
-
-        });
+            configuraMensagemCamposValidos();
+            return true;
+        }
+        return false;
     }
+
     private void inserePersonagemServidor(Personagem novoPersonagem) {
         personagemViewModel.inserePersonagem(novoPersonagem).observe(this, resultadoInserePersonagem -> {
             if (resultadoInserePersonagem.getErro() == null) {
@@ -114,6 +111,7 @@ public class InserePersonagemFragment extends Fragment {
         personagemSenhaTxt = binding.txtSenhaPersonagem;
         PersonagemViewModelFactory personagemViewModelFactory = new PersonagemViewModelFactory(new PersonagemRepository(getContext()));
         personagemViewModel = new ViewModelProvider(requireActivity(), personagemViewModelFactory).get(PersonagemViewModel.class);
+        binding.btnExcluiPersonagem.setVisibility(GONE);
     }
 
     private void configuraMensagemCamposValidos() {
@@ -145,9 +143,9 @@ public class InserePersonagemFragment extends Fragment {
     }
 
     private boolean verificaCamposValidos() {
-        return !personagemNome.getText().toString().isEmpty() ||
-            !personagemEspacoProducao.getText().toString().isEmpty() ||
-            !personagemEmail.getText().toString().isEmpty() ||
+        return !personagemNome.getText().toString().isEmpty() &&
+            !personagemEspacoProducao.getText().toString().isEmpty() &&
+            !personagemEmail.getText().toString().isEmpty() &&
             !personagemSenha.getText().toString().isEmpty();
     }
 }

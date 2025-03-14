@@ -26,11 +26,11 @@ public class PersonagemViewModel extends ViewModel {
     }
 
     public LiveData<Resource<ArrayList<Personagem>>> pegaTodosPersonagens() {
-        return personagemRepository.pegaTodosPersonagens();
+        return personagemRepository.pegaPersonagensBanco();
     }
 
-    public LiveData<Resource<Void>> sincronizaPersonagens() {
-        return personagemRepository.sincronizaPersonagens();
+    public LiveData<Resource<Void>> sincronizaPersonagens(ArrayList<Personagem> personagens) {
+        return personagemRepository.sincronizaPersonagens(personagens);
     }
     public LiveData<Resource<Void>> modificaPersonagem(Personagem personagemModificado) {
         return personagemRepository.modificaPersonagem(personagemModificado);
@@ -42,5 +42,13 @@ public class PersonagemViewModel extends ViewModel {
 
     public LiveData<Resource<Void>> removePersonagem(Personagem personagemRecebido) {
         return personagemRepository.removePersonagem(personagemRecebido);
+    }
+
+    public LiveData<Resource<ArrayList<String>>> pegaIdsPersonagens() {
+        return personagemRepository.pegaIdsPersonagens();
+    }
+
+    public LiveData<Resource<ArrayList<Personagem>>> pegaPersonagensServidor(ArrayList<String> idsPersonagens) {
+        return personagemRepository.pegaPersonagensServidor(idsPersonagens);
     }
 }

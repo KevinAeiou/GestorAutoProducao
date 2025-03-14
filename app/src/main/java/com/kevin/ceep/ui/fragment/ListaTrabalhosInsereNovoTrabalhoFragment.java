@@ -53,7 +53,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment {
+public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment implements MenuProvider{
     private FragmentListaTrabalhosInsereNovoTrabalhoBinding binding;
     private ProgressBar indicadorProgresso;
     private RecyclerView meuRecycler;
@@ -71,14 +71,9 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentListaTrabalhosInsereNovoTrabalhoBinding.inflate(inflater, container, false);
+        requireActivity().addMenuProvider(this, getViewLifecycleOwner(), androidx.lifecycle.Lifecycle.State.RESUMED);
         return binding.getRoot();
     }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -91,20 +86,20 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment {
         recebeDadosIntent();
         configuraMeuRecycler();
         configuraChipSelecionado();
-        requireActivity().addMenuProvider(new MenuProvider() {
-            @Override
-            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+    }
 
-            }
+    @Override
+    public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
 
-            @Override
-            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-                if (menuItem.getItemId() == R.id.itemMenuBusca) {
-                    configuraCampoDeBusca(menuItem);
-                }
-                return true;
-            }
-        });
+    }
+
+    @Override
+    public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+        if (menuItem.getItemId() == R.id.itemMenuBusca) {
+            configuraCampoDeBusca(menuItem);
+            return true;
+        }
+        return false;
     }
 
     private void configuraChipSelecionado() {
@@ -233,9 +228,9 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment {
                     TrabalhoEstoqueViewModelFactory trabalhoEstoqueViewModelFactory = new TrabalhoEstoqueViewModelFactory(new TrabalhoEstoqueRepository(getContext(), personagemId));
                     TrabalhoEstoqueViewModel trabalhoEstoqueViewModel = new ViewModelProvider(getViewModelStore(), trabalhoEstoqueViewModelFactory).get(TrabalhoEstoqueViewModel.class);
                     TrabalhoEstoque trabalhoEstoque = new TrabalhoEstoque();
-                    trabalhoEstoque.setTrabalhoId(trabalho.getId());
+                    trabalhoEstoque.setIdTrabalho(trabalho.getId());
                     trabalhoEstoque.setQuantidade(1);
-                    TrabalhoEstoque trabalhoEncontrado = trabalhoEstoqueViewModel.pegaTrabalhoEstoquePorIdTrabalho(trabalhoEstoque.getTrabalhoId());
+                    TrabalhoEstoque trabalhoEncontrado = trabalhoEstoqueViewModel.pegaTrabalhoEstoquePorIdTrabalho(trabalhoEstoque.getIdTrabalho());
                     if (trabalhoEncontrado == null) {
                         trabalhoEstoqueViewModel.insereTrabalhoEstoque(trabalhoEstoque).observe(getViewLifecycleOwner(), resultadoInsereTrabalho -> {
                             if (resultadoInsereTrabalho.getErro() != null) {

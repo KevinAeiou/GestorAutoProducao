@@ -4,7 +4,6 @@ import static com.kevin.ceep.utilitario.Utilitario.comparaString;
 import static java.lang.Integer.parseInt;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,7 +23,6 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.textfield.TextInputLayout;
 import com.kevin.ceep.R;
 import com.kevin.ceep.databinding.FragmentAtributosPersonagemBinding;
 import com.kevin.ceep.model.Personagem;
@@ -34,10 +32,9 @@ import com.kevin.ceep.ui.viewModel.EstadoAppViewModel;
 import com.kevin.ceep.ui.viewModel.PersonagemViewModel;
 import com.kevin.ceep.ui.viewModel.factory.PersonagemViewModelFactory;
 
-public class AtributosPersonagemFragment extends Fragment {
+public class AtributosPersonagemFragment extends Fragment implements MenuProvider{
 
     private Personagem personagemRecebido;
-    private TextInputLayout personagemNomeTxt, personagemEspacoProducaoTxt, personagemEmailTxt, personagemSenhaTxt;
     private EditText personagemNome, personagemEspacoProducao, personagemEmail, personagemSenha;
     private SwitchCompat personagemSwUso, personagemSwEstado, personagemSwAutoProducao;
     private FragmentAtributosPersonagemBinding binding;
@@ -48,6 +45,7 @@ public class AtributosPersonagemFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentAtributosPersonagemBinding.inflate(inflater, container, false);
+        requireActivity().addMenuProvider(this, getViewLifecycleOwner(), androidx.lifecycle.Lifecycle.State.RESUMED);
         return binding.getRoot();
     }
 
@@ -66,9 +64,31 @@ public class AtributosPersonagemFragment extends Fragment {
         componentesVisuais.itemMenuConfirma = true;
         estadoAppViewModel.componentes.setValue(componentesVisuais);
         inicializaComponentes();
-        configuraMenu();
         pegaPersonagemSelecionado();
         configuraBotaoExcluir();
+    }
+
+    @Override
+    public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+
+    }
+
+    @Override
+    public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+        if (menuItem.getItemId() == R.id.itemMenuConfirma) {
+            Personagem personagem = definePersonagemModificado();
+            if (personagemEhModificado(personagem)) {
+                MaterialAlertDialogBuilder dialogoDeAlerta = new MaterialAlertDialogBuilder(requireContext());
+                dialogoDeAlerta.setMessage("Deseja confirmar alterações?");
+                dialogoDeAlerta.setNegativeButton("Não", ((dialogInterface, i) -> onDestroy()));
+                dialogoDeAlerta.setPositiveButton("Sim", (dialogInterface, i) -> modificaPersonagemServidor(personagem));
+                dialogoDeAlerta.show();
+                return true;
+            }
+            voltaParaTrabalhosProducao();
+            return true;
+        }
+        return false;
     }
 
     private void configuraBotaoExcluir() {
@@ -76,9 +96,7 @@ public class AtributosPersonagemFragment extends Fragment {
             MaterialAlertDialogBuilder dialogoDeAlerta = new MaterialAlertDialogBuilder(requireContext());
             dialogoDeAlerta.setMessage("Confirma exclusão?");
             dialogoDeAlerta.setNegativeButton("Não", ((dialogInterface, i) -> onDestroy()));
-            dialogoDeAlerta.setPositiveButton("Sim", (dialogInterface, i) -> {
-                deletaPersonagem();
-            });
+            dialogoDeAlerta.setPositiveButton("Sim", (dialogInterface, i) -> deletaPersonagem());
             dialogoDeAlerta.show();
         });
     }
@@ -102,37 +120,6 @@ public class AtributosPersonagemFragment extends Fragment {
         });
     }
 
-    private void configuraMenu() {
-        requireActivity().addMenuProvider(new MenuProvider() {
-            @Override
-            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-
-            }
-
-            @Override
-            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-                if (menuItem.getItemId() == R.id.itemMenuConfirma) {
-                    Personagem personagem = definePersonagemModificado();
-                    if (personagemEhModificado(personagem)) {
-                        Log.d("fluxo", "PERSONAGEM MODIFICADO");
-                        MaterialAlertDialogBuilder dialogoDeAlerta = new MaterialAlertDialogBuilder(requireContext());
-                        dialogoDeAlerta.setMessage("Deseja confirmar alterações?");
-                        dialogoDeAlerta.setNegativeButton("Não", ((dialogInterface, i) -> onDestroy()));
-                        dialogoDeAlerta.setPositiveButton("Sim", (dialogInterface, i) -> {
-                            modificaPersonagemServidor(personagem);
-                        });
-                        dialogoDeAlerta.show();
-                        return true;
-                    }
-                    Log.d("fluxo", "PERSONAGEM NÃO MODIFICADO");
-                    voltaParaTrabalhosProducao();
-                    return true;
-                }
-                return true;
-            }
-        });
-    }
-
     private void voltaParaTrabalhosProducao() {
         controlador.navigate(AtributosPersonagemFragmentDirections.vaiParaListaTrabalhosProducao());
     }
@@ -149,26 +136,14 @@ public class AtributosPersonagemFragment extends Fragment {
 
     private void inicializaComponentes() {
         personagemNome = binding.edtNomePersonagem;
-        personagemNomeTxt = binding.txtNomePersonagem;
         personagemEspacoProducao = binding.edtEspacoProducaoPersonagem;
-        personagemEspacoProducaoTxt = binding.txtEspacoProducaoPersonagem;
         personagemSwUso = binding.swUsoPersonagem;
         personagemSwEstado = binding.swEstadoPersonagem;
         personagemSwAutoProducao = binding.swAutoProducaoPersonagem;
         personagemEmail = binding.edtEmailPersonagem;
-        personagemEmailTxt = binding.txtEmailPersonagem;
         personagemSenha = binding.edtSenhaPersonagem;
-        personagemSenhaTxt = binding.txtSenhaPersonagem;
         PersonagemViewModelFactory personagemViewModelFactory = new PersonagemViewModelFactory(new PersonagemRepository(getContext()));
         personagemViewModel = new ViewModelProvider(requireActivity(), personagemViewModelFactory).get(PersonagemViewModel.class);
-    }
-    private boolean configuraMensagem(EditText personagemNome, TextInputLayout personagemNomeTxt) {
-        if (personagemNome.getText().toString().isEmpty()) {
-            personagemNomeTxt.setHelperText("Campo requerido!");
-            return true;
-        }
-        personagemNomeTxt.setHelperTextEnabled(false);
-        return false;
     }
 
     private Personagem definePersonagemModificado() {

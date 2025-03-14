@@ -142,7 +142,7 @@ public class ConfirmaTrabalhoFragment extends Fragment {
         CheckBox checkRecorrencia = binding.checkBoxProducaoRecorrenteConfirmaTrabalho;
         TrabalhoProducao trabalhoProducao = new TrabalhoProducao();
         trabalhoProducao.setIdTrabalho(trabalhoRecebido.getId());
-        trabalhoProducao.setTipo_licenca(autoCompleteLicenca.getText().toString());
+        trabalhoProducao.setTipoLicenca(autoCompleteLicenca.getText().toString());
         trabalhoProducao.setRecorrencia(checkRecorrencia.isChecked());
         trabalhoProducao.setEstado(0);
         return trabalhoProducao;

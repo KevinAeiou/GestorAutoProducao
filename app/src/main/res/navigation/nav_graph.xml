@@ -114,7 +114,7 @@
             android:id="@+id/vaiDeTrabalhoEspecficoParaTrabalhos"
             app:destination="@id/nav_trabalhos"
             app:popUpTo="@id/nav_trabalhos"
-            app:popUpToInclusive="true" />
+            app:popUpToInclusive="false" />
     </fragment>
     <fragment
         android:id="@+id/atributosPersonagem"

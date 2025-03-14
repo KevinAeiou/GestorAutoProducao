@@ -5,6 +5,7 @@ import static android.view.View.VISIBLE;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -35,6 +36,7 @@ import com.kevin.ceep.databinding.ActivityMainBinding;
 import com.kevin.ceep.model.Personagem;
 import com.kevin.ceep.model.Trabalho;
 import com.kevin.ceep.repository.PersonagemRepository;
+import com.kevin.ceep.repository.Resource;
 import com.kevin.ceep.ui.fragment.ConfirmaTrabalhoFragmentArgs;
 import com.kevin.ceep.ui.viewModel.ComponentesVisuais;
 import com.kevin.ceep.ui.viewModel.EstadoAppViewModel;
@@ -167,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        sincronizaPersonagens();
+        configuraPersonagens();
     }
     private void configuraToolbar() {
         setSupportActionBar(toolbar);
@@ -205,38 +207,65 @@ public class MainActivity extends AppCompatActivity {
             txtCabecalhoAutoProducao.setText(getString(R.string.stringAutoProducaoValor, autoProducao));
             txtCabecalhoEspacoProducao.setText(getString(R.string.stringEspacoProducaoValor,personagem.getEspacoProducao()));
             personagemSelecionado = personagem;
-
+            Log.d("personagem", "Personagem definido cabeçalho: "+ personagemSelecionado.getNome());
         });
     }
-    private void pegaTodosPersonagens() {
+    private void pegaPersonagensBanco() {
         personagens.clear();
         FirebaseUser usuarioID = FirebaseAuth.getInstance().getCurrentUser();
         if (usuarioID == null) return;
         PersonagemViewModelFactory personagemViewModelFactory = new PersonagemViewModelFactory(new PersonagemRepository(getApplicationContext()));
         personagemViewModel = new ViewModelProvider(this, personagemViewModelFactory).get(PersonagemViewModel.class);
         personagemViewModel.pegaTodosPersonagens().observe(this, resultadoPersonagens -> {
-            if (resultadoPersonagens.getDado() != null) {
+            if (resultadoPersonagens.getErro() == null) {
                 personagens = resultadoPersonagens.getDado();
+                if (personagens.isEmpty()) return;
+                Log.d("personagem", "Lista de personagens não está vazia: ");
+                if (personagemSelecionado == null) personagemViewModel.definePersonagemSelecionado(personagens.get(0));
+                atualizaCabecalhoPersonagemSelecionado();
+                configuraDropDownPersonagens();
+                return;
             }
-            if (resultadoPersonagens.getErro() != null) {
-                Snackbar.make(getApplicationContext(), Objects.requireNonNull(getCurrentFocus()), "Erro: "+resultadoPersonagens.getErro(), Snackbar.LENGTH_LONG).show();
-            }
+            Snackbar.make(getApplicationContext(), Objects.requireNonNull(getCurrentFocus()), "Erro: "+resultadoPersonagens.getErro(), Snackbar.LENGTH_LONG).show();
         });
     }
 
-    private void sincronizaPersonagens() {
+    private void configuraPersonagens() {
         FirebaseUser usuarioID = FirebaseAuth.getInstance().getCurrentUser();
         if (usuarioID == null) return;
         PersonagemViewModelFactory personagemViewModelFactory = new PersonagemViewModelFactory(new PersonagemRepository(getApplicationContext()));
         personagemViewModel = new ViewModelProvider(this, personagemViewModelFactory).get(PersonagemViewModel.class);
-        personagemViewModel.sincronizaPersonagens().observe(this, resultadoSincroniza -> {
-            if (resultadoSincroniza.getErro() != null) {
-                Snackbar.make(getApplicationContext(), Objects.requireNonNull(getCurrentFocus()), "Erro: "+resultadoSincroniza.getErro(), Snackbar.LENGTH_LONG).show();
+        pegaIdsPersonagens();
+    }
+
+    private void pegaIdsPersonagens() {
+        personagemViewModel.pegaIdsPersonagens().observe(this, resultadoIdsPersonagens -> {
+            if (resultadoIdsPersonagens.getErro() == null) {
+                pegaPersonagens(resultadoIdsPersonagens);
+                return;
             }
-            pegaTodosPersonagens();
-            if (personagemSelecionado == null) personagemViewModel.definePersonagemSelecionado(personagens.get(0));
-            atualizaCabecalhoPersonagemSelecionado();
-            configuraDropDownPersonagens();
+            Snackbar.make(getApplicationContext(), Objects.requireNonNull(getCurrentFocus()), "Erro: " + resultadoIdsPersonagens.getErro(), Snackbar.LENGTH_LONG).show();
+        });
+    }
+
+    private void pegaPersonagens(Resource<ArrayList<String>> resultadoIdsPersonagens) {
+        personagemViewModel.pegaPersonagensServidor(resultadoIdsPersonagens.getDado()).observe(this, resultadoPersonagens -> {
+            if (resultadoPersonagens.getErro() == null) {
+                sincronizaPersonagens(resultadoPersonagens);
+                return;
+            }
+            Snackbar.make(getApplicationContext(), Objects.requireNonNull(getCurrentFocus()), "Erro: " + resultadoPersonagens.getErro(), Snackbar.LENGTH_LONG).show();
+        });
+    }
+
+    private void sincronizaPersonagens(Resource<ArrayList<Personagem>> resultadoPersonagens) {
+        personagemViewModel.sincronizaPersonagens(resultadoPersonagens.getDado()).observe(this, resultadoSincroniza -> {
+            Log.d("personagem", "sincronizaPersonagens: ");
+            if (resultadoSincroniza.getErro() == null) {
+                pegaPersonagensBanco();
+                return;
+            }
+            Snackbar.make(getApplicationContext(), Objects.requireNonNull(getCurrentFocus()), "Erro: " + resultadoSincroniza.getErro(), Snackbar.LENGTH_LONG).show();
         });
     }
 
@@ -247,6 +276,11 @@ public class MainActivity extends AppCompatActivity {
         }
         ArrayAdapter<String> adapterPersonagens = new ArrayAdapter<>(this, R.layout.item_dropdrown, nomesPersonagens);
         adapterPersonagens.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        if (personagemSelecionado == null) {
+            autoCompleteCabecalhoNome.setText(personagens.get(0).getNome());
+            autoCompleteCabecalhoNome.setAdapter(adapterPersonagens);
+            return;
+        }
         autoCompleteCabecalhoNome.setText(personagemSelecionado.getNome());
         autoCompleteCabecalhoNome.setAdapter(adapterPersonagens);
     }

@@ -12,7 +12,6 @@ import static com.kevin.ceep.ui.fragment.TrabalhoEspecificoFragmentDirections.va
 import static com.kevin.ceep.ui.fragment.TrabalhoEspecificoFragmentDirections.vaiParaListaTrabalhosProducao;
 import static com.kevin.ceep.utilitario.Utilitario.comparaString;
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -64,7 +63,7 @@ import com.kevin.ceep.ui.viewModel.factory.TrabalhoViewModelFactory;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class TrabalhoEspecificoFragment extends Fragment {
+public class TrabalhoEspecificoFragment extends Fragment implements MenuProvider{
     private FragmentTrabalhoEspecificoBinding binding;
     private TrabalhoProducao trabalhoProducaoRecebido;
     private Trabalho trabalhoRecebido;
@@ -94,13 +93,8 @@ public class TrabalhoEspecificoFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentTrabalhoEspecificoBinding.inflate(inflater, container, false);
+        requireActivity().addMenuProvider(this, getViewLifecycleOwner(), androidx.lifecycle.Lifecycle.State.RESUMED);
         return binding.getRoot();
-    }
-
-    @SuppressLint("MissingInflatedId")
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -111,39 +105,34 @@ public class TrabalhoEspecificoFragment extends Fragment {
         componentesVisuais.appBar = true;
         componentesVisuais.itemMenuConfirma = true;
         estadoAppViewModel.componentes.setValue(componentesVisuais);
-        inicializaComponentes();
         recebeDados();
+        inicializaComponentes();
         configuraAcaoImagem();
-        configuraMenu();
     }
 
-    private void configuraMenu() {
-        requireActivity().addMenuProvider(new MenuProvider() {
-            @Override
-            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+    @Override
+    public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
 
-            }
+    }
 
-            @Override
-            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-                if (menuItem.getItemId() == R.id.itemMenuConfirma) {
-                    indicadorProgresso.setVisibility(View.VISIBLE);
-                    defineTrabalhoNecessario();
-                    if (codigoRequisicao == CODIGO_REQUISICAO_ALTERA_TRABALHO_PRODUCAO) {
-                        verificaModificacaoTrabalhoProducao();
-                        return true;
-                    }
-                    if (codigoRequisicao == CODIGO_REQUISICAO_ALTERA_TRABALHO) {
-                        verificaModificacaoTrabalho();
-                        return true;
-                    }
-                    if (codigoRequisicao == CODIGO_REQUISICAO_INSERE_TRABALHO) {
-                        verificaNovoTrabalho();
-                    }
-                }
+    @Override
+    public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+        if (menuItem.getItemId() == R.id.itemMenuConfirma) {
+            indicadorProgresso.setVisibility(View.VISIBLE);
+            defineTrabalhoNecessario();
+            if (codigoRequisicao == CODIGO_REQUISICAO_ALTERA_TRABALHO_PRODUCAO) {
+                verificaModificacaoTrabalhoProducao();
                 return true;
             }
-        });
+            if (codigoRequisicao == CODIGO_REQUISICAO_ALTERA_TRABALHO) {
+                verificaModificacaoTrabalho();
+                return true;
+            }
+            if (codigoRequisicao == CODIGO_REQUISICAO_INSERE_TRABALHO) {
+                verificaNovoTrabalho();
+            }
+        }
+        return false;
     }
 
     private void verificaNovoTrabalho() {
@@ -276,7 +265,7 @@ public class TrabalhoEspecificoFragment extends Fragment {
         if (trabalhoEstoqueEncontrado == null) {
             if (!trabalhoModificado.ehProducaoDeRecursos()) {
                 TrabalhoEstoque novoTrabalhoEstoque = new TrabalhoEstoque();
-                novoTrabalhoEstoque.setTrabalhoId(trabalhoModificado.getIdTrabalho());
+                novoTrabalhoEstoque.setIdTrabalho(trabalhoModificado.getIdTrabalho());
                 novoTrabalhoEstoque.setQuantidade(1);
                 trabalhoEstoqueViewModel.insereTrabalhoEstoque(novoTrabalhoEstoque).observe(this, resultaSalvaTrabalhoEstoque -> {
                     if (resultaSalvaTrabalhoEstoque.getErro() == null) return;
@@ -331,45 +320,37 @@ public class TrabalhoEspecificoFragment extends Fragment {
         estadosTrabalho = getResources().getStringArray(R.array.estados);
 
         TrabalhoViewModelFactory trabalhoViewModelFactory = new TrabalhoViewModelFactory(new TrabalhoRepository(getContext()));
-        trabalhoViewModel = new ViewModelProvider(this, trabalhoViewModelFactory).get(TrabalhoViewModel.class);
+        trabalhoViewModel = new ViewModelProvider(requireActivity(), trabalhoViewModelFactory).get(TrabalhoViewModel.class);
         confirmacao = new MutableLiveData<>(true);
         controlador = Navigation.findNavController(binding.getRoot());
     }
     private void recebeDados() {
         codigoRequisicao = TrabalhoEspecificoFragmentArgs.fromBundle(getArguments()).getCodigoRequisicao();
-        if (codigoRequisicao == CODIGO_REQUISICAO_INSERE_TRABALHO){
-            configuraDropdownTrabalhoNecessario();
-            configuraLayoutNovoTrabalho();
-            return;
-        }
         if (codigoRequisicao == CODIGO_REQUISICAO_ALTERA_TRABALHO){
             trabalhoRecebido = TrabalhoEspecificoFragmentArgs.fromBundle(getArguments()).getTrabalho();
-            configuraLayoutModificaTrabalho(trabalhoRecebido);
             return;
         }
         if (codigoRequisicao == CODIGO_REQUISICAO_ALTERA_TRABALHO_PRODUCAO) {
-            configuraLayoutModificaTrabalhoProducao();
+            trabalhoProducaoRecebido = TrabalhoEspecificoFragmentArgs.fromBundle(getArguments()).getTrabalhoProducao();
         }
     }
 
     private void configuraLayoutModificaTrabalhoProducao() {
-        trabalhoProducaoRecebido = TrabalhoEspecificoFragmentArgs.fromBundle(getArguments()).getTrabalhoProducao();
         if (trabalhoProducaoRecebido == null) return;
         String personagemId = TrabalhoEspecificoFragmentArgs.fromBundle(getArguments()).getIdPersonagem();
-        TrabalhoProducaoViewModelFactory trabalhoProducaoViewModelFactory = new TrabalhoProducaoViewModelFactory(new TrabalhoProducaoRepository(getContext(), personagemId));
-        trabalhoProducaoViewModel = new ViewModelProvider(this, trabalhoProducaoViewModelFactory).get(TrabalhoProducaoViewModel.class);
-        TrabalhoEstoqueViewModelFactory trabalhoEstoqueViewModelFactory = new TrabalhoEstoqueViewModelFactory(new TrabalhoEstoqueRepository(getContext(), personagemId));
-        trabalhoEstoqueViewModel = new ViewModelProvider(this, trabalhoEstoqueViewModelFactory).get(TrabalhoEstoqueViewModel.class);
+        TrabalhoProducaoViewModelFactory trabalhoProducaoViewModelFactory = new TrabalhoProducaoViewModelFactory(new TrabalhoProducaoRepository(requireContext(), personagemId));
+        trabalhoProducaoViewModel = new ViewModelProvider(requireActivity(), trabalhoProducaoViewModelFactory).get(TrabalhoProducaoViewModel.class);
+        TrabalhoEstoqueViewModelFactory trabalhoEstoqueViewModelFactory = new TrabalhoEstoqueViewModelFactory(new TrabalhoEstoqueRepository(requireContext(), personagemId));
+        trabalhoEstoqueViewModel = new ViewModelProvider(requireActivity(), trabalhoEstoqueViewModelFactory).get(TrabalhoEstoqueViewModel.class);
         ProfissaoViewModelFactory profissaoViewModelFactory = new ProfissaoViewModelFactory(new ProfissaoRepository(personagemId));
-        profissaoViewModel = new ViewModelProvider(this, profissaoViewModelFactory).get(ProfissaoViewModel.class);
+        profissaoViewModel = new ViewModelProvider(requireActivity(), profissaoViewModelFactory).get(ProfissaoViewModel.class);
         configuraComponentesAlteraTrabalhoProducao();
     }
 
-    private void configuraLayoutModificaTrabalho(Trabalho trabalhoRecebido) {
-        if (trabalhoRecebido != null){
-            configuraComponentesAlteraTrabalho();
-            configuraBotaoExcluiTrabalhoEspecifico();
-        }
+    private void configuraLayoutModificaTrabalho() {
+        if (trabalhoRecebido == null) return;
+        configuraComponentesAlteraTrabalho();
+        configuraBotaoExcluiTrabalhoEspecifico();
     }
 
     private void configuraAcaoImagem() {
@@ -419,7 +400,8 @@ public class TrabalhoEspecificoFragment extends Fragment {
             trabalhoViewModel.excluiTrabalhoEspecificoServidor(trabalhoRecebido).observe(getViewLifecycleOwner(), resultado -> {
                 indicadorProgresso.setVisibility(GONE);
                 if (resultado.getErro() == null) {
-                    voltaParaListaTrabalhos();
+//                    voltaParaListaTrabalhos();
+                    Snackbar.make(binding.getRoot(), "Trabalho "+trabalhoRecebido.getNome() + " removido com sucesso!", Snackbar.LENGTH_LONG).show();
                 } else {
                     Snackbar.make(binding.getRoot(), "Erro: "+resultado.getErro(), Snackbar.LENGTH_LONG).show();
                 }
@@ -565,7 +547,7 @@ public class TrabalhoEspecificoFragment extends Fragment {
 
     private void configuraComponentesAlteraTrabalhoProducao() {
         desativaCamposTrabalhoProducao();
-        if (comparaString(trabalhoProducaoRecebido.getTipo_licenca(), "licença de produção do principiante")) {
+        if (comparaString(trabalhoProducaoRecebido.getTipoLicenca(), "licença de produção do principiante")) {
             acrescimo = true;
         }
         defineValoresCamposTrabalhoProducao();
@@ -579,7 +561,7 @@ public class TrabalhoEspecificoFragment extends Fragment {
         edtNivelTrabalho.setText(String.valueOf(trabalhoProducaoRecebido.getNivel()));
         autoCompleteRaridade.setText(trabalhoProducaoRecebido.getRaridade());
         checkBoxRecorrenciaTrabalho.setChecked(trabalhoProducaoRecebido.getRecorrencia());
-        autoCompleteLicenca.setText(trabalhoProducaoRecebido.getTipo_licenca());
+        autoCompleteLicenca.setText(trabalhoProducaoRecebido.getTipoLicenca());
         autoCompleteEstado.setText(estadosTrabalho[trabalhoProducaoRecebido.getEstado()]);
         defineValoresCamposTrabalhosNecessarios();
     }
@@ -658,7 +640,7 @@ public class TrabalhoEspecificoFragment extends Fragment {
         trabalhoModificado.setId(trabalhoProducaoRecebido.getId());
         trabalhoModificado.setIdTrabalho(trabalhoProducaoRecebido.getIdTrabalho());
         trabalhoModificado.setRecorrencia(checkBoxRecorrenciaTrabalho.isChecked());
-        trabalhoModificado.setTipo_licenca(autoCompleteLicenca.getText().toString());
+        trabalhoModificado.setTipoLicenca(autoCompleteLicenca.getText().toString());
         trabalhoModificado.setEstado(adapterEstado.getPosition(autoCompleteEstado.getText().toString()));
         return trabalhoModificado;
     }
@@ -710,7 +692,7 @@ public class TrabalhoEspecificoFragment extends Fragment {
     }
 
     private boolean licencaTrabalhoProducaoEhModificado(TrabalhoProducao trabalhoModificado) {
-        return !comparaString(trabalhoProducaoRecebido.getTipo_licenca(), trabalhoModificado.getTipo_licenca());
+        return !comparaString(trabalhoProducaoRecebido.getTipoLicenca(), trabalhoModificado.getTipoLicenca());
     }
 
     private boolean estadoTrabalhoProducaoEhModificado(TrabalhoProducao trabalhoModificado) {
@@ -744,14 +726,30 @@ public class TrabalhoEspecificoFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (codigoRequisicao != CODIGO_REQUISICAO_INVALIDA) {
-            if (codigoRequisicao == CODIGO_REQUISICAO_INSERE_TRABALHO || codigoRequisicao == CODIGO_REQUISICAO_ALTERA_TRABALHO) {
-                configuraDropdownProfissoes();
-                configuraDropdownRaridades();
-            } else if (codigoRequisicao == CODIGO_REQUISICAO_ALTERA_TRABALHO_PRODUCAO) {
-                configuraDropdownLicencas();
-                configuraDropdownEstados();
+        if (codigoRequisicao == CODIGO_REQUISICAO_INVALIDA) return;
+        if (codigoRequisicao == CODIGO_REQUISICAO_INSERE_TRABALHO || codigoRequisicao == CODIGO_REQUISICAO_ALTERA_TRABALHO) {
+            configuraDropdownProfissoes();
+            configuraDropdownRaridades();
+            if (codigoRequisicao == CODIGO_REQUISICAO_INSERE_TRABALHO){
+                configuraDropdownTrabalhoNecessario();
+                configuraLayoutNovoTrabalho();
+                return;
             }
+            if (codigoRequisicao == CODIGO_REQUISICAO_ALTERA_TRABALHO){
+                configuraLayoutModificaTrabalho();
+            }
+            return;
         }
+        if (codigoRequisicao == CODIGO_REQUISICAO_ALTERA_TRABALHO_PRODUCAO) {
+            configuraLayoutModificaTrabalhoProducao();
+            configuraDropdownLicencas();
+            configuraDropdownEstados();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        binding= null;
     }
 }

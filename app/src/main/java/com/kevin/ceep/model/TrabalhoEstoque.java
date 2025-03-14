@@ -6,7 +6,7 @@ import java.io.Serializable;
 
 public class TrabalhoEstoque extends Trabalho implements Serializable {
     private Integer quantidade;
-    private String trabalhoId;
+    private String idTrabalho;
     public TrabalhoEstoque() {
         super();
         super.setId(geraIdAleatorio());
@@ -18,10 +18,10 @@ public class TrabalhoEstoque extends Trabalho implements Serializable {
         if (novaQuantidade < 0) novaQuantidade = 0;
         this.quantidade = novaQuantidade;
     }
-    public String getTrabalhoId() {
-        return trabalhoId;
+    public String getIdTrabalho() {
+        return idTrabalho;
     }
-    public void setTrabalhoId(String trabalhoId) {
-        this.trabalhoId = trabalhoId;
+    public void setIdTrabalho(String trabalhoId) {
+        this.idTrabalho = trabalhoId;
     }
 }

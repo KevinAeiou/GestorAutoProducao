@@ -86,6 +86,8 @@ public class ListaProfissaoAdapter extends RecyclerView.Adapter<ListaProfissaoAd
             nome_profissao.setText(profissao.getNome());
             if (profissao.isPrioridade()) {
                 cardProfissao.setCardBackgroundColor(ContextCompat.getColor(context,R.color.cor_background_feito));
+            } else {
+                cardProfissao.setCardBackgroundColor(ContextCompat.getColor(context,R.color.cor_background_card));
             }
             nivelProfissao.setText(String.valueOf(profissao.getNivel()));
         }

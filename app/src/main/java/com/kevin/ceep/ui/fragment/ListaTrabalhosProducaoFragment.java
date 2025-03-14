@@ -5,6 +5,7 @@ import static com.kevin.ceep.ui.activity.Constantes.CODIGO_REQUISICAO_INSERE_TRA
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -237,6 +238,7 @@ public class ListaTrabalhosProducaoFragment extends Fragment {
     }
     private void vaiParaTrabalhoEspecificoActivity(TrabalhoProducao trabalho) {
          VaiParaTrabalhoEspecifico acao = ListaTrabalhosProducaoFragmentDirections.vaiParaTrabalhoEspecifico(personagemId);
+        Log.d("ciclo", "trabalhoProducaoEnviado: " + trabalho);
          acao.setTrabalhoProducao(trabalho);
          acao.setCodigoRequisicao(CODIGO_REQUISICAO_ALTERA_TRABALHO_PRODUCAO);
          Navigation.findNavController(binding.getRoot()).navigate(acao);

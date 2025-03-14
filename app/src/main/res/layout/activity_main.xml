@@ -34,7 +34,7 @@
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
             app:headerLayout="@layout/cabecalho"
-            app:menu="@menu/menu_drawer" />
+            app:menu="@menu/menu_navegacao_lateral" />
     </androidx.drawerlayout.widget.DrawerLayout>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView

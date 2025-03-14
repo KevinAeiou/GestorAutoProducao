@@ -5,9 +5,6 @@ import static com.kevin.ceep.db.contracts.EstoqueDbContract.EstoqueEntry.COLUMN_
 import static com.kevin.ceep.db.contracts.EstoqueDbContract.EstoqueEntry.COLUMN_NAME_ID_TRABALHO;
 import static com.kevin.ceep.db.contracts.EstoqueDbContract.EstoqueEntry.COLUMN_NAME_QUANTIDADE;
 import static com.kevin.ceep.db.contracts.EstoqueDbContract.EstoqueEntry.TABLE_ESTOQUE;
-import static com.kevin.ceep.ui.activity.Constantes.CHAVE_LISTA_ESTOQUE;
-import static com.kevin.ceep.ui.activity.Constantes.CHAVE_LISTA_PERSONAGEM;
-import static com.kevin.ceep.ui.activity.Constantes.CHAVE_USUARIOS;
 
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
@@ -19,7 +16,6 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -32,34 +28,35 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class TrabalhoEstoqueRepository {
-    private final DatabaseReference minhaReferencia;
+    private static final String CHAVE_ESTOQUE = "Estoque";
+    private final DatabaseReference referenciaEstoque;
     private final SQLiteDatabase dbLeitura, dbModificacao;
     private final String idPersonagem;
-    private final MutableLiveData<Resource<ArrayList<TrabalhoEstoque>>> trabalhosEstoqueEncontrados;
 
-    public TrabalhoEstoqueRepository(Context context, String personagemID) {
-        this.idPersonagem = personagemID;
-        String usuarioID = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
-        this.minhaReferencia = FirebaseDatabase.getInstance().getReference(CHAVE_USUARIOS).child(usuarioID).child(CHAVE_LISTA_PERSONAGEM)
-                .child(personagemID).child(CHAVE_LISTA_ESTOQUE);
+    public TrabalhoEstoqueRepository(Context context, String idPersonagem) {
+        this.idPersonagem = idPersonagem;
+        this.referenciaEstoque = FirebaseDatabase.getInstance().getReference(CHAVE_ESTOQUE).child(idPersonagem);
         DbHelper dbHelper = DbHelper.getInstance(context);
         this.dbLeitura = dbHelper.getReadableDatabase();
         this.dbModificacao = dbHelper.getWritableDatabase();
-        this.trabalhosEstoqueEncontrados = new MutableLiveData<>();
     }
 
     public LiveData<Resource<Void>> modificaTrabalhoEstoque(TrabalhoEstoque trabalho) {
+        TrabalhoEstoque trabalhoModificado= new TrabalhoEstoque();
         MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
-        if (trabalho.getId() == null || trabalho.getTrabalhoId() == null || trabalho.getQuantidade() == null) {
+        if (trabalho.getId() == null || trabalho.getIdTrabalho() == null || trabalho.getQuantidade() == null) {
             liveData.setValue(new Resource<>(null, "Atributos do trabalho está nulo"));
             return liveData;
         }
-        minhaReferencia.child(trabalho.getId()).setValue(trabalho).addOnCompleteListener(task -> {
+        trabalhoModificado.setId(trabalho.getId());
+        trabalhoModificado.setIdTrabalho(trabalho.getIdTrabalho());
+        trabalhoModificado.setQuantidade(trabalho.getQuantidade());
+        referenciaEstoque.child(trabalhoModificado.getId()).setValue(trabalhoModificado).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 ContentValues values = new ContentValues();
-                values.put(COLUMN_NAME_QUANTIDADE, trabalho.getQuantidade());
+                values.put(COLUMN_NAME_QUANTIDADE, trabalhoModificado.getQuantidade());
                 String selection = COLUMN_NAME_ID + " LIKE ?";
-                String[] selectionArgs = {trabalho.getId()};
+                String[] selectionArgs = {trabalhoModificado.getId()};
                 long newRowId = dbModificacao.update(TABLE_ESTOQUE, values, selection, selectionArgs);
                 if (newRowId == -1) {
                     liveData.setValue(new Resource<>(null, "Erro ao modificar trabalho produção no banco"));
@@ -73,6 +70,7 @@ public class TrabalhoEstoqueRepository {
         return liveData;
     }
     public LiveData<Resource<ArrayList<TrabalhoEstoque>>> pegaTodosTrabalhosEstoque() {
+        MutableLiveData<Resource<ArrayList<TrabalhoEstoque>>> trabalhosEstoqueEncontrados = new MutableLiveData<>();
         String sql = "SELECT Lista_estoque.id, Lista_estoque.idTrabalho, Lista_estoque.idPersonagem, trabalhos.nome, trabalhos.nomeProducao, trabalhos.profissao, trabalhos.raridade, trabalhos.trabalhoNecessario, trabalhos.nivel, trabalhos.experiencia, Lista_estoque.quantidade\n" +
                 "FROM Lista_estoque\n" +
                 "INNER JOIN trabalhos\n" +
@@ -88,7 +86,7 @@ public class TrabalhoEstoqueRepository {
         while (cursor.moveToNext()) {
             TrabalhoEstoque trabalhoEstoque = new TrabalhoEstoque();
             trabalhoEstoque.setId(cursor.getString(0));
-            trabalhoEstoque.setTrabalhoId(cursor.getString(1));
+            trabalhoEstoque.setIdTrabalho(cursor.getString(1));
             trabalhoEstoque.setNome(cursor.getString(3));
             trabalhoEstoque.setNomeProducao(cursor.getString(4));
             trabalhoEstoque.setProfissao(cursor.getString(5));
@@ -115,7 +113,7 @@ public class TrabalhoEstoqueRepository {
             cursor.moveToFirst();
             TrabalhoEstoque trabalhoEstoque = new TrabalhoEstoque();
             trabalhoEstoque.setId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID)));
-            trabalhoEstoque.setTrabalhoId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID_TRABALHO)));
+            trabalhoEstoque.setIdTrabalho(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID_TRABALHO)));
             trabalhoEstoque.setQuantidade(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_QUANTIDADE)));
             cursor.close();
             return trabalhoEstoque;
@@ -126,12 +124,12 @@ public class TrabalhoEstoqueRepository {
 
     public LiveData<Resource<Void>> insereTrabalhoEstoque(TrabalhoEstoque novoTrabalho) {
         MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
-        minhaReferencia.child(novoTrabalho.getId()).setValue(novoTrabalho).addOnCompleteListener(task -> {
+        referenciaEstoque.child(novoTrabalho.getId()).setValue(novoTrabalho).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 ContentValues values = new ContentValues();
                 values.put(COLUMN_NAME_ID, novoTrabalho.getId());
                 values.put(COLUMN_NAME_ID_PERSONAGEM, idPersonagem);
-                values.put(COLUMN_NAME_ID_TRABALHO, novoTrabalho.getTrabalhoId());
+                values.put(COLUMN_NAME_ID_TRABALHO, novoTrabalho.getIdTrabalho());
                 values.put(COLUMN_NAME_QUANTIDADE, novoTrabalho.getQuantidade());
                 long novaLinha = dbModificacao.insert(TABLE_ESTOQUE, null, values);
                 if (novaLinha == -1) {
@@ -148,7 +146,7 @@ public class TrabalhoEstoqueRepository {
 
     public LiveData<Resource<Void>> removeTrabalhoEstoque(TrabalhoEstoque trabalhoRemovido) {
         MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
-        minhaReferencia.child(trabalhoRemovido.getId()).removeValue().addOnCompleteListener(task -> {
+        referenciaEstoque.child(trabalhoRemovido.getId()).removeValue().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 String selection = COLUMN_NAME_ID + " LIKE ?";
                 String[] selectionArgs = {trabalhoRemovido.getId()};
@@ -168,7 +166,7 @@ public class TrabalhoEstoqueRepository {
     public LiveData<Resource<Void>> sincronizaEstoque() {
         ArrayList<TrabalhoEstoque> trabalhosEstoqueServidor = new ArrayList<>();
         MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
-        minhaReferencia.addListenerForSingleValueEvent(new ValueEventListener() {
+        referenciaEstoque.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot dn:dataSnapshot.getChildren()){
@@ -190,7 +188,7 @@ public class TrabalhoEstoqueRepository {
                     cursor.close();
                     ContentValues values = new ContentValues();
                     values.put(COLUMN_NAME_ID_PERSONAGEM, idPersonagem);
-                    values.put(COLUMN_NAME_ID_TRABALHO, trabalho.getTrabalhoId());
+                    values.put(COLUMN_NAME_ID_TRABALHO, trabalho.getIdTrabalho());
                     values.put(COLUMN_NAME_QUANTIDADE, trabalho.getQuantidade());
                     if (contadorLinhas > 0) {
                         selection = COLUMN_NAME_ID + " LIKE ?";

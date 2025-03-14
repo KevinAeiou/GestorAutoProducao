@@ -56,9 +56,10 @@ public class Profissao implements Serializable {
         xpNiveis.add(375000);
         xpNiveis.add(470000);
         xpNiveis.add(585000);
-        xpNiveis.add(705000);
+        xpNiveis.add(706825);
         xpNiveis.add(830000);
-        xpNiveis.add(830000);
+        xpNiveis.add(996000);
+        xpNiveis.add(996000);
         for (i = 0; i < xpNiveis.size()-1; i ++){
             if (i == 0 && experiencia <= xpNiveis.get(i)) {
                 return i + 1;

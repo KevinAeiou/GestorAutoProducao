@@ -1,6 +1,8 @@
 package com.kevin.ceep.repository;
 
 import static com.kevin.ceep.db.contracts.EstoqueDbContract.EstoqueEntry.COLUMN_NAME_QUANTIDADE;
+import static com.kevin.ceep.db.contracts.TrabalhoDbContract.TrabalhoEntry.COLUMN_NAME_NOME;
+import static com.kevin.ceep.db.contracts.TrabalhoDbContract.TrabalhoEntry.COLUMN_NAME_RARIDADE;
 import static com.kevin.ceep.db.contracts.TrabalhoProducaoContract.TrabalhoProducaoEntry.COLUMN_NAME_ID;
 import static com.kevin.ceep.db.contracts.TrabalhoProducaoContract.TrabalhoProducaoEntry.COLUMN_NAME_ID_PERSONAGEM;
 import static com.kevin.ceep.db.contracts.TrabalhoProducaoContract.TrabalhoProducaoEntry.COLUMN_NAME_ID_TRABALHO;
@@ -8,9 +10,6 @@ import static com.kevin.ceep.db.contracts.TrabalhoVendidoContract.TrabalhoVendid
 import static com.kevin.ceep.db.contracts.TrabalhoVendidoContract.TrabalhoVendidoEntry.COLUMN_NAME_DESCRICAO;
 import static com.kevin.ceep.db.contracts.TrabalhoVendidoContract.TrabalhoVendidoEntry.COLUMN_NAME_VALOR;
 import static com.kevin.ceep.db.contracts.TrabalhoVendidoContract.TrabalhoVendidoEntry.TABLE_TRABALHOS_VENDIDOS;
-import static com.kevin.ceep.ui.activity.Constantes.CHAVE_LISTA_PERSONAGEM;
-import static com.kevin.ceep.ui.activity.Constantes.CHAVE_LISTA_VENDAS;
-import static com.kevin.ceep.ui.activity.Constantes.CHAVE_USUARIOS;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -35,26 +34,33 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class TrabalhoVendidoRepository {
-    private final DatabaseReference minhaReferencia;
+    private static final String CHAVE_VENDAS = "Vendas";
+    private final DatabaseReference referenciaVendas;
     private final SQLiteDatabase dbLeitura, dbModificacao;
     private final String idPersonagem;
-    private final MutableLiveData<Resource<ArrayList<TrabalhoVendido>>> todosTrabalhosVendidosEncontrados;
 
     public TrabalhoVendidoRepository(Context context, String idPersonagem) {
         this.idPersonagem = idPersonagem;
         String usuarioID = Objects.requireNonNull(FirebaseAuth.getInstance().getUid());
-        this.minhaReferencia = FirebaseDatabase.getInstance().getReference(CHAVE_USUARIOS)
-                .child(usuarioID).child(CHAVE_LISTA_PERSONAGEM).child(idPersonagem)
-                .child(CHAVE_LISTA_VENDAS);
+        this.referenciaVendas = FirebaseDatabase.getInstance().getReference(CHAVE_VENDAS)
+                .child(idPersonagem);
         DbHelper dbHelper = DbHelper.getInstance(context);
         this.dbLeitura = dbHelper.getReadableDatabase();
         this.dbModificacao = dbHelper.getWritableDatabase();
-        this.todosTrabalhosVendidosEncontrados = new MutableLiveData<>();
     }
 
     public LiveData<Resource<ArrayList<TrabalhoVendido>>> pegaTodosTrabalhosVendidos() {
-        String selection = "" +
-        "SELECT Lista_vendas.id, Lista_vendas.idPersonagem, Lista_vendas.idTrabalho, trabalhos.nome, Lista_vendas.descricao, Lista_vendas.dataVenda, Lista_vendas.quantidade, Lista_vendas.valor, trabalhos.raridade\n" +
+        MutableLiveData<Resource<ArrayList<TrabalhoVendido>>> todosTrabalhosVendidosEncontrados = new MutableLiveData<>();
+        String selection = "SELECT " +
+                "Lista_vendas.id, " +
+                "Lista_vendas.idPersonagem, " +
+                "Lista_vendas.idTrabalho, " +
+                "trabalhos.nome, " +
+                "Lista_vendas.descricao, " +
+                "Lista_vendas.dataVenda, " +
+                "Lista_vendas.quantidade, " +
+                "Lista_vendas.valor, " +
+                "trabalhos.raridade\n" +
         "FROM Lista_vendas\n" +
         "LEFT JOIN trabalhos\n" +
         "ON Lista_vendas.idTrabalho == trabalhos.id\n" +
@@ -65,15 +71,15 @@ public class TrabalhoVendidoRepository {
         ArrayList<TrabalhoVendido> trabalhosVendidos = new ArrayList<>();
         while (cursor.moveToNext()) {
             TrabalhoVendido trabalho = new TrabalhoVendido();
-            trabalho.setId(cursor.getString(0));
-            trabalho.setIdPersonagem(cursor.getString(1));
-            trabalho.setIdTrabalho(cursor.getString(2));
-            trabalho.setNome(cursor.getString(3));
-            trabalho.setDescricao(cursor.getString(4));
-            trabalho.setDataVenda(cursor.getString(5));
-            trabalho.setQuantidade(cursor.getInt(6));
-            trabalho.setValor(cursor.getInt(7));
-            trabalho.setRaridade(cursor.getString(8));
+            trabalho.setId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID)));
+            trabalho.setIdPersonagem(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID_PERSONAGEM)));
+            trabalho.setIdTrabalho(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID_TRABALHO)));
+            trabalho.setNome(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME)));
+            trabalho.setDescricao(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_DESCRICAO)));
+            trabalho.setDataVenda(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_DATA_VENDA)));
+            trabalho.setQuantidade(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_QUANTIDADE)));
+            trabalho.setValor(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_VALOR)));
+            trabalho.setRaridade(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_RARIDADE)));
             trabalhosVendidos.add(trabalho);
         }
         cursor.close();
@@ -82,7 +88,7 @@ public class TrabalhoVendidoRepository {
     }
     public LiveData<Resource<Void>> removeTrabalho(TrabalhoVendido trabalho) {
         MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
-        minhaReferencia.child(trabalho.getId()).removeValue().addOnCompleteListener(task -> {
+        referenciaVendas.child(trabalho.getId()).removeValue().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 liveData.setValue(new Resource<>(null, null));
             } else if (task.isCanceled()) {
@@ -98,7 +104,7 @@ public class TrabalhoVendidoRepository {
     public LiveData<Resource<Void>> sincronizaTrabalhos() {
         ArrayList<TrabalhoVendido> trabalhosVendidosServidor = new ArrayList<>();
         MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
-        minhaReferencia.addListenerForSingleValueEvent(new ValueEventListener() {
+        referenciaVendas.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 trabalhosVendidosServidor.clear();
@@ -170,7 +176,7 @@ public class TrabalhoVendidoRepository {
 
     public LiveData<Resource<Void>> modificaTrabalhoVendido(TrabalhoVendido trabalho) {
         MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
-        minhaReferencia.child(trabalho.getId()).setValue(trabalho).addOnCompleteListener(task -> {
+        referenciaVendas.child(trabalho.getId()).setValue(trabalho).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 ContentValues values = new ContentValues();
                 values.put(COLUMN_NAME_ID_PERSONAGEM, idPersonagem);
@@ -190,7 +196,6 @@ public class TrabalhoVendidoRepository {
                 }
             }
         });
-        liveData.setValue(new Resource<>(null, "Erro teste!"));
         return liveData;
     }
 }

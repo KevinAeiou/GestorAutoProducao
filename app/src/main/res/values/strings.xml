@@ -59,10 +59,10 @@
     </string-array>
     <string-array name="profissoes">
         <item>Armas de Longo Alcance</item>
-        <item>Arma corpo a corpo</item>
-        <item>Armadura de Tecido</item>
+        <item>Armas corpo a corpo</item>
+        <item>Armaduras de Tecido</item>
         <item>Armaduras Leves</item>
-        <item>Armadura Pesada</item>
+        <item>Armaduras Pesadas</item>
         <item>Anéis</item>
         <item>Amuletos</item>
         <item>Braceletes</item>
