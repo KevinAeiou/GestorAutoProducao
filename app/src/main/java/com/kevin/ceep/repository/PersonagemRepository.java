@@ -10,6 +10,12 @@ import static com.kevin.ceep.db.contracts.PersoagemDbContract.PersonagemEntry.CO
 import static com.kevin.ceep.db.contracts.PersoagemDbContract.PersonagemEntry.COLUMN_NAME_SENHA;
 import static com.kevin.ceep.db.contracts.PersoagemDbContract.PersonagemEntry.COLUMN_NAME_USO;
 import static com.kevin.ceep.db.contracts.PersoagemDbContract.PersonagemEntry.TABLE_PERSONAGENS;
+import static com.kevin.ceep.ui.activity.Constantes.CHAVE_ESTOQUE;
+import static com.kevin.ceep.ui.activity.Constantes.CHAVE_PERSONAGENS;
+import static com.kevin.ceep.ui.activity.Constantes.CHAVE_PRODUCAO;
+import static com.kevin.ceep.ui.activity.Constantes.CHAVE_PROFISSOES;
+import static com.kevin.ceep.ui.activity.Constantes.CHAVE_USUARIOS2;
+import static com.kevin.ceep.ui.activity.Constantes.CHAVE_VENDAS;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -38,8 +44,6 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class PersonagemRepository {
-    private static final String CHAVE_PERSONAGENS = "Personagens";
-    private static final String CHAVE_USUARIOS2 = "Usuarios2";
     private final DatabaseReference referenciaPersonagens;
     private final DatabaseReference referenciaUsuarios;
     private final String usuarioID;
@@ -177,112 +181,14 @@ public class PersonagemRepository {
         personagensEncontrados.setValue(new Resource<>(personagens, null));
         return personagensEncontrados;
     }
-    public LiveData<Resource<Void>> modificaPersonagem(Personagem personagemModificado) {
+    public LiveData<Resource<Void>> modificaPersonagem(Personagem personagem) {
         MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
-        referenciaPersonagens.child(personagemModificado.getId()).child(COLUMN_NAME_NOME).setValue(personagemModificado.getNome()).addOnCompleteListener(task -> {
+        referenciaPersonagens.child(personagem.getId()).setValue(personagem).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                if (personagemDao.modificaNomePersonagem(personagemModificado)) {
+                if (personagemDao.modificaNomePersonagem(personagem)) {
                     liveData.setValue(new Resource<>(null, null));
                 } else {
-                    liveData.setValue(new Resource<>(null, "Erro ao modificar "+personagemModificado.getNome()+" no banco: " + personagemDao.pegaErro()));
-                }
-            } else if (task.isCanceled()) {
-                liveData.setValue(new Resource<>(null, Objects.requireNonNull(task.getException()).toString()));
-            }
-        });
-        referenciaPersonagens.child(personagemModificado.getId()).child(COLUMN_NAME_EMAIL).setValue(personagemModificado.getEmail()).addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                ContentValues values = new ContentValues();
-                values.put(COLUMN_NAME_EMAIL, personagemModificado.getEmail());
-                String selection = COLUMN_NAME_ID + " LIKE ?";
-                String[] selectionArgs = {personagemModificado.getId()};
-                long newRowId = dbModifica.update(TABLE_PERSONAGENS, values, selection, selectionArgs);
-                if (newRowId == -1) {
-                    liveData.setValue(new Resource<>(null, "Erro ao modificar "+personagemModificado.getNome()+" no banco"));
-                } else {
-                    liveData.setValue(new Resource<>(null, null));
-                }
-            } else if (task.isCanceled()) {
-                liveData.setValue(new Resource<>(null, Objects.requireNonNull(task.getException()).toString()));
-            }
-        });
-        referenciaPersonagens.child(personagemModificado.getId()).child(COLUMN_NAME_SENHA).setValue(personagemModificado.getSenha()).addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                ContentValues values = new ContentValues();
-                values.put(COLUMN_NAME_SENHA, personagemModificado.getSenha());
-                String selection = COLUMN_NAME_ID + " LIKE ?";
-                String[] selectionArgs = {personagemModificado.getId()};
-                long newRowId = dbModifica.update(TABLE_PERSONAGENS, values, selection, selectionArgs);
-                if (newRowId == -1) {
-                    liveData.setValue(new Resource<>(null, "Erro ao modificar "+personagemModificado.getNome()+" no banco"));
-                } else {
-                    liveData.setValue(new Resource<>(null, null));
-                }
-            } else if (task.isCanceled()) {
-                liveData.setValue(new Resource<>(null, Objects.requireNonNull(task.getException()).toString()));
-            }
-        });
-        referenciaPersonagens.child(personagemModificado.getId()).child(COLUMN_NAME_ESTADO).setValue(personagemModificado.getEstado()).addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                ContentValues values = new ContentValues();
-                values.put(COLUMN_NAME_ESTADO, personagemModificado.getEstado());
-                String selection = COLUMN_NAME_ID + " LIKE ?";
-                String[] selectionArgs = {personagemModificado.getId()};
-                long newRowId = dbModifica.update(TABLE_PERSONAGENS, values, selection, selectionArgs);
-                if (newRowId == -1) {
-                    Log.d("modificaPersonagem", "Erro ao modificar estado para: "+personagemModificado.getEstado());
-                    liveData.setValue(new Resource<>(null, "Erro ao modificar "+personagemModificado.getNome()+" no banco"));
-                } else {
-                    Log.d("modificaPersonagem", "Estado modificado para: "+personagemModificado.getEstado());
-                    liveData.setValue(new Resource<>(null, null));
-                }
-            } else if (task.isCanceled()) {
-                liveData.setValue(new Resource<>(null, Objects.requireNonNull(task.getException()).toString()));
-            }
-        });
-        referenciaPersonagens.child(personagemModificado.getId()).child(COLUMN_NAME_USO).setValue(personagemModificado.getUso()).addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                ContentValues values = new ContentValues();
-                values.put(COLUMN_NAME_USO, personagemModificado.getUso());
-                String selection = COLUMN_NAME_ID + " LIKE ?";
-                String[] selectionArgs = {personagemModificado.getId()};
-                long newRowId = dbModifica.update(TABLE_PERSONAGENS, values, selection, selectionArgs);
-                if (newRowId == -1) {
-                    liveData.setValue(new Resource<>(null, "Erro ao modificar "+personagemModificado.getNome()+" no banco"));
-                } else {
-                    liveData.setValue(new Resource<>(null, null));
-                }
-            } else if (task.isCanceled()) {
-                liveData.setValue(new Resource<>(null, Objects.requireNonNull(task.getException()).toString()));
-            }
-        });
-        referenciaPersonagens.child(personagemModificado.getId()).child(COLUMN_NAME_AUTO_PRODUCAO).setValue(personagemModificado.isAutoProducao()).addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                ContentValues values = new ContentValues();
-                values.put(COLUMN_NAME_AUTO_PRODUCAO, personagemModificado.isAutoProducao());
-                String selection = COLUMN_NAME_ID + " LIKE ?";
-                String[] selectionArgs = {personagemModificado.getId()};
-                long newRowId = dbModifica.update(TABLE_PERSONAGENS, values, selection, selectionArgs);
-                if (newRowId == -1) {
-                    liveData.setValue(new Resource<>(null, "Erro ao modificar "+personagemModificado.getNome()+" no banco"));
-                } else {
-                    liveData.setValue(new Resource<>(null, null));
-                }
-            } else if (task.isCanceled()) {
-                liveData.setValue(new Resource<>(null, Objects.requireNonNull(task.getException()).toString()));
-            }
-        });
-        referenciaPersonagens.child(personagemModificado.getId()).child(COLUMN_NAME_ESPACO_PRODUCAO).setValue(personagemModificado.getEspacoProducao()).addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                ContentValues values = new ContentValues();
-                values.put(COLUMN_NAME_ESPACO_PRODUCAO, personagemModificado.getEspacoProducao());
-                String selection = COLUMN_NAME_ID + " LIKE ?";
-                String[] selectionArgs = {personagemModificado.getId()};
-                long newRowId = dbModifica.update(TABLE_PERSONAGENS, values, selection, selectionArgs);
-                if (newRowId == -1) {
-                    liveData.setValue(new Resource<>(null, "Erro ao modificar "+personagemModificado.getNome()+" no banco"));
-                } else {
-                    liveData.setValue(new Resource<>(null, null));
+                    liveData.setValue(new Resource<>(null, "Erro ao modificar "+personagem.getNome()+" no banco: " + personagemDao.pegaErro()));
                 }
             } else if (task.isCanceled()) {
                 liveData.setValue(new Resource<>(null, Objects.requireNonNull(task.getException()).toString()));
@@ -291,14 +197,14 @@ public class PersonagemRepository {
         return liveData;
     }
 
-    public LiveData<Resource<Void>> inserePersonagem(Personagem novoPersonagem) {
+    public LiveData<Resource<Void>> inserePersonagem(Personagem personagem) {
         MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
-        referenciaPersonagens.child(novoPersonagem.getId()).setValue(novoPersonagem).addOnCompleteListener(task -> {
+        referenciaPersonagens.child(personagem.getId()).setValue(personagem).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                ContentValues values = defineValorPersonagem(novoPersonagem);
+                ContentValues values = defineValorPersonagem(personagem);
                 long newRowId = dbModifica.insert(TABLE_PERSONAGENS, null, values);
                 if (newRowId == -1) {
-                    liveData.setValue(new Resource<>(null, "Erro ao inserir "+novoPersonagem.getNome()+" no banco"));
+                    liveData.setValue(new Resource<>(null, "Erro ao inserir "+personagem.getNome()+" no banco"));
                 } else {
                     liveData.setValue(new Resource<>(null, null));
                 }
@@ -313,6 +219,11 @@ public class PersonagemRepository {
         MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
         referenciaPersonagens.child(personagem.getId()).removeValue().addOnCompleteListener(task -> {
            if (task.isSuccessful()) {
+               FirebaseDatabase.getInstance().getReference(CHAVE_ESTOQUE).child(personagem.getId()).removeValue();
+               FirebaseDatabase.getInstance().getReference(CHAVE_PROFISSOES).child(personagem.getId()).removeValue();
+               FirebaseDatabase.getInstance().getReference(CHAVE_PRODUCAO).child(personagem.getId()).removeValue();
+               FirebaseDatabase.getInstance().getReference(CHAVE_VENDAS).child(personagem.getId()).removeValue();
+               referenciaUsuarios.child(personagem.getId()).removeValue();
                String selection = EstoqueDbContract.EstoqueEntry.COLUMN_NAME_ID + " LIKE ?";
                String[] selectionArgs = {personagem.getId()};
                long linhaRemovida = dbModifica.delete(TABLE_PERSONAGENS, selection, selectionArgs);
