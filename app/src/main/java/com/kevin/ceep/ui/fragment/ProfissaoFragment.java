@@ -1,6 +1,6 @@
 package com.kevin.ceep.ui.fragment;
 
-import static com.kevin.ceep.ui.activity.Constantes.CHAVE_PERSONAGEM;
+import static com.kevin.ceep.ui.activity.Constantes.CHAVE_ID_PERSONAGEM;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -36,7 +36,7 @@ public class ProfissaoFragment extends DialogFragment {
         super.onCreate(savedInstanceState);
         Bundle argumento = getArguments();
         if (argumento != null) {
-            idPersonagem = argumento.getString(CHAVE_PERSONAGEM);
+            idPersonagem = argumento.getString(CHAVE_ID_PERSONAGEM);
             if (argumento.containsKey("profissao")) {
                 profissaoRecebido = new Profissao();
                 profissaoRecebido = (Profissao) argumento.getSerializable("profissao");

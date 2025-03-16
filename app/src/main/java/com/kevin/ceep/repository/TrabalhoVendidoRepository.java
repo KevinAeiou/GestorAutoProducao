@@ -10,6 +10,7 @@ import static com.kevin.ceep.db.contracts.TrabalhoVendidoContract.TrabalhoVendid
 import static com.kevin.ceep.db.contracts.TrabalhoVendidoContract.TrabalhoVendidoEntry.COLUMN_NAME_DESCRICAO;
 import static com.kevin.ceep.db.contracts.TrabalhoVendidoContract.TrabalhoVendidoEntry.COLUMN_NAME_VALOR;
 import static com.kevin.ceep.db.contracts.TrabalhoVendidoContract.TrabalhoVendidoEntry.TABLE_TRABALHOS_VENDIDOS;
+import static com.kevin.ceep.ui.activity.Constantes.CHAVE_VENDAS;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -32,7 +33,6 @@ import com.kevin.ceep.model.TrabalhoVendido;
 import java.util.ArrayList;
 
 public class TrabalhoVendidoRepository {
-    private static final String CHAVE_VENDAS = "Vendas";
     private final DatabaseReference referenciaVendas;
     private final SQLiteDatabase dbLeitura, dbModificacao;
     private final String idPersonagem;

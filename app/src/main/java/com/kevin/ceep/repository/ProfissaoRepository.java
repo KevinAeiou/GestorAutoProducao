@@ -1,5 +1,6 @@
 package com.kevin.ceep.repository;
 
+import static com.kevin.ceep.ui.activity.Constantes.CHAVE_PROFISSOES;
 import static com.kevin.ceep.utilitario.Utilitario.comparaString;
 
 import android.annotation.SuppressLint;
@@ -22,7 +23,6 @@ import java.util.Comparator;
 import java.util.Objects;
 
 public class ProfissaoRepository {
-    private static final String CHAVE_PROFISSOES = "Profissoes";
     private static final String CHAVE_LISTA_PROFISSOES = "Lista_profissoes";
     private final DatabaseReference referenciaProfissoes;
     private final DatabaseReference referenciaListaProfissoes;

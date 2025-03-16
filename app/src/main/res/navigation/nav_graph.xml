@@ -118,7 +118,7 @@
     </fragment>
     <fragment
         android:id="@+id/atributosPersonagem"
-        android:name="com.kevin.ceep.ui.fragment.AtributosPersonagemFragment"
+        android:name="com.kevin.ceep.ui.fragment.ModificaPersonagemFragment"
         android:label="Atributos"
         tools:layout="@layout/fragment_atributos_personagem" >
     </fragment>

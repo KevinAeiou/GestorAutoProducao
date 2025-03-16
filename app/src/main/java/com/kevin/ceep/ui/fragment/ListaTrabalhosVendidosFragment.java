@@ -1,9 +1,5 @@
 package com.kevin.ceep.ui.fragment;
 
-import static com.kevin.ceep.ui.activity.Constantes.CHAVE_PERSONAGEM;
-import static com.kevin.ceep.ui.activity.Constantes.CHAVE_TRABALHO;
-
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;

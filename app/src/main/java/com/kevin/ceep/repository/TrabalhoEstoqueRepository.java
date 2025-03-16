@@ -5,6 +5,7 @@ import static com.kevin.ceep.db.contracts.EstoqueDbContract.EstoqueEntry.COLUMN_
 import static com.kevin.ceep.db.contracts.EstoqueDbContract.EstoqueEntry.COLUMN_NAME_ID_TRABALHO;
 import static com.kevin.ceep.db.contracts.EstoqueDbContract.EstoqueEntry.COLUMN_NAME_QUANTIDADE;
 import static com.kevin.ceep.db.contracts.EstoqueDbContract.EstoqueEntry.TABLE_ESTOQUE;
+import static com.kevin.ceep.ui.activity.Constantes.CHAVE_ESTOQUE;
 
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
@@ -28,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class TrabalhoEstoqueRepository {
-    private static final String CHAVE_ESTOQUE = "Estoque";
     private final DatabaseReference referenciaEstoque;
     private final SQLiteDatabase dbLeitura, dbModificacao;
     private final String idPersonagem;

@@ -14,6 +14,7 @@ import static com.kevin.ceep.db.contracts.TrabalhoProducaoContract.TrabalhoProdu
 import static com.kevin.ceep.db.contracts.TrabalhoProducaoContract.TrabalhoProducaoEntry.COLUMN_NAME_LICENCA;
 import static com.kevin.ceep.db.contracts.TrabalhoProducaoContract.TrabalhoProducaoEntry.COLUMN_NAME_RECORRENCIA;
 import static com.kevin.ceep.db.contracts.TrabalhoProducaoContract.TrabalhoProducaoEntry.TABLE_TRABALHOS_PRODUCAO;
+import static com.kevin.ceep.ui.activity.Constantes.CHAVE_PRODUCAO;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -38,7 +39,6 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class TrabalhoProducaoRepository {
-    private static final String CHAVE_PRODUCAO = "Producao";
     private final DatabaseReference minhaReferenciaProducao;
     private final SQLiteDatabase dbLeitura, dbModificacao;
     private final String idPersonagem;

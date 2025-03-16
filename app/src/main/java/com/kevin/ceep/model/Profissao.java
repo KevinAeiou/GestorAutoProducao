@@ -94,7 +94,7 @@ public class Profissao implements Serializable {
     }
 
     public void setExperiencia(int experiencia) {
-        if (experiencia > 830000) experiencia = 830000;
+        if (experiencia > 996000) experiencia = 996000;
         this.experiencia = experiencia;
     }
 

@@ -1,6 +1,6 @@
 package com.kevin.ceep.ui.fragment;
 
-import static com.kevin.ceep.ui.activity.Constantes.CHAVE_PERSONAGEM;
+import static com.kevin.ceep.ui.activity.Constantes.CHAVE_ID_PERSONAGEM;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -34,7 +34,7 @@ import java.util.ArrayList;
 public class ListaProfissoesFragment extends Fragment {
     private FragmentListaProfissoesBinding binding;
     private ListaProfissaoAdapter listaProfissaoAdapter;
-    private String personagemId;
+    private String idPersonagem;
     private ArrayList<Profissao> todasProfissoes;
     private RecyclerView meuRecycler;
     private SwipeRefreshLayout swipeRefreshLayout;
@@ -81,7 +81,7 @@ public class ListaProfissoesFragment extends Fragment {
         listaProfissaoAdapter.setOnItemClickListener((profissao, adapterPosition) -> {
             ProfissaoFragment profissaoFragment = new ProfissaoFragment();
             Bundle argumento = new Bundle();
-            argumento.putString(CHAVE_PERSONAGEM, personagemId);
+            argumento.putString(CHAVE_ID_PERSONAGEM, idPersonagem);
             argumento.putSerializable("profissao", profissao);
             profissaoFragment.setArguments(argumento);
             profissaoFragment.show(getChildFragmentManager(), "profissaoFragment");
@@ -103,7 +103,7 @@ public class ListaProfissoesFragment extends Fragment {
     private void configuraSwipeRefreshLayout() {
         swipeRefreshLayout.setOnRefreshListener(() -> {
             listaProfissaoAdapter.limpaLista();
-            if (personagemId != null){
+            if (idPersonagem != null){
                 pegaTodasProfissoes();
             }
         });
@@ -122,8 +122,8 @@ public class ListaProfissoesFragment extends Fragment {
         super.onResume();
         personagemViewModel.pegaPersonagemSelecionado().observe(getViewLifecycleOwner(), resultadoPegaPersonagem -> {
             if (resultadoPegaPersonagem == null) return;
-            personagemId = resultadoPegaPersonagem.getId();
-            ProfissaoViewModelFactory profissaoViewModelFactory = new ProfissaoViewModelFactory(new ProfissaoRepository(personagemId));
+            idPersonagem = resultadoPegaPersonagem.getId();
+            ProfissaoViewModelFactory profissaoViewModelFactory = new ProfissaoViewModelFactory(new ProfissaoRepository(idPersonagem));
             profissaoViewModel = new ViewModelProvider(this, profissaoViewModelFactory).get(ProfissaoViewModel.class);
             pegaTodasProfissoes();
         });

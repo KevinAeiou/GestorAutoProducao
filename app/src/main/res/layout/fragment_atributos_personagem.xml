@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/constraintLayoutAtributosPersonagem"
-    tools:context=".ui.fragment.AtributosPersonagemFragment">
+    tools:context=".ui.fragment.ModificaPersonagemFragment">
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/txtNomePersonagem"

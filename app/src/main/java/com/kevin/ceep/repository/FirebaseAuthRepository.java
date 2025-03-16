@@ -1,6 +1,6 @@
 package com.kevin.ceep.repository;
 
-import static com.kevin.ceep.ui.activity.Constantes.CHAVE_USUARIOS;
+import static com.kevin.ceep.ui.activity.Constantes.CHAVE_USUARIOS2;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -21,7 +21,7 @@ public class FirebaseAuthRepository {
 
     public FirebaseAuthRepository() {
         this.minhaInstancia = FirebaseAuth.getInstance();
-        this.minhaReferencia = FirebaseDatabase.getInstance().getReference(CHAVE_USUARIOS);
+        this.minhaReferencia = FirebaseDatabase.getInstance().getReference(CHAVE_USUARIOS2);
     }
     public LiveData<Resource<Void>> autenticarUsuario(Usuario usuario) {
         MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();

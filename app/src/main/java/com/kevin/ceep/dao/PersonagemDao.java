@@ -63,13 +63,13 @@ public class PersonagemDao {
         return personagens;
     }
 
-    public boolean modificaNomePersonagem(Personagem personagemModificado) {
+    public boolean modificaNomePersonagem(Personagem personagem) {
         dbModifica.beginTransaction();
         try {
             ContentValues values = new ContentValues();
-            values.put(COLUMN_NAME_NOME, personagemModificado.getNome());
+            values.put(COLUMN_NAME_NOME, personagem.getNome());
             String selection = COLUMN_NAME_ID + " LIKE ?";
-            String[] selectionArgs = {personagemModificado.getId()};
+            String[] selectionArgs = {personagem.getId()};
             dbModifica.update(TABLE_PERSONAGENS, values, selection, selectionArgs);
             dbModifica.setTransactionSuccessful();
             return true;

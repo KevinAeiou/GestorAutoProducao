@@ -1,11 +1,9 @@
 package com.kevin.ceep.ui.recyclerview.adapter;
 
-import static com.kevin.ceep.ui.activity.Constantes.CHAVE_NOME_TRABALHO;
-import static com.kevin.ceep.ui.activity.Constantes.CHAVE_TRABALHO;
 import static com.kevin.ceep.ui.activity.Constantes.CODIGO_REQUISICAO_ALTERA_TRABALHO;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,9 +22,6 @@ import com.kevin.ceep.model.ProfissaoTrabalho;
 import com.kevin.ceep.model.Trabalho;
 import com.kevin.ceep.ui.fragment.ListaTodosTrabalhosFragmentDirections;
 import com.kevin.ceep.ui.fragment.ListaTodosTrabalhosFragmentDirections.ActionListaTodosTrabalhosFragmentToTrabalhoEspecificoFragment;
-import com.kevin.ceep.ui.fragment.TrabalhoEspecificoFragment;
-import com.kevin.ceep.ui.recyclerview.adapter.listener.OnItemClickListener;
-import com.kevin.ceep.ui.recyclerview.adapter.listener.OnItemClickListenerTrabalho;
 
 import java.util.List;
 
@@ -40,6 +35,7 @@ public class ListaTodosTrabalhosAdapter extends RecyclerView.Adapter<ListaTodosT
         this.profissoes = profissaoTrabalhos;
         this.context = context;
     }
+    @SuppressLint("NotifyDataSetChanged")
     public void atualiza(List<ProfissaoTrabalho> listaFiltrada) {
         this.profissoes = listaFiltrada;
         notifyDataSetChanged();

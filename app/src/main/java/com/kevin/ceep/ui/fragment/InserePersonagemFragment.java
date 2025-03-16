@@ -94,7 +94,7 @@ public class InserePersonagemFragment extends Fragment implements MenuProvider{
         });
     }
     private void voltaParaTrabalhosProducao() {
-        controlador.navigate(AtributosPersonagemFragmentDirections.vaiParaListaTrabalhosProducao());
+        controlador.navigate(ModificaPersonagemFragmentDirections.vaiParaListaTrabalhosProducao());
     }
 
     private void inicializaComponentes() {

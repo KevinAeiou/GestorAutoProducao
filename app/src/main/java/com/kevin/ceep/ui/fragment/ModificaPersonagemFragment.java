@@ -32,7 +32,7 @@ import com.kevin.ceep.ui.viewModel.EstadoAppViewModel;
 import com.kevin.ceep.ui.viewModel.PersonagemViewModel;
 import com.kevin.ceep.ui.viewModel.factory.PersonagemViewModelFactory;
 
-public class AtributosPersonagemFragment extends Fragment implements MenuProvider{
+public class ModificaPersonagemFragment extends Fragment implements MenuProvider{
 
     private Personagem personagemRecebido;
     private EditText personagemNome, personagemEspacoProducao, personagemEmail, personagemSenha;
@@ -121,7 +121,7 @@ public class AtributosPersonagemFragment extends Fragment implements MenuProvide
     }
 
     private void voltaParaTrabalhosProducao() {
-        controlador.navigate(AtributosPersonagemFragmentDirections.vaiParaListaTrabalhosProducao());
+        controlador.navigate(ModificaPersonagemFragmentDirections.vaiParaListaTrabalhosProducao());
     }
 
     private void preencheCampos() {
