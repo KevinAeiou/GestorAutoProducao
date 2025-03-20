@@ -4,14 +4,54 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
     app:startDestination="@id/listaTrabalhosProducao">
+
     <action
         android:id="@+id/vai_para_lista_trabalhos_producao"
         app:destination="@+id/listaTrabalhosProducao"
-        app:popUpTo="@id/nav_graph"
+        app:enterAnim="@animator/nav_default_enter_anim"
+        app:exitAnim="@animator/nav_default_exit_anim"
+        app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+        app:popExitAnim="@animator/nav_default_pop_exit_anim"
+        app:popUpTo="@id/listaTrabalhosProducao"
         app:popUpToInclusive="true" />
+
+    <action
+        android:id="@+id/vai_para_lista_trabalhos_vendidos"
+        app:destination="@+id/listaTrabalhosVendidos"
+        app:enterAnim="@animator/nav_default_enter_anim"
+        app:exitAnim="@animator/nav_default_exit_anim"
+        app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+        app:popExitAnim="@animator/nav_default_pop_exit_anim"
+        app:popUpTo="@id/listaTrabalhosProducao"
+        app:popUpToInclusive="false" />
+
+    <action
+        android:id="@+id/vai_para_lista_profissoes"
+        app:destination="@+id/listaProfissoes"
+        app:enterAnim="@animator/nav_default_enter_anim"
+        app:exitAnim="@animator/nav_default_exit_anim"
+        app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+        app:popExitAnim="@animator/nav_default_pop_exit_anim"
+        app:popUpTo="@id/listaProfissoes"
+        app:popUpToInclusive="true" />
+
+    <action
+        android:id="@+id/vai_para_lista_trabalhos_estoque"
+        app:destination="@+id/listaTrabalhosEstoque"
+        app:enterAnim="@animator/nav_default_enter_anim"
+        app:exitAnim="@animator/nav_default_exit_anim"
+        app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+        app:popExitAnim="@animator/nav_default_pop_exit_anim"
+        app:popUpTo="@id/listaTrabalhosProducao"
+        app:popUpToInclusive="false" />
+
     <action
         android:id="@+id/vaiParaSlashScreen"
         app:destination="@+id/splashscreenFragment"
+        app:enterAnim="@animator/nav_default_enter_anim"
+        app:exitAnim="@animator/nav_default_exit_anim"
+        app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+        app:popExitAnim="@animator/nav_default_pop_exit_anim"
         app:popUpTo="@id/nav_graph"
         app:popUpToInclusive="true" />
     <fragment
@@ -26,7 +66,11 @@
         tools:layout="@layout/fragment_lista_trabalhos_estoque" >
         <action
             android:id="@+id/vai_de_estoque_para_trabalhos"
-            app:destination="@id/listaTrabalhosInsereNovoTrabalhoFragment" />
+            app:destination="@id/listaTrabalhosInsereNovoTrabalhoFragment"
+            app:enterAnim="@animator/nav_default_enter_anim"
+            app:exitAnim="@animator/nav_default_exit_anim"
+            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+            app:popExitAnim="@animator/nav_default_pop_exit_anim" />
     </fragment>
     <fragment
         android:id="@+id/listaTrabalhosVendidos"
@@ -35,7 +79,11 @@
         tools:layout="@layout/fragment_lista_trabalhos_vendidos" >
         <action
             android:id="@+id/vaiDeTrabalhosVendidosParaDetalhesTrabalhoVendido"
-            app:destination="@id/detalhesTrabalhoVendidoFragment" />
+            app:destination="@id/detalhesTrabalhoVendidoFragment"
+            app:enterAnim="@animator/nav_default_enter_anim"
+            app:exitAnim="@animator/nav_default_exit_anim"
+            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+            app:popExitAnim="@animator/nav_default_pop_exit_anim" />
     </fragment>
     <fragment
         android:id="@+id/listaTrabalhosProducao"
@@ -44,10 +92,18 @@
         tools:layout="@layout/fragment_lista_trabalhos_producao" >
         <action
             android:id="@+id/vai_para_lista_trabalhos"
-            app:destination="@id/listaTrabalhosInsereNovoTrabalhoFragment"/>
+            app:destination="@id/listaTrabalhosInsereNovoTrabalhoFragment"
+            app:enterAnim="@animator/nav_default_enter_anim"
+            app:exitAnim="@animator/nav_default_exit_anim"
+            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+            app:popExitAnim="@animator/nav_default_pop_exit_anim" />
         <action
             android:id="@+id/vai_para_trabalho_especifico"
-            app:destination="@id/trabalhoEspecificoFragment" />
+            app:destination="@id/trabalhoEspecificoFragment"
+            app:enterAnim="@animator/nav_default_enter_anim"
+            app:exitAnim="@animator/nav_default_exit_anim"
+            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+            app:popExitAnim="@animator/nav_default_pop_exit_anim" />
     </fragment>
     <fragment
         android:id="@+id/listaTrabalhosInsereNovoTrabalhoFragment"
@@ -61,6 +117,10 @@
         <action
             android:id="@+id/vai_para_confirma_trabalho"
             app:destination="@id/confirmaTrabalhoFragment"
+            app:enterAnim="@animator/nav_default_enter_anim"
+            app:exitAnim="@animator/nav_default_exit_anim"
+            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+            app:popExitAnim="@animator/nav_default_pop_exit_anim"
             app:popUpTo="@id/listaTrabalhosInsereNovoTrabalhoFragment"
             app:popUpToInclusive="true" />
         <argument
@@ -70,6 +130,10 @@
         <action
             android:id="@+id/vai_de_trabalhos_para_estoque"
             app:destination="@id/listaTrabalhosEstoque"
+            app:enterAnim="@animator/nav_default_enter_anim"
+            app:exitAnim="@animator/nav_default_exit_anim"
+            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+            app:popExitAnim="@animator/nav_default_pop_exit_anim"
             app:popUpTo="@id/listaTrabalhosInsereNovoTrabalhoFragment"
             app:popUpToInclusive="true" />
     </fragment>
@@ -113,6 +177,10 @@
         <action
             android:id="@+id/vaiDeTrabalhoEspecficoParaTrabalhos"
             app:destination="@id/nav_trabalhos"
+            app:enterAnim="@animator/nav_default_enter_anim"
+            app:exitAnim="@animator/nav_default_exit_anim"
+            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+            app:popExitAnim="@animator/nav_default_pop_exit_anim"
             app:popUpTo="@id/nav_trabalhos"
             app:popUpToInclusive="false" />
     </fragment>
@@ -129,7 +197,11 @@
         tools:layout="@layout/fragment_lista_todos_trabalhos">
         <action
             android:id="@+id/action_listaTodosTrabalhosFragment_to_trabalhoEspecificoFragment"
-            app:destination="@id/trabalhoEspecificoFragment" />
+            app:destination="@id/trabalhoEspecificoFragment"
+            app:enterAnim="@animator/nav_default_enter_anim"
+            app:exitAnim="@animator/nav_default_exit_anim"
+            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+            app:popExitAnim="@animator/nav_default_pop_exit_anim" />
     </fragment>
     <fragment
         android:id="@+id/entrarFragment"
@@ -138,10 +210,18 @@
         tools:layout="@layout/fragment_entrar_usuario">
         <action
             android:id="@+id/vai_de_entrar_para_recuperar_senha"
-            app:destination="@id/recuperarSenhaFragment" />
+            app:destination="@id/recuperarSenhaFragment"
+            app:enterAnim="@animator/nav_default_enter_anim"
+            app:exitAnim="@animator/nav_default_exit_anim"
+            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+            app:popExitAnim="@animator/nav_default_pop_exit_anim" />
         <action
             android:id="@+id/vai_de_entrar_para_cadastrar"
-            app:destination="@id/cadastrarUsuarioFragment" />
+            app:destination="@id/cadastrarUsuarioFragment"
+            app:enterAnim="@animator/nav_default_enter_anim"
+            app:exitAnim="@animator/nav_default_exit_anim"
+            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+            app:popExitAnim="@animator/nav_default_pop_exit_anim" />
     </fragment>
     <fragment
         android:id="@+id/cadastrarUsuarioFragment"
@@ -161,6 +241,10 @@
         <action
             android:id="@+id/vaiDeSplashscreenParaEntrar"
             app:destination="@id/entrarFragment"
+            app:enterAnim="@animator/nav_default_enter_anim"
+            app:exitAnim="@animator/nav_default_exit_anim"
+            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+            app:popExitAnim="@animator/nav_default_pop_exit_anim"
             app:popUpTo="@id/nav_graph"
             app:popUpToInclusive="true" />
     </fragment>
@@ -172,6 +256,10 @@
         <action
             android:id="@+id/vaiDeDetalhesTrabalhoVendidoParaTrabalhosVendidos"
             app:destination="@id/listaTrabalhosVendidos"
+            app:enterAnim="@animator/nav_default_enter_anim"
+            app:exitAnim="@animator/nav_default_exit_anim"
+            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+            app:popExitAnim="@animator/nav_default_pop_exit_anim"
             app:popUpTo="@id/listaTrabalhosVendidos"
             app:popUpToInclusive="true" />
         <argument
