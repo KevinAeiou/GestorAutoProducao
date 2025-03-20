@@ -18,11 +18,11 @@ public class Trabalho implements Serializable {
     private Integer nivel;
     private Integer experiencia;
     public Trabalho(){
-        this.id = geraIdAleatorio();
+        geraNovoId();
     }
 
     public Trabalho(String nome, String nomeProducao, String profissao, String raridade, String trabalhoNecessario, Integer nivel, Integer experiencia) {
-        this.id = geraIdAleatorio();
+        geraNovoId();
         this.nome = nome;
         this.nomeProducao = nomeProducao;
         this.profissao = profissao;
@@ -123,5 +123,9 @@ public class Trabalho implements Serializable {
                 "recebendoambar","recebendodistintivodeaprendiz"
         ));
         return listaProducaoRecursos.contains(limpaString(nomeProducao));
+    }
+
+    public void geraNovoId() {
+        this.id= geraIdAleatorio();
     }
 }

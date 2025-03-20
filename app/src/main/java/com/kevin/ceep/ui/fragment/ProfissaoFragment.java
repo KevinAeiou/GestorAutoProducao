@@ -57,7 +57,7 @@ public class ProfissaoFragment extends DialogFragment {
         TextView txtNomePersonagem = binding.txtNomeProfissaoFragment;
         edtExperiencia = binding.edtExperienciaProfissaoFragment;
         swtPrioridade = binding.swtPrioridadeProfissaoFragment;
-        ProfissaoViewModelFactory profissaoViewModelFactory = new ProfissaoViewModelFactory(new ProfissaoRepository(idPersonagem));
+        ProfissaoViewModelFactory profissaoViewModelFactory = new ProfissaoViewModelFactory(idPersonagem);
         profissaoViewModel = new ViewModelProvider(this, profissaoViewModelFactory).get(ProfissaoViewModel.class);
 
         txtNomePersonagem.setText(profissaoRecebido.getNome());

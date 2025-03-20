@@ -1,10 +1,9 @@
 package com.kevin.ceep.ui.viewModel;
 
-import android.content.Context;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.kevin.ceep.model.Trabalho;
 import com.kevin.ceep.model.TrabalhoProducao;
 import com.kevin.ceep.repository.Resource;
 import com.kevin.ceep.repository.TrabalhoProducaoRepository;
@@ -41,5 +40,9 @@ public class TrabalhoProducaoViewModel extends ViewModel {
 
     public LiveData<Resource<Void>> sicronizaTrabalhosProducao() {
         return repository.sincronizaTrabalhosProducao();
+    }
+
+    public void removeReferenciaTrabalhoEspecifico(Trabalho trabalho) {
+        repository.removeReferenciaTrabalhoEspecifico(trabalho);
     }
 }

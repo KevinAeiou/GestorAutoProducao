@@ -33,17 +33,27 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.kevin.ceep.db.DbHelper;
 import com.kevin.ceep.db.contracts.TrabalhoDbContract;
+import com.kevin.ceep.model.Trabalho;
 import com.kevin.ceep.model.TrabalhoProducao;
 
 import java.util.ArrayList;
 import java.util.Objects;
 
 public class TrabalhoProducaoRepository {
-    private final DatabaseReference minhaReferenciaProducao;
+    private DatabaseReference referenciaProducaoIdPersonagem;
+    private DatabaseReference referenciaProducao;
     private final SQLiteDatabase dbLeitura, dbModificacao;
-    private final String idPersonagem;
+    private String idPersonagem;
+
+    public TrabalhoProducaoRepository(Context context) {
+        this.referenciaProducao = FirebaseDatabase.getInstance().getReference(CHAVE_PRODUCAO);
+        DbHelper dbHelper = DbHelper.getInstance(context);
+        this.dbLeitura = dbHelper.getReadableDatabase();
+        this.dbModificacao = dbHelper.getWritableDatabase();
+    }
+
     public TrabalhoProducaoRepository(Context context, String idPersonagem) {
-        this.minhaReferenciaProducao = FirebaseDatabase.getInstance().getReference(CHAVE_PRODUCAO)
+        this.referenciaProducaoIdPersonagem = FirebaseDatabase.getInstance().getReference(CHAVE_PRODUCAO)
             .child(idPersonagem);
         DbHelper dbHelper = DbHelper.getInstance(context);
         this.dbLeitura = dbHelper.getReadableDatabase();
@@ -54,7 +64,7 @@ public class TrabalhoProducaoRepository {
     public LiveData<Resource<Void>> modificaTrabalhoProducao(TrabalhoProducao trabalhoModificado) {
         Log.d("ciclo", "Modifica trabalho de produção no servidor");
         MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
-        minhaReferenciaProducao.child(trabalhoModificado.getId()).setValue(trabalhoModificado).addOnCompleteListener(task -> {
+        referenciaProducaoIdPersonagem.child(trabalhoModificado.getId()).setValue(trabalhoModificado).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 Log.d("ciclo", "Trabalho de produção modificado no servidor com sucesso");
                 ContentValues values = new ContentValues();
@@ -82,8 +92,9 @@ public class TrabalhoProducaoRepository {
 
     public LiveData<Resource<Void>> insereTrabalhoProducao(TrabalhoProducao novoTrabalho) {
         MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
-        minhaReferenciaProducao.child(novoTrabalho.getId()).setValue(novoTrabalho).addOnCompleteListener(task -> {
+        referenciaProducaoIdPersonagem.child(novoTrabalho.getId()).setValue(novoTrabalho).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
+                novoTrabalho.geraNovoId();
                 ContentValues values = defineConteudo(novoTrabalho);
                 long newRowId = dbModificacao.insert(TABLE_TRABALHOS_PRODUCAO, null, values);
                 if (newRowId == -1) {
@@ -114,7 +125,7 @@ public class TrabalhoProducaoRepository {
 
     public LiveData<Resource<Void>> removeTrabalhoProducao(TrabalhoProducao trabalhoProducao) {
         MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
-        minhaReferenciaProducao.child(trabalhoProducao.getId()).removeValue().addOnCompleteListener(task -> {
+        referenciaProducaoIdPersonagem.child(trabalhoProducao.getId()).removeValue().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 String selection = COLUMN_NAME_ID + " LIKE ?";
                 String[] selectionArgs = {trabalhoProducao.getId()};
@@ -184,7 +195,7 @@ public class TrabalhoProducaoRepository {
     public LiveData<Resource<Void>> sincronizaTrabalhosProducao() {
         ArrayList<TrabalhoProducao> trabalhosProducaoServidor = new ArrayList<>();
         MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
-        minhaReferenciaProducao.addValueEventListener(new ValueEventListener() {
+        referenciaProducaoIdPersonagem.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 trabalhosProducaoServidor.clear();
@@ -248,5 +259,31 @@ public class TrabalhoProducaoRepository {
             }
         });
         return liveData;
+    }
+
+    public void removeReferenciaTrabalhoEspecifico(Trabalho trabalho) {
+        referenciaProducao.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dn: snapshot.getChildren()) {
+                    Log.d("removeTrabalho", "ID PERSONAGEM: " + dn.getKey());
+                    referenciaProducaoIdPersonagem = referenciaProducao.child(Objects.requireNonNull(dn.getKey()));
+                    for (DataSnapshot dn2: dn.getChildren()) {
+                        Log.d("removeTrabalho", "ID TRABALHO PRODUCAO: " + dn2.getKey());
+                        Log.d("removeTrabalho", "VALOR: " + dn2.getValue());
+                        TrabalhoProducao trabalhoEncontrado= dn2.getValue(TrabalhoProducao.class);
+                        assert trabalhoEncontrado != null;
+                        if (trabalhoEncontrado.getIdTrabalho().equals(trabalho.getId())) {
+                            removeTrabalhoProducao(trabalhoEncontrado);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 }

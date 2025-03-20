@@ -28,19 +28,28 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.kevin.ceep.db.DbHelper;
+import com.kevin.ceep.model.Trabalho;
 import com.kevin.ceep.model.TrabalhoVendido;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class TrabalhoVendidoRepository {
-    private final DatabaseReference referenciaVendas;
+    private DatabaseReference referenciaVendasIdPersonagem;
+    private DatabaseReference referenciaVendas;
     private final SQLiteDatabase dbLeitura, dbModificacao;
-    private final String idPersonagem;
+    private String idPersonagem;
 
     public TrabalhoVendidoRepository(Context context, String idPersonagem) {
         this.idPersonagem = idPersonagem;
-        this.referenciaVendas = FirebaseDatabase.getInstance().getReference(CHAVE_VENDAS)
+        this.referenciaVendasIdPersonagem = FirebaseDatabase.getInstance().getReference(CHAVE_VENDAS)
                 .child(idPersonagem);
+        DbHelper dbHelper = DbHelper.getInstance(context);
+        this.dbLeitura = dbHelper.getReadableDatabase();
+        this.dbModificacao = dbHelper.getWritableDatabase();
+    }
+    public TrabalhoVendidoRepository(Context context) {
+        this.referenciaVendas = FirebaseDatabase.getInstance().getReference(CHAVE_VENDAS);
         DbHelper dbHelper = DbHelper.getInstance(context);
         this.dbLeitura = dbHelper.getReadableDatabase();
         this.dbModificacao = dbHelper.getWritableDatabase();
@@ -85,7 +94,7 @@ public class TrabalhoVendidoRepository {
     }
     public LiveData<Resource<Void>> removeTrabalho(TrabalhoVendido trabalho) {
         MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
-        referenciaVendas.child(trabalho.getId()).removeValue().addOnCompleteListener(task -> {
+        referenciaVendasIdPersonagem.child(trabalho.getId()).removeValue().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 liveData.setValue(new Resource<>(null, null));
             } else if (task.isCanceled()) {
@@ -101,7 +110,7 @@ public class TrabalhoVendidoRepository {
     public LiveData<Resource<Void>> sincronizaTrabalhos() {
         ArrayList<TrabalhoVendido> trabalhosVendidosServidor = new ArrayList<>();
         MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
-        referenciaVendas.addListenerForSingleValueEvent(new ValueEventListener() {
+        referenciaVendasIdPersonagem.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 trabalhosVendidosServidor.clear();
@@ -173,7 +182,7 @@ public class TrabalhoVendidoRepository {
 
     public LiveData<Resource<Void>> modificaTrabalhoVendido(TrabalhoVendido trabalho) {
         MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
-        referenciaVendas.child(trabalho.getId()).setValue(trabalho).addOnCompleteListener(task -> {
+        referenciaVendasIdPersonagem.child(trabalho.getId()).setValue(trabalho).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 ContentValues values = new ContentValues();
                 values.put(COLUMN_NAME_ID_PERSONAGEM, idPersonagem);
@@ -194,5 +203,28 @@ public class TrabalhoVendidoRepository {
             }
         });
         return liveData;
+    }
+
+    public void removeReferenciaTrabalhoEspecfico(Trabalho trabalho) {
+        referenciaVendas.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dn: snapshot.getChildren()) {
+                    referenciaVendasIdPersonagem= referenciaVendas.child(Objects.requireNonNull(dn.getKey()));
+                    for (DataSnapshot dn2: dn.getChildren()) {
+                        TrabalhoVendido trabalhoEncontrado= dn2.getValue(TrabalhoVendido.class);
+                        assert trabalhoEncontrado != null;
+                        if (trabalhoEncontrado.getIdTrabalho().equals(trabalho.getId())){
+                            removeTrabalho(trabalhoEncontrado);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 }

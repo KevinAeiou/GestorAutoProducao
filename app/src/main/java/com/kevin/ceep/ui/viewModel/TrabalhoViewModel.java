@@ -22,7 +22,7 @@ public class TrabalhoViewModel extends ViewModel {
     public LiveData<Resource<Void>> modificaTrabalho(Trabalho trabalho) {
         return trabalhoRepository.modificaTrabalho(trabalho);
     }
-    public LiveData<Resource<Void>> excluiTrabalhoEspecificoServidor(Trabalho trabalhoRecebido) {
+    public LiveData<Resource<Void>> removeTrabalhoEspecificoServidor(Trabalho trabalhoRecebido) {
         return trabalhoRepository.removeTrabalho(trabalhoRecebido);
     }
     public LiveData<Resource<ArrayList<Trabalho>>> pegaTodosTrabalhos() {

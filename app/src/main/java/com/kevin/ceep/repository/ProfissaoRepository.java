@@ -1,10 +1,10 @@
 package com.kevin.ceep.repository;
 
+import static com.kevin.ceep.ui.activity.Constantes.CHAVE_LISTA_PROFISSOES;
 import static com.kevin.ceep.ui.activity.Constantes.CHAVE_PROFISSOES;
 import static com.kevin.ceep.utilitario.Utilitario.comparaString;
 
 import android.annotation.SuppressLint;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -23,9 +23,9 @@ import java.util.Comparator;
 import java.util.Objects;
 
 public class ProfissaoRepository {
-    private static final String CHAVE_LISTA_PROFISSOES = "Lista_profissoes";
     private final DatabaseReference referenciaProfissoes;
     private final DatabaseReference referenciaListaProfissoes;
+
 
     public ProfissaoRepository(String idPersonagem) {
         FirebaseDatabase meuBanco= FirebaseDatabase.getInstance();
@@ -33,10 +33,9 @@ public class ProfissaoRepository {
         this.referenciaListaProfissoes = meuBanco.getReference(CHAVE_LISTA_PROFISSOES);
     }
 
-    public Profissao retornaProfissaoModificada(ArrayList<Profissao> profissoes, TrabalhoProducao trabalhoModificado) {
+    public Profissao retornaProfissaoModificada(ArrayList<Profissao> profissoes, TrabalhoProducao trabalho) {
         for (Profissao profissao : profissoes) {
-            if (comparaString(profissao.getNome(), trabalhoModificado.getProfissao())) {
-                Log.d("profissao", "Profissao encontrada: "+ profissao.getNome());
+            if (comparaString(profissao.getNome(), trabalho.getProfissao())) {
                 return profissao;
             }
         }
@@ -58,7 +57,6 @@ public class ProfissaoRepository {
                     insereNovasProfissoes();
                 }
                 for (Profissao profissao: profissoes) {
-                    Log.d("profissao", "ID profissao: " + profissao.getId());
                     referenciaListaProfissoes.child(profissao.getId()).addListenerForSingleValueEvent(new ValueEventListener() {
                         @SuppressLint("NewApi")
                         @Override
@@ -67,7 +65,6 @@ public class ProfissaoRepository {
                             assert valor != null;
                             profissao.setNome(valor.getNome());
                             if (profissoes.indexOf(profissao) + 1 == profissoes.size()) {
-                                profissoes.sort(Comparator.comparing(Profissao::getNome));
                                 profissoes.sort(Comparator.comparing(Profissao::getExperiencia).reversed());
                                 liveData.setValue(new Resource<>(profissoes, null));
                             }

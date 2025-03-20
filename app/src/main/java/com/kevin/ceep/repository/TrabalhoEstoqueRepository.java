@@ -23,19 +23,27 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.kevin.ceep.db.DbHelper;
+import com.kevin.ceep.model.Trabalho;
 import com.kevin.ceep.model.TrabalhoEstoque;
 
 import java.util.ArrayList;
 import java.util.Objects;
 
 public class TrabalhoEstoqueRepository {
-    private final DatabaseReference referenciaEstoque;
+    private DatabaseReference referenciaEstoqueIdPersonagem;
+    private DatabaseReference referenciaEstoque;
     private final SQLiteDatabase dbLeitura, dbModificacao;
-    private final String idPersonagem;
+    private String idPersonagem;
 
     public TrabalhoEstoqueRepository(Context context, String idPersonagem) {
         this.idPersonagem = idPersonagem;
-        this.referenciaEstoque = FirebaseDatabase.getInstance().getReference(CHAVE_ESTOQUE).child(idPersonagem);
+        this.referenciaEstoqueIdPersonagem = FirebaseDatabase.getInstance().getReference(CHAVE_ESTOQUE).child(idPersonagem);
+        DbHelper dbHelper = DbHelper.getInstance(context);
+        this.dbLeitura = dbHelper.getReadableDatabase();
+        this.dbModificacao = dbHelper.getWritableDatabase();
+    }
+    public TrabalhoEstoqueRepository(Context context) {
+        this.referenciaEstoque= FirebaseDatabase.getInstance().getReference(CHAVE_ESTOQUE);
         DbHelper dbHelper = DbHelper.getInstance(context);
         this.dbLeitura = dbHelper.getReadableDatabase();
         this.dbModificacao = dbHelper.getWritableDatabase();
@@ -51,7 +59,7 @@ public class TrabalhoEstoqueRepository {
         trabalhoModificado.setId(trabalho.getId());
         trabalhoModificado.setIdTrabalho(trabalho.getIdTrabalho());
         trabalhoModificado.setQuantidade(trabalho.getQuantidade());
-        referenciaEstoque.child(trabalhoModificado.getId()).setValue(trabalhoModificado).addOnCompleteListener(task -> {
+        referenciaEstoqueIdPersonagem.child(trabalhoModificado.getId()).setValue(trabalhoModificado).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 ContentValues values = new ContentValues();
                 values.put(COLUMN_NAME_QUANTIDADE, trabalhoModificado.getQuantidade());
@@ -124,7 +132,7 @@ public class TrabalhoEstoqueRepository {
 
     public LiveData<Resource<Void>> insereTrabalhoEstoque(TrabalhoEstoque novoTrabalho) {
         MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
-        referenciaEstoque.child(novoTrabalho.getId()).setValue(novoTrabalho).addOnCompleteListener(task -> {
+        referenciaEstoqueIdPersonagem.child(novoTrabalho.getId()).setValue(novoTrabalho).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 ContentValues values = new ContentValues();
                 values.put(COLUMN_NAME_ID, novoTrabalho.getId());
@@ -146,7 +154,7 @@ public class TrabalhoEstoqueRepository {
 
     public LiveData<Resource<Void>> removeTrabalhoEstoque(TrabalhoEstoque trabalhoRemovido) {
         MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
-        referenciaEstoque.child(trabalhoRemovido.getId()).removeValue().addOnCompleteListener(task -> {
+        referenciaEstoqueIdPersonagem.child(trabalhoRemovido.getId()).removeValue().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 String selection = COLUMN_NAME_ID + " LIKE ?";
                 String[] selectionArgs = {trabalhoRemovido.getId()};
@@ -166,7 +174,7 @@ public class TrabalhoEstoqueRepository {
     public LiveData<Resource<Void>> sincronizaEstoque() {
         ArrayList<TrabalhoEstoque> trabalhosEstoqueServidor = new ArrayList<>();
         MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
-        referenciaEstoque.addListenerForSingleValueEvent(new ValueEventListener() {
+        referenciaEstoqueIdPersonagem.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot dn:dataSnapshot.getChildren()){
@@ -236,5 +244,28 @@ public class TrabalhoEstoqueRepository {
             }
         });
         return liveData;
+    }
+
+    public void removeReferenciaTrabalhoEspecifico(Trabalho trabalho) {
+        referenciaEstoque.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dn: snapshot.getChildren()) {
+                    referenciaEstoqueIdPersonagem= referenciaEstoque.child(Objects.requireNonNull(dn.getKey()));
+                    for (DataSnapshot dn2: dn.getChildren()) {
+                        TrabalhoEstoque trabalhoEncontrado= dn2.getValue(TrabalhoEstoque.class);
+                        assert trabalhoEncontrado != null;
+                        if (trabalhoEncontrado.getIdTrabalho().equals(trabalho.getId())) {
+                            removeTrabalhoEstoque(trabalhoEncontrado);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 }

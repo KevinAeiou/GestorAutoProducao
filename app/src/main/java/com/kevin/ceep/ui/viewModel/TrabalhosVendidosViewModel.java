@@ -3,6 +3,7 @@ package com.kevin.ceep.ui.viewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.kevin.ceep.model.Trabalho;
 import com.kevin.ceep.model.TrabalhoVendido;
 import com.kevin.ceep.repository.TrabalhoVendidoRepository;
 import com.kevin.ceep.repository.Resource;
@@ -28,5 +29,9 @@ public class TrabalhosVendidosViewModel extends ViewModel {
 
     public LiveData<Resource<Void>> modificaTrabalhoVendido(TrabalhoVendido trabalho) {
         return repository.modificaTrabalhoVendido(trabalho);
+    }
+
+    public void removeReferenciaTrabalhoEspecfico(Trabalho trabalho) {
+        repository.removeReferenciaTrabalhoEspecfico(trabalho);
     }
 }
