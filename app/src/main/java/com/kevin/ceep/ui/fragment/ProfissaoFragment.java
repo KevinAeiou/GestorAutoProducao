@@ -18,7 +18,6 @@ import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.android.material.textfield.TextInputEditText;
 import com.kevin.ceep.databinding.FragmentProfissaoBinding;
 import com.kevin.ceep.model.Profissao;
-import com.kevin.ceep.repository.ProfissaoRepository;
 import com.kevin.ceep.ui.viewModel.ProfissaoViewModel;
 import com.kevin.ceep.ui.viewModel.factory.ProfissaoViewModelFactory;
 

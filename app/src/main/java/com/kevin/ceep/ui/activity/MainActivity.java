@@ -3,6 +3,10 @@ package com.kevin.ceep.ui.activity;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
+import static com.kevin.ceep.ui.activity.Constantes.CHAVE_NOVO_TRABALHO;
+import static com.kevin.ceep.ui.activity.Constantes.CODIGO_REQUISICAO_ALTERA_TRABALHO;
+import static com.kevin.ceep.ui.activity.Constantes.CODIGO_REQUISICAO_INSERE_TRABALHO;
+
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.SearchView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -38,6 +43,7 @@ import com.kevin.ceep.model.Trabalho;
 import com.kevin.ceep.repository.PersonagemRepository;
 import com.kevin.ceep.repository.Resource;
 import com.kevin.ceep.ui.fragment.ConfirmaTrabalhoFragmentArgs;
+import com.kevin.ceep.ui.fragment.TrabalhoEspecificoFragmentArgs;
 import com.kevin.ceep.ui.viewModel.ComponentesVisuais;
 import com.kevin.ceep.ui.viewModel.EstadoAppViewModel;
 import com.kevin.ceep.ui.viewModel.PersonagemViewModel;
@@ -85,7 +91,21 @@ public class MainActivity extends AppCompatActivity {
                 assert bundle != null;
                 Trabalho trabalho = ConfirmaTrabalhoFragmentArgs.fromBundle(bundle).getTrabalho();
                 assert trabalho != null;
-                navDestination.setLabel(trabalho.getNome());
+                toolbar.setTitle(trabalho.getNome());
+            }
+            if (navDestination.getId() == R.id.trabalhoEspecificoFragment){
+                assert bundle != null;
+                int codigoRequisicao= TrabalhoEspecificoFragmentArgs.fromBundle(bundle).getCodigoRequisicao();
+                if (codigoRequisicao == CODIGO_REQUISICAO_INSERE_TRABALHO) {
+                    toolbar.setTitle(CHAVE_NOVO_TRABALHO);
+                    return;
+                }
+                if (codigoRequisicao == CODIGO_REQUISICAO_ALTERA_TRABALHO) {
+                    Trabalho trabalho= TrabalhoEspecificoFragmentArgs.fromBundle(bundle).getTrabalho();
+                    assert trabalho != null;
+                    toolbar.setTitle(trabalho.getNome());
+                    return;
+                }
             }
             configuraComponentesVisuais();
         });
@@ -125,26 +145,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void configuraMenuBarraAcao(ComponentesVisuais componentes) {
-        if (componentes.itemMenuBusca || componentes.itemMenuConfirma) {
-            addMenuProvider(new MenuProvider() {
-                @Override
-                public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-                    menu.clear();
-                    if (componentes.itemMenuBusca) menuInflater.inflate(R.menu.menu_busca, menu);
-                    if (componentes.itemMenuConfirma) menuInflater.inflate(R.menu.menu_confirma, menu);
-                }
-
-                @Override
-                public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-                    return false;
-                }
-            });
-            return;
-        }
         addMenuProvider(new MenuProvider() {
             @Override
             public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
                 menu.clear();
+                if (componentes.itemMenuBusca) menuInflater.inflate(R.menu.menu_busca, menu);
+                if (componentes.itemMenuConfirma) menuInflater.inflate(R.menu.menu_confirma, menu);
             }
 
             @Override
@@ -159,11 +165,25 @@ public class MainActivity extends AppCompatActivity {
         return NavigationUI.navigateUp(controlador, appBarConfiguration) || super.onSupportNavigateUp();
     }
 
+    @SuppressLint("NonConstantResourceId")
     private void configuraClickAutoComplete() {
         autoCompleteCabecalhoNome.setOnItemClickListener((adapterView, view, i, l) -> {
             personagemViewModel.definePersonagemSelecionado(personagens.get(i));
             atualizaCabecalhoPersonagemSelecionado();
-            controlador.navigate(Objects.requireNonNull(controlador.getCurrentDestination()).getId());
+            switch (Objects.requireNonNull(controlador.getCurrentDestination()).getId()) {
+                case R.id.listaTrabalhosProducao:
+                    controlador.navigate(R.id.vai_para_lista_trabalhos_producao);
+                    break;
+                case R.id.listaTrabalhosEstoque:
+                    controlador.navigate(R.id.vai_para_lista_trabalhos_estoque);
+                    break;
+                case R.id.listaTrabalhosVendidos:
+                    controlador.navigate(R.id.vai_para_lista_trabalhos_vendidos);
+                    break;
+                case R.id.listaProfissoes:
+                    controlador.navigate(R.id.vai_para_lista_profissoes);
+                    break;
+            }
         });
     }
 
@@ -208,7 +228,6 @@ public class MainActivity extends AppCompatActivity {
             txtCabecalhoAutoProducao.setText(getString(R.string.stringAutoProducaoValor, autoProducao));
             txtCabecalhoEspacoProducao.setText(getString(R.string.stringEspacoProducaoValor,personagem.getEspacoProducao()));
             personagemSelecionado = personagem;
-            Log.d("personagem", "Personagem definido cabeçalho: "+ personagemSelecionado.getNome());
         });
     }
     private void pegaPersonagensBanco() {

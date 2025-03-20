@@ -51,6 +51,7 @@
         <item>Licença do Aprendiz</item>
         <item>Licença do Novato</item>
     </string-array>
+    <string name="licencaIniciante">Licença de Artesanato de Iniciante</string>
     <string-array name="licencas_completas">
         <item>Licença de Artesanato de Iniciante</item>
         <item>Licença de Artesanato de Mestre</item>
@@ -216,4 +217,9 @@
     <string name="stringAutoProducao">Auto produção</string>
     <string name="stringBusca">Buscar</string>
     <string name="stringImagemIndiceConteudoExpandido">Imagem indice de conteúdo expandido</string>
+    <string name="string_nao_encontrado">Não encontrado</string>
+    <string name="stringMelhorado">Melhorado</string>
+    <string name="stringRaro">Raro</string>
+    <string name="stringComum">Comum</string>
+    <string name="stringNadaEncontrado">Nada encontrado</string>
 </resources>
