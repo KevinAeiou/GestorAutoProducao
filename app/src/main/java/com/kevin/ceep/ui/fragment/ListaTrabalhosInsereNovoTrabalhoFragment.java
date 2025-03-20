@@ -1,5 +1,7 @@
 package com.kevin.ceep.ui.fragment;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 import static com.kevin.ceep.ui.activity.Constantes.CODIGO_REQUISICAO_INSERE_TRABALHO_ESTOQUE;
 import static com.kevin.ceep.ui.activity.Constantes.CODIGO_REQUISICAO_INSERE_TRABALHO_PRODUCAO;
 import static com.kevin.ceep.ui.activity.Constantes.CODIGO_REQUISICAO_INVALIDA;
@@ -38,7 +40,6 @@ import com.kevin.ceep.databinding.FragmentListaTrabalhosInsereNovoTrabalhoBindin
 import com.kevin.ceep.model.Profissao;
 import com.kevin.ceep.model.Trabalho;
 import com.kevin.ceep.model.TrabalhoEstoque;
-import com.kevin.ceep.repository.ProfissaoRepository;
 import com.kevin.ceep.repository.TrabalhoEstoqueRepository;
 import com.kevin.ceep.repository.TrabalhoRepository;
 import com.kevin.ceep.ui.fragment.ListaTrabalhosInsereNovoTrabalhoFragmentDirections.VaiParaConfirmaTrabalho;
@@ -95,16 +96,49 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment implement
 
     @Override
     public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+        configuraComportamentoVisivilidadeGrupoChips(menu);
+    }
 
+    private void configuraComportamentoVisivilidadeGrupoChips(@NonNull Menu menu) {
+        MenuItem itemBusca= menu.findItem(R.id.itemMenuBusca);
+        SearchView visualizacaoBusca= (SearchView) itemBusca.getActionView();
+        assert visualizacaoBusca != null;
+        visualizacaoBusca.setOnQueryTextFocusChangeListener((view, b) -> {
+            if (b) {
+                grupoChipsProfissoes.setVisibility(VISIBLE);
+                return;
+            }
+            grupoChipsProfissoes.setVisibility(GONE);
+        });
     }
 
     @Override
     public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
         if (menuItem.getItemId() == R.id.itemMenuBusca) {
-            configuraCampoDeBusca(menuItem);
+            configuraComportamentoBuscaPorTexto(menuItem);
             return true;
         }
         return false;
+    }
+
+    private void configuraComportamentoBuscaPorTexto(@NonNull MenuItem menuItem) {
+        SearchView busca = (SearchView) menuItem.getActionView();
+        assert busca != null;
+        busca.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String texto) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    textoFiltro = texto;
+                    filtroLista();
+                }
+                return false;
+            }
+        });
     }
 
     private void configuraChipSelecionado() {
@@ -157,7 +191,7 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment implement
 
     private void configuraListaDeProfissoes() {
         listaProfissoes.clear();
-        ProfissaoViewModelFactory profissaoViewModelFactory = new ProfissaoViewModelFactory(new ProfissaoRepository(personagemId));
+        ProfissaoViewModelFactory profissaoViewModelFactory = new ProfissaoViewModelFactory(personagemId);
         ProfissaoViewModel profissaoViewModel = new ViewModelProvider(this, profissaoViewModelFactory).get(ProfissaoViewModel.class);
         profissaoViewModel.pegaTodasProfissoes().observe(getViewLifecycleOwner(), resultadoProfissoes -> {
             if (resultadoProfissoes.getErro() == null) {
@@ -171,26 +205,6 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment implement
         });
     }
 
-    private void configuraCampoDeBusca(MenuItem itemBusca) {
-        androidx.appcompat.widget.SearchView busca = (androidx.appcompat.widget.SearchView) itemBusca.getActionView();
-        assert busca != null;
-        busca.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String texto) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    textoFiltro = texto;
-                    filtroLista();
-                }
-                return false;
-            }
-        });
-    }
-
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void filtroLista() {
         if (!textoFiltro.isEmpty()) {
@@ -199,11 +213,11 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment implement
                             trabalho -> stringContemString(trabalho.getNome(), textoFiltro))
                             .collect(Collectors.toList());
             if (listaFiltrada.isEmpty()) {
-                iconeListaVazia.setVisibility(View.VISIBLE);
-                txtListaVazia.setVisibility(View.VISIBLE);
+                iconeListaVazia.setVisibility(VISIBLE);
+                txtListaVazia.setVisibility(VISIBLE);
             } else {
-                txtListaVazia.setVisibility(View.GONE);
-                iconeListaVazia.setVisibility(View.GONE);
+                txtListaVazia.setVisibility(GONE);
+                iconeListaVazia.setVisibility(GONE);
             }
             listaTrabalhoEspecificoAdapter.atualizaLista(listaFiltrada);
         } else {
@@ -294,13 +308,13 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment implement
             if (resultadoPegaTodosTrabalhos.getDado() != null) {
                 todosTrabalhos = resultadoPegaTodosTrabalhos.getDado();
                 listaTrabalhosFiltrada = (ArrayList<Trabalho>) todosTrabalhos.clone();
-                indicadorProgresso.setVisibility(View.GONE);
+                indicadorProgresso.setVisibility(GONE);
                 if (listaTrabalhosFiltrada.isEmpty()) {
-                    iconeListaVazia.setVisibility(View.VISIBLE);
-                    txtListaVazia.setVisibility(View.VISIBLE);
+                    iconeListaVazia.setVisibility(VISIBLE);
+                    txtListaVazia.setVisibility(VISIBLE);
                 } else {
-                    txtListaVazia.setVisibility(View.GONE);
-                    iconeListaVazia.setVisibility(View.GONE);
+                    txtListaVazia.setVisibility(GONE);
+                    iconeListaVazia.setVisibility(GONE);
                 }
                 configuraListaDeProfissoes();
                 listaTrabalhoEspecificoAdapter.atualizaLista(listaTrabalhosFiltrada);
