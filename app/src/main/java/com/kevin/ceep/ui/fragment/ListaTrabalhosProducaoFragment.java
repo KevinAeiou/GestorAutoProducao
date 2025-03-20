@@ -5,7 +5,6 @@ import static com.kevin.ceep.ui.activity.Constantes.CODIGO_REQUISICAO_INSERE_TRA
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,7 +49,7 @@ public class ListaTrabalhosProducaoFragment extends Fragment {
     private ListaTrabalhoProducaoAdapter trabalhoAdapter;
     private RecyclerView recyclerView;
     private ArrayList<TrabalhoProducao> trabalhos, trabalhosFiltrados;
-    private String personagemId;
+    private String idPersonagem;
     private SwipeRefreshLayout swipeRefreshLayout;
     private ProgressBar indicadorProgresso;
     private ChipGroup grupoChipsEstados;
@@ -190,7 +189,7 @@ public class ListaTrabalhosProducaoFragment extends Fragment {
     private void configuraSwipeRefreshLayout() {
         swipeRefreshLayout.setOnRefreshListener(() -> personagemViewModel.pegaPersonagemSelecionado().observe(getViewLifecycleOwner(), personagemSelecionado -> {
             if (personagemSelecionado == null) return;
-            personagemId = personagemSelecionado.getId();
+            idPersonagem = personagemSelecionado.getId();
             sincronizaTrabalhos();
         }));
     }
@@ -198,19 +197,20 @@ public class ListaTrabalhosProducaoFragment extends Fragment {
         binding.floatingActionButton.setOnClickListener(v -> {
             personagemViewModel.pegaPersonagemSelecionado().observe(getViewLifecycleOwner(), personagemSelecionado -> {
                 if (personagemSelecionado == null) return;
-                personagemId = personagemSelecionado.getId();
+                idPersonagem = personagemSelecionado.getId();
             });
-            if (personagemId == null) {
+            if (idPersonagem.isEmpty()) {
                 Snackbar.make(binding.getRoot(), "Selecione um personagem para continuar", Snackbar.LENGTH_LONG).setAnchorView(binding.floatingActionButton).show();
                 return;
             }
-            VaiParaListaTrabalhos acao = ListaTrabalhosProducaoFragmentDirections.vaiParaListaTrabalhos(personagemId);
+            VaiParaListaTrabalhos acao = ListaTrabalhosProducaoFragmentDirections.vaiParaListaTrabalhos(idPersonagem);
             acao.setRequisicao(CODIGO_REQUISICAO_INSERE_TRABALHO_PRODUCAO);
             Navigation.findNavController(v).navigate(acao);
         });
     }
 
     private void inicializaComponentes() {
+        idPersonagem = "";
         trabalhos = new ArrayList<>();
         recyclerView = binding.listaTrabalhoRecyclerView;
         swipeRefreshLayout = binding.swipeRefreshLayoutTrabalhos;
@@ -237,8 +237,7 @@ public class ListaTrabalhosProducaoFragment extends Fragment {
         trabalhoAdapter.setOnItemClickListener(this::vaiParaTrabalhoEspecificoActivity);
     }
     private void vaiParaTrabalhoEspecificoActivity(TrabalhoProducao trabalho) {
-         VaiParaTrabalhoEspecifico acao = ListaTrabalhosProducaoFragmentDirections.vaiParaTrabalhoEspecifico(personagemId);
-        Log.d("ciclo", "trabalhoProducaoEnviado: " + trabalho);
+         VaiParaTrabalhoEspecifico acao = ListaTrabalhosProducaoFragmentDirections.vaiParaTrabalhoEspecifico(idPersonagem);
          acao.setTrabalhoProducao(trabalho);
          acao.setCodigoRequisicao(CODIGO_REQUISICAO_ALTERA_TRABALHO_PRODUCAO);
          Navigation.findNavController(binding.getRoot()).navigate(acao);
@@ -271,9 +270,9 @@ public class ListaTrabalhosProducaoFragment extends Fragment {
         super.onResume();
         personagemViewModel.pegaPersonagemSelecionado().observe(getViewLifecycleOwner(), personagemSelecionado -> {
             if (personagemSelecionado == null) return;
-            personagemId = personagemSelecionado.getId();
-            TrabalhoProducaoViewModelFactory trabalhoProducaoViewModelFactory = new TrabalhoProducaoViewModelFactory(new TrabalhoProducaoRepository(getContext(), personagemId));
-            trabalhoProducaoViewModel = new ViewModelProvider(this, trabalhoProducaoViewModelFactory).get(TrabalhoProducaoViewModel.class);
+            idPersonagem = personagemSelecionado.getId();
+            TrabalhoProducaoViewModelFactory trabalhoProducaoViewModelFactory = new TrabalhoProducaoViewModelFactory(new TrabalhoProducaoRepository(getContext(), idPersonagem));
+            trabalhoProducaoViewModel = new ViewModelProvider(this, trabalhoProducaoViewModelFactory).get(idPersonagem, TrabalhoProducaoViewModel.class);
             pegaTodosTrabalhos();
         });
     }

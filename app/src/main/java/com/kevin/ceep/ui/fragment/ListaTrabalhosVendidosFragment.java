@@ -38,7 +38,7 @@ import java.util.ArrayList;
 public class ListaTrabalhosVendidosFragment extends Fragment {
     private FragmentListaTrabalhosVendidosBinding binding;
     private ListaTrabalhosVendidosAdapter trabalhosVendidosAdapter;
-    private String personagemId;
+    private String idPersonagem;
     private ArrayList<TrabalhoVendido> trabalhosVendidos;
     private RecyclerView meuRecycler;
     private SwipeRefreshLayout swipeRefreshLayout;
@@ -123,7 +123,7 @@ public class ListaTrabalhosVendidosFragment extends Fragment {
     private void configuraSwipeRefreshLayout() {
         swipeRefreshLayout.setOnRefreshListener(() -> {
             trabalhosVendidosAdapter.limpaLista();
-            if (personagemId != null){
+            if (idPersonagem != null){
                 sincronizaTrabalhos();
             }
         });
@@ -165,7 +165,7 @@ public class ListaTrabalhosVendidosFragment extends Fragment {
     private void vaiParaDetalhesTrabalhoVendido(TrabalhoVendido trabalhoVendido) {
         VaiDeTrabalhosVendidosParaDetalhesTrabalhoVendido acao = ListaTrabalhosVendidosFragmentDirections.vaiDeTrabalhosVendidosParaDetalhesTrabalhoVendido(
                 trabalhoVendido,
-                personagemId);
+                idPersonagem);
         Navigation.findNavController(binding.getRoot()).navigate(acao);
     }
 
@@ -185,9 +185,9 @@ public class ListaTrabalhosVendidosFragment extends Fragment {
         super.onResume();
         personagemViewModel.pegaPersonagemSelecionado().observe(getViewLifecycleOwner(), resultadoPegaPersonagem -> {
             if (resultadoPegaPersonagem == null) return;
-            personagemId = resultadoPegaPersonagem.getId();
-            TrabalhosVendidosViewModelFactory trabalhosVendidosViewModelFactory = new TrabalhosVendidosViewModelFactory(new TrabalhoVendidoRepository(getContext(), personagemId));
-            trabalhosVendidosViewModel = new ViewModelProvider(this, trabalhosVendidosViewModelFactory).get(TrabalhosVendidosViewModel.class);
+            idPersonagem = resultadoPegaPersonagem.getId();
+            TrabalhosVendidosViewModelFactory trabalhosVendidosViewModelFactory = new TrabalhosVendidosViewModelFactory(new TrabalhoVendidoRepository(getContext(), idPersonagem));
+            trabalhosVendidosViewModel = new ViewModelProvider(this, trabalhosVendidosViewModelFactory).get(idPersonagem, TrabalhosVendidosViewModel.class);
             pegaTodosProdutosVendidos();
         });
     }

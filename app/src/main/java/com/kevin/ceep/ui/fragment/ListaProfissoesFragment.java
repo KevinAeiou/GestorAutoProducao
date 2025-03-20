@@ -20,7 +20,6 @@ import com.google.android.material.snackbar.Snackbar;
 import com.kevin.ceep.databinding.FragmentListaProfissoesBinding;
 import com.kevin.ceep.model.Profissao;
 import com.kevin.ceep.repository.PersonagemRepository;
-import com.kevin.ceep.repository.ProfissaoRepository;
 import com.kevin.ceep.ui.recyclerview.adapter.ListaProfissaoAdapter;
 import com.kevin.ceep.ui.viewModel.ComponentesVisuais;
 import com.kevin.ceep.ui.viewModel.EstadoAppViewModel;
@@ -68,7 +67,16 @@ public class ListaProfissoesFragment extends Fragment {
         inicializaComponentes();
         configuraRecyclerView();
         configuraSwipeRefreshLayout();
+        configuraPersonagemSelecionado();
     }
+
+    private void configuraPersonagemSelecionado() {
+        personagemViewModel.pegaPersonagemSelecionado().observe(getViewLifecycleOwner(), resultadoPegaPersonagem -> {
+            if (resultadoPegaPersonagem == null) return;
+            atualizarViewModel(resultadoPegaPersonagem.getId());
+        });
+    }
+
     private void configuraRecyclerView() {
         meuRecycler.setHasFixedSize(true);
         meuRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -103,12 +111,12 @@ public class ListaProfissoesFragment extends Fragment {
     private void configuraSwipeRefreshLayout() {
         swipeRefreshLayout.setOnRefreshListener(() -> {
             listaProfissaoAdapter.limpaLista();
-            if (idPersonagem != null){
-                pegaTodasProfissoes();
-            }
+            if (idPersonagem.isEmpty()) return;
+            pegaTodasProfissoes();
         });
     }
     private void inicializaComponentes() {
+        idPersonagem= "";
         todasProfissoes = new ArrayList<>();
         meuRecycler = binding.recyclerViewListaProfissoesFragment;
         swipeRefreshLayout = binding.swipeRefreshLayoutListaProfissoesFragment;
@@ -120,13 +128,14 @@ public class ListaProfissoesFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        personagemViewModel.pegaPersonagemSelecionado().observe(getViewLifecycleOwner(), resultadoPegaPersonagem -> {
-            if (resultadoPegaPersonagem == null) return;
-            idPersonagem = resultadoPegaPersonagem.getId();
-            ProfissaoViewModelFactory profissaoViewModelFactory = new ProfissaoViewModelFactory(new ProfissaoRepository(idPersonagem));
-            profissaoViewModel = new ViewModelProvider(this, profissaoViewModelFactory).get(ProfissaoViewModel.class);
-            pegaTodasProfissoes();
-        });
+        pegaTodasProfissoes();
+    }
+
+    private void atualizarViewModel(String novoIdPersonagem) {
+        if (idPersonagem.equals(novoIdPersonagem)) return;
+        idPersonagem= novoIdPersonagem;
+        ProfissaoViewModelFactory profissaoViewModelFactory = new ProfissaoViewModelFactory(idPersonagem);
+        profissaoViewModel = new ViewModelProvider(this, profissaoViewModelFactory).get(idPersonagem, ProfissaoViewModel.class);
     }
 
     @Override

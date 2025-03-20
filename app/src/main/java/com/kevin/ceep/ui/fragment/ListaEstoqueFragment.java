@@ -1,5 +1,7 @@
 package com.kevin.ceep.ui.fragment;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 import static com.kevin.ceep.ui.activity.Constantes.CODIGO_REQUISICAO_INSERE_TRABALHO_ESTOQUE;
 import static com.kevin.ceep.utilitario.Utilitario.stringContemString;
 
@@ -33,7 +35,6 @@ import com.kevin.ceep.databinding.FragmentListaTrabalhosEstoqueBinding;
 import com.kevin.ceep.model.Profissao;
 import com.kevin.ceep.model.TrabalhoEstoque;
 import com.kevin.ceep.repository.PersonagemRepository;
-import com.kevin.ceep.repository.ProfissaoRepository;
 import com.kevin.ceep.repository.TrabalhoEstoqueRepository;
 import com.kevin.ceep.ui.recyclerview.adapter.ListaTrabalhoEstoqueAdapter;
 import com.kevin.ceep.ui.viewModel.ComponentesVisuais;
@@ -55,7 +56,7 @@ public class ListaEstoqueFragment extends Fragment {
     private RecyclerView recyclerView;
     private ArrayList<TrabalhoEstoque> todosTrabalhosEstoque, listaTrabalhosEstoqueFiltrada;
     private ArrayList<String> profissoes;
-    private String personagemId;
+    private String idPersonagem;
     private SwipeRefreshLayout swipeRefreshLayout;
     private ProgressBar indicadorDeProgresso;
     private ChipGroup grupoChipsProfissoes;
@@ -64,10 +65,6 @@ public class ListaEstoqueFragment extends Fragment {
     private TextView txtListaVazia;
     private PersonagemViewModel personagemViewModel;
     public ListaEstoqueFragment() {
-    }
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -84,10 +81,12 @@ public class ListaEstoqueFragment extends Fragment {
         EstadoAppViewModel estadoAppViewModel = new ViewModelProvider(requireActivity()).get(EstadoAppViewModel.class);
         ComponentesVisuais componentesVisuais = new ComponentesVisuais();
         componentesVisuais.appBar = true;
+        componentesVisuais.itemMenuBusca = true;
         componentesVisuais.menuNavegacaoLateral = true;
         componentesVisuais.menuNavegacaoInferior = true;
         estadoAppViewModel.componentes.setValue(componentesVisuais);
         inicializaComponentes();
+        configuraPersonagemSelecionado();
         configuraRecyclerView();
         configuraDeslizeItem();
         configuraSwipeRefreshLayout();
@@ -95,9 +94,28 @@ public class ListaEstoqueFragment extends Fragment {
         configuraBotaoInsereTrabalho();
     }
 
+    private void configuraIndicadorListaVazia(ArrayList<TrabalhoEstoque> listaFiltrada) {
+        if (listaFiltrada.isEmpty()) {
+            iconeListaVazia.setVisibility(VISIBLE);
+            txtListaVazia.setVisibility(VISIBLE);
+            return;
+        }
+        txtListaVazia.setVisibility(GONE);
+        iconeListaVazia.setVisibility(GONE);
+    }
+
+    private void configuraPersonagemSelecionado() {
+        personagemViewModel.pegaPersonagemSelecionado().observe(getViewLifecycleOwner(), personagemSelecionado -> {
+            if (personagemSelecionado == null) return;
+            idPersonagem = personagemSelecionado.getId();
+            TrabalhoEstoqueViewModelFactory trabalhoEstoqueViewModelFactory = new TrabalhoEstoqueViewModelFactory(new TrabalhoEstoqueRepository(getContext(), idPersonagem));
+            trabalhoEstoqueViewModel = new ViewModelProvider(this, trabalhoEstoqueViewModelFactory).get(idPersonagem, TrabalhoEstoqueViewModel.class);
+        });
+    }
+
     private void configuraBotaoInsereTrabalho() {
         binding.floatingButtonFragmentTrabalhosEstoque.setOnClickListener(view -> {
-            ListaEstoqueFragmentDirections.VaiDeEstoqueParaTrabalhos acao = ListaEstoqueFragmentDirections.vaiDeEstoqueParaTrabalhos(personagemId);
+            ListaEstoqueFragmentDirections.VaiDeEstoqueParaTrabalhos acao = ListaEstoqueFragmentDirections.vaiDeEstoqueParaTrabalhos(idPersonagem);
             acao.setRequisicao(CODIGO_REQUISICAO_INSERE_TRABALHO_ESTOQUE);
             Navigation.findNavController(view).navigate(acao);
         });
@@ -114,6 +132,7 @@ public class ListaEstoqueFragment extends Fragment {
         List<String> profissoesSelecionadas = defineListaDeProfissoesSelecionadas(listaIDS);
         if (profissoesSelecionadas.isEmpty()) {
             listaTrabalhosEstoqueFiltrada = (ArrayList<TrabalhoEstoque>) todosTrabalhosEstoque.clone();
+            configuraIndicadorListaVazia(listaTrabalhosEstoqueFiltrada);
             trabalhoEstoqueAdapter.atualiza(listaTrabalhosEstoqueFiltrada);
             return;
         }
@@ -124,6 +143,7 @@ public class ListaEstoqueFragment extends Fragment {
                     .collect(Collectors.toList());
             listaTrabalhosEstoqueFiltrada.addAll(listaProfissaoEspecifica);
         }
+        configuraIndicadorListaVazia(listaTrabalhosEstoqueFiltrada);
         trabalhoEstoqueAdapter.atualiza(listaTrabalhosEstoqueFiltrada);
     }
 
@@ -137,7 +157,7 @@ public class ListaEstoqueFragment extends Fragment {
 
     private void configuraSwipeRefreshLayout() {
         swipeRefreshLayout.setOnRefreshListener(() -> {
-            if (personagemId != null) sincronizaTrabalhosEstoque();
+            if (idPersonagem != null) sincronizaTrabalhosEstoque();
         });
     }
 
@@ -191,8 +211,8 @@ public class ListaEstoqueFragment extends Fragment {
 
     private void configuraListaDeProfissoes() {
         profissoes.clear();
-        ProfissaoViewModelFactory profissaoViewModelFactory = new ProfissaoViewModelFactory(new ProfissaoRepository(personagemId));
-        ProfissaoViewModel profissaoViewModel = new ViewModelProvider(this, profissaoViewModelFactory).get(ProfissaoViewModel.class);
+        ProfissaoViewModelFactory profissaoViewModelFactory = new ProfissaoViewModelFactory(idPersonagem);
+        ProfissaoViewModel profissaoViewModel = new ViewModelProvider(this, profissaoViewModelFactory).get(idPersonagem, ProfissaoViewModel.class);
         profissaoViewModel.pegaTodasProfissoes().observe(getViewLifecycleOwner(), resultadoProfissoes -> {
             if (resultadoProfissoes.getErro() == null) {
                 for (Profissao profissao : resultadoProfissoes.getDado()) {
@@ -206,6 +226,7 @@ public class ListaEstoqueFragment extends Fragment {
     }
 
     private void inicializaComponentes() {
+        idPersonagem= "";
         todosTrabalhosEstoque = new ArrayList<>();
         listaTrabalhosEstoqueFiltrada = new ArrayList<>();
         profissoes= new ArrayList<>();
@@ -304,13 +325,7 @@ public class ListaEstoqueFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        personagemViewModel.pegaPersonagemSelecionado().observe(getViewLifecycleOwner(), personagemSelecionado -> {
-            if (personagemSelecionado == null) return;
-            personagemId = personagemSelecionado.getId();
-            TrabalhoEstoqueViewModelFactory trabalhoEstoqueViewModelFactory = new TrabalhoEstoqueViewModelFactory(new TrabalhoEstoqueRepository(getContext(), personagemId));
-            trabalhoEstoqueViewModel = new ViewModelProvider(this, trabalhoEstoqueViewModelFactory).get(TrabalhoEstoqueViewModel.class);
-            pegaTodosTrabalhosEstoque();
-        });
+        pegaTodosTrabalhosEstoque();
     }
 
     @Override
