@@ -56,7 +56,7 @@ public class Profissao implements Serializable {
         xpNiveis.add(375000);
         xpNiveis.add(470000);
         xpNiveis.add(585000);
-        xpNiveis.add(706825);
+        xpNiveis.add(705000);
         xpNiveis.add(830000);
         xpNiveis.add(996000);
         xpNiveis.add(996000);
