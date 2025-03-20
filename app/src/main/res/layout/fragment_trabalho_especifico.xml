@@ -29,8 +29,9 @@
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/txtLayoutNomeTrabalho"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            app:layout_constraintWidth_max="320dp"
             android:layout_margin="16dp"
             android:hint="@string/string_nome"
             app:layout_constraintStart_toStartOf="parent"
@@ -41,7 +42,7 @@
                 android:id="@+id/edtNomeTrabalho"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="text"
+                android:inputType="textMultiLine"
                 android:textSize="24sp" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -60,7 +61,7 @@
                 android:id="@+id/edtNomeProducaoTrabalho"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="text"
+                android:inputType="textMultiLine"
                 android:textSize="24sp" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -192,6 +193,7 @@
                         android:gravity="start"
                         android:inputType="none"
                         android:padding="8dp"
+                        android:textSize="24sp"
                         android:text="@string/stringTrabalhoNecessario"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -226,6 +228,7 @@
                         android:gravity="start"
                         android:inputType="none"
                         android:padding="8dp"
+                        android:textSize="24sp"
                         android:text="@string/stringTrabalhoNecessario" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -289,9 +292,9 @@
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnExcluiTrabalhoEspecifico"
-            android:layout_width="200dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="20dp"
             android:layout_marginBottom="16dp"
             android:background="@drawable/botao_estados_background"
             android:padding="8dp"
@@ -302,6 +305,7 @@
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@id/linearLayout1TrabalhoEspecifico"
+            app:layout_constraintEnd_toEndOf="@+id/linearLayout1TrabalhoEspecifico"
             app:layout_constraintTop_toBottomOf="@id/linearLayout2TrabalhoEspecifico"
             app:layout_constraintVertical_bias="1.0" />
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -28,6 +28,7 @@
 
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/grupoProfissoesChipListaNovaProducao"
+            android:visibility="gone"
             tools:text="@string/stringProfissoes"
             app:singleLine="true"
             android:padding="8dp"

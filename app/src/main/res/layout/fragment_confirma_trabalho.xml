@@ -88,7 +88,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="@string/stringLicenca"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="20dp"
         android:labelFor="@id/txtAutoCompleteLicencaConfirmaTrabalho"
         app:layout_constraintStart_toStartOf="@id/txtProfissaoConfirmaTrabalho"
         app:layout_constraintEnd_toEndOf="@id/txtProfissaoConfirmaTrabalho"
