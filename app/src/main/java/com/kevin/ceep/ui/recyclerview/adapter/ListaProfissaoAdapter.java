@@ -9,6 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.kevin.ceep.R;
@@ -16,15 +17,14 @@ import com.kevin.ceep.model.Profissao;
 import com.kevin.ceep.ui.recyclerview.adapter.listener.OnItemClickListenerProfissao;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class ListaProfissaoAdapter extends RecyclerView.Adapter<ListaProfissaoAdapter.ProfissaoViewHolder> {
 
-    private List<Profissao> profissoes;
+    private final ArrayList<Profissao> profissoes;
     private final Context context;
     private OnItemClickListenerProfissao onItemClickListener;
 
-    public ListaProfissaoAdapter(Context context, List<Profissao> profissao) {
+    public ListaProfissaoAdapter(Context context, ArrayList<Profissao> profissao) {
         this.profissoes = profissao;
         this.context = context;
     }
@@ -51,14 +51,15 @@ public class ListaProfissaoAdapter extends RecyclerView.Adapter<ListaProfissaoAd
         return profissoes.size();
     }
 
-    public void atualiza(ArrayList<Profissao> profissoes) {
-        this.profissoes = profissoes;
-        notifyDataSetChanged();
+    public void atualiza(ArrayList<Profissao> profissoesAtualizadas) {
+        DiffUtil.DiffResult diffResult= DiffUtil.calculateDiff(new ItemDiffCallback(profissoes, profissoesAtualizadas));
+        profissoes.clear();
+        profissoes.addAll(profissoesAtualizadas);
+        diffResult.dispatchUpdatesTo(this);
     }
 
     public void limpaLista() {
-        profissoes.clear();
-        notifyDataSetChanged();
+        atualiza(new ArrayList<>());
     }
     public class ProfissaoViewHolder extends RecyclerView.ViewHolder {
 
@@ -89,6 +90,34 @@ public class ListaProfissaoAdapter extends RecyclerView.Adapter<ListaProfissaoAd
                 cardProfissao.setCardBackgroundColor(ContextCompat.getColor(context,R.color.cor_background_card));
             }
             nivelProfissao.setText(String.valueOf(profissao.getNivel()));
+        }
+    }
+    private static class ItemDiffCallback extends DiffUtil.Callback {
+        private final ArrayList<Profissao> listaAntiga;
+        private final ArrayList<Profissao> listaNova;
+        public ItemDiffCallback(ArrayList<Profissao> listaAntiga, ArrayList<Profissao> listaNova) {
+            this.listaAntiga= listaAntiga;
+            this.listaNova= listaNova;
+        }
+
+        @Override
+        public int getOldListSize() {
+            return listaAntiga.size();
+        }
+
+        @Override
+        public int getNewListSize() {
+            return listaNova.size();
+        }
+
+        @Override
+        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+            return listaAntiga.get(oldItemPosition).getId().equals(listaNova.get(newItemPosition).getId());
+        }
+
+        @Override
+        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+            return listaAntiga.get(oldItemPosition).equals(listaNova.get(newItemPosition));
         }
     }
 }

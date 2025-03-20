@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.textview.MaterialTextView;
@@ -17,15 +18,14 @@ import com.kevin.ceep.model.TrabalhoEstoque;
 import com.kevin.ceep.ui.recyclerview.adapter.listener.OnItemClickListenerTrabalhoEstoque;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class ListaTrabalhoEstoqueAdapter extends RecyclerView.Adapter<ListaTrabalhoEstoqueAdapter.TrabalhoEstoqueViewHolder> {
 
-    private List<TrabalhoEstoque> trabalhosEstoque;
+    private final ArrayList<TrabalhoEstoque> trabalhosEstoque;
     private final Context context;
     private OnItemClickListenerTrabalhoEstoque onItemClickListener;
 
-    public ListaTrabalhoEstoqueAdapter(List<TrabalhoEstoque> trabalhosEstoque, Context context) {
+    public ListaTrabalhoEstoqueAdapter(ArrayList<TrabalhoEstoque> trabalhosEstoque, Context context) {
         this.trabalhosEstoque = trabalhosEstoque;
         this.context = context;
     }
@@ -56,9 +56,11 @@ public class ListaTrabalhoEstoqueAdapter extends RecyclerView.Adapter<ListaTraba
         notifyItemChanged(posicao);
     }
 
-    public void atualiza(ArrayList<TrabalhoEstoque> todosTrabalhosEstoque) {
-        this.trabalhosEstoque = todosTrabalhosEstoque;
-        notifyDataSetChanged();
+    public void atualiza(ArrayList<TrabalhoEstoque> trabalhosEstoqueAtualizada) {
+        DiffUtil.DiffResult diffResult= DiffUtil.calculateDiff(new ItemDiffCallback(trabalhosEstoque, trabalhosEstoqueAtualizada));
+        trabalhosEstoque.clear();
+        trabalhosEstoque.addAll(trabalhosEstoqueAtualizada);
+        diffResult.dispatchUpdatesTo(this);
     }
 
     public void adiciona(TrabalhoEstoque trabalhoremovido, int itemPosicao) {
@@ -132,4 +134,32 @@ public class ListaTrabalhoEstoqueAdapter extends RecyclerView.Adapter<ListaTraba
         }
     }
 
+    private static class ItemDiffCallback extends DiffUtil.Callback {
+        private final ArrayList<TrabalhoEstoque> listaAntiga;
+        private final ArrayList<TrabalhoEstoque> listaNova;
+        public ItemDiffCallback(ArrayList<TrabalhoEstoque> trabalhosEstoque, ArrayList<TrabalhoEstoque> trabalhosEstoqueAtualizada) {
+            this.listaAntiga= trabalhosEstoque;
+            this.listaNova= trabalhosEstoqueAtualizada;
+        }
+
+        @Override
+        public int getOldListSize() {
+            return listaAntiga.size();
+        }
+
+        @Override
+        public int getNewListSize() {
+            return listaNova.size();
+        }
+
+        @Override
+        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+            return listaAntiga.get(oldItemPosition).getId().equals(listaNova.get(newItemPosition).getId());
+        }
+
+        @Override
+        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+            return listaAntiga.get(oldItemPosition).equals(listaNova.get(newItemPosition));
+        }
+    }
 }

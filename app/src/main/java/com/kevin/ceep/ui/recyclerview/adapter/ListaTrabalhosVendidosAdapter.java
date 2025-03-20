@@ -8,28 +8,32 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.kevin.ceep.R;
 import com.kevin.ceep.model.TrabalhoVendido;
 import com.kevin.ceep.ui.recyclerview.adapter.listener.OnItemClickListenerTrabalhoVendido;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ListaTrabalhosVendidosAdapter extends RecyclerView.Adapter<ListaTrabalhosVendidosAdapter.TrabalhosVendidosViewHolder>{
-    private List<TrabalhoVendido> listaTrabalhosVendidos;
+    private final ArrayList<TrabalhoVendido> trabalhosVendidos;
     private final Context context;
     private OnItemClickListenerTrabalhoVendido onItemClickListener;
-    public ListaTrabalhosVendidosAdapter(List<TrabalhoVendido> listaTrabalhosVendidos, Context context) {
-        this.listaTrabalhosVendidos = listaTrabalhosVendidos;
+    public ListaTrabalhosVendidosAdapter(ArrayList<TrabalhoVendido> listaTrabalhosVendidos, Context context) {
+        this.trabalhosVendidos = listaTrabalhosVendidos;
         this.context = context;
     }
     public void setOnItemClickListener(OnItemClickListenerTrabalhoVendido onItemClickListener){
         this.onItemClickListener = onItemClickListener;
     }
-    public  void atualiza(List<TrabalhoVendido> listaFiltrada) {
-        this.listaTrabalhosVendidos = listaFiltrada;
-        notifyDataSetChanged();
+    public  void atualiza(List<TrabalhoVendido> trabalhoVendidosAtualizada) {
+        DiffUtil.DiffResult diffResult= DiffUtil.calculateDiff(new ItemDiffCallback(trabalhosVendidos, trabalhoVendidosAtualizada));
+        trabalhosVendidos.clear();
+        trabalhosVendidos.addAll(trabalhoVendidosAtualizada);
+        diffResult.dispatchUpdatesTo(this);
     }
     @NonNull
     @Override
@@ -41,34 +45,33 @@ public class ListaTrabalhosVendidosAdapter extends RecyclerView.Adapter<ListaTra
 
     @Override
     public void onBindViewHolder(@NonNull TrabalhosVendidosViewHolder holder, int posicao) {
-        TrabalhoVendido trabalhoVendido = listaTrabalhosVendidos.get(posicao);
+        TrabalhoVendido trabalhoVendido = trabalhosVendidos.get(posicao);
         holder.vincula(trabalhoVendido);
     }
 
     @Override
     public int getItemCount() {
-        return listaTrabalhosVendidos.size();
+        return trabalhosVendidos.size();
     }
     public void remove(int posicao){
-        if (posicao < 0 || posicao >= listaTrabalhosVendidos.size()) {
+        if (posicao < 0 || posicao >= trabalhosVendidos.size()) {
             return;
         }
-        listaTrabalhosVendidos.remove(posicao);
+        trabalhosVendidos.remove(posicao);
         notifyItemRemoved(posicao);
-        notifyItemRangeChanged(posicao, listaTrabalhosVendidos.size());
+        notifyItemRangeChanged(posicao, trabalhosVendidos.size());
     }
     public void limpaLista() {
-        listaTrabalhosVendidos.clear();
-        notifyDataSetChanged();
+        atualiza(new ArrayList<>());
     }
 
     public void adiciona(TrabalhoVendido trabalhoVendidoRemovido, int itemPosicao) {
-        if (itemPosicao < 0 || itemPosicao > listaTrabalhosVendidos.size()){
+        if (itemPosicao < 0 || itemPosicao > trabalhosVendidos.size()){
             return;
         }
-        listaTrabalhosVendidos.add(itemPosicao, trabalhoVendidoRemovido);
+        trabalhosVendidos.add(itemPosicao, trabalhoVendidoRemovido);
         notifyItemInserted(itemPosicao);
-        notifyItemRangeChanged(itemPosicao, listaTrabalhosVendidos.size());
+        notifyItemRangeChanged(itemPosicao, trabalhosVendidos.size());
     }
 
     public class TrabalhosVendidosViewHolder extends RecyclerView.ViewHolder{
@@ -118,6 +121,35 @@ public class ListaTrabalhosVendidosAdapter extends RecyclerView.Adapter<ListaTra
                         break;
                 }
             }
+        }
+    }
+
+    private static class ItemDiffCallback extends DiffUtil.Callback {
+        private final ArrayList<TrabalhoVendido> listaAntiga;
+        private final List<TrabalhoVendido> listaNova;
+        public ItemDiffCallback(ArrayList<TrabalhoVendido> listaAntiga, List<TrabalhoVendido> listaNova) {
+            this.listaAntiga= listaAntiga;
+            this.listaNova= listaNova;
+        }
+
+        @Override
+        public int getOldListSize() {
+            return listaAntiga.size();
+        }
+
+        @Override
+        public int getNewListSize() {
+            return listaNova.size();
+        }
+
+        @Override
+        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+            return listaAntiga.get(oldItemPosition).getId().equals(listaNova.get(newItemPosition).getId());
+        }
+
+        @Override
+        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+            return listaAntiga.get(oldItemPosition).equals(listaNova.get(newItemPosition));
         }
     }
 }

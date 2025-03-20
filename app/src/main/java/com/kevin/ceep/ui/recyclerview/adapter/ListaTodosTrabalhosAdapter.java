@@ -2,7 +2,6 @@ package com.kevin.ceep.ui.recyclerview.adapter;
 
 import static com.kevin.ceep.ui.activity.Constantes.CODIGO_REQUISICAO_ALTERA_TRABALHO;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,22 +23,23 @@ import com.kevin.ceep.model.Trabalho;
 import com.kevin.ceep.ui.fragment.ListaTodosTrabalhosFragmentDirections;
 import com.kevin.ceep.ui.fragment.ListaTodosTrabalhosFragmentDirections.ActionListaTodosTrabalhosFragmentToTrabalhoEspecificoFragment;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class ListaTodosTrabalhosAdapter extends RecyclerView.Adapter<ListaTodosTrabalhosAdapter.ProfissaoTrabalhoViewHolder> {
-    private List<ProfissaoTrabalho> profissoes;
-    private List<Trabalho> trabalhos;
+    private final ArrayList<ProfissaoTrabalho> profissoes;
+    private ArrayList<Trabalho> trabalhos;
     private final Context context;
     public static int posicaoPai = -1;
 
-    public ListaTodosTrabalhosAdapter(List<ProfissaoTrabalho> profissaoTrabalhos, Context context) {
+    public ListaTodosTrabalhosAdapter(ArrayList<ProfissaoTrabalho> profissaoTrabalhos, Context context) {
         this.profissoes = profissaoTrabalhos;
         this.context = context;
     }
-    @SuppressLint("NotifyDataSetChanged")
-    public void atualiza(List<ProfissaoTrabalho> listaFiltrada) {
-        this.profissoes = listaFiltrada;
-        notifyDataSetChanged();
+    public void atualiza(ArrayList<ProfissaoTrabalho> profissoesAtualizada) {
+        DiffUtil.DiffResult diffResult= DiffUtil.calculateDiff(new ItemDiffCallback(profissoes, profissoesAtualizada));
+        profissoes.clear();
+        profissoes.addAll(profissoesAtualizada);
+        diffResult.dispatchUpdatesTo(this);
     }
     @NonNull
     @Override
@@ -105,6 +106,34 @@ public class ListaTodosTrabalhosAdapter extends RecyclerView.Adapter<ListaTodosT
 
         private void preencheCampos(ProfissaoTrabalho profissaoTrabalho) {
             txtNomeItemProfissaoTrabalho.setText(profissaoTrabalho.getNome());
+        }
+    }
+    private static class ItemDiffCallback extends DiffUtil.Callback {
+        private final ArrayList<ProfissaoTrabalho> listaAntiga;
+        private final ArrayList<ProfissaoTrabalho> listaNova;
+        public ItemDiffCallback(ArrayList<ProfissaoTrabalho> listaAntiga, ArrayList<ProfissaoTrabalho> listaNova) {
+            this.listaAntiga= listaAntiga;
+            this.listaNova= listaNova;
+        }
+
+        @Override
+        public int getOldListSize() {
+            return listaAntiga.size();
+        }
+
+        @Override
+        public int getNewListSize() {
+            return listaNova.size();
+        }
+
+        @Override
+        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+            return listaAntiga.get(oldItemPosition).getNome().equals(listaNova.get(newItemPosition).getNome());
+        }
+
+        @Override
+        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+            return listaAntiga.get(oldItemPosition).equals(listaNova.get(newItemPosition));
         }
     }
 }

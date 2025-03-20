@@ -39,8 +39,8 @@ public class ListaTodosTrabalhosFragment extends Fragment {
     private ListaTodosTrabalhosAdapter listaTodosTrabalhosAdapter;
     private FloatingActionButton botaoNovoTrabalho;
     private RecyclerView meuRecycler;
-    private List<ProfissaoTrabalho> profissoesTrabalhos;
-    private List<Trabalho> todosTrabalhos;
+    private ArrayList<ProfissaoTrabalho> profissoesTrabalhos;
+    private ArrayList<Trabalho> todosTrabalhos;
     private ProgressBar indicadorProgresso;
     private TrabalhoViewModel trabalhoViewModel;
 
@@ -104,14 +104,13 @@ public class ListaTodosTrabalhosFragment extends Fragment {
                 listaTrabalhosProfissao.add(trabalho);
                 ProfissaoTrabalho profissaoTrabalho = new ProfissaoTrabalho(trabalho.getProfissao(), listaTrabalhosProfissao);
                 profissoesTrabalhos.add(profissaoTrabalho);
-            } else {
-                if (!profissaoExiste(trabalho)) {
-                    ArrayList<Trabalho> listaTrabalhosProfissao = new ArrayList<>();
-                    listaTrabalhosProfissao.add(trabalho);
-                    ProfissaoTrabalho profissaoTrabalho = new ProfissaoTrabalho(trabalho.getProfissao(), listaTrabalhosProfissao);
-                    profissoesTrabalhos.add(profissaoTrabalho);
-                }
+                continue;
             }
+            if (profissaoExiste(trabalho)) continue;
+            ArrayList<Trabalho> listaTrabalhosProfissao = new ArrayList<>();
+            listaTrabalhosProfissao.add(trabalho);
+            ProfissaoTrabalho profissaoTrabalho = new ProfissaoTrabalho(trabalho.getProfissao(), listaTrabalhosProfissao);
+            profissoesTrabalhos.add(profissaoTrabalho);
         }
         indicadorProgresso.setVisibility(View.GONE);
         listaTodosTrabalhosAdapter.atualiza(profissoesTrabalhos);
