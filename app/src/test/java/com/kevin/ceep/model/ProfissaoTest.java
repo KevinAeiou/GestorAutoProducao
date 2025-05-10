@@ -1,18 +1,26 @@
 package com.kevin.ceep.model;
 
 import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
+import android.content.Context;
+import org.junit.Before;
+import org.robolectric.RuntimeEnvironment;
+import org.testng.annotations.Test;
 
 public class ProfissaoTest {
-    private final Profissao BRACELETES = new Profissao("1", "Braceletes", 19, false);
-    private final Profissao CAPOTES = new Profissao("2", "Capotes", 199, false);
-    private final Profissao ANEIS = new Profissao("3", "Anéis", 830000, false);
-    private final Profissao AMULETOS = new Profissao("4", "Amuletos", 830001, false);
+    private final Profissao BRACELETES = new Profissao();
+    private final Profissao CAPOTES = new Profissao();
+    private final Profissao ANEIS = new Profissao();
+    private final Profissao AMULETOS = new Profissao();
+    private Context context;
+
+    @Before
+    public void setUp() {
+        context = RuntimeEnvironment.getApplication();
+    }
 
     @Test
     public void deve_RetornarNivelUm_QuandoXpAtualIgualADezenove() {
-        int nivel = BRACELETES.getNivel();
+        int nivel = BRACELETES.getNivel(context);
         assertEquals(1, nivel);
     }
     @Test
@@ -34,7 +42,7 @@ public class ProfissaoTest {
     }
     @Test
     public void deve_RetornarNivelDois_QuandoXpAtualIgualACentoENoventaENove() {
-        int nivel = CAPOTES.getNivel();
+        int nivel = CAPOTES.getNivel(context);
         assertEquals(2, nivel);
     }
     @Test
@@ -56,12 +64,12 @@ public class ProfissaoTest {
     }
     @Test
     public void deve_RetornarNivelVinteESeis_QuandoXpAtualIgualACentoEOitocentoETrintaMilEUm() {
-        int nivel = AMULETOS.getNivel();
+        int nivel = AMULETOS.getNivel(context);
         assertEquals(26, nivel);
     }
     @Test
     public void deve_RetornarNivelVinteESeis_QuandoXpAtualIgualACentoEOitocentoETrintaMil() {
-        int nivel = ANEIS.getNivel();
+        int nivel = ANEIS.getNivel(context);
         assertEquals(26, nivel);
     }
     @Test

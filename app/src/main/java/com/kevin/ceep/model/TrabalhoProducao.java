@@ -2,6 +2,8 @@ package com.kevin.ceep.model;
 
 import static com.kevin.ceep.utilitario.Utilitario.geraIdAleatorio;
 
+import androidx.annotation.NonNull;
+
 import java.io.Serializable;
 
 public class TrabalhoProducao extends Trabalho implements Serializable {
@@ -44,5 +46,11 @@ public class TrabalhoProducao extends Trabalho implements Serializable {
 
     public void setIdTrabalho(String idTrabalho) {
         this.idTrabalho = idTrabalho;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return getId() + " | " + idTrabalho + " | " + tipoLicenca + " | " + estado + " | " + recorrencia;
     }
 }

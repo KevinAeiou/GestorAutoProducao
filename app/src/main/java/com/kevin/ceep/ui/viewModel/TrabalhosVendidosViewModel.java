@@ -17,14 +17,11 @@ public class TrabalhosVendidosViewModel extends ViewModel {
         this.repository = repository;
     }
 
-    public LiveData<Resource<ArrayList<TrabalhoVendido>>> pegaTodosTrabalhosVendidos() {
-        return repository.pegaTodosTrabalhosVendidos();
+    public LiveData<Resource<ArrayList<TrabalhoVendido>>> recuperaVendas() {
+        return repository.recuperaVendas();
     }
-    public LiveData<Resource<Void>> removeTrabalhoVendido(TrabalhoVendido trabalhoRemovido) {
+    public LiveData<Resource<Void>> removeVenda(TrabalhoVendido trabalhoRemovido) {
         return repository.removeTrabalho(trabalhoRemovido);
-    }
-    public LiveData<Resource<Void>> sincronizaTrabalhos() {
-        return repository.sincronizaTrabalhos();
     }
 
     public LiveData<Resource<Void>> modificaTrabalhoVendido(TrabalhoVendido trabalho) {
@@ -33,5 +30,13 @@ public class TrabalhosVendidosViewModel extends ViewModel {
 
     public void removeReferenciaTrabalhoEspecfico(Trabalho trabalho) {
         repository.removeReferenciaTrabalhoEspecfico(trabalho);
+    }
+
+    public LiveData<Resource<Void>> insereVenda(TrabalhoVendido trabalho) {
+        return repository.insereVenda(trabalho);
+    }
+
+    public void removeOuvinte() {
+        repository.removeOuvinte();
     }
 }

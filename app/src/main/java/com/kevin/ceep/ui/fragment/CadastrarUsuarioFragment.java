@@ -62,7 +62,7 @@ public class CadastrarUsuarioFragment extends Fragment implements View.OnClickLi
         estadoAppViewModel.componentes.setValue(componentesVisuais);
         txtSenha = binding.txtSenha;
         edtSenha = binding.edtSenha;
-        AutenticacaoViewModelFactor autenticacaoViewModelFactor = new AutenticacaoViewModelFactor(new FirebaseAuthRepository());
+        AutenticacaoViewModelFactor autenticacaoViewModelFactor = new AutenticacaoViewModelFactor(FirebaseAuthRepository.getInstance());
         autenticacaoViewModel = new ViewModelProvider(this, autenticacaoViewModelFactor).get(AutenticacaoViewModel.class);
         configuraEdtSenhaRobusta();
         botaoCadastrarUsuario = binding.botaoCadastrarUsuario;
@@ -168,7 +168,7 @@ public class CadastrarUsuarioFragment extends Fragment implements View.OnClickLi
         usuario.setSenha(Objects.requireNonNull(edtSenha.getText()).toString());
 
         if (verificaCampos(usuario)){
-            autenticacaoViewModel.criaUsuario(usuario).observe(this, resultadoCriaUsuario -> {
+            autenticacaoViewModel.criaUsuario(usuario).observe(getViewLifecycleOwner(), resultadoCriaUsuario -> {
                 if (resultadoCriaUsuario.getErro() == null) {
                     salvarDadosUsuario();
                     return;
@@ -190,7 +190,7 @@ public class CadastrarUsuarioFragment extends Fragment implements View.OnClickLi
         Usuario usuario = new Usuario();
         usuario.setId(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid());
         usuario.setNome(Objects.requireNonNull(edtNome.getText()).toString());
-        autenticacaoViewModel.insereUsuario(usuario).observe(this, resultadoInsereUsuario -> {
+        autenticacaoViewModel.insereUsuario(usuario).observe(getViewLifecycleOwner(), resultadoInsereUsuario -> {
             if (resultadoInsereUsuario.getErro() == null) {
                 NavDirections acao = CadastrarUsuarioFragmentDirections.vaiParaSlashScreen();
                 Navigation.findNavController(binding.getRoot()).navigate(acao);
@@ -202,5 +202,11 @@ public class CadastrarUsuarioFragment extends Fragment implements View.OnClickLi
 
     private boolean verificaCampos(Usuario personagem) {
         return personagem.getNome().isEmpty() || personagem.getEmail().isEmpty() || personagem.getSenha().isEmpty();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 }

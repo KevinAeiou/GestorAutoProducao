@@ -14,6 +14,10 @@
             android:title="@string/trabalhos" />
 
         <item
+            android:id="@+id/recursosFragment"
+            android:title="@string/stringRecursos" />
+
+        <item
             android:id="@+id/atributosPersonagem"
             android:title="@string/stringConfiguracao"/>
 

@@ -32,7 +32,6 @@ import com.kevin.ceep.ui.viewModel.TrabalhoViewModel;
 import com.kevin.ceep.ui.viewModel.factory.TrabalhoViewModelFactory;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class ListaTodosTrabalhosFragment extends Fragment {
     private FragmentListaTodosTrabalhosBinding binding;
@@ -128,7 +127,7 @@ public class ListaTodosTrabalhosFragment extends Fragment {
 
     private void pegaTodosTrabalhos() {
         todosTrabalhos = new ArrayList<>();
-        trabalhoViewModel.pegaTodosTrabalhos().observe(getViewLifecycleOwner(), resultadoPegaTodosTrabalhos -> {
+        trabalhoViewModel.recuperaTrabalhos().observe(getViewLifecycleOwner(), resultadoPegaTodosTrabalhos -> {
             if (resultadoPegaTodosTrabalhos.getDado() != null) {
                 todosTrabalhos = resultadoPegaTodosTrabalhos.getDado();
                 filtraTrabalhosProfissao();
@@ -166,8 +165,8 @@ public class ListaTodosTrabalhosFragment extends Fragment {
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onDestroyView() {
+        super.onDestroyView();
         binding = null;
     }
 }

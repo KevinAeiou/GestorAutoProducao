@@ -1,7 +1,18 @@
 package com.kevin.ceep.ui.fragment;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+import static com.kevin.ceep.ui.activity.Constantes.CODIGO_REQUISICAO_ALTERA_VENDAS;
+import static com.kevin.ceep.ui.activity.Constantes.CODIGO_REQUISICAO_INSERE_TRABALHO_VENDAS;
+import static com.kevin.ceep.ui.fragment.ListaTrabalhosVendidosFragmentDirections.*;
+import static com.kevin.ceep.utilitario.Utilitario.stringContemString;
+
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -10,6 +21,9 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.widget.SearchView;
+import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
@@ -34,12 +48,13 @@ import com.kevin.ceep.ui.viewModel.factory.PersonagemViewModelFactory;
 import com.kevin.ceep.ui.viewModel.factory.TrabalhosVendidosViewModelFactory;
 
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
-public class ListaTrabalhosVendidosFragment extends Fragment {
+public class ListaTrabalhosVendidosFragment extends Fragment implements MenuProvider {
     private FragmentListaTrabalhosVendidosBinding binding;
     private ListaTrabalhosVendidosAdapter trabalhosVendidosAdapter;
-    private String idPersonagem;
-    private ArrayList<TrabalhoVendido> trabalhosVendidos;
+    private String idPersonagem, textoFiltro;
+    private ArrayList<TrabalhoVendido> trabalhosVendidos, trabalhosFiltrados;
     private RecyclerView meuRecycler;
     private SwipeRefreshLayout swipeRefreshLayout;
     private ProgressBar indicadorProgresso;
@@ -50,31 +65,96 @@ public class ListaTrabalhosVendidosFragment extends Fragment {
 
     public ListaTrabalhosVendidosFragment() {
     }
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentListaTrabalhosVendidosBinding.inflate(inflater, container, false);
+        requireActivity().addMenuProvider(this, getViewLifecycleOwner(), androidx.lifecycle.Lifecycle.State.RESUMED);
         return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        EstadoAppViewModel estadoAppViewModel = new ViewModelProvider(requireActivity()).get(EstadoAppViewModel.class);
-        ComponentesVisuais componentesVisuais = new ComponentesVisuais();
-        componentesVisuais.appBar = true;
-        componentesVisuais.menuNavegacaoInferior = true;
-        estadoAppViewModel.componentes.setValue(componentesVisuais);
+        configuraComponentesVisuais();
         inicializaComponentes();
         configuraRecyclerView();
         configuraSwipeRefreshLayout();
         configuraDeslizeItem();
+        configuraBotaoInsereVenda();
     }
+
+    private void configuraComponentesVisuais() {
+        EstadoAppViewModel estadoAppViewModel = new ViewModelProvider(requireActivity()).get(EstadoAppViewModel.class);
+        ComponentesVisuais componentesVisuais = new ComponentesVisuais();
+        componentesVisuais.appBar = true;
+        componentesVisuais.itemMenuBusca = true;
+        componentesVisuais.menuNavegacaoInferior = true;
+        estadoAppViewModel.componentes.setValue(componentesVisuais);
+    }
+
+    private void configuraBotaoInsereVenda() {
+        binding.botaoFlutuanteVendas.setOnClickListener(view -> {
+            VaiDeVendasParaTrabalhos acao = ListaTrabalhosVendidosFragmentDirections.vaiDeVendasParaTrabalhos(idPersonagem);
+            acao.setRequisicao(CODIGO_REQUISICAO_INSERE_TRABALHO_VENDAS);
+            Navigation.findNavController(view).navigate(acao);
+        });
+    }
+
+    @Override
+    public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+
+    }
+
+    @Override
+    public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+        if (menuItem.getItemId() == R.id.itemMenuBusca) {
+            configuraComportamentoBuscaPorTexto(menuItem);
+            return true;
+        }
+        return false;
+    }
+
+    private void configuraComportamentoBuscaPorTexto(@NonNull MenuItem menuItem) {
+        SearchView busca = (SearchView) menuItem.getActionView();
+        assert busca != null;
+        busca.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String texto) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    textoFiltro = texto;
+                    filtroLista();
+                    mostraListaFiltrada();
+                }
+                return false;
+            }
+        });
+    }
+
+    private void mostraListaFiltrada() {
+        if (trabalhosFiltrados.isEmpty()) {
+            iconeListaVazia.setVisibility(VISIBLE);
+            txtListaVazia.setVisibility(VISIBLE);
+            trabalhosVendidosAdapter.limpaLista();
+            return;
+        }
+        txtListaVazia.setVisibility(GONE);
+        iconeListaVazia.setVisibility(GONE);
+        trabalhosVendidosAdapter.atualiza(trabalhosFiltrados);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void filtroLista() {
+        if (textoFiltro.isEmpty()) return;
+        trabalhosFiltrados = (ArrayList<TrabalhoVendido>) trabalhosVendidos.stream().filter(trabalho -> stringContemString(trabalho.getNome(), textoFiltro)).collect(Collectors.toList());
+    }
+
     private void configuraDeslizeItem() {
         ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.RIGHT) {
             @Override
@@ -87,9 +167,9 @@ public class ListaTrabalhosVendidosFragment extends Fragment {
                 int itemPosicao = viewHolder.getAdapterPosition();
                 trabalhosVendidosAdapter = (ListaTrabalhosVendidosAdapter) meuRecycler.getAdapter();
                 if (trabalhosVendidosAdapter != null) {
-                    TrabalhoVendido trabalhoVendidoRemovido = trabalhosVendidos.get(itemPosicao);
+                    TrabalhoVendido trabalhoVendidoRemovido = trabalhosFiltrados.get(itemPosicao);
                     trabalhosVendidosAdapter.remove(itemPosicao);
-                    Snackbar snackbarDesfazer = Snackbar.make(binding.getRoot(), trabalhoVendidoRemovido.getDescricao()+ " excluido", Snackbar.LENGTH_LONG);
+                    Snackbar snackbarDesfazer = Snackbar.make(binding.getRoot(), "Venda removida: ", Snackbar.LENGTH_LONG);
                     snackbarDesfazer.addCallback(new Snackbar.Callback(){
                         @Override
                         public void onDismissed(Snackbar transientBottomBar, int event) {
@@ -110,43 +190,35 @@ public class ListaTrabalhosVendidosFragment extends Fragment {
     }
 
     private void removeTrabalhoDaLista(TrabalhoVendido trabalhoVendidoRemovido) {
-        trabalhosVendidos.remove(trabalhoVendidoRemovido);
+        trabalhosFiltrados.remove(trabalhoVendidoRemovido);
     }
 
     private void removeTrabalhoDoBanco(TrabalhoVendido trabalhoRemovido) {
-        trabalhosVendidosViewModel.removeTrabalhoVendido(trabalhoRemovido).observe(getViewLifecycleOwner(), resultadoRemoveTrabalho -> {
-            if (resultadoRemoveTrabalho.getErro() != null) {
-                Snackbar.make(binding.getRoot(), "Erro: "+resultadoRemoveTrabalho.getErro(), Snackbar.LENGTH_LONG).show();
+        trabalhosVendidosViewModel.removeVenda(trabalhoRemovido).observe(getViewLifecycleOwner(), resultadoRemoveVenda -> {
+            if (resultadoRemoveVenda.getErro() != null) {
+                Snackbar.make(binding.getRoot(), "Erro ao remover venda: "+resultadoRemoveVenda.getErro(), Snackbar.LENGTH_LONG).show();
             }
         });
     }
     private void configuraSwipeRefreshLayout() {
         swipeRefreshLayout.setOnRefreshListener(() -> {
             trabalhosVendidosAdapter.limpaLista();
-            if (idPersonagem != null){
-                sincronizaTrabalhos();
-            }
+            if (idPersonagem == null) return;
+            recuperaVendas();
         });
     }
 
-    private void pegaTodosProdutosVendidos() {
-        trabalhosVendidosViewModel.pegaTodosTrabalhosVendidos().observe(getViewLifecycleOwner(), resultadoTodosTrabalhos -> {
-            if (resultadoTodosTrabalhos.getDado() != null) {
+    private void recuperaVendas() {
+        trabalhosVendidosViewModel.recuperaVendas().observe(getViewLifecycleOwner(), resultadoTodosTrabalhos -> {
+            if (resultadoTodosTrabalhos.getErro() == null) {
                 trabalhosVendidos = resultadoTodosTrabalhos.getDado();
-                if (trabalhosVendidos.isEmpty()) {
-                    iconeListaVazia.setVisibility(View.VISIBLE);
-                    txtListaVazia.setVisibility(View.VISIBLE);
-                } else {
-                    iconeListaVazia.setVisibility(View.GONE);
-                    txtListaVazia.setVisibility(View.GONE);
-                }
+                trabalhosFiltrados = (ArrayList<TrabalhoVendido>) trabalhosVendidos.clone();
+                mostraListaFiltrada();
                 indicadorProgresso.setVisibility(View.GONE);
                 swipeRefreshLayout.setRefreshing(false);
-                trabalhosVendidosAdapter.atualiza(trabalhosVendidos);
+                return;
             }
-            if (resultadoTodosTrabalhos.getErro() != null) {
-                Snackbar.make(binding.getRoot(), "Erro: "+resultadoTodosTrabalhos.getErro(), Snackbar.LENGTH_LONG).show();
-            }
+            Snackbar.make(binding.getRoot(), "Erro ao recuperar vendas: "+resultadoTodosTrabalhos.getErro(), Snackbar.LENGTH_LONG).show();
         });
     }
 
@@ -166,6 +238,7 @@ public class ListaTrabalhosVendidosFragment extends Fragment {
         VaiDeTrabalhosVendidosParaDetalhesTrabalhoVendido acao = ListaTrabalhosVendidosFragmentDirections.vaiDeTrabalhosVendidosParaDetalhesTrabalhoVendido(
                 trabalhoVendido,
                 idPersonagem);
+        acao.setCodigoRequisicao(CODIGO_REQUISICAO_ALTERA_VENDAS);
         Navigation.findNavController(binding.getRoot()).navigate(acao);
     }
 
@@ -176,7 +249,8 @@ public class ListaTrabalhosVendidosFragment extends Fragment {
         indicadorProgresso = binding.indicadorProgressoListaProdutosVendidosFragment;
         iconeListaVazia = binding.iconeVazia;
         txtListaVazia = binding.txtListaVazia;
-        PersonagemViewModelFactory personagemViewModelFactory = new PersonagemViewModelFactory(new PersonagemRepository(getContext()));
+        textoFiltro = "";
+        PersonagemViewModelFactory personagemViewModelFactory = new PersonagemViewModelFactory(PersonagemRepository.getInstance());
         personagemViewModel = new ViewModelProvider(requireActivity(), personagemViewModelFactory).get(PersonagemViewModel.class);
     }
 
@@ -186,23 +260,27 @@ public class ListaTrabalhosVendidosFragment extends Fragment {
         personagemViewModel.pegaPersonagemSelecionado().observe(getViewLifecycleOwner(), resultadoPegaPersonagem -> {
             if (resultadoPegaPersonagem == null) return;
             idPersonagem = resultadoPegaPersonagem.getId();
-            TrabalhosVendidosViewModelFactory trabalhosVendidosViewModelFactory = new TrabalhosVendidosViewModelFactory(new TrabalhoVendidoRepository(getContext(), idPersonagem));
+            TrabalhosVendidosViewModelFactory trabalhosVendidosViewModelFactory = new TrabalhosVendidosViewModelFactory(TrabalhoVendidoRepository.getInstance(idPersonagem));
             trabalhosVendidosViewModel = new ViewModelProvider(this, trabalhosVendidosViewModelFactory).get(idPersonagem, TrabalhosVendidosViewModel.class);
-            pegaTodosProdutosVendidos();
-        });
-    }
-
-    private void sincronizaTrabalhos() {
-        trabalhosVendidosViewModel.sincronizaTrabalhos().observe(getViewLifecycleOwner(), resultadoSincronizaTrabalhos -> {
-            if (resultadoSincronizaTrabalhos.getErro() == null) {
-                pegaTodosProdutosVendidos();
-            }
+            recuperaVendas();
         });
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
+    public void onDestroyView() {
+        super.onDestroyView();
+        removeOuvintePersonagem();
+        removeOuvinteVenda();
         binding = null;
+    }
+
+    private void removeOuvinteVenda() {
+        if (trabalhosVendidosViewModel == null) return;
+        trabalhosVendidosViewModel.removeOuvinte();
+    }
+
+    private void removeOuvintePersonagem() {
+        if (personagemViewModel == null) return;
+        personagemViewModel.removeOuvinte();
     }
 }

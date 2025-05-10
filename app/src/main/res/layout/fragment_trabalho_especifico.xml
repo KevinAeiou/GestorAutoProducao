@@ -194,7 +194,7 @@
                         android:inputType="none"
                         android:padding="8dp"
                         android:textSize="24sp"
-                        android:text="@string/stringTrabalhoNecessario"/>
+                        android:text="@string/stringSelecioneTrabalho"/>
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.imageview.ShapeableImageView
@@ -229,7 +229,7 @@
                         android:inputType="none"
                         android:padding="8dp"
                         android:textSize="24sp"
-                        android:text="@string/stringTrabalhoNecessario" />
+                        android:text="@string/stringSelecioneTrabalho" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.imageview.ShapeableImageView

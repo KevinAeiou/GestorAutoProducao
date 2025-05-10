@@ -78,4 +78,10 @@ public class ProfissaoFragment extends DialogFragment {
         profissaoModificada.setPrioridade(swtPrioridade.isChecked());
         profissaoViewModel.modificaExperienciaProfissao(profissaoModificada);
     }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
 }

@@ -25,30 +25,27 @@ public class PersonagemViewModel extends ViewModel {
         personagemSelecionado.setValue(personagem);
     }
 
-    public LiveData<Resource<ArrayList<Personagem>>> pegaTodosPersonagens() {
-        return personagemRepository.pegaPersonagensBanco();
-    }
-
-    public LiveData<Resource<Void>> sincronizaPersonagens(ArrayList<Personagem> personagens) {
-        return personagemRepository.sincronizaPersonagens(personagens);
-    }
     public LiveData<Resource<Void>> modificaPersonagem(Personagem personagemModificado) {
         return personagemRepository.modificaPersonagem(personagemModificado);
     }
 
-    public LiveData<Resource<Void>> inserePersonagem(Personagem novoPersonagem) {
-        return personagemRepository.inserePersonagem(novoPersonagem);
+    public LiveData<Resource<Void>> inserePersonagem(Personagem personagem) {
+        return personagemRepository.inserePersonagem(personagem);
     }
 
-    public LiveData<Resource<Void>> removePersonagem(Personagem personagemRecebido) {
-        return personagemRepository.removePersonagem(personagemRecebido);
+    public LiveData<Resource<Void>> removePersonagem(Personagem personagem) {
+        return personagemRepository.removePersonagem(personagem);
     }
 
     public LiveData<Resource<ArrayList<String>>> pegaIdsPersonagens() {
         return personagemRepository.pegaIdsPersonagens();
     }
 
-    public LiveData<Resource<ArrayList<Personagem>>> pegaPersonagensServidor(ArrayList<String> idsPersonagens) {
-        return personagemRepository.pegaPersonagensServidor(idsPersonagens);
+    public LiveData<Resource<ArrayList<Personagem>>> recuperaPersonagensServidor(ArrayList<String> idsPersonagens) {
+        return personagemRepository.recuperaPersonagensServidor(idsPersonagens);
+    }
+
+    public void removeOuvinte() {
+        personagemRepository.removeOuvinte();
     }
 }

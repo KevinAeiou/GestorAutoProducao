@@ -16,7 +16,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.SearchView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -26,6 +25,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.MenuProvider;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
@@ -41,7 +41,6 @@ import com.kevin.ceep.databinding.ActivityMainBinding;
 import com.kevin.ceep.model.Personagem;
 import com.kevin.ceep.model.Trabalho;
 import com.kevin.ceep.repository.PersonagemRepository;
-import com.kevin.ceep.repository.Resource;
 import com.kevin.ceep.ui.fragment.ConfirmaTrabalhoFragmentArgs;
 import com.kevin.ceep.ui.fragment.TrabalhoEspecificoFragmentArgs;
 import com.kevin.ceep.ui.viewModel.ComponentesVisuais;
@@ -213,30 +212,32 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void atualizaCabecalhoPersonagemSelecionado() {
-        PersonagemViewModelFactory personagemViewModelFactory = new PersonagemViewModelFactory(new PersonagemRepository(getApplicationContext()));
+        PersonagemViewModelFactory personagemViewModelFactory = new PersonagemViewModelFactory(PersonagemRepository.getInstance());
         personagemViewModel = new ViewModelProvider(this, personagemViewModelFactory).get(PersonagemViewModel.class);
         personagemViewModel.pegaPersonagemSelecionado().observe(this, personagem -> {
             if (personagem == null) return;
-            String estado= getString(R.string.stringInativo);
-            String uso= getString(R.string.stringInativo);
-            String autoProducao= getString(R.string.stringInativo);
-            if (personagem.getEstado()) estado = getString(R.string.stringAtivo);
-            if (personagem.getUso()) uso = getString(R.string.stringAtivo);
-            if (personagem.isAutoProducao()) autoProducao = getString(R.string.stringAtivo);
-            txtCabecalhoEstado.setText(getString(R.string.stringEstadoValor,estado));
-            txtCabecalhoUso.setText(getString(R.string.stringUsoValor,uso));
-            txtCabecalhoAutoProducao.setText(getString(R.string.stringAutoProducaoValor, autoProducao));
-            txtCabecalhoEspacoProducao.setText(getString(R.string.stringEspacoProducaoValor,personagem.getEspacoProducao()));
-            personagemSelecionado = personagem;
+            if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
+                String estado= getString(R.string.stringInativo);
+                String uso= getString(R.string.stringInativo);
+                String autoProducao= getString(R.string.stringInativo);
+                if (personagem.getEstado()) estado = getString(R.string.stringAtivo);
+                if (personagem.getUso()) uso = getString(R.string.stringAtivo);
+                if (personagem.isAutoProducao()) autoProducao = getString(R.string.stringAtivo);
+                txtCabecalhoEstado.setText(getString(R.string.stringEstadoValor,estado));
+                txtCabecalhoUso.setText(getString(R.string.stringUsoValor,uso));
+                txtCabecalhoAutoProducao.setText(getString(R.string.stringAutoProducaoValor, autoProducao));
+                txtCabecalhoEspacoProducao.setText(getString(R.string.stringEspacoProducaoValor,personagem.getEspacoProducao()));
+                personagemSelecionado = personagem;
+            }
         });
     }
-    private void pegaPersonagensBanco() {
+    private void recuperaPersonagensServidor(ArrayList<String> dado) {
         personagens.clear();
         FirebaseUser usuarioID = FirebaseAuth.getInstance().getCurrentUser();
         if (usuarioID == null) return;
-        PersonagemViewModelFactory personagemViewModelFactory = new PersonagemViewModelFactory(new PersonagemRepository(getApplicationContext()));
+        PersonagemViewModelFactory personagemViewModelFactory = new PersonagemViewModelFactory(PersonagemRepository.getInstance());
         personagemViewModel = new ViewModelProvider(this, personagemViewModelFactory).get(PersonagemViewModel.class);
-        personagemViewModel.pegaTodosPersonagens().observe(this, resultadoPersonagens -> {
+        personagemViewModel.recuperaPersonagensServidor(dado).observe(this, resultadoPersonagens -> {
             if (resultadoPersonagens.getErro() == null) {
                 personagens = resultadoPersonagens.getDado();
                 if (personagens.isEmpty()) return;
@@ -246,46 +247,25 @@ public class MainActivity extends AppCompatActivity {
                 configuraDropDownPersonagens();
                 return;
             }
-            Snackbar.make(getApplicationContext(), Objects.requireNonNull(getCurrentFocus()), "Erro: "+resultadoPersonagens.getErro(), Snackbar.LENGTH_LONG).show();
+            Snackbar.make(binding.getRoot(), "Erro: "+resultadoPersonagens.getErro(), Snackbar.LENGTH_LONG).show();
         });
     }
 
     private void configuraPersonagens() {
         FirebaseUser usuarioID = FirebaseAuth.getInstance().getCurrentUser();
         if (usuarioID == null) return;
-        PersonagemViewModelFactory personagemViewModelFactory = new PersonagemViewModelFactory(new PersonagemRepository(getApplicationContext()));
-        personagemViewModel = new ViewModelProvider(this, personagemViewModelFactory).get(PersonagemViewModel.class);
+        PersonagemViewModelFactory personagemViewModelFactory = new PersonagemViewModelFactory(PersonagemRepository.getInstance());
+        personagemViewModel = new ViewModelProvider(this, personagemViewModelFactory).get(usuarioID.getUid(), PersonagemViewModel.class);
         pegaIdsPersonagens();
     }
 
     private void pegaIdsPersonagens() {
         personagemViewModel.pegaIdsPersonagens().observe(this, resultadoIdsPersonagens -> {
             if (resultadoIdsPersonagens.getErro() == null) {
-                pegaPersonagens(resultadoIdsPersonagens);
+                recuperaPersonagensServidor(resultadoIdsPersonagens.getDado());
                 return;
             }
             Snackbar.make(getApplicationContext(), Objects.requireNonNull(getCurrentFocus()), "Erro: " + resultadoIdsPersonagens.getErro(), Snackbar.LENGTH_LONG).show();
-        });
-    }
-
-    private void pegaPersonagens(Resource<ArrayList<String>> resultadoIdsPersonagens) {
-        personagemViewModel.pegaPersonagensServidor(resultadoIdsPersonagens.getDado()).observe(this, resultadoPersonagens -> {
-            if (resultadoPersonagens.getErro() == null) {
-                sincronizaPersonagens(resultadoPersonagens);
-                return;
-            }
-            Snackbar.make(getApplicationContext(), Objects.requireNonNull(getCurrentFocus()), "Erro: " + resultadoPersonagens.getErro(), Snackbar.LENGTH_LONG).show();
-        });
-    }
-
-    private void sincronizaPersonagens(Resource<ArrayList<Personagem>> resultadoPersonagens) {
-        personagemViewModel.sincronizaPersonagens(resultadoPersonagens.getDado()).observe(this, resultadoSincroniza -> {
-            Log.d("personagem", "sincronizaPersonagens: ");
-            if (resultadoSincroniza.getErro() == null) {
-                pegaPersonagensBanco();
-                return;
-            }
-            Snackbar.make(getApplicationContext(), Objects.requireNonNull(getCurrentFocus()), "Erro: " + resultadoSincroniza.getErro(), Snackbar.LENGTH_LONG).show();
         });
     }
 
@@ -303,5 +283,17 @@ public class MainActivity extends AppCompatActivity {
         }
         autoCompleteCabecalhoNome.setText(personagemSelecionado.getNome());
         autoCompleteCabecalhoNome.setAdapter(adapterPersonagens);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        removeOuvintePersonagem();
+        binding = null;
+    }
+
+    private void removeOuvintePersonagem() {
+        if (personagemViewModel == null) return;
+        personagemViewModel.removeOuvinte();
     }
 }

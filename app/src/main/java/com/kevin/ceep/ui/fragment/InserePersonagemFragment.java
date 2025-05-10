@@ -45,6 +45,7 @@ public class InserePersonagemFragment extends Fragment implements MenuProvider{
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentAtributosPersonagemBinding.inflate(inflater, container, false);
+        requireActivity().addMenuProvider(this, getViewLifecycleOwner(), androidx.lifecycle.Lifecycle.State.RESUMED);
         return binding.getRoot();
     }
 
@@ -85,7 +86,7 @@ public class InserePersonagemFragment extends Fragment implements MenuProvider{
     }
 
     private void inserePersonagemServidor(Personagem novoPersonagem) {
-        personagemViewModel.inserePersonagem(novoPersonagem).observe(this, resultadoInserePersonagem -> {
+        personagemViewModel.inserePersonagem(novoPersonagem).observe(getViewLifecycleOwner(), resultadoInserePersonagem -> {
             if (resultadoInserePersonagem.getErro() == null) {
                 voltaParaTrabalhosProducao();
                 return;
@@ -109,25 +110,24 @@ public class InserePersonagemFragment extends Fragment implements MenuProvider{
         personagemEmailTxt = binding.txtEmailPersonagem;
         personagemSenha = binding.edtSenhaPersonagem;
         personagemSenhaTxt = binding.txtSenhaPersonagem;
-        PersonagemViewModelFactory personagemViewModelFactory = new PersonagemViewModelFactory(new PersonagemRepository(getContext()));
+        PersonagemViewModelFactory personagemViewModelFactory = new PersonagemViewModelFactory(PersonagemRepository.getInstance());
         personagemViewModel = new ViewModelProvider(requireActivity(), personagemViewModelFactory).get(PersonagemViewModel.class);
         binding.btnExcluiPersonagem.setVisibility(GONE);
     }
 
     private void configuraMensagemCamposValidos() {
-        if (configuraMensagem(personagemNome, personagemNomeTxt)) return;
-        if (configuraMensagem(personagemEspacoProducao, personagemEspacoProducaoTxt)) return;
-        if (configuraMensagem(personagemEmail, personagemEmailTxt)) return;
+        configuraMensagem(personagemNome, personagemNomeTxt);
+        configuraMensagem(personagemEspacoProducao, personagemEspacoProducaoTxt);
+        configuraMensagem(personagemEmail, personagemEmailTxt);
         configuraMensagem(personagemSenha, personagemSenhaTxt);
     }
 
-    private boolean configuraMensagem(EditText personagemNome, TextInputLayout personagemNomeTxt) {
+    private void configuraMensagem(EditText personagemNome, TextInputLayout personagemNomeTxt) {
         if (personagemNome.getText().toString().isEmpty()) {
             personagemNomeTxt.setHelperText("Campo requerido!");
-            return true;
+            return;
         }
         personagemNomeTxt.setHelperTextEnabled(false);
-        return false;
     }
 
     private Personagem definePersonagemModificado() {
@@ -147,5 +147,17 @@ public class InserePersonagemFragment extends Fragment implements MenuProvider{
             !personagemEspacoProducao.getText().toString().isEmpty() &&
             !personagemEmail.getText().toString().isEmpty() &&
             !personagemSenha.getText().toString().isEmpty();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        removeOuvintePersonagem();
+        binding = null;
+    }
+
+    private void removeOuvintePersonagem() {
+        if (personagemViewModel == null) return;
+        personagemViewModel.removeOuvinte();
     }
 }

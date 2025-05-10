@@ -13,13 +13,12 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.kevin.ceep.R;
 import com.kevin.ceep.model.Trabalho;
 import com.kevin.ceep.model.TrabalhoProducao;
-import com.kevin.ceep.repository.TrabalhoProducaoRepository;
 import com.kevin.ceep.repository.TrabalhoRepository;
 import com.kevin.ceep.ui.viewModel.ComponentesVisuais;
 import com.kevin.ceep.ui.viewModel.EstadoAppViewModel;
@@ -36,6 +35,7 @@ public class ConfirmaTrabalhoFragment extends Fragment {
     private Trabalho trabalhoRecebido;
     private int contador;
     private String nomesTrabalhosNecessarios;
+    private AppCompatButton botaoCadastraTrabalho;
 
     @Nullable
     @Override
@@ -45,20 +45,19 @@ public class ConfirmaTrabalhoFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        configuraCamposVisuais();
+        recebeDados();
+        preencheCampos();
+        configuraBotaoCadastraTrabalho();
+    }
+
+    private void configuraCamposVisuais() {
         EstadoAppViewModel estadoAppViewModel = new ViewModelProvider(requireActivity()).get(EstadoAppViewModel.class);
         ComponentesVisuais componentesVisuais = new ComponentesVisuais();
         componentesVisuais.appBar = true;
         estadoAppViewModel.componentes.setValue(componentesVisuais);
-        recebeDados();
-        preencheCampos();
-        configuraBotaoCadastraTrabalho();
     }
 
     private void preencheCampos() {
@@ -73,11 +72,7 @@ public class ConfirmaTrabalhoFragment extends Fragment {
                 if (resultadoPegaTrabalho.getErro() == null) {
                     nomesTrabalhosNecessarios += resultadoPegaTrabalho.getDado().getNome();
                 }
-//                else {
-//                    Snackbar.make(binding.getRoot(), id + " " + resultadoPegaTrabalho.getErro(), Snackbar.LENGTH_LONG).show();
-//                }
-                if (!nomesTrabalhosNecessarios.isEmpty())
-                    binding.txtTrabalhoNecessarioConfirmaTrabalho.setText(nomesTrabalhosNecessarios);
+                if (!nomesTrabalhosNecessarios.isEmpty()) binding.txtTrabalhoNecessarioConfirmaTrabalho.setText(nomesTrabalhosNecessarios);
             });
         }
     }
@@ -89,18 +84,15 @@ public class ConfirmaTrabalhoFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        configuraDropDrow();
+        configuraDropDrown();
     }
-    private void configuraDropDrow() {
+    private void configuraDropDrown() {
         autoCompleteLicenca = binding.txtAutoCompleteLicencaConfirmaTrabalho;
         autoCompleteQuantidade = binding.txtAutoCompleteQuantidadeConfirmaTrabalho;
-
         String[] licencas = getResources().getStringArray(R.array.licencas_completas);
         String[] quantidade = getResources().getStringArray(R.array.quantidade);
-
         ArrayAdapter<String> adapterLicenca = new ArrayAdapter<>(requireContext(), R.layout.item_dropdrown, licencas);
         ArrayAdapter<String> adapterQuantidade = new ArrayAdapter<>(requireContext(), R.layout.item_dropdrown, quantidade);
-
         adapterLicenca.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         adapterQuantidade.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         autoCompleteLicenca.setText(licencas[3]);
@@ -109,33 +101,44 @@ public class ConfirmaTrabalhoFragment extends Fragment {
     }
 
     private void configuraBotaoCadastraTrabalho() {
-        AppCompatButton botaoCadastraTrabalho = binding.botaoCadastraConfirmaTrabalho;
+        botaoCadastraTrabalho = binding.botaoCadastraConfirmaTrabalho;
         botaoCadastraTrabalho.setOnClickListener(view -> {
             botaoCadastraTrabalho.setEnabled(false);
-            adicionaTrabalhoProducao();
+            insereTrabalhoProducaoXVezes();
         });
     }
 
-    private void adicionaTrabalhoProducao() {
-        TrabalhoProducaoViewModelFactory trabalhoProducaoViewModelFactory = new TrabalhoProducaoViewModelFactory(new TrabalhoProducaoRepository(getContext(), idPersonagem));
-        TrabalhoProducaoViewModel trabalhoProducaoViewModel = new ViewModelProvider(this, trabalhoProducaoViewModelFactory).get(TrabalhoProducaoViewModel.class);
+    private void insereTrabalhoProducaoXVezes() {
         int quantidadeSelecionada = Integer.parseInt(autoCompleteQuantidade.getText().toString());
-        contador = 1;
+        contador = 0;
         for (int x = 0; x < quantidadeSelecionada; x ++){
-            TrabalhoProducao novoTrabalho = defineNovoModeloTrabalhoProducao();
-            trabalhoProducaoViewModel.insereTrabalhoProducao(novoTrabalho).observe(getViewLifecycleOwner(), resposta -> {
-                if (resposta.getErro() == null) {
-                    if (contador == quantidadeSelecionada) {
-                        NavDirections acao = ConfirmaTrabalhoFragmentDirections.vaiParaListaTrabalhosProducao();
-                        Navigation.findNavController(binding.getRoot()).navigate(acao);
-                    }
-                    contador += 1;
-                }
-            });
+            insereTrabalhoProducao(quantidadeSelecionada);
         }
     }
 
-    private TrabalhoProducao defineNovoModeloTrabalhoProducao() {
+    private void insereTrabalhoProducao(int quantidadeSelecionada) {
+        TrabalhoProducaoViewModelFactory trabalhoProducaoViewModelFactory = new TrabalhoProducaoViewModelFactory(idPersonagem);
+        TrabalhoProducaoViewModel trabalhoProducaoViewModel = new ViewModelProvider(this, trabalhoProducaoViewModelFactory).get(idPersonagem, TrabalhoProducaoViewModel.class);
+        TrabalhoProducao novoTrabalho = defineNovoTrabalhoProducao();
+        trabalhoProducaoViewModel.insereTrabalhoProducao(novoTrabalho).observe(getViewLifecycleOwner(), resposta -> {
+            if (resposta.getErro() == null) {
+                contador += 1;
+                if (contador >= quantidadeSelecionada) {
+                    Snackbar.make(binding.getRoot(), trabalhoRecebido.getNome() + " foi inserido com sucesso!", Snackbar.LENGTH_LONG).show();
+                    voltaParaListaProducao();
+                }
+                return;
+            }
+            botaoCadastraTrabalho.setEnabled(true);
+            Snackbar.make(binding.getRoot(), "Erro ao inserir " + trabalhoRecebido.getNome(), Snackbar.LENGTH_LONG).show();
+        });
+    }
+
+    private void voltaParaListaProducao() {
+        Navigation.findNavController(binding.getRoot()).navigate(ConfirmaTrabalhoFragmentDirections.vaiParaListaTrabalhosProducao());
+    }
+
+    private TrabalhoProducao defineNovoTrabalhoProducao() {
         CheckBox checkRecorrencia = binding.checkBoxProducaoRecorrenteConfirmaTrabalho;
         TrabalhoProducao trabalhoProducao = new TrabalhoProducao();
         trabalhoProducao.setIdTrabalho(trabalhoRecebido.getId());
@@ -146,8 +149,10 @@ public class ConfirmaTrabalhoFragment extends Fragment {
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onDestroyView() {
+        autoCompleteLicenca = null;
+        autoCompleteQuantidade = null;
+        super.onDestroyView();
         binding = null;
     }
 }

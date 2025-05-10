@@ -58,16 +58,20 @@ public class ListaProfissoesFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        configuraComponentesVisuais();
+        inicializaComponentes();
+        configuraRecyclerView();
+        configuraSwipeRefreshLayout();
+        configuraPersonagemSelecionado();
+    }
+
+    private void configuraComponentesVisuais() {
         EstadoAppViewModel estadoAppViewModel = new ViewModelProvider(requireActivity()).get(EstadoAppViewModel.class);
         ComponentesVisuais componentesVisuais = new ComponentesVisuais();
         componentesVisuais.appBar = true;
         componentesVisuais.menuNavegacaoLateral = true;
         componentesVisuais.menuNavegacaoInferior = true;
         estadoAppViewModel.componentes.setValue(componentesVisuais);
-        inicializaComponentes();
-        configuraRecyclerView();
-        configuraSwipeRefreshLayout();
-        configuraPersonagemSelecionado();
     }
 
     private void configuraPersonagemSelecionado() {
@@ -96,9 +100,16 @@ public class ListaProfissoesFragment extends Fragment {
         });
     }
     private void pegaTodasProfissoes() {
-        profissaoViewModel.pegaTodasProfissoes().observe(getViewLifecycleOwner(), resultadoTodasProfissoes -> {
+        profissaoViewModel.recuperaProfissoes().observe(getViewLifecycleOwner(), resultadoTodasProfissoes -> {
             if (resultadoTodasProfissoes.getDado() != null) {
                 todasProfissoes = resultadoTodasProfissoes.getDado();
+                if (todasProfissoes.isEmpty()) {
+                    profissaoViewModel.insereProfissoes().observe(getViewLifecycleOwner(), resultadoInsereProfissoes -> {
+                        if (resultadoInsereProfissoes.getErro() != null) {
+                            Snackbar.make(binding.getRoot(), "Erro: "+resultadoTodasProfissoes.getErro(), Snackbar.LENGTH_LONG).show();
+                        }
+                    });
+                }
                 indicadorProgresso.setVisibility(View.GONE);
                 swipeRefreshLayout.setRefreshing(false);
                 listaProfissaoAdapter.atualiza(todasProfissoes);
@@ -121,7 +132,7 @@ public class ListaProfissoesFragment extends Fragment {
         meuRecycler = binding.recyclerViewListaProfissoesFragment;
         swipeRefreshLayout = binding.swipeRefreshLayoutListaProfissoesFragment;
         indicadorProgresso = binding.indicadorProgressoListaProfissoesFragment;
-        PersonagemViewModelFactory personagemViewModelFactory = new PersonagemViewModelFactory(new PersonagemRepository(getContext()));
+        PersonagemViewModelFactory personagemViewModelFactory = new PersonagemViewModelFactory(PersonagemRepository.getInstance());
         personagemViewModel = new ViewModelProvider(requireActivity(), personagemViewModelFactory).get(PersonagemViewModel.class);
     }
 
@@ -139,8 +150,20 @@ public class ListaProfissoesFragment extends Fragment {
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
+    public void onDestroyView() {
+        super.onDestroyView();
+        removeOuvinteProfissao();
+        removeOuvintePersonagem();
         binding = null;
+    }
+
+    private void removeOuvintePersonagem() {
+        if (personagemViewModel == null) return;
+        personagemViewModel.removeOuvinte();
+    }
+
+    private void removeOuvinteProfissao() {
+        if (profissaoViewModel == null) return;
+        profissaoViewModel.removeOuvinte();
     }
 }

@@ -17,7 +17,7 @@ public class TrabalhoViewModel extends ViewModel {
     }
 
     public LiveData<Resource<Void>> insereTrabalho(Trabalho trabalho) {
-        return trabalhoRepository.adicionaTrabalho(trabalho);
+        return trabalhoRepository.insereTrabalho(trabalho);
     }
     public LiveData<Resource<Void>> modificaTrabalho(Trabalho trabalho) {
         return trabalhoRepository.modificaTrabalho(trabalho);
@@ -25,7 +25,7 @@ public class TrabalhoViewModel extends ViewModel {
     public LiveData<Resource<Void>> removeTrabalhoEspecificoServidor(Trabalho trabalhoRecebido) {
         return trabalhoRepository.removeTrabalho(trabalhoRecebido);
     }
-    public LiveData<Resource<ArrayList<Trabalho>>> pegaTodosTrabalhos() {
+    public LiveData<Resource<ArrayList<Trabalho>>> recuperaTrabalhos() {
         return trabalhoRepository.pegaTodosTrabalhos();
     }
     public LiveData<Resource<Void>> sincronizaTrabalhos() {
@@ -42,5 +42,9 @@ public class TrabalhoViewModel extends ViewModel {
 
     public LiveData<Resource<Trabalho>> pegaTrabalhoPorId(String id) {
         return trabalhoRepository.pegaTrabalhoPorId(id);
+    }
+
+    public void removeOuvinte() {
+        trabalhoRepository.removeOuvinte();
     }
 }

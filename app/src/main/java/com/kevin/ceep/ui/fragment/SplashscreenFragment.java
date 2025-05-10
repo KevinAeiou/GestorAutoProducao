@@ -66,4 +66,10 @@ public class SplashscreenFragment extends Fragment {
         NavDirections acao = SplashscreenFragmentDirections.vaiDeSplashscreenParaEntrar();
         Navigation.findNavController(binding.getRoot()).navigate(acao);
     }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
 }

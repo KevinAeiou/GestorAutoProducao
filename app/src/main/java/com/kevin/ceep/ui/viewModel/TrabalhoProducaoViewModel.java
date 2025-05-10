@@ -17,24 +17,30 @@ public class TrabalhoProducaoViewModel extends ViewModel {
     }
 
     public LiveData<Resource<Void>> modificaTrabalhoProducao(TrabalhoProducao trabalhoModificado) {
-        return repository.modificaTrabalhoProducao(trabalhoModificado);
+        TrabalhoProducao trabalho = new TrabalhoProducao();
+        trabalho.setId(trabalhoModificado.getId());
+        trabalho.setIdTrabalho(trabalhoModificado.getIdTrabalho());
+        trabalho.setTipoLicenca(trabalhoModificado.getTipoLicenca());
+        trabalho.setEstado(trabalhoModificado.getEstado());
+        trabalho.setRecorrencia(trabalhoModificado.getRecorrencia());
+        return repository.modificaTrabalhoProducao(trabalho);
     }
-    public LiveData<Resource<Void>> insereTrabalhoProducao(TrabalhoProducao novoTrabalho) {
-        return repository.insereTrabalhoProducao(novoTrabalho);
+    public LiveData<Resource<Void>> insereTrabalhoProducao(TrabalhoProducao trabalho) {
+        return repository.insereTrabalhoProducao(trabalho);
     }
-    public LiveData<Resource<Void>> deletaTrabalhoProducao(TrabalhoProducao trabalhoDeletado) {
-        return repository.removeTrabalhoProducao(trabalhoDeletado);
-    }
-
-    public LiveData<Resource<ArrayList<TrabalhoProducao>>> pegaTodosTrabalhosProducao() {
-        return repository.pegaTodosTrabalhosProducao();
-    }
-
-    public LiveData<Resource<Void>> sicronizaTrabalhosProducao() {
-        return repository.sincronizaTrabalhosProducao();
+    public LiveData<Resource<Void>> removeTrabalhoProducao(TrabalhoProducao trabalho) {
+        return repository.removeTrabalhoProducao(trabalho);
     }
 
-    public void removeReferenciaTrabalhoEspecifico(Trabalho trabalho) {
-        repository.removeReferenciaTrabalhoEspecifico(trabalho);
+    public LiveData<Resource<Void>> removeReferenciaTrabalhoEspecifico(Trabalho trabalho) {
+        return repository.removeReferenciaTrabalhoEspecifico(trabalho);
+    }
+
+    public LiveData<Resource<ArrayList<TrabalhoProducao>>> recuperaTrabalhosServidor() {
+        return repository.recuperaTrabalhosServidor();
+    }
+
+    public void removeOuvinte() {
+        repository.removeOuvinte();
     }
 }

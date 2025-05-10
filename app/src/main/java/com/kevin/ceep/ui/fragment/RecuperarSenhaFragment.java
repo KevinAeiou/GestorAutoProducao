@@ -135,4 +135,10 @@ public class RecuperarSenhaFragment extends Fragment {
                             Snackbar.LENGTH_LONG).show();
                 });
     }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
 }

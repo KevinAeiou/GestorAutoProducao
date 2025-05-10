@@ -75,7 +75,7 @@ public class EntrarUsuarioFragment extends Fragment implements View.OnClickListe
         txtSenha = binding.txtSenha;
         edtEmail = binding.edtEmail;
         edtSenha = binding.edtSenha;
-        AutenticacaoViewModelFactor autenticacaoViewModelFactor = new AutenticacaoViewModelFactor(new FirebaseAuthRepository());
+        AutenticacaoViewModelFactor autenticacaoViewModelFactor = new AutenticacaoViewModelFactor(FirebaseAuthRepository.getInstance());
         autenticacaoViewModel = new ViewModelProvider(this, autenticacaoViewModelFactor).get(AutenticacaoViewModel.class);
         estadoAppViewModel = new ViewModelProvider(requireActivity()).get(EstadoAppViewModel.class);
     }
@@ -126,22 +126,20 @@ public class EntrarUsuarioFragment extends Fragment implements View.OnClickListe
         configuraErroCampoSenhaVazia(usuario);
     }
 
-    private boolean configuraErroCampoEmailVazio(Usuario usuario) {
+    private void configuraErroCampoEmailVazio(Usuario usuario) {
         if (usuario.getEmail().isEmpty()) {
             txtEmail.setHelperText(menssagens[0]);
-            return true;
+            return;
         }
         txtEmail.setHelperTextEnabled(false);
-        return false;
     }
 
-    private boolean configuraErroCampoSenhaVazia(Usuario usuario) {
+    private void configuraErroCampoSenhaVazia(Usuario usuario) {
         if (usuario.getSenha().isEmpty()) {
             txtSenha.setHelperText(menssagens[0]);
-            return true;
+            return;
         }
         txtSenha.setHelperTextEnabled(false);
-        return false;
     }
 
     private static boolean camposVazios(Usuario personagem) {
@@ -149,7 +147,7 @@ public class EntrarUsuarioFragment extends Fragment implements View.OnClickListe
     }
 
     private void autenticarUsuario(Usuario usuario) {
-        autenticacaoViewModel.autenticarUsuario(usuario).observe(this, resultadoAutenticacao -> {
+        autenticacaoViewModel.autenticarUsuario(usuario).observe(getViewLifecycleOwner(), resultadoAutenticacao -> {
             if (resultadoAutenticacao.getErro() == null) {
                 Log.d("fluxo", "USUARIO AUTENTICADO");
                 vaiParaMenuNavegacao();
@@ -181,5 +179,11 @@ public class EntrarUsuarioFragment extends Fragment implements View.OnClickListe
         Log.d("fluxo", "USUARIO ATUAL: " + usuarioAtual);
         if (usuarioAtual == null) return;
         vaiParaMenuNavegacao();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 }

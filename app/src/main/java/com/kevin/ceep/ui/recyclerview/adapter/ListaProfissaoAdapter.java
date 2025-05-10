@@ -81,7 +81,7 @@ public class ListaProfissaoAdapter extends RecyclerView.Adapter<ListaProfissaoAd
             preencheCampo(profissao);
         }
         private void preencheCampo(Profissao profissao) {
-            String barraExperiencia = profissao.getExperiencia() + " / " + profissao.getXpMaximo(profissao.getNivel());
+            String barraExperiencia = profissao.getExperiencia() + " / " + profissao.getXpMaximo(profissao.getNivel(context));
             experiencia_profissao.setText(barraExperiencia);
             nome_profissao.setText(profissao.getNome());
             if (profissao.isPrioridade()) {
@@ -89,7 +89,7 @@ public class ListaProfissaoAdapter extends RecyclerView.Adapter<ListaProfissaoAd
             } else {
                 cardProfissao.setCardBackgroundColor(ContextCompat.getColor(context,R.color.cor_background_card));
             }
-            nivelProfissao.setText(String.valueOf(profissao.getNivel()));
+            nivelProfissao.setText(String.valueOf(profissao.getNivel(context)));
         }
     }
     private static class ItemDiffCallback extends DiffUtil.Callback {

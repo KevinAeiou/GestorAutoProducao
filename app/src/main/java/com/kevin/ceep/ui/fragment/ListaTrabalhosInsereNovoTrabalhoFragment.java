@@ -4,6 +4,7 @@ import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static com.kevin.ceep.ui.activity.Constantes.CODIGO_REQUISICAO_INSERE_TRABALHO_ESTOQUE;
 import static com.kevin.ceep.ui.activity.Constantes.CODIGO_REQUISICAO_INSERE_TRABALHO_PRODUCAO;
+import static com.kevin.ceep.ui.activity.Constantes.CODIGO_REQUISICAO_INSERE_TRABALHO_VENDAS;
 import static com.kevin.ceep.ui.activity.Constantes.CODIGO_REQUISICAO_INVALIDA;
 import static com.kevin.ceep.utilitario.Utilitario.stringContemString;
 
@@ -40,8 +41,10 @@ import com.kevin.ceep.databinding.FragmentListaTrabalhosInsereNovoTrabalhoBindin
 import com.kevin.ceep.model.Profissao;
 import com.kevin.ceep.model.Trabalho;
 import com.kevin.ceep.model.TrabalhoEstoque;
+import com.kevin.ceep.model.TrabalhoVendido;
 import com.kevin.ceep.repository.TrabalhoEstoqueRepository;
 import com.kevin.ceep.repository.TrabalhoRepository;
+import com.kevin.ceep.ui.fragment.ListaTrabalhosInsereNovoTrabalhoFragmentDirections.VaiDeTrabalhosParaDetalhesVenda;
 import com.kevin.ceep.ui.fragment.ListaTrabalhosInsereNovoTrabalhoFragmentDirections.VaiParaConfirmaTrabalho;
 import com.kevin.ceep.ui.recyclerview.adapter.ListaTrabalhoEspecificoAdapter;
 import com.kevin.ceep.ui.recyclerview.adapter.ListaTrabalhoEspecificoNovaProducaoAdapter;
@@ -64,7 +67,7 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment implement
     private ProgressBar indicadorProgresso;
     private RecyclerView meuRecycler;
     private ListaTrabalhoEspecificoNovaProducaoAdapter listaTrabalhoEspecificoAdapter;
-    private String personagemId, textoFiltro;
+    private String idPersonagem, textoFiltro;
     private ChipGroup grupoChipsProfissoes;
     private ArrayList<String> listaProfissoes;
     private ArrayList<Trabalho> todosTrabalhos, listaTrabalhosFiltrada;
@@ -83,15 +86,19 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment implement
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        configuraComponentesVisuais();
+        inicializaComponentes();
+        recebeDadosIntent();
+        configuraMeuRecycler();
+        configuraChipSelecionado();
+    }
+
+    private void configuraComponentesVisuais() {
         EstadoAppViewModel estadoAppViewModel = new ViewModelProvider(requireActivity()).get(EstadoAppViewModel.class);
         ComponentesVisuais componentesVisuais = new ComponentesVisuais();
         componentesVisuais.appBar = true;
         componentesVisuais.itemMenuBusca = true;
         estadoAppViewModel.componentes.setValue(componentesVisuais);
-        inicializaComponentes();
-        recebeDadosIntent();
-        configuraMeuRecycler();
-        configuraChipSelecionado();
     }
 
     @Override
@@ -191,9 +198,9 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment implement
 
     private void configuraListaDeProfissoes() {
         listaProfissoes.clear();
-        ProfissaoViewModelFactory profissaoViewModelFactory = new ProfissaoViewModelFactory(personagemId);
+        ProfissaoViewModelFactory profissaoViewModelFactory = new ProfissaoViewModelFactory(idPersonagem);
         ProfissaoViewModel profissaoViewModel = new ViewModelProvider(this, profissaoViewModelFactory).get(ProfissaoViewModel.class);
-        profissaoViewModel.pegaTodasProfissoes().observe(getViewLifecycleOwner(), resultadoProfissoes -> {
+        profissaoViewModel.recuperaProfissoes().observe(getViewLifecycleOwner(), resultadoProfissoes -> {
             if (resultadoProfissoes.getErro() == null) {
                 for (Profissao profissao : resultadoProfissoes.getDado()) {
                     listaProfissoes.add(profissao.getNome());
@@ -226,7 +233,7 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment implement
     }
 
     private void recebeDadosIntent() {
-        personagemId = ListaTrabalhosInsereNovoTrabalhoFragmentArgs.fromBundle(getArguments()).getIdPersonagem();
+        idPersonagem = ListaTrabalhosInsereNovoTrabalhoFragmentArgs.fromBundle(getArguments()).getIdPersonagem();
         codigoRequisicao = ListaTrabalhosInsereNovoTrabalhoFragmentArgs.fromBundle(getArguments()).getRequisicao();
     }
 
@@ -244,30 +251,37 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment implement
             public void onItemClick(Trabalho trabalho, int adapterPosition) {
                 if (codigoRequisicao == CODIGO_REQUISICAO_INSERE_TRABALHO_PRODUCAO) vaiParaConfirmaTrabalhoFragment(trabalho);
                 if (codigoRequisicao == CODIGO_REQUISICAO_INSERE_TRABALHO_ESTOQUE) {
-                    TrabalhoEstoqueViewModelFactory trabalhoEstoqueViewModelFactory = new TrabalhoEstoqueViewModelFactory(new TrabalhoEstoqueRepository(getContext(), personagemId));
+                    TrabalhoEstoqueViewModelFactory trabalhoEstoqueViewModelFactory = new TrabalhoEstoqueViewModelFactory(new TrabalhoEstoqueRepository(idPersonagem));
                     TrabalhoEstoqueViewModel trabalhoEstoqueViewModel = new ViewModelProvider(getViewModelStore(), trabalhoEstoqueViewModelFactory).get(TrabalhoEstoqueViewModel.class);
                     TrabalhoEstoque trabalhoEstoque = new TrabalhoEstoque();
                     trabalhoEstoque.setIdTrabalho(trabalho.getId());
                     trabalhoEstoque.setQuantidade(1);
-                    TrabalhoEstoque trabalhoEncontrado = trabalhoEstoqueViewModel.pegaTrabalhoEstoquePorIdTrabalho(trabalhoEstoque.getIdTrabalho());
-                    if (trabalhoEncontrado == null) {
-                        trabalhoEstoqueViewModel.insereTrabalhoEstoque(trabalhoEstoque).observe(getViewLifecycleOwner(), resultadoInsereTrabalho -> {
-                            if (resultadoInsereTrabalho.getErro() != null) {
-                                Snackbar.make(binding.getRoot(), "Erro ao inserir: " + resultadoInsereTrabalho.getErro(), Snackbar.LENGTH_LONG).show();
+                    trabalhoEstoqueViewModel.recuperaTrabalhoEstoquePorIdTrabalho(trabalhoEstoque.getIdTrabalho()).observe(getViewLifecycleOwner(), resultadoTrabalhoEncontrado -> {
+                        if (resultadoTrabalhoEncontrado.getErro() == null) {
+                            TrabalhoEstoque trabalhoEncontrado = resultadoTrabalhoEncontrado.getDado();
+                            if (trabalhoEncontrado == null) {
+                                trabalhoEstoqueViewModel.insereTrabalhoEstoque(trabalhoEstoque).observe(getViewLifecycleOwner(), resultadoInsereTrabalho -> {
+                                    if (resultadoInsereTrabalho.getErro() != null) {
+                                        Snackbar.make(binding.getRoot(), "Erro ao inserir: " + resultadoInsereTrabalho.getErro(), Snackbar.LENGTH_LONG).show();
+                                        return;
+                                    }
+                                    voltaParaListaEstoqueFragment();
+                                });
                                 return;
                             }
-                            voltaParaListaEstoqueFragment();
-                        });
-                        return;
-                    }
-                    trabalhoEncontrado.setQuantidade(trabalhoEncontrado.getQuantidade() + 1);
-                    trabalhoEstoqueViewModel.modificaTrabalhoEstoque(trabalhoEncontrado).observe(getViewLifecycleOwner(), resultadoInsereTrabalho -> {
-                        if (resultadoInsereTrabalho.getErro() != null) {
-                            Snackbar.make(binding.getRoot(), "Erro ao modificar: " + resultadoInsereTrabalho.getErro(), Snackbar.LENGTH_LONG).show();
-                            return;
+                            trabalhoEncontrado.setQuantidade(trabalhoEncontrado.getQuantidade() + 1);
+                            trabalhoEstoqueViewModel.modificaTrabalhoEstoque(trabalhoEncontrado).observe(getViewLifecycleOwner(), resultadoInsereTrabalho -> {
+                                if (resultadoInsereTrabalho.getErro() != null) {
+                                    Snackbar.make(binding.getRoot(), "Erro ao modificar: " + resultadoInsereTrabalho.getErro(), Snackbar.LENGTH_LONG).show();
+                                    return;
+                                }
+                                voltaParaListaEstoqueFragment();
+                            });
                         }
-                        voltaParaListaEstoqueFragment();
                     });
+                }
+                if (codigoRequisicao == CODIGO_REQUISICAO_INSERE_TRABALHO_VENDAS) {
+                    vaiParaDetalhesVenda(trabalho);
                 }
             }
 
@@ -278,13 +292,21 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment implement
         });
     }
 
+    private void vaiParaDetalhesVenda(Trabalho trabalho) {
+        TrabalhoVendido trabalhoVendido = new TrabalhoVendido();
+        trabalhoVendido.setIdTrabalho(trabalho.getId());
+        VaiDeTrabalhosParaDetalhesVenda acao = ListaTrabalhosInsereNovoTrabalhoFragmentDirections.vaiDeTrabalhosParaDetalhesVenda(trabalhoVendido, idPersonagem);
+        acao.setCodigoRequisicao(codigoRequisicao);
+        Navigation.findNavController(binding.getRoot()).navigate(acao);
+    }
+
     private void voltaParaListaEstoqueFragment() {
         NavDirections acao = ListaTrabalhosInsereNovoTrabalhoFragmentDirections.vaiDeTrabalhosParaEstoque();
         Navigation.findNavController(binding.getRoot()).navigate(acao);
     }
 
     private void vaiParaConfirmaTrabalhoFragment(Trabalho trabalho) {
-        VaiParaConfirmaTrabalho acao = ListaTrabalhosInsereNovoTrabalhoFragmentDirections.vaiParaConfirmaTrabalho(personagemId);
+        VaiParaConfirmaTrabalho acao = ListaTrabalhosInsereNovoTrabalhoFragmentDirections.vaiParaConfirmaTrabalho(idPersonagem);
         acao.setTrabalho(trabalho);
         Navigation.findNavController(requireView()).navigate(acao);
     }
@@ -296,7 +318,7 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment implement
         listaProfissoes = new ArrayList<>();
         todosTrabalhos = new ArrayList<>();
         listaTrabalhosFiltrada = new ArrayList<>();
-        ListaNovaProducaoViewModelFactory listaNovaProducaoViewModelFactory = new ListaNovaProducaoViewModelFactory(new TrabalhoRepository(getContext()));
+        ListaNovaProducaoViewModelFactory listaNovaProducaoViewModelFactory = new ListaNovaProducaoViewModelFactory(TrabalhoRepository.getInstancia(getContext()));
         novaProducaoViewModel = new ViewModelProvider(this, listaNovaProducaoViewModelFactory).get(ListaNovaProducaoViewModel.class);
         iconeListaVazia = binding.iconeVazia;
         txtListaVazia = binding.txtListaVazia;
@@ -304,7 +326,7 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment implement
     }
 
     private void pegaTodosTrabalhos() {
-        novaProducaoViewModel.pegaTodosTrabalhos().observe(this, resultadoPegaTodosTrabalhos -> {
+        novaProducaoViewModel.pegaTodosTrabalhos().observe(getViewLifecycleOwner(), resultadoPegaTodosTrabalhos -> {
             if (resultadoPegaTodosTrabalhos.getDado() != null) {
                 todosTrabalhos = resultadoPegaTodosTrabalhos.getDado();
                 listaTrabalhosFiltrada = (ArrayList<Trabalho>) todosTrabalhos.clone();
@@ -331,8 +353,8 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment implement
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
+    public void onDestroyView() {
+        super.onDestroyView();
         binding = null;
     }
 }

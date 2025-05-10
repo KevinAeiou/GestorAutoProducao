@@ -94,17 +94,18 @@ public class ModificaPersonagemFragment extends Fragment implements MenuProvider
     private void configuraBotaoExcluir() {
         binding.btnExcluiPersonagem.setOnClickListener(view -> {
             MaterialAlertDialogBuilder dialogoDeAlerta = new MaterialAlertDialogBuilder(requireContext());
-            dialogoDeAlerta.setMessage("Confirma exclusão?");
-            dialogoDeAlerta.setNegativeButton("Não", ((dialogInterface, i) -> onDestroy()));
-            dialogoDeAlerta.setPositiveButton("Sim", (dialogInterface, i) -> deletaPersonagem());
+            dialogoDeAlerta.setTitle("Personagem será removido permanentemente");
+            dialogoDeAlerta.setMessage("Deseja continuar?");
+            dialogoDeAlerta.setNegativeButton("Não", ((dialogInterface, i) -> voltaParaTrabalhosProducao()));
+            dialogoDeAlerta.setPositiveButton("Sim", (dialogInterface, i) -> removePersonagem());
             dialogoDeAlerta.show();
         });
     }
 
-    private void deletaPersonagem() {
+    private void removePersonagem() {
         personagemViewModel.removePersonagem(personagemRecebido).observe(getViewLifecycleOwner(), resultadoPersonagem -> {
             if (resultadoPersonagem.getErro() == null) {
-                Snackbar.make(binding.getRoot(), "Personagem: " + personagemRecebido.getId() + " foi excluído! ", Snackbar.LENGTH_LONG).show();
+                Snackbar.make(binding.getRoot(), "Personagem: " + personagemRecebido.getId() + " foi removido!", Snackbar.LENGTH_LONG).show();
                 voltaParaTrabalhosProducao();
                 return;
             }
@@ -142,7 +143,7 @@ public class ModificaPersonagemFragment extends Fragment implements MenuProvider
         personagemSwAutoProducao = binding.swAutoProducaoPersonagem;
         personagemEmail = binding.edtEmailPersonagem;
         personagemSenha = binding.edtSenhaPersonagem;
-        PersonagemViewModelFactory personagemViewModelFactory = new PersonagemViewModelFactory(new PersonagemRepository(getContext()));
+        PersonagemViewModelFactory personagemViewModelFactory = new PersonagemViewModelFactory(PersonagemRepository.getInstance());
         personagemViewModel = new ViewModelProvider(requireActivity(), personagemViewModelFactory).get(PersonagemViewModel.class);
     }
 
@@ -160,7 +161,7 @@ public class ModificaPersonagemFragment extends Fragment implements MenuProvider
     }
 
     private void modificaPersonagemServidor(Personagem personagemModificado) {
-        personagemViewModel.modificaPersonagem(personagemModificado).observe(this, resultadoModificaPersonagem -> {
+        personagemViewModel.modificaPersonagem(personagemModificado).observe(getViewLifecycleOwner(), resultadoModificaPersonagem -> {
             if (resultadoModificaPersonagem.getErro() == null) {
                 voltaParaTrabalhosProducao();
                 return;
@@ -177,5 +178,17 @@ public class ModificaPersonagemFragment extends Fragment implements MenuProvider
                personagem.getEspacoProducao() == personagemRecebido.getEspacoProducao() &&
                comparaString(personagem.getEmail(), personagemRecebido.getEmail()) &&
                comparaString(personagem.getSenha(), personagemRecebido.getSenha()));
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        removeOuvintePersonagem();
+        binding = null;
+    }
+
+    private void removeOuvintePersonagem() {
+        if (personagemViewModel == null) return;
+        personagemViewModel.removeOuvinte();
     }
 }

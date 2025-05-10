@@ -21,11 +21,19 @@ public class ProfissaoViewModel extends ViewModel {
         return repository.retornaProfissaoModificada(profissoes,trabalhoModificado);
     }
 
-    public LiveData<Resource<ArrayList<Profissao>>> pegaTodasProfissoes() {
-        return repository.pegaTodasProfissoes();
+    public LiveData<Resource<ArrayList<Profissao>>> recuperaProfissoes() {
+        return repository.recuperaProfissoes();
     }
 
     public LiveData<Resource<Void>> modificaExperienciaProfissao(Profissao profissaoModificada) {
         return repository.modificaProfissao(profissaoModificada);
+    }
+
+    public void removeOuvinte() {
+        repository.removeOuvinte();
+    }
+
+    public LiveData<Resource<Void>> insereProfissoes() {
+        return repository.insereNovasProfissoes();
     }
 }

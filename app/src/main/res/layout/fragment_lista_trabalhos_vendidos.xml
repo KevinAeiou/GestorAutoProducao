@@ -60,4 +60,18 @@
         app:layout_constraintEnd_toEndOf="@id/iconeVazia"
         app:layout_constraintTop_toBottomOf="@id/iconeVazia"/>
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/botaoFlutuanteVendas"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:contentDescription="@string/cadastrar_novo_trabalho"
+        android:foregroundGravity="center"
+        app:elevation="12dp"
+        app:fabSize="auto"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/ic_adiciona"
+        tools:ignore="SpeakableTextPresentCheck" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

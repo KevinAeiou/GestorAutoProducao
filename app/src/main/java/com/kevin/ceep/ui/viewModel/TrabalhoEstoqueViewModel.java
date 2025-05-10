@@ -16,16 +16,16 @@ public class TrabalhoEstoqueViewModel extends ViewModel {
     public TrabalhoEstoqueViewModel(TrabalhoEstoqueRepository repository) {
         this.repository = repository;
     }
-    public LiveData<Resource<ArrayList<TrabalhoEstoque>>> pegaTodosTrabalhosEstoque() {
-        return repository.pegaTodosTrabalhosEstoque();
+    public LiveData<Resource<ArrayList<TrabalhoEstoque>>> recuperaTrabalhosEstoque() {
+        return repository.recuperaEstoque();
     }
 
     public LiveData<Resource<Void>> modificaTrabalhoEstoque(TrabalhoEstoque trabalhoEstoqueModificado) {
         return repository.modificaTrabalhoEstoque(trabalhoEstoqueModificado);
     }
 
-    public TrabalhoEstoque pegaTrabalhoEstoquePorIdTrabalho(String idTrabalho) {
-        return repository.pegaTrabalhoEstoquePorIdTrabalho(idTrabalho);
+    public LiveData<Resource<TrabalhoEstoque>> recuperaTrabalhoEstoquePorIdTrabalho(String idTrabalho) {
+        return repository.recuperaTrabalhoEstoquePorIdTrabalho(idTrabalho);
     }
 
     public LiveData<Resource<Void>> insereTrabalhoEstoque(TrabalhoEstoque trabalhoEstoque) {
@@ -35,11 +35,11 @@ public class TrabalhoEstoqueViewModel extends ViewModel {
         return repository.removeTrabalhoEstoque(trabalhoRemovido);
     }
 
-    public LiveData<Resource<Void>> sincronizaEstoque() {
-        return repository.sincronizaEstoque();
+    public LiveData<Resource<Void>> removeReferenciaTrabalhoEspecifico(Trabalho trabalho) {
+        return repository.removeReferenciaTrabalhoEspecifico(trabalho);
     }
 
-    public void removeReferenciaTrabalhoEspecifico(Trabalho trabalho) {
-        repository.removeReferenciaTrabalhoEspecifico(trabalho);
+    public void removeOuvinte() {
+        repository.removeOuvinte();
     }
 }

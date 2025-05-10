@@ -30,9 +30,10 @@
         <item>375000</item>
         <item>470000</item>
         <item>585000</item>
-        <item>720000</item>
-        <item>875000</item>
-        <item>1050000</item>
+        <item>705000</item>
+        <item>830000</item>
+        <item>996000</item>
+        <item>1195000</item>
     </integer-array>
     <string-array name="raridades">
         <item>Comum</item>
@@ -59,16 +60,25 @@
         <item>Licença de Artesanato de Novato</item>
     </string-array>
     <string-array name="profissoes">
-        <item>Armas de Longo Alcance</item>
-        <item>Armas corpo a corpo</item>
-        <item>Armaduras de Tecido</item>
-        <item>Armaduras Leves</item>
-        <item>Armaduras Pesadas</item>
-        <item>Anéis</item>
-        <item>Amuletos</item>
-        <item>Braceletes</item>
-        <item>Capotes</item>
+        <item>@string/stringProfissaoArmaLongoAlcance</item>
+        <item>@string/stringProfissaoArmasCorpoCorpo</item>
+        <item>@string/stringProfissaoArmaduraTecido</item>
+        <item>@string/stringProfissaoArmaduraLeve</item>
+        <item>@string/stringProfissaoArmaduraPesada</item>
+        <item>@string/stringProfissaoAneis</item>
+        <item>@string/stringProfissaoAmuletos</item>
+        <item>@string/stringProfissaoBraceletes</item>
+        <item>@string/stringProfissaoCapotes</item>
     </string-array>
+    <string name="stringProfissaoArmaLongoAlcance">Armas de Longo Alcance</string>
+    <string name="stringProfissaoArmasCorpoCorpo">Armas Corpo a Corpo</string>
+    <string name="stringProfissaoArmaduraTecido">Armaduras de Tecido</string>
+    <string name="stringProfissaoArmaduraLeve">Armaduras Leves</string>
+    <string name="stringProfissaoArmaduraPesada">Armaduras Pesadas</string>
+    <string name="stringProfissaoAneis">Anéis</string>
+    <string name="stringProfissaoAmuletos">Amuletos</string>
+    <string name="stringProfissaoBraceletes">Braceletes</string>
+    <string name="stringProfissaoCapotes">Capotes</string>
     <string-array name="quantidade">
         <item>1</item>
         <item>2</item>
@@ -209,6 +219,9 @@
     <string name="stringUsoValor">Uso: %1$s</string>
     <string name="stringAutoProducaoValor">Auto produção: %1$s</string>
     <string name="stringEspacoProducaoValor">Espaço para produção: %1$d</string>
+    <string name="stringTaxaLucroValor">%d%%</string>
+    <string name="stringValorProducaoValor">%1$d ouros</string>
+    <string name="stringValorLucroValor">%1$d ouros</string>
     <string name="teste">teste</string>
     <string name="stringPrioridade">Prioridade</string>
     <string name="stringListaVazia">Lista vazia</string>
@@ -222,4 +235,57 @@
     <string name="stringRaro">Raro</string>
     <string name="stringComum">Comum</string>
     <string name="stringNadaEncontrado">Nada encontrado</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="stringDescricao">Descrição</string>
+    <string name="stringData">Data</string>
+    <string name="stringValor">Valor</string>
+    <string name="stringValorProducao">Valor de produção</string>
+    <string name="stringTaxaLucro">Taxa de lucro (%)</string>
+    <string name="stringValorLucro">Valor com lucro (ouro)</string>
+    <string name="stringIndefinido">Indefinido</string>
+
+    <string name="stringSubstanciaComum">Substância comum</string>
+    <string name="stringSubstanciaComposta">Substância composta</string>
+    <string name="stringSubstanciaEnergia">Substância energética</string>
+    <string name="stringSubstanciaEterea">Substância etérea</string>
+    <string name="stringEssenciaComum">Essência comum</string>
+    <string name="stringEssenciaComposta">Essência composta</string>
+    <string name="stringEssenciaEnergia">Essência de energia</string>
+    <string name="stringEssenciaEterea">Essência etérea</string>
+    <string name="stringCatalisadorComum">Catalisador comum</string>
+    <string name="stringCatalisadorComposto">Catalisador amplificado</string>
+    <string name="stringCatalisadorEnergia">Catalisador de energia</string>
+    <string name="stringCatalisadorEtereo">Catalisador Etéreo</string>
+    <string name="stringCampoRequerido">Campo requerido!</string>
+    <string name="strngValorInvalido">Valor inválido!</string>
+    <string name="stringRaridadeRaro">Raro</string>
+    <string name="stringRaridadeMelhorado">Melhorado</string>
+    <string name="stringSelecioneTrabalho">Selecione um trabalho</string>
+    <string name="stringRecursos">Recursos</string>
+    <string name="stringEtereo">Etéreo</string>
+    <string name="stringEnergia">Energia</string>
+    <string name="stringComposto">Composto</string>
+    <string name="stringSubstancias">Substâncias</string>
+    <string name="stringEssencias">Essências</string>
+    <string name="stringCatalisador">Catalisadores</string>
+    <string name="stringCampoInvalido">Campo inválido</string>
+    <string-array name="substancias">
+        <item>@string/stringSubstanciaComum</item>
+        <item>@string/stringSubstanciaComposta</item>
+        <item>@string/stringSubstanciaEnergia</item>
+        <item>@string/stringSubstanciaEterea</item>
+    </string-array>
+    <string-array name="essencias">
+        <item>@string/stringEssenciaComum</item>
+        <item>@string/stringEssenciaComposta</item>
+        <item>@string/stringEssenciaEnergia</item>
+        <item>@string/stringEssenciaEterea</item>
+    </string-array>
+    <string-array name="catalisadores">
+        <item>@string/stringCatalisadorComum</item>
+        <item>@string/stringCatalisadorComposto</item>
+        <item>@string/stringCatalisadorEnergia</item>
+        <item>@string/stringCatalisadorEtereo</item>
+    </string-array>
 </resources>

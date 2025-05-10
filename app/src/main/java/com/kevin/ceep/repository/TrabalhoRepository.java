@@ -9,6 +9,7 @@ import static com.kevin.ceep.db.contracts.TrabalhoDbContract.TrabalhoEntry.COLUM
 import static com.kevin.ceep.db.contracts.TrabalhoDbContract.TrabalhoEntry.COLUMN_NAME_RARIDADE;
 import static com.kevin.ceep.db.contracts.TrabalhoDbContract.TrabalhoEntry.COLUMN_NAME_TRABALHO_NECESSARIO;
 import static com.kevin.ceep.db.contracts.TrabalhoDbContract.TrabalhoEntry.TABLE_TRABALHOS;
+import static com.kevin.ceep.repository.TrabalhoProducaoRepository.destroyInstance;
 import static com.kevin.ceep.ui.activity.Constantes.CHAVE_LISTA_TRABALHO;
 
 import android.content.ContentValues;
@@ -33,37 +34,57 @@ import com.kevin.ceep.model.Trabalho;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Objects;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class TrabalhoRepository {
-    private final DatabaseReference minhaReferencia;
+    private final DatabaseReference referenciaTrabalho;
     private final SQLiteDatabase dbLeitura, dbModificacao;
     private final MutableLiveData<Resource<ArrayList<Trabalho>>> trabalhosEncontrados;
+    private static volatile TrabalhoRepository instancia;
+    private ValueEventListener ouvinteTrabalho;
+    private final Executor backgroundExecutor = Executors.newFixedThreadPool(2);
 
     public TrabalhoRepository(Context context) {
-        this.minhaReferencia = FirebaseDatabase.getInstance().getReference(CHAVE_LISTA_TRABALHO);
+        this.referenciaTrabalho = FirebaseDatabase.getInstance().getReference(CHAVE_LISTA_TRABALHO);
         DbHelper dbHelper = DbHelper.getInstance(context);
         this.dbLeitura = dbHelper.getReadableDatabase();
         this.dbModificacao = dbHelper.getWritableDatabase();
         this.trabalhosEncontrados = new MutableLiveData<>();
     }
+
+    public static synchronized TrabalhoRepository getInstancia(Context context) {
+        if (instancia == null) {
+            destroyInstance();
+            instancia = new TrabalhoRepository(context);
+        }
+        return instancia;
+    }
+
     public LiveData<Resource<Void>> modificaTrabalho(Trabalho trabalhoModificado) {
         MutableLiveData<Resource<Void>> liveData = new  MutableLiveData<>();
-        minhaReferencia.child(trabalhoModificado.getId()).setValue(trabalhoModificado).addOnCompleteListener(task -> {
+        referenciaTrabalho.child(trabalhoModificado.getId()).setValue(trabalhoModificado).addOnCompleteListener(backgroundExecutor, task -> {
             if (task.isSuccessful()) {
                 ContentValues values = defineTrabalhoModificado(trabalhoModificado);
                 String selection = COLUMN_NAME_ID + " LIKE ?";
                 String[] selectionArgs = {trabalhoModificado.getId()};
                 long newRowId = dbModificacao.update(TABLE_TRABALHOS, values, selection, selectionArgs);
                 if (newRowId == -1) {
-                    liveData.setValue(new Resource<>(null, "Erro ao adicionar novo trabalho a lista"));
-                } else {
-                    liveData.setValue(new Resource<>(null, null));
+                    liveData.postValue(new Resource<>(null, "Erro ao adicionar novo trabalho a lista"));
+                    return;
                 }
-            } else if (task.isCanceled()) {
-                liveData.setValue(new Resource<>(null, Objects.requireNonNull(task.getException()).toString()));
+                liveData.postValue(new Resource<>(null, null));
+                return;
             }
+            Exception exception = task.getException();
+            String erro = recuperaErro(exception, "Erro desconhecido ao modificar trabalho");
+            liveData.postValue(new Resource<>(null, erro));
         });
         return liveData;
+    }
+
+    private String recuperaErro(Exception exception, String erro) {
+        return exception == null ? erro : exception.getMessage();
     }
 
     @NonNull
@@ -79,20 +100,22 @@ public class TrabalhoRepository {
         return values;
     }
 
-    public LiveData<Resource<Void>> adicionaTrabalho(Trabalho trabalho) {
+    public LiveData<Resource<Void>> insereTrabalho(Trabalho trabalho) {
         MutableLiveData<Resource<Void>> liveData = new  MutableLiveData<>();
-        minhaReferencia.child(trabalho.getId()).setValue(trabalho).addOnCompleteListener(task -> {
+        referenciaTrabalho.child(trabalho.getId()).setValue(trabalho).addOnCompleteListener(backgroundExecutor, task -> {
             if (task.isSuccessful()) {
                 ContentValues values = defineNovoTrabalho(trabalho);
                 long newRowId = dbModificacao.insert(TABLE_TRABALHOS, null, values);
                 if (newRowId == -1) {
-                    liveData.setValue(new Resource<>(null, "Erro ao adicionar novo trabalho a lista"));
-                } else {
-                    liveData.setValue(new Resource<>(null, null));
+                    liveData.postValue(new Resource<>(null, "Erro ao adicionar novo trabalho a lista"));
+                    return;
                 }
-            } else if (task.isCanceled()) {
-                liveData.setValue(new Resource<>(null, Objects.requireNonNull(task.getException()).toString()));
+                liveData.postValue(new Resource<>(null, null));
+                return;
             }
+            Exception exception = task.getException();
+            String erro = recuperaErro(exception, "Erro desconhecido ao inserir trabalho");
+            liveData.postValue(new Resource<>(null, erro));
         });
         return liveData;
     }
@@ -111,17 +134,19 @@ public class TrabalhoRepository {
         return values;
     }
 
-    public LiveData<Resource<Void>> removeTrabalho(Trabalho trabalhoRecebido) {
+    public LiveData<Resource<Void>> removeTrabalho(Trabalho trabalho) {
         MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
-        minhaReferencia.child(trabalhoRecebido.getId()).removeValue().addOnCompleteListener(task -> {
+        referenciaTrabalho.child(trabalho.getId()).removeValue().addOnCompleteListener(backgroundExecutor, task -> {
             if (task.isSuccessful()) {
                 String selection = COLUMN_NAME_ID + " LIKE ?";
-                String[] selectionArgs = {trabalhoRecebido.getId()};
+                String[] selectionArgs = {trabalho.getId()};
                 dbModificacao.delete(TABLE_TRABALHOS, selection, selectionArgs);
-                liveData.setValue(new Resource<>(null, null));
-            } else if (task.isCanceled()) {
-                liveData.setValue(new Resource<>(null, Objects.requireNonNull(task.getException()).toString()));
+                liveData.postValue(new Resource<>(null, null));
+                return;
             }
+            Exception exception = task.getException();
+            String erro = recuperaErro(exception, "Erro desconhecido ao remover trabalho");
+            liveData.postValue(new Resource<>(null, erro));
         });
         return liveData;
     }
@@ -160,11 +185,11 @@ public class TrabalhoRepository {
     public LiveData<Resource<Void>> sincronizaTrabalhos() {
         ArrayList<Trabalho> trabalhosServidor = new ArrayList<>();
         MutableLiveData<Resource<Void>> liveData = new  MutableLiveData<>();
-        minhaReferencia.addListenerForSingleValueEvent(new ValueEventListener() {
+        ouvinteTrabalho = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 trabalhosServidor.clear();
-                for (DataSnapshot dn:snapshot.getChildren()){
+                for (DataSnapshot dn : snapshot.getChildren()) {
                     Trabalho trabalho = dn.getValue(Trabalho.class);
                     trabalhosServidor.add(trabalho);
                     String selection = COLUMN_NAME_ID + " LIKE ?";
@@ -200,7 +225,7 @@ public class TrabalhoRepository {
                         null
                 );
                 ArrayList<Trabalho> trabalhosBanco = new ArrayList<>();
-                while(cursor.moveToNext()) {
+                while (cursor.moveToNext()) {
                     Trabalho trabalho = new Trabalho(
                             cursor.getString(1), //nome
                             cursor.getString(2), //nomeProducao
@@ -236,7 +261,8 @@ public class TrabalhoRepository {
             public void onCancelled(@NonNull DatabaseError error) {
                 liveData.setValue(new Resource<>(null, error.getMessage()));
             }
-        });
+        };
+        referenciaTrabalho.addListenerForSingleValueEvent(ouvinteTrabalho);
         return liveData;
     }
 
@@ -312,5 +338,11 @@ public class TrabalhoRepository {
         cursor.close();
         liveData.setValue(new Resource<>(null, "Não encontrado"));
         return liveData;
+    }
+
+    public void removeOuvinte() {
+        if (referenciaTrabalho != null && ouvinteTrabalho != null) {
+            referenciaTrabalho.removeEventListener(ouvinteTrabalho);
+        }
     }
 }

@@ -18,7 +18,7 @@ public class ProfissaoViewModelFactory implements ViewModelProvider.Factory {
     @Override
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
         if (modelClass.isAssignableFrom(ProfissaoViewModel.class)) {
-            return (T) new ProfissaoViewModel(new ProfissaoRepository(idPersonagem));
+            return (T) new ProfissaoViewModel(ProfissaoRepository.getInstance(idPersonagem));
         }
         throw new IllegalArgumentException("Classe ViewModel desconhecida");
     }
