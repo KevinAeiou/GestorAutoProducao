@@ -225,19 +225,23 @@ public class ListaTrabalhosProducaoFragment extends Fragment implements MenuProv
                 if (trabalhoAdapter != null) {
                     TrabalhoProducao trabalhoremovido = trabalhosFiltrados.get(itemPosicao);
                     trabalhoAdapter.remove(itemPosicao);
+                    trabalhosFiltrados.remove(trabalhoremovido);
                     Snackbar snackbarDesfazer = Snackbar.make(binding.getRoot(), trabalhoremovido.getNome()+ " excluido", Snackbar.LENGTH_LONG);
                     snackbarDesfazer.addCallback(new Snackbar.Callback(){
                         @Override
                         public void onDismissed(Snackbar transientBottomBar, int event) {
                             super.onDismissed(transientBottomBar, event);
                             if (event != DISMISS_EVENT_ACTION){
-                                removeTrabalhoDoBanco(trabalhoremovido);
+                                removeTrabalhoProducao(trabalhoremovido);
                                 removeTrabalhoDaLista(trabalhoremovido);
                             }
                         }
                     });
                     snackbarDesfazer.setAnchorView(binding.floatingActionButton);
-                    snackbarDesfazer.setAction(getString(R.string.stringDesfazer), v -> trabalhoAdapter.adiciona(trabalhoremovido, itemPosicao));
+                    snackbarDesfazer.setAction(getString(R.string.stringDesfazer), v -> {
+                        trabalhoAdapter.adiciona(trabalhoremovido, itemPosicao);
+                        trabalhosFiltrados.add(itemPosicao, trabalhoremovido);
+                    });
                     snackbarDesfazer.show();
                 }
             }
@@ -250,7 +254,7 @@ public class ListaTrabalhosProducaoFragment extends Fragment implements MenuProv
         trabalhos.remove(trabalhoremovido);
     }
 
-    private void removeTrabalhoDoBanco(TrabalhoProducao trabalho) {
+    private void removeTrabalhoProducao(TrabalhoProducao trabalho) {
         trabalhoProducaoViewModel.getRemocaoResultado().observe(getViewLifecycleOwner(), resultadoRemoveTrabalho -> {
             if (resultadoRemoveTrabalho.getErro() == null) return;
             Snackbar.make(binding.getRoot(), "Erro: "+resultadoRemoveTrabalho.getErro(), Snackbar.LENGTH_LONG).setAnchorView(binding.floatingActionButton).show();
