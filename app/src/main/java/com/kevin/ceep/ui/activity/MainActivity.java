@@ -9,7 +9,6 @@ import static com.kevin.ceep.ui.activity.Constantes.CODIGO_REQUISICAO_INSERE_TRA
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -75,13 +74,18 @@ public class MainActivity extends AppCompatActivity {
         inicializaComponentes();
         configuraClickAutoComplete();
         configuraToolbar();
+        configuraNavegacao();
+    }
+
+    private void configuraNavegacao() {
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_content_main);
         assert navHostFragment != null;
         controlador = navHostFragment.getNavController();
-        appBarConfiguration = new AppBarConfiguration.Builder(R.id.listaTrabalhosProducao, R.id.listaTrabalhosEstoque, R.id.listaTrabalhosVendidos, R.id.listaProfissoes).setOpenableLayout(drawerLayout).build();
-        NavigationUI.setupWithNavController(toolbar, controlador, appBarConfiguration);
-        NavigationUI.setupWithNavController(navigationView, controlador);
-        NavigationUI.setupWithNavController(binding.navegacaoInferior, controlador);
+        configuraAppBar();
+        conguraNavigationListeners();
+    }
+
+    private void conguraNavigationListeners() {
         controlador.addOnDestinationChangedListener((navController, navDestination, bundle) -> {
             if (navDestination.getId() == R.id.splashscreenFragment) {
                 FirebaseAuth.getInstance().signOut();
@@ -108,6 +112,13 @@ public class MainActivity extends AppCompatActivity {
             }
             configuraComponentesVisuais();
         });
+    }
+
+    private void configuraAppBar() {
+        appBarConfiguration = new AppBarConfiguration.Builder(R.id.listaTrabalhosProducao, R.id.listaTrabalhosEstoque, R.id.listaTrabalhosVendidos, R.id.listaProfissoes).setOpenableLayout(drawerLayout).build();
+        NavigationUI.setupWithNavController(toolbar, controlador, appBarConfiguration);
+        NavigationUI.setupWithNavController(navigationView, controlador);
+        NavigationUI.setupWithNavController(binding.navegacaoInferior, controlador);
     }
 
     private void configuraComponentesVisuais() {
@@ -209,11 +220,11 @@ public class MainActivity extends AppCompatActivity {
         personagemSelecionado = null;
         personagens = new ArrayList<>();
         estadoAppViewModel = new ViewModelProvider(this).get(EstadoAppViewModel.class);
+        PersonagemViewModelFactory personagemViewModelFactory = new PersonagemViewModelFactory(PersonagemRepository.getInstance());
+        personagemViewModel = new ViewModelProvider(this, personagemViewModelFactory).get(PersonagemViewModel.class);
     }
 
     private void atualizaCabecalhoPersonagemSelecionado() {
-        PersonagemViewModelFactory personagemViewModelFactory = new PersonagemViewModelFactory(PersonagemRepository.getInstance());
-        personagemViewModel = new ViewModelProvider(this, personagemViewModelFactory).get(PersonagemViewModel.class);
         personagemViewModel.pegaPersonagemSelecionado().observe(this, personagem -> {
             if (personagem == null) return;
             if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
@@ -235,13 +246,10 @@ public class MainActivity extends AppCompatActivity {
         personagens.clear();
         FirebaseUser usuarioID = FirebaseAuth.getInstance().getCurrentUser();
         if (usuarioID == null) return;
-        PersonagemViewModelFactory personagemViewModelFactory = new PersonagemViewModelFactory(PersonagemRepository.getInstance());
-        personagemViewModel = new ViewModelProvider(this, personagemViewModelFactory).get(PersonagemViewModel.class);
         personagemViewModel.recuperaPersonagensServidor(dado).observe(this, resultadoPersonagens -> {
             if (resultadoPersonagens.getErro() == null) {
                 personagens = resultadoPersonagens.getDado();
                 if (personagens.isEmpty()) return;
-                Log.d("personagem", "Lista de personagens não está vazia: ");
                 if (personagemSelecionado == null) personagemViewModel.definePersonagemSelecionado(personagens.get(0));
                 atualizaCabecalhoPersonagemSelecionado();
                 configuraDropDownPersonagens();
@@ -254,8 +262,6 @@ public class MainActivity extends AppCompatActivity {
     private void configuraPersonagens() {
         FirebaseUser usuarioID = FirebaseAuth.getInstance().getCurrentUser();
         if (usuarioID == null) return;
-        PersonagemViewModelFactory personagemViewModelFactory = new PersonagemViewModelFactory(PersonagemRepository.getInstance());
-        personagemViewModel = new ViewModelProvider(this, personagemViewModelFactory).get(usuarioID.getUid(), PersonagemViewModel.class);
         pegaIdsPersonagens();
     }
 
