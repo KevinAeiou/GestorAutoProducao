@@ -120,7 +120,7 @@ public class ConfirmaTrabalhoFragment extends Fragment {
         TrabalhoProducaoViewModelFactory trabalhoProducaoViewModelFactory = new TrabalhoProducaoViewModelFactory(idPersonagem);
         TrabalhoProducaoViewModel trabalhoProducaoViewModel = new ViewModelProvider(this, trabalhoProducaoViewModelFactory).get(idPersonagem, TrabalhoProducaoViewModel.class);
         TrabalhoProducao novoTrabalho = defineNovoTrabalhoProducao();
-        trabalhoProducaoViewModel.insereTrabalhoProducao(novoTrabalho).observe(getViewLifecycleOwner(), resposta -> {
+        trabalhoProducaoViewModel.getInsercaoResultado().observe(getViewLifecycleOwner(), resposta -> {
             if (resposta.getErro() == null) {
                 contador += 1;
                 if (contador >= quantidadeSelecionada) {
@@ -132,6 +132,7 @@ public class ConfirmaTrabalhoFragment extends Fragment {
             botaoCadastraTrabalho.setEnabled(true);
             Snackbar.make(binding.getRoot(), "Erro ao inserir " + trabalhoRecebido.getNome(), Snackbar.LENGTH_LONG).show();
         });
+        trabalhoProducaoViewModel.insereTrabalhoProducao(novoTrabalho);
     }
 
     private void voltaParaListaProducao() {

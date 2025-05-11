@@ -251,17 +251,18 @@ public class ListaTrabalhosProducaoFragment extends Fragment implements MenuProv
     }
 
     private void removeTrabalhoDoBanco(TrabalhoProducao trabalho) {
-        trabalhoProducaoViewModel.removeTrabalhoProducao(trabalho).observe(getViewLifecycleOwner(), resultadoRemoveTrabalho -> {
+        trabalhoProducaoViewModel.getRemocaoResultado().observe(getViewLifecycleOwner(), resultadoRemoveTrabalho -> {
             if (resultadoRemoveTrabalho.getErro() == null) return;
             Snackbar.make(binding.getRoot(), "Erro: "+resultadoRemoveTrabalho.getErro(), Snackbar.LENGTH_LONG).setAnchorView(binding.floatingActionButton).show();
         });
+        trabalhoProducaoViewModel.removeTrabalhoProducao(trabalho);
     }
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void configuraSwipeRefreshLayout() {
         swipeRefreshLayout.setOnRefreshListener(() -> personagemViewModel.pegaPersonagemSelecionado().observe(getViewLifecycleOwner(), personagemSelecionado -> {
             if (personagemSelecionado == null) return;
             idPersonagem = personagemSelecionado.getId();
-            recuperaTrabalhosServidor();
+            recuperaTrabalhosProducao();
         }));
     }
     private void configuraBotaoInsereTrabalho() {
@@ -326,15 +327,14 @@ public class ListaTrabalhosProducaoFragment extends Fragment implements MenuProv
             idPersonagem = personagemSelecionado.getId();
             TrabalhoProducaoViewModelFactory trabalhoProducaoViewModelFactory = new TrabalhoProducaoViewModelFactory(idPersonagem);
             trabalhoProducaoViewModel = new ViewModelProvider(this, trabalhoProducaoViewModelFactory).get(idPersonagem, TrabalhoProducaoViewModel.class);
-            recuperaTrabalhosServidor();
+            recuperaTrabalhosProducao();
         });
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    private void recuperaTrabalhosServidor() {
+    private void recuperaTrabalhosProducao() {
         trabalhos.clear();
-        Log.d("trabalhoProducao", "Limpou a lista");
-        trabalhoProducaoViewModel.recuperaTrabalhosServidor().observe(getViewLifecycleOwner(), resultadoTrabalhosRecuperados -> {
+        trabalhoProducaoViewModel.getTrabalhosProducao().observe(getViewLifecycleOwner(), resultadoTrabalhosRecuperados -> {
             if (resultadoTrabalhosRecuperados.getDado() != null) {
                 trabalhos = resultadoTrabalhosRecuperados.getDado();
                 Log.d("trabalhoProducao", "Tamanho da lista de trabalhos recuperados: " + trabalhos.size());
@@ -346,12 +346,13 @@ public class ListaTrabalhosProducaoFragment extends Fragment implements MenuProv
             }
             if (resultadoTrabalhosRecuperados.getErro() == null) return;
             Snackbar.make(
-                    binding.getRoot(),
-                    "Erro ao recuperar trabalhos do servidor: " + resultadoTrabalhosRecuperados.getErro(),
-                    Snackbar.LENGTH_LONG)
+                            binding.getRoot(),
+                            "Erro ao recuperar trabalhos do servidor: " + resultadoTrabalhosRecuperados.getErro(),
+                            Snackbar.LENGTH_LONG)
                     .setAnchorView(binding.floatingActionButton)
                     .show();
         });
+        trabalhoProducaoViewModel.recuperaTrabalhosProducao();
     }
 
     @Override

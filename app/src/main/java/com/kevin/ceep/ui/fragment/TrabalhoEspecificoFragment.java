@@ -226,13 +226,14 @@ public class TrabalhoEspecificoFragment extends Fragment implements MenuProvider
     }
 
     private void processaTrabalhoProducaoModificado(TrabalhoProducao trabalhoModificado) {
-        trabalhoProducaoViewModel.modificaTrabalhoProducao(trabalhoModificado).observe(getViewLifecycleOwner(), resultado -> {
+        trabalhoProducaoViewModel.getModificacaoResultado().observe(getViewLifecycleOwner(), resultado -> {
             if (resultado.getErro() == null) {
                 verficaEstadoTrabalhoProducaoModificado(trabalhoModificado);
                 return;
             }
             Snackbar.make(binding.getRoot(), "Erro: "+resultado.getErro(), Snackbar.LENGTH_LONG).show();
         });
+        trabalhoProducaoViewModel.modificaTrabalhoProducao(trabalhoModificado);
     }
 
     private void verficaEstadoTrabalhoProducaoModificado(TrabalhoProducao trabalhoModificado) {
@@ -465,7 +466,7 @@ public class TrabalhoEspecificoFragment extends Fragment implements MenuProvider
             trabalhoViewModel.removeTrabalhoEspecificoServidor(trabalhoRecebido).observe(getViewLifecycleOwner(), resultado -> {
                 indicadorProgresso.setVisibility(GONE);
                 if (resultado.getErro() == null) {
-                    trabalhoProducaoViewModel.removeReferenciaTrabalhoEspecifico(trabalhoRecebido).observe(getViewLifecycleOwner(), resultadoRemoveProducao -> {
+                    trabalhoProducaoViewModel.getRemocaoReferenciaResultado().observe(getViewLifecycleOwner(), resultadoRemoveProducao -> {
                         if (resultadoRemoveProducao.getErro() != null) Snackbar.make(binding.getRoot(), "Erro: "+ resultadoRemoveProducao.getErro(), Snackbar.LENGTH_LONG).show();
                     });
                     trabalhoEstoqueViewModel.getRemocaoReferenciaResultado().observe(getViewLifecycleOwner(), resultadoRemoveEstoque -> {
@@ -474,6 +475,7 @@ public class TrabalhoEspecificoFragment extends Fragment implements MenuProvider
                     trabalhoEstoqueViewModel.removeReferenciaTrabalhoEspecifico(trabalhoRecebido);
                     trabalhosVendidosViewModel.removeReferenciaTrabalhoEspecfico(trabalhoRecebido);
                     voltaParaListaTrabalhos();
+                    trabalhoProducaoViewModel.removeReferenciaTrabalhoEspecifico(trabalhoRecebido);
                     return;
                 }
                 Snackbar.make(binding.getRoot(), "Erro: "+resultado.getErro(), Snackbar.LENGTH_LONG).show();
