@@ -18,4 +18,8 @@ public class ListaNovaProducaoViewModel extends ViewModel {
     public LiveData<Resource<ArrayList<Trabalho>>> pegaTodosTrabalhos() {
         return trabalhoRepository.pegaTodosTrabalhos();
     }
+
+    public void removeOuvinte() {
+        trabalhoRepository.removeOuvinte();
+    }
 }

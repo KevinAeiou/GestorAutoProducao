@@ -88,6 +88,7 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment implement
         super.onViewCreated(view, savedInstanceState);
         configuraComponentesVisuais();
         inicializaComponentes();
+        pegaTodosTrabalhos();
         recebeDadosIntent();
         configuraMeuRecycler();
         configuraChipSelecionado();
@@ -139,6 +140,7 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment implement
 
             @Override
             public boolean onQueryTextChange(String texto) {
+                if (texto == null) return false;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                     textoFiltro = texto;
                     filtroLista();
@@ -208,7 +210,7 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment implement
                 configuraGrupoChipsProfissoes();
                 return;
             }
-            Snackbar.make(binding.getRoot(), "Erro ao buscar profissões: "+ resultadoProfissoes.getErro(), Snackbar.LENGTH_LONG).show();
+            aoMostrarErro(resultadoProfissoes.getErro());
         });
     }
 
@@ -219,17 +221,20 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment implement
                     (ArrayList<Trabalho>) listaTrabalhosFiltrada.stream().filter(
                             trabalho -> stringContemString(trabalho.getNome(), textoFiltro))
                             .collect(Collectors.toList());
-            if (listaFiltrada.isEmpty()) {
-                iconeListaVazia.setVisibility(VISIBLE);
-                txtListaVazia.setVisibility(VISIBLE);
-            } else {
-                txtListaVazia.setVisibility(GONE);
-                iconeListaVazia.setVisibility(GONE);
-            }
+            atualizaVisibilidadeListaVazia(listaFiltrada.isEmpty());
             listaTrabalhoEspecificoAdapter.atualizaLista(listaFiltrada);
         } else {
             listaTrabalhoEspecificoAdapter.atualizaLista(listaTrabalhosFiltrada);
         }
+    }
+    private void atualizaVisibilidadeListaVazia(boolean listaVazia) {
+        if (listaVazia) {
+            iconeListaVazia.setVisibility(VISIBLE);
+            txtListaVazia.setVisibility(VISIBLE);
+            return;
+        }
+        iconeListaVazia.setVisibility(GONE);
+        txtListaVazia.setVisibility(GONE);
     }
 
     private void recebeDadosIntent() {
@@ -244,45 +249,14 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment implement
     }
 
     private void configuraAdapter() {
-        listaTrabalhoEspecificoAdapter = new ListaTrabalhoEspecificoNovaProducaoAdapter(getContext(), todosTrabalhos);
-        meuRecycler.setAdapter(listaTrabalhoEspecificoAdapter);
+        if (listaTrabalhoEspecificoAdapter == null) {
+            listaTrabalhoEspecificoAdapter = new ListaTrabalhoEspecificoNovaProducaoAdapter(getContext(), todosTrabalhos);
+            meuRecycler.setAdapter(listaTrabalhoEspecificoAdapter);
+        }
         listaTrabalhoEspecificoAdapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(Trabalho trabalho, int adapterPosition) {
-                if (codigoRequisicao == CODIGO_REQUISICAO_INSERE_TRABALHO_PRODUCAO) vaiParaConfirmaTrabalhoFragment(trabalho);
-                if (codigoRequisicao == CODIGO_REQUISICAO_INSERE_TRABALHO_ESTOQUE) {
-                    TrabalhoEstoqueViewModelFactory trabalhoEstoqueViewModelFactory = new TrabalhoEstoqueViewModelFactory(new TrabalhoEstoqueRepository(idPersonagem));
-                    TrabalhoEstoqueViewModel trabalhoEstoqueViewModel = new ViewModelProvider(getViewModelStore(), trabalhoEstoqueViewModelFactory).get(TrabalhoEstoqueViewModel.class);
-                    TrabalhoEstoque trabalhoEstoque = new TrabalhoEstoque();
-                    trabalhoEstoque.setIdTrabalho(trabalho.getId());
-                    trabalhoEstoque.setQuantidade(1);
-                    trabalhoEstoqueViewModel.recuperaTrabalhoEstoquePorIdTrabalho(trabalhoEstoque.getIdTrabalho()).observe(getViewLifecycleOwner(), resultadoTrabalhoEncontrado -> {
-                        if (resultadoTrabalhoEncontrado.getErro() == null) {
-                            TrabalhoEstoque trabalhoEncontrado = resultadoTrabalhoEncontrado.getDado();
-                            if (trabalhoEncontrado == null) {
-                                trabalhoEstoqueViewModel.insereTrabalhoEstoque(trabalhoEstoque).observe(getViewLifecycleOwner(), resultadoInsereTrabalho -> {
-                                    if (resultadoInsereTrabalho.getErro() != null) {
-                                        Snackbar.make(binding.getRoot(), "Erro ao inserir: " + resultadoInsereTrabalho.getErro(), Snackbar.LENGTH_LONG).show();
-                                        return;
-                                    }
-                                    voltaParaListaEstoqueFragment();
-                                });
-                                return;
-                            }
-                            trabalhoEncontrado.setQuantidade(trabalhoEncontrado.getQuantidade() + 1);
-                            trabalhoEstoqueViewModel.modificaTrabalhoEstoque(trabalhoEncontrado).observe(getViewLifecycleOwner(), resultadoInsereTrabalho -> {
-                                if (resultadoInsereTrabalho.getErro() != null) {
-                                    Snackbar.make(binding.getRoot(), "Erro ao modificar: " + resultadoInsereTrabalho.getErro(), Snackbar.LENGTH_LONG).show();
-                                    return;
-                                }
-                                voltaParaListaEstoqueFragment();
-                            });
-                        }
-                    });
-                }
-                if (codigoRequisicao == CODIGO_REQUISICAO_INSERE_TRABALHO_VENDAS) {
-                    vaiParaDetalhesVenda(trabalho);
-                }
+                aoTrabalhoSelecionado(trabalho);
             }
 
             @Override
@@ -290,6 +264,52 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment implement
 
             }
         });
+    }
+
+    private void aoTrabalhoSelecionado(Trabalho trabalho) {
+        switch (codigoRequisicao) {
+            case CODIGO_REQUISICAO_INSERE_TRABALHO_PRODUCAO:
+                vaiParaConfirmaTrabalhoFragment(trabalho);
+                break;
+            case CODIGO_REQUISICAO_INSERE_TRABALHO_ESTOQUE:
+                TrabalhoEstoqueViewModelFactory trabalhoEstoqueViewModelFactory = new TrabalhoEstoqueViewModelFactory(new TrabalhoEstoqueRepository(idPersonagem));
+                TrabalhoEstoqueViewModel trabalhoEstoqueViewModel = new ViewModelProvider(getViewModelStore(), trabalhoEstoqueViewModelFactory).get(TrabalhoEstoqueViewModel.class);
+                TrabalhoEstoque trabalhoEstoque = new TrabalhoEstoque();
+                trabalhoEstoque.setIdTrabalho(trabalho.getId());
+                trabalhoEstoque.setQuantidade(1);
+                trabalhoEstoqueViewModel.getTrabalhoPorId().observe(getViewLifecycleOwner(), resultadoTrabalhoEncontrado -> {
+                    if (resultadoTrabalhoEncontrado.getErro() == null) {
+                        TrabalhoEstoque trabalhoEncontrado = resultadoTrabalhoEncontrado.getDado();
+                        if (trabalhoEncontrado == null) {
+                            trabalhoEstoqueViewModel.getInsercaoResultado().observe(getViewLifecycleOwner(), resultadoInsereTrabalho -> {
+                                if (resultadoInsereTrabalho.getErro() != null) {
+                                    aoMostrarErro(resultadoInsereTrabalho.getErro());
+                                    return;
+                                }
+                                voltaParaListaEstoqueFragment();
+                            });
+                            trabalhoEstoqueViewModel.insereTrabalhoEstoque(trabalhoEstoque);
+                            return;
+                        }
+                        trabalhoEncontrado.setQuantidade(trabalhoEncontrado.getQuantidade() + 1);
+                        trabalhoEstoqueViewModel.getModificacaoResultado().observe(
+                                getViewLifecycleOwner(),
+                                resultadoInsereTrabalho -> {
+                                    if (resultadoInsereTrabalho.getErro() != null) {
+                                        aoMostrarErro(resultadoInsereTrabalho.getErro());
+                                        return;
+                                    }
+                                    voltaParaListaEstoqueFragment();
+                                });
+                        trabalhoEstoqueViewModel.modificaTrabalhoEstoque(trabalhoEncontrado);
+                    }
+                });
+                trabalhoEstoqueViewModel.recuperaTrabalhoEstoquePorIdTrabalho(trabalhoEstoque.getIdTrabalho());
+                break;
+            case CODIGO_REQUISICAO_INSERE_TRABALHO_VENDAS:
+                vaiParaDetalhesVenda(trabalho);
+                break;
+        }
     }
 
     private void vaiParaDetalhesVenda(Trabalho trabalho) {
@@ -306,9 +326,13 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment implement
     }
 
     private void vaiParaConfirmaTrabalhoFragment(Trabalho trabalho) {
-        VaiParaConfirmaTrabalho acao = ListaTrabalhosInsereNovoTrabalhoFragmentDirections.vaiParaConfirmaTrabalho(idPersonagem);
-        acao.setTrabalho(trabalho);
-        Navigation.findNavController(requireView()).navigate(acao);
+        try {
+            VaiParaConfirmaTrabalho acao = ListaTrabalhosInsereNovoTrabalhoFragmentDirections.vaiParaConfirmaTrabalho(idPersonagem);
+            acao.setTrabalho(trabalho);
+            Navigation.findNavController(requireView()).navigate(acao);
+        } catch (IllegalArgumentException e) {
+            aoMostrarErro("Erro na navegação");
+        }
     }
 
     private void inicializaComponentes() {
@@ -331,30 +355,25 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment implement
                 todosTrabalhos = resultadoPegaTodosTrabalhos.getDado();
                 listaTrabalhosFiltrada = (ArrayList<Trabalho>) todosTrabalhos.clone();
                 indicadorProgresso.setVisibility(GONE);
-                if (listaTrabalhosFiltrada.isEmpty()) {
-                    iconeListaVazia.setVisibility(VISIBLE);
-                    txtListaVazia.setVisibility(VISIBLE);
-                } else {
-                    txtListaVazia.setVisibility(GONE);
-                    iconeListaVazia.setVisibility(GONE);
-                }
+                atualizaVisibilidadeListaVazia(listaTrabalhosFiltrada.isEmpty());
                 configuraListaDeProfissoes();
                 listaTrabalhoEspecificoAdapter.atualizaLista(listaTrabalhosFiltrada);
             }
             if (resultadoPegaTodosTrabalhos.getErro() != null) {
-                Snackbar.make(binding.getRoot(), "Erro: "+resultadoPegaTodosTrabalhos.getErro(), Snackbar.LENGTH_LONG).show();
+                aoMostrarErro(resultadoPegaTodosTrabalhos.getErro());
             }
         });
     }
-    @Override
-    public void onResume() {
-        super.onResume();
-        pegaTodosTrabalhos();
+    private void aoMostrarErro(String erro) {
+        if (binding == null) return;
+        Snackbar.make(binding.getRoot(), "Erro: " + erro, Snackbar.LENGTH_LONG).show();
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        meuRecycler.setAdapter(null);
         binding = null;
+        novaProducaoViewModel.removeOuvinte();
     }
 }

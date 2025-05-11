@@ -8,7 +8,6 @@ import static com.kevin.ceep.utilitario.Utilitario.stringContemString;
 import android.annotation.SuppressLint;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -172,11 +171,10 @@ public class ListaEstoqueFragment extends Fragment implements MenuProvider {
     }
 
     private void recuperaTrabalhosEstoque() {
-        Log.d("estoque", "Função recuperaTrabalhosEstoque iniciada");
-        trabalhoEstoqueViewModel.recuperaTrabalhosEstoque().observe(getViewLifecycleOwner(), resultadorecuperaTrabalhos -> {
-            Log.d("estoque", "Resultado devlvido");
+        trabalhoEstoqueViewModel.getTrabalhosEstoque().observe(
+                getViewLifecycleOwner(),
+                resultadorecuperaTrabalhos -> {
             if (resultadorecuperaTrabalhos.getErro() == null) {
-                Log.d("estoque", "Estoque recuperado: ");
                 todosTrabalhosEstoque = resultadorecuperaTrabalhos.getDado();
                 trabalhosEstoqueFiltrada = (ArrayList<TrabalhoEstoque>) todosTrabalhosEstoque.clone();
                 indicadorDeProgresso.setVisibility(View.GONE);
@@ -193,9 +191,9 @@ public class ListaEstoqueFragment extends Fragment implements MenuProvider {
                 configuraListaDeProfissoes();
                 return;
             }
-            Log.d("estoque", "Resultado erro");
-            Snackbar.make(binding.getRoot(), "Erro: "+resultadorecuperaTrabalhos.getErro(), Snackbar.LENGTH_LONG).show();
+            mostraMensagem(resultadorecuperaTrabalhos.getErro());
         });
+        trabalhoEstoqueViewModel.recuperaTrabalhosEstoque();
     }
 
     private void configuraGrupoChipsProfissoes() {
@@ -225,7 +223,7 @@ public class ListaEstoqueFragment extends Fragment implements MenuProvider {
                 configuraGrupoChipsProfissoes();
                 return;
             }
-            Snackbar.make(binding.getRoot(), "Erro ao buscar profissões: "+ resultadoProfissoes.getErro(), Snackbar.LENGTH_LONG).show();
+            mostraMensagem(resultadoProfissoes.getErro());
         });
     }
 
@@ -273,13 +271,14 @@ public class ListaEstoqueFragment extends Fragment implements MenuProvider {
                 break;
         }
         trabalhoEstoqueModificado.setQuantidade(novaQuantidade);
-        trabalhoEstoqueViewModel.modificaTrabalhoEstoque(trabalhoEstoqueModificado).observe(getViewLifecycleOwner(), resultadoModificaQuantidade -> {
+        trabalhoEstoqueViewModel.getModificacaoResultado().observe(getViewLifecycleOwner(), resultadoModificaQuantidade -> {
             if (resultadoModificaQuantidade.getErro() != null) {
-                Snackbar.make(binding.getRoot(), resultadoModificaQuantidade.getErro(), Snackbar.LENGTH_SHORT).show();
+                mostraMensagem(resultadoModificaQuantidade.getErro());
                 return;
             }
             trabalhoEstoqueAdapter.altera(adapterPosition, trabalhoEstoqueModificado);
         });
+        trabalhoEstoqueViewModel.modificaTrabalhoEstoque(trabalhoEstoqueModificado);
     }
     private void configuraDeslizeItem() {
         ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.RIGHT) {
@@ -321,9 +320,15 @@ public class ListaEstoqueFragment extends Fragment implements MenuProvider {
     }
 
     private void removeTrabalhoDoBanco(TrabalhoEstoque trabalhoremovido) {
-        trabalhoEstoqueViewModel.removeTrabalhoEstoque(trabalhoremovido).observe(getViewLifecycleOwner(), resultadoRemoveTrabalho -> {
-            if (resultadoRemoveTrabalho.getErro() != null) Snackbar.make(binding.getRoot(), "Erro: "+resultadoRemoveTrabalho.getErro(), Snackbar.LENGTH_LONG).show();
+        trabalhoEstoqueViewModel.getRemocaoResultado().observe(getViewLifecycleOwner(), resultadoRemoveTrabalho -> {
+            if (resultadoRemoveTrabalho.getErro() != null) mostraMensagem(resultadoRemoveTrabalho.getErro());
         });
+        trabalhoEstoqueViewModel.removeTrabalhoEstoque(trabalhoremovido);
+    }
+
+    private void mostraMensagem(String mensagem) {
+        if (binding == null) return;
+        Snackbar.make(binding.getRoot(), "Erro: "+ mensagem, Snackbar.LENGTH_LONG).show();
     }
 
     @Override

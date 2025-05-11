@@ -246,21 +246,23 @@ public class TrabalhoEspecificoFragment extends Fragment implements MenuProvider
                     if (trabalhoModificado.possueTrabalhoNecessarioValido()) {
                         String[] listaIdsTrabalhosNecessarios = trabalhoModificado.getTrabalhoNecessario().split(",");
                         for (String idTrabalho : listaIdsTrabalhosNecessarios) {
-                            trabalhoEstoqueViewModel.recuperaTrabalhoEstoquePorIdTrabalho(idTrabalho).observe(getViewLifecycleOwner(), resultadoTrabalhoEncontrado -> {
+                            trabalhoEstoqueViewModel.getTrabalhoPorId().observe(getViewLifecycleOwner(), resultadoTrabalhoEncontrado -> {
                                 if (resultadoTrabalhoEncontrado.getErro() == null) {
                                     TrabalhoEstoque trabalhoEncontrado = resultadoTrabalhoEncontrado.getDado();
                                     if (trabalhoEncontrado == null) return;
                                     trabalhoEncontrado.setQuantidade(trabalhoEncontrado.getQuantidade() - 1);
-                                    trabalhoEstoqueViewModel.modificaTrabalhoEstoque(trabalhoEncontrado).observe(getViewLifecycleOwner(), resultadoModificaTrabalho -> {
+                                    trabalhoEstoqueViewModel.getModificacaoResultado().observe(getViewLifecycleOwner(), resultadoModificaTrabalho -> {
                                         if (resultadoModificaTrabalho.getErro() == null) {
                                             Snackbar.make(binding.getRoot(), trabalhoProducaoRecebido.getNome() + " foi modificado com sucesso!", Snackbar.LENGTH_LONG).show();
                                             voltaParaListaTrabalhosProducao();
                                         }
                                     });
+                                    trabalhoEstoqueViewModel.modificaTrabalhoEstoque(trabalhoEncontrado);
                                     return;
                                 }
                                 Snackbar.make(binding.getRoot(), "Erro: "+ resultadoTrabalhoEncontrado.getErro(), Snackbar.LENGTH_LONG).show();
                             });
+                            trabalhoEstoqueViewModel.recuperaTrabalhoEstoquePorIdTrabalho(idTrabalho);
                         }
                         break;
                     }
@@ -310,7 +312,7 @@ public class TrabalhoEspecificoFragment extends Fragment implements MenuProvider
     }
 
     private void modificaEstoque(TrabalhoProducao trabalhoModificado) {
-        trabalhoEstoqueViewModel.recuperaTrabalhoEstoquePorIdTrabalho(trabalhoModificado.getIdTrabalho()).observe(getViewLifecycleOwner(), resultadoTrabalhoEncontrado -> {
+        trabalhoEstoqueViewModel.getTrabalhoPorId().observe(getViewLifecycleOwner(), resultadoTrabalhoEncontrado -> {
             if (resultadoTrabalhoEncontrado.getErro() == null) {
                 TrabalhoEstoque trabalhoEncontrado = resultadoTrabalhoEncontrado.getDado();
                 if (trabalhoEncontrado == null) {
@@ -318,22 +320,25 @@ public class TrabalhoEspecificoFragment extends Fragment implements MenuProvider
                         TrabalhoEstoque novoTrabalhoEstoque = new TrabalhoEstoque();
                         novoTrabalhoEstoque.setIdTrabalho(trabalhoModificado.getIdTrabalho());
                         novoTrabalhoEstoque.setQuantidade(1);
-                        trabalhoEstoqueViewModel.insereTrabalhoEstoque(novoTrabalhoEstoque).observe(getViewLifecycleOwner(), resultaSalvaTrabalhoEstoque -> {
+                        trabalhoEstoqueViewModel.getInsercaoResultado().observe(getViewLifecycleOwner(), resultaSalvaTrabalhoEstoque -> {
                             if (resultaSalvaTrabalhoEstoque.getErro() == null) return;
                             Snackbar.make(binding.getRoot(), "Erro: " + resultaSalvaTrabalhoEstoque.getErro(), Snackbar.LENGTH_LONG).show();
                             confirmacao.setValue(false);
                         });
+                        trabalhoEstoqueViewModel.insereTrabalhoEstoque(novoTrabalhoEstoque);
                     }
                     return;
                 }
                 trabalhoEncontrado.setQuantidade(trabalhoEncontrado.getQuantidade()+1);
-                trabalhoEstoqueViewModel.modificaTrabalhoEstoque(trabalhoEncontrado).observe(getViewLifecycleOwner(), resultaModificaQuantidade -> {
+                trabalhoEstoqueViewModel.getModificacaoResultado().observe(getViewLifecycleOwner(), resultaModificaQuantidade -> {
                     if (resultaModificaQuantidade.getErro() == null) return;
                     Snackbar.make(binding.getRoot(), "Erro: "+resultaModificaQuantidade.getErro(), Snackbar.LENGTH_LONG).show();
                     confirmacao.setValue(false);
                 });
+                trabalhoEstoqueViewModel.modificaTrabalhoEstoque(trabalhoEncontrado);
             }
         });
+        trabalhoEstoqueViewModel.recuperaTrabalhoEstoquePorIdTrabalho(trabalhoModificado.getIdTrabalho());
     }
 
     private void voltaParaListaTrabalhosProducao() {
@@ -463,9 +468,10 @@ public class TrabalhoEspecificoFragment extends Fragment implements MenuProvider
                     trabalhoProducaoViewModel.removeReferenciaTrabalhoEspecifico(trabalhoRecebido).observe(getViewLifecycleOwner(), resultadoRemoveProducao -> {
                         if (resultadoRemoveProducao.getErro() != null) Snackbar.make(binding.getRoot(), "Erro: "+ resultadoRemoveProducao.getErro(), Snackbar.LENGTH_LONG).show();
                     });
-                    trabalhoEstoqueViewModel.removeReferenciaTrabalhoEspecifico(trabalhoRecebido).observe(getViewLifecycleOwner(), resultadoRemoveEstoque -> {
+                    trabalhoEstoqueViewModel.getRemocaoReferenciaResultado().observe(getViewLifecycleOwner(), resultadoRemoveEstoque -> {
                         if (resultadoRemoveEstoque.getErro() != null) Snackbar.make(binding.getRoot(), "Erro: " + resultadoRemoveEstoque.getErro(), Snackbar.LENGTH_LONG).show();
                     });
+                    trabalhoEstoqueViewModel.removeReferenciaTrabalhoEspecifico(trabalhoRecebido);
                     trabalhosVendidosViewModel.removeReferenciaTrabalhoEspecfico(trabalhoRecebido);
                     voltaParaListaTrabalhos();
                     return;
