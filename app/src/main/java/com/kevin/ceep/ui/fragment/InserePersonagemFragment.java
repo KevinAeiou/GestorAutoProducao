@@ -16,12 +16,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.view.MenuProvider;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 import com.kevin.ceep.R;
 import com.kevin.ceep.databinding.FragmentAtributosPersonagemBinding;
@@ -32,32 +30,28 @@ import com.kevin.ceep.ui.viewModel.EstadoAppViewModel;
 import com.kevin.ceep.ui.viewModel.PersonagemViewModel;
 import com.kevin.ceep.ui.viewModel.factory.PersonagemViewModelFactory;
 
-public class InserePersonagemFragment extends Fragment implements MenuProvider{
+public class InserePersonagemFragment
+        extends BaseFragment<FragmentAtributosPersonagemBinding>
+        implements MenuProvider{
 
     private TextInputLayout personagemNomeTxt, personagemEspacoProducaoTxt, personagemEmailTxt, personagemSenhaTxt;
     private EditText personagemNome, personagemEspacoProducao, personagemEmail, personagemSenha;
     private SwitchCompat personagemSwUso, personagemSwEstado, personagemSwAutoProducao;
-    private FragmentAtributosPersonagemBinding binding;
     private PersonagemViewModel personagemViewModel;
     private NavController controlador;
-
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = FragmentAtributosPersonagemBinding.inflate(inflater, container, false);
-        requireActivity().addMenuProvider(this, getViewLifecycleOwner(), androidx.lifecycle.Lifecycle.State.RESUMED);
-        return binding.getRoot();
+    protected FragmentAtributosPersonagemBinding inflateBinding(LayoutInflater inflater, ViewGroup container) {
+        return FragmentAtributosPersonagemBinding.inflate(
+                inflater,
+                container,
+                false
+        );
     }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        controlador = NavHostFragment.findNavController(this);
-    }
-
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        requireActivity().addMenuProvider(this, getViewLifecycleOwner(), androidx.lifecycle.Lifecycle.State.RESUMED);
+        controlador = NavHostFragment.findNavController(this);
         EstadoAppViewModel estadoAppViewModel = new ViewModelProvider(requireActivity()).get(EstadoAppViewModel.class);
         ComponentesVisuais componentesVisuais = new ComponentesVisuais();
         componentesVisuais.appBar = true;
@@ -65,12 +59,10 @@ public class InserePersonagemFragment extends Fragment implements MenuProvider{
         estadoAppViewModel.componentes.setValue(componentesVisuais);
         inicializaComponentes();
     }
-
     @Override
     public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
 
     }
-
     @Override
     public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
         if (menuItem.getItemId() == R.id.itemMenuConfirma) {
@@ -91,7 +83,7 @@ public class InserePersonagemFragment extends Fragment implements MenuProvider{
                 voltaParaTrabalhosProducao();
                 return;
             }
-            Snackbar.make(binding.getRoot(),"Erro: "+resultadoInserePersonagem.getErro(), Snackbar.LENGTH_LONG).show();
+            mostraMensagem("Erro: "+resultadoInserePersonagem.getErro());
         });
     }
     private void voltaParaTrabalhosProducao() {

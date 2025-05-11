@@ -11,11 +11,9 @@ import android.widget.CheckBox;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatButton;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.kevin.ceep.R;
 import com.kevin.ceep.model.Trabalho;
 import com.kevin.ceep.model.TrabalhoProducao;
@@ -28,22 +26,24 @@ import com.kevin.ceep.ui.viewModel.factory.TrabalhoProducaoViewModelFactory;
 import com.kevin.ceep.ui.viewModel.factory.TrabalhoViewModelFactory;
 import com.kevin.ceep.databinding.FragmentConfirmaTrabalhoBinding;
 
-public class ConfirmaTrabalhoFragment extends Fragment {
-    private FragmentConfirmaTrabalhoBinding binding;
-    private AutoCompleteTextView autoCompleteLicenca,autoCompleteQuantidade;
+public class ConfirmaTrabalhoFragment
+        extends BaseFragment<FragmentConfirmaTrabalhoBinding> {
+    private AutoCompleteTextView autoCompleteLicenca, autoCompleteQuantidade;
     private String idPersonagem;
     private Trabalho trabalhoRecebido;
     private int contador;
     private String nomesTrabalhosNecessarios;
     private AppCompatButton botaoCadastraTrabalho;
-
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = FragmentConfirmaTrabalhoBinding.inflate(inflater, container, false);
-        return binding.getRoot();
+    protected FragmentConfirmaTrabalhoBinding inflateBinding(
+            LayoutInflater inflater,
+            ViewGroup container) {
+        return FragmentConfirmaTrabalhoBinding.inflate(
+                inflater,
+                container,
+                false
+        );
     }
-
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -124,13 +124,13 @@ public class ConfirmaTrabalhoFragment extends Fragment {
             if (resposta.getErro() == null) {
                 contador += 1;
                 if (contador >= quantidadeSelecionada) {
-                    Snackbar.make(binding.getRoot(), trabalhoRecebido.getNome() + " foi inserido com sucesso!", Snackbar.LENGTH_LONG).show();
+                    mostraMensagem(trabalhoRecebido.getNome() + " foi inserido com sucesso!");
                     voltaParaListaProducao();
                 }
                 return;
             }
             botaoCadastraTrabalho.setEnabled(true);
-            Snackbar.make(binding.getRoot(), "Erro ao inserir " + trabalhoRecebido.getNome(), Snackbar.LENGTH_LONG).show();
+            mostraMensagem("Erro ao inserir " + trabalhoRecebido.getNome());
         });
         trabalhoProducaoViewModel.insereTrabalhoProducao(novoTrabalho);
     }

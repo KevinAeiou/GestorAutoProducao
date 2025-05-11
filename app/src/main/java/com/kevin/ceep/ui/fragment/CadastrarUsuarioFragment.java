@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatButton;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
@@ -33,22 +32,15 @@ import com.kevin.ceep.ui.viewModel.factory.AutenticacaoViewModelFactor;
 
 import java.util.Objects;
 
-public class CadastrarUsuarioFragment extends Fragment implements View.OnClickListener {
-    private FragmentCadastrarUsuarioBinding binding;
+public class CadastrarUsuarioFragment
+        extends BaseFragment<FragmentCadastrarUsuarioBinding>
+        implements View.OnClickListener {
     private AppCompatButton botaoCadastrarUsuario;
     private TextInputLayout txtSenha;
     private TextInputEditText edtNome;
     private TextInputEditText edtSenha;
     String[] menssagens = {"Preencha todos os campos", "Usuário cadastrado com sucesso!"};
     private AutenticacaoViewModel autenticacaoViewModel;
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = FragmentCadastrarUsuarioBinding.inflate(inflater, container, false);
-        return binding.getRoot();
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,17 +49,25 @@ public class CadastrarUsuarioFragment extends Fragment implements View.OnClickLi
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        configuraComponenteVisual();
+        inicializaComponentes();
+        configuraEdtSenhaRobusta();
+        botaoCadastrarUsuario.setOnClickListener(this);
+        binding.txtLinkEntrar.setOnClickListener(this);
+    }
+
+    private void inicializaComponentes() {
+        txtSenha = binding.txtSenha;
+        edtSenha = binding.edtSenha;
+        botaoCadastrarUsuario = binding.botaoCadastrarUsuario;
+        AutenticacaoViewModelFactor autenticacaoViewModelFactor = new AutenticacaoViewModelFactor(FirebaseAuthRepository.getInstance());
+        autenticacaoViewModel = new ViewModelProvider(this, autenticacaoViewModelFactor).get(AutenticacaoViewModel.class);
+    }
+
+    private void configuraComponenteVisual() {
         EstadoAppViewModel estadoAppViewModel = new ViewModelProvider(requireActivity()).get(EstadoAppViewModel.class);
         ComponentesVisuais componentesVisuais = new ComponentesVisuais();
         estadoAppViewModel.componentes.setValue(componentesVisuais);
-        txtSenha = binding.txtSenha;
-        edtSenha = binding.edtSenha;
-        AutenticacaoViewModelFactor autenticacaoViewModelFactor = new AutenticacaoViewModelFactor(FirebaseAuthRepository.getInstance());
-        autenticacaoViewModel = new ViewModelProvider(this, autenticacaoViewModelFactor).get(AutenticacaoViewModel.class);
-        configuraEdtSenhaRobusta();
-        botaoCadastrarUsuario = binding.botaoCadastrarUsuario;
-        botaoCadastrarUsuario.setOnClickListener(this);
-        binding.txtLinkEntrar.setOnClickListener(this);
     }
 
     private void configuraEdtSenhaRobusta() {
@@ -136,9 +136,7 @@ public class CadastrarUsuarioFragment extends Fragment implements View.OnClickLi
     @SuppressLint("NewApi")
     private boolean configuraEditSenha(boolean senha) {
         if (!senha){
-//            txtSenha.setHintTextColor(ColorStateList.valueOf(getColor(R.color.cor_background_bordo)));
             txtSenha.setBoxStrokeColor(Color.parseColor("#A71500"));
-//            txtSenha.setHelperTextColor(ColorStateList.valueOf(getColor(R.color.cor_background_bordo)));
             txtSenha.setHelperTextEnabled(true);
             botaoCadastrarUsuario.setEnabled(false);
             return false;
@@ -202,6 +200,15 @@ public class CadastrarUsuarioFragment extends Fragment implements View.OnClickLi
 
     private boolean verificaCampos(Usuario personagem) {
         return personagem.getNome().isEmpty() || personagem.getEmail().isEmpty() || personagem.getSenha().isEmpty();
+    }
+
+    @Override
+    protected FragmentCadastrarUsuarioBinding inflateBinding(LayoutInflater inflater, ViewGroup container) {
+        return FragmentCadastrarUsuarioBinding.inflate(
+                inflater,
+                container,
+                false
+        );
     }
 
     @Override

@@ -6,7 +6,6 @@ import static com.kevin.ceep.ui.activity.Constantes.CODIGO_REQUISICAO_ALTERA_TRA
 import static com.kevin.ceep.ui.activity.Constantes.CODIGO_REQUISICAO_INSERE_TRABALHO_PRODUCAO;
 import static com.kevin.ceep.utilitario.Utilitario.stringContemString;
 
-import android.annotation.SuppressLint;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,7 +24,6 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.view.MenuProvider;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
@@ -55,8 +53,9 @@ import com.kevin.ceep.ui.viewModel.factory.TrabalhoProducaoViewModelFactory;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
-public class ListaTrabalhosProducaoFragment extends Fragment implements MenuProvider {
-    private FragmentListaTrabalhosProducaoBinding binding;
+public class ListaTrabalhosProducaoFragment
+        extends BaseFragment<FragmentListaTrabalhosProducaoBinding>
+        implements MenuProvider {
     private ListaTrabalhoProducaoAdapter trabalhoAdapter;
     private RecyclerView recyclerView;
     private ArrayList<TrabalhoProducao> trabalhos, trabalhosFiltrados;
@@ -73,19 +72,26 @@ public class ListaTrabalhosProducaoFragment extends Fragment implements MenuProv
     public ListaTrabalhosProducaoFragment() {
     }
 
-    @SuppressLint("ResourceType")
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        binding = FragmentListaTrabalhosProducaoBinding.inflate(inflater, container, false);
-        requireActivity().addMenuProvider(this, getViewLifecycleOwner(), androidx.lifecycle.Lifecycle.State.RESUMED);
-        return binding.getRoot();
+    protected FragmentListaTrabalhosProducaoBinding inflateBinding(
+            LayoutInflater inflater,
+            ViewGroup container) {
+        return FragmentListaTrabalhosProducaoBinding.inflate(
+                inflater,
+                container,
+                false
+        );
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        requireActivity().addMenuProvider(
+                this,
+                getViewLifecycleOwner(),
+                androidx.lifecycle.Lifecycle.State.RESUMED
+        );
         FirebaseUser usuarioID = FirebaseAuth.getInstance().getCurrentUser();
         if (usuarioID == null) {
             NavDirections acao = ListaTrabalhosProducaoFragmentDirections.vaiParaSlashScreen();
@@ -93,17 +99,21 @@ public class ListaTrabalhosProducaoFragment extends Fragment implements MenuProv
             return;
         }
         inicializaComponentes();
+        configuraComponentesVisuais();
+        configuraRecyclerView();
+        configuraSwipeRefreshLayout();
+        configuraBotaoInsereTrabalho();
+        configuraDeslizeItem();
+        configuraChipSelecionado();
+    }
+
+    private void configuraComponentesVisuais() {
         ComponentesVisuais componentesVisuais = new ComponentesVisuais();
         componentesVisuais.appBar = true;
         componentesVisuais.itemMenuBusca = true;
         componentesVisuais.menuNavegacaoLateral = true;
         componentesVisuais.menuNavegacaoInferior = true;
         estadoAppViewModel.componentes.setValue(componentesVisuais);
-        configuraRecyclerView();
-        configuraSwipeRefreshLayout();
-        configuraBotaoInsereTrabalho();
-        configuraDeslizeItem();
-        configuraChipSelecionado();
     }
 
     @Override
@@ -257,7 +267,7 @@ public class ListaTrabalhosProducaoFragment extends Fragment implements MenuProv
     private void removeTrabalhoProducao(TrabalhoProducao trabalho) {
         trabalhoProducaoViewModel.getRemocaoResultado().observe(getViewLifecycleOwner(), resultadoRemoveTrabalho -> {
             if (resultadoRemoveTrabalho.getErro() == null) return;
-            Snackbar.make(binding.getRoot(), "Erro: "+resultadoRemoveTrabalho.getErro(), Snackbar.LENGTH_LONG).setAnchorView(binding.floatingActionButton).show();
+            mostraMensagemAncorada("Erro: "+ resultadoRemoveTrabalho.getErro(), binding.floatingActionButton);
         });
         trabalhoProducaoViewModel.removeTrabalhoProducao(trabalho);
     }
@@ -276,7 +286,7 @@ public class ListaTrabalhosProducaoFragment extends Fragment implements MenuProv
                 idPersonagem = personagemSelecionado.getId();
             });
             if (idPersonagem.isEmpty()) {
-                Snackbar.make(binding.getRoot(), "Selecione um personagem para continuar", Snackbar.LENGTH_LONG).setAnchorView(binding.floatingActionButton).show();
+                mostraMensagemAncorada("Selecione um personagem para continuar", binding.floatingActionButton);
                 return;
             }
             VaiParaListaTrabalhos acao = ListaTrabalhosProducaoFragmentDirections.vaiParaListaTrabalhos(idPersonagem);
@@ -341,20 +351,13 @@ public class ListaTrabalhosProducaoFragment extends Fragment implements MenuProv
         trabalhoProducaoViewModel.getTrabalhosProducao().observe(getViewLifecycleOwner(), resultadoTrabalhosRecuperados -> {
             if (resultadoTrabalhosRecuperados.getDado() != null) {
                 trabalhos = resultadoTrabalhosRecuperados.getDado();
-                Log.d("trabalhoProducao", "Tamanho da lista de trabalhos recuperados: " + trabalhos.size());
                 trabalhosFiltrados= (ArrayList<TrabalhoProducao>) trabalhos.clone();
-                Log.d("trabalhoProducao", "Limpou a lista de trabalhos filtrados");
                 indicadorProgresso.setVisibility(View.GONE);
                 swipeRefreshLayout.setRefreshing(false);
                 atualizaListaTrabalho();
             }
             if (resultadoTrabalhosRecuperados.getErro() == null) return;
-            Snackbar.make(
-                            binding.getRoot(),
-                            "Erro ao recuperar trabalhos do servidor: " + resultadoTrabalhosRecuperados.getErro(),
-                            Snackbar.LENGTH_LONG)
-                    .setAnchorView(binding.floatingActionButton)
-                    .show();
+            mostraMensagemAncorada(resultadoTrabalhosRecuperados.getErro(), binding.floatingActionButton);
         });
         trabalhoProducaoViewModel.recuperaTrabalhosProducao();
     }

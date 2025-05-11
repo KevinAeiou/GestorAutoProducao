@@ -6,7 +6,6 @@ import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,17 +36,20 @@ public class SplashscreenFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        configuraComponentesVisuais();
+        SharedPreferences preferences = requireActivity().getSharedPreferences("user_preferences", MODE_PRIVATE);
+        if (preferences.contains("ja_abriu_app")) {
+            vaiParaEntraUsuarioActivity();
+            return;
+        }
+        adicionarPreferenceJaAbriu(preferences);
+        mostrarSplash();
+    }
+
+    private void configuraComponentesVisuais() {
         EstadoAppViewModel estadoAppViewModel = new ViewModelProvider(requireActivity()).get(EstadoAppViewModel.class);
         ComponentesVisuais componentesVisuais = new ComponentesVisuais();
         estadoAppViewModel.componentes.setValue(componentesVisuais);
-        SharedPreferences preferences = requireActivity().getSharedPreferences("user_preferences", MODE_PRIVATE);
-        Log.d("fluxo", "onViewCreated");
-        if (preferences.contains("ja_abriu_app")) {
-            vaiParaEntraUsuarioActivity();
-        } else {
-            adicionarPreferenceJaAbriu(preferences);
-            mostrarSplash();
-        }
     }
 
     private void mostrarSplash() {
@@ -62,7 +64,6 @@ public class SplashscreenFragment extends Fragment {
     }
 
     private void vaiParaEntraUsuarioActivity() {
-        Log.d("fluxo", "vaiParaEntraUsuarioActivity");
         NavDirections acao = SplashscreenFragmentDirections.vaiDeSplashscreenParaEntrar();
         Navigation.findNavController(binding.getRoot()).navigate(acao);
     }

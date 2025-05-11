@@ -7,7 +7,6 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.view.MenuProvider;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
@@ -18,7 +17,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.kevin.ceep.R;
@@ -36,7 +34,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RecursosFragment extends Fragment implements MenuProvider {
+public class RecursosFragment
+        extends BaseFragment<FragmentRecursosBinding>
+        implements MenuProvider {
     public static final String ID_SUBSTANCIA_COMUM = "6ac21d44-1e8d-4bf8-bd62-53248e568417";
     public static final String ID_SUBSTANCIA_COMPOSTA = "6250e394-4a82-4ccb-b697-c788b9094c41";
     public static final String ID_SUBSTANCIA_ENERGIA = "b2f158f9-5b52-444a-a27b-7ac1284063c6";
@@ -49,7 +49,6 @@ public class RecursosFragment extends Fragment implements MenuProvider {
     public static final String ID_CATALISADOR_COMPOSTO = "3a085587-5093-471d-9187-27b2370e4b38";
     public static final String ID_CATALISADOR_ENERGIA = "259d5a95-72fd-4b36-b17f-c7b6a2a6897f";
     public static final String ID_CATALISADOR_ETEREO = "2d8c434a-50eb-4269-bc70-725ded6bc7e9";
-    private FragmentRecursosBinding binding;
     private String idPersonagem;
     private PersonagemViewModel personagemViewModel;
     private RecursosProducaoViewModel recursosProducaoViewModel;
@@ -65,16 +64,18 @@ public class RecursosFragment extends Fragment implements MenuProvider {
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        binding = FragmentRecursosBinding.inflate(inflater, container, false);
-        requireActivity().addMenuProvider(this, getViewLifecycleOwner(), androidx.lifecycle.Lifecycle.State.RESUMED);
-        return binding.getRoot();
+    protected FragmentRecursosBinding inflateBinding(LayoutInflater inflater, ViewGroup container) {
+        return FragmentRecursosBinding.inflate(
+                inflater,
+                container,
+                false
+        );
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        requireActivity().addMenuProvider(this, getViewLifecycleOwner(), androidx.lifecycle.Lifecycle.State.RESUMED);
         configuraComponentesVisuais();
         inicializaComponentes();
     }
@@ -100,11 +101,11 @@ public class RecursosFragment extends Fragment implements MenuProvider {
     private void modificaRecursos(ArrayList<RecursoAvancado> recursosModificados) {
         recursosProducaoViewModel.modificaListaRecursos(recursosModificados).observe(getViewLifecycleOwner(), resultadoModificaRecursos -> {
             if (resultadoModificaRecursos.getErro() == null) {
-                Snackbar.make(binding.getRoot(), "Recursos modificados com sucesso!", Snackbar.LENGTH_LONG).show();
+                mostraMensagem("Recursos modificados com sucesso!");
                 voltaParaListaProducao();
                 return;
             }
-            Snackbar.make(binding.getRoot(), "Erro: " + resultadoModificaRecursos.getErro(), Snackbar.LENGTH_LONG).show();
+            mostraMensagem("Erro: " + resultadoModificaRecursos.getErro());
         });
     }
 
@@ -303,7 +304,7 @@ public class RecursosFragment extends Fragment implements MenuProvider {
                     }
                     return;
                 }
-                Snackbar.make(binding.getRoot(), "Erro: " + resultadoRecuperaRecursos.getErro(), Snackbar.LENGTH_LONG).show();
+                mostraMensagem("Erro: " + resultadoRecuperaRecursos.getErro());
             });
         });
     }

@@ -26,7 +26,6 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.view.MenuProvider;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
@@ -35,7 +34,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
-import com.google.android.material.snackbar.Snackbar;
 import com.kevin.ceep.R;
 import com.kevin.ceep.databinding.FragmentListaTrabalhosInsereNovoTrabalhoBinding;
 import com.kevin.ceep.model.Profissao;
@@ -62,8 +60,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment implements MenuProvider{
-    private FragmentListaTrabalhosInsereNovoTrabalhoBinding binding;
+public class ListaTrabalhosInsereNovoTrabalhoFragment
+        extends BaseFragment<FragmentListaTrabalhosInsereNovoTrabalhoBinding>
+        implements MenuProvider{
     private ProgressBar indicadorProgresso;
     private RecyclerView meuRecycler;
     private ListaTrabalhoEspecificoNovaProducaoAdapter listaTrabalhoEspecificoAdapter;
@@ -75,17 +74,18 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment implement
     private TextView txtListaVazia;
     private ImageView iconeListaVazia;
     private int codigoRequisicao = CODIGO_REQUISICAO_INVALIDA;
-
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        binding = FragmentListaTrabalhosInsereNovoTrabalhoBinding.inflate(inflater, container, false);
-        requireActivity().addMenuProvider(this, getViewLifecycleOwner(), androidx.lifecycle.Lifecycle.State.RESUMED);
-        return binding.getRoot();
+    protected FragmentListaTrabalhosInsereNovoTrabalhoBinding inflateBinding(LayoutInflater inflater, ViewGroup container) {
+        return FragmentListaTrabalhosInsereNovoTrabalhoBinding.inflate(
+                inflater,
+                container,
+                false
+        );
     }
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        requireActivity().addMenuProvider(this, getViewLifecycleOwner(), androidx.lifecycle.Lifecycle.State.RESUMED);
         configuraComponentesVisuais();
         inicializaComponentes();
         pegaTodosTrabalhos();
@@ -160,7 +160,9 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment implement
     private void filtraTrabalhoPorProfissaoSelecionada(List<Integer> listaIds) {
         listaTrabalhosFiltrada.clear();
         List<String> profissoesSelecionadas = defineListaDeProfissoesSelecionadas(listaIds);
-        if (!profissoesSelecionadas.isEmpty()) {
+        if (profissoesSelecionadas.isEmpty()) {
+            listaTrabalhosFiltrada = (ArrayList<Trabalho>) todosTrabalhos.clone();
+        } else {
             ArrayList<Trabalho> listaProfissaoEspecifica;
             for (String profissao : profissoesSelecionadas) {
                 listaProfissaoEspecifica = (ArrayList<Trabalho>) todosTrabalhos.stream().filter(
@@ -168,8 +170,6 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment implement
                         .collect(Collectors.toList());
                 listaTrabalhosFiltrada.addAll(listaProfissaoEspecifica);
             }
-        } else {
-            listaTrabalhosFiltrada = (ArrayList<Trabalho>) todosTrabalhos.clone();
         }
         filtroLista();
     }
@@ -210,7 +210,7 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment implement
                 configuraGrupoChipsProfissoes();
                 return;
             }
-            aoMostrarErro(resultadoProfissoes.getErro());
+            mostraMensagem(resultadoProfissoes.getErro());
         });
     }
 
@@ -283,7 +283,7 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment implement
                         if (trabalhoEncontrado == null) {
                             trabalhoEstoqueViewModel.getInsercaoResultado().observe(getViewLifecycleOwner(), resultadoInsereTrabalho -> {
                                 if (resultadoInsereTrabalho.getErro() != null) {
-                                    aoMostrarErro(resultadoInsereTrabalho.getErro());
+                                    mostraMensagem(resultadoInsereTrabalho.getErro());
                                     return;
                                 }
                                 voltaParaListaEstoqueFragment();
@@ -296,7 +296,7 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment implement
                                 getViewLifecycleOwner(),
                                 resultadoInsereTrabalho -> {
                                     if (resultadoInsereTrabalho.getErro() != null) {
-                                        aoMostrarErro(resultadoInsereTrabalho.getErro());
+                                        mostraMensagem(resultadoInsereTrabalho.getErro());
                                         return;
                                     }
                                     voltaParaListaEstoqueFragment();
@@ -331,7 +331,7 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment implement
             acao.setTrabalho(trabalho);
             Navigation.findNavController(requireView()).navigate(acao);
         } catch (IllegalArgumentException e) {
-            aoMostrarErro("Erro na navegação");
+            mostraMensagem("Erro na navegação");
         }
     }
 
@@ -360,15 +360,10 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment extends Fragment implement
                 listaTrabalhoEspecificoAdapter.atualizaLista(listaTrabalhosFiltrada);
             }
             if (resultadoPegaTodosTrabalhos.getErro() != null) {
-                aoMostrarErro(resultadoPegaTodosTrabalhos.getErro());
+                mostraMensagem(resultadoPegaTodosTrabalhos.getErro());
             }
         });
     }
-    private void aoMostrarErro(String erro) {
-        if (binding == null) return;
-        Snackbar.make(binding.getRoot(), "Erro: " + erro, Snackbar.LENGTH_LONG).show();
-    }
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();

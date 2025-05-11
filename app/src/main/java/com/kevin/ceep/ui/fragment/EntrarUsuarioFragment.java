@@ -11,12 +11,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatButton;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
@@ -32,8 +30,9 @@ import com.kevin.ceep.ui.viewModel.factory.AutenticacaoViewModelFactor;
 
 import java.util.Objects;
 
-public class EntrarUsuarioFragment extends Fragment implements View.OnClickListener {
-    private FragmentEntrarUsuarioBinding binding;
+public class EntrarUsuarioFragment
+        extends BaseFragment<FragmentEntrarUsuarioBinding>
+        implements View.OnClickListener {
     private TextInputEditText edtEmail, edtSenha;
     private TextInputLayout txtEmail, txtSenha;
     private TextView txtCadastrar, txtRecuperarSenha;
@@ -41,21 +40,14 @@ public class EntrarUsuarioFragment extends Fragment implements View.OnClickListe
     private AutenticacaoViewModel autenticacaoViewModel;
     private EstadoAppViewModel estadoAppViewModel;
     String [] menssagens = {"Campo requerido!", "Login efetuado com sucesso!"};
-
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = FragmentEntrarUsuarioBinding.inflate(inflater, container, false);
-        Log.d("fluxo", "onCreateView");
-
-        return binding.getRoot();
+    protected FragmentEntrarUsuarioBinding inflateBinding(LayoutInflater inflater, ViewGroup container) {
+        return FragmentEntrarUsuarioBinding.inflate(
+                inflater,
+                container,
+                false
+        );
     }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -160,7 +152,7 @@ public class EntrarUsuarioFragment extends Fragment implements View.OnClickListe
     private void configuraErroExecoesCampos(String mensagem) {
         botao_entrar.setEnabled(true);
         if (mensagem.equals("A network error (such as timeout, interrupted connection or unreachable host) has occurred.")) {
-            Snackbar.make(binding.getRoot(), "Sem conexão com a internet!", Snackbar.LENGTH_LONG).show();
+            mostraMensagem("Sem conexão com a internet!");
             return;
         }
         txtEmail.setHelperText("Email inválido!");
@@ -176,7 +168,6 @@ public class EntrarUsuarioFragment extends Fragment implements View.OnClickListe
     public void onStart() {
         super.onStart();
         FirebaseUser usuarioAtual = FirebaseAuth.getInstance().getCurrentUser();
-        Log.d("fluxo", "USUARIO ATUAL: " + usuarioAtual);
         if (usuarioAtual == null) return;
         vaiParaMenuNavegacao();
     }

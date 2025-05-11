@@ -11,7 +11,6 @@ import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -19,7 +18,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.kevin.ceep.databinding.FragmentListaTodosTrabalhosBinding;
 import com.kevin.ceep.model.ProfissaoTrabalho;
 import com.kevin.ceep.model.Trabalho;
@@ -33,8 +31,8 @@ import com.kevin.ceep.ui.viewModel.factory.TrabalhoViewModelFactory;
 
 import java.util.ArrayList;
 
-public class ListaTodosTrabalhosFragment extends Fragment {
-    private FragmentListaTodosTrabalhosBinding binding;
+public class ListaTodosTrabalhosFragment
+        extends BaseFragment<FragmentListaTodosTrabalhosBinding> {
     private ListaTodosTrabalhosAdapter listaTodosTrabalhosAdapter;
     private FloatingActionButton botaoNovoTrabalho;
     private RecyclerView meuRecycler;
@@ -42,14 +40,6 @@ public class ListaTodosTrabalhosFragment extends Fragment {
     private ArrayList<Trabalho> todosTrabalhos;
     private ProgressBar indicadorProgresso;
     private TrabalhoViewModel trabalhoViewModel;
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = FragmentListaTodosTrabalhosBinding.inflate(inflater, container, false);
-        return binding.getRoot();
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,14 +48,18 @@ public class ListaTodosTrabalhosFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        EstadoAppViewModel estadoAppViewModel = new ViewModelProvider(requireActivity()).get(EstadoAppViewModel.class);
-        ComponentesVisuais componentesVisuais = new ComponentesVisuais();
-        componentesVisuais.appBar = true;
-        estadoAppViewModel.componentes.setValue(componentesVisuais);
+        configuraComponentesVisuais();
         inicializaComponentes();
         configuraRecyclerView();
         configuraBotaoCadastraNovoTrabalho();
         configuraSwipeRefreshLayout();
+    }
+
+    private void configuraComponentesVisuais() {
+        EstadoAppViewModel estadoAppViewModel = new ViewModelProvider(requireActivity()).get(EstadoAppViewModel.class);
+        ComponentesVisuais componentesVisuais = new ComponentesVisuais();
+        componentesVisuais.appBar = true;
+        estadoAppViewModel.componentes.setValue(componentesVisuais);
     }
 
     private void inicializaComponentes() {
@@ -133,7 +127,7 @@ public class ListaTodosTrabalhosFragment extends Fragment {
                 filtraTrabalhosProfissao();
             }
             if (resultadoPegaTodosTrabalhos.getErro() != null) {
-                Snackbar.make(binding.getRoot(), "Erro: "+resultadoPegaTodosTrabalhos.getErro(), Snackbar.LENGTH_LONG).show();
+                mostraMensagem("Erro: "+resultadoPegaTodosTrabalhos.getErro());
             }
         });
     }
@@ -141,7 +135,7 @@ public class ListaTodosTrabalhosFragment extends Fragment {
     private void sincronizaTrabalhos() {
         trabalhoViewModel.sincronizaTrabalhos().observe(getViewLifecycleOwner(), resultadoSincroniza -> {
             if (resultadoSincroniza.getErro() != null) {
-                Snackbar.make(binding.getRoot(), "Erro: "+resultadoSincroniza.getErro(), Snackbar.LENGTH_LONG).show();
+                mostraMensagem("Erro: "+resultadoSincroniza.getErro());
             }
         });
     }
@@ -162,6 +156,15 @@ public class ListaTodosTrabalhosFragment extends Fragment {
         super.onResume();
         sincronizaTrabalhos();
         pegaTodosTrabalhos();
+    }
+
+    @Override
+    protected FragmentListaTodosTrabalhosBinding inflateBinding(LayoutInflater inflater, ViewGroup container) {
+        return FragmentListaTodosTrabalhosBinding.inflate(
+                inflater,
+                container,
+                false
+        );
     }
 
     @Override

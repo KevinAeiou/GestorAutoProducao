@@ -16,13 +16,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.view.MenuProvider;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.snackbar.Snackbar;
 import com.kevin.ceep.R;
 import com.kevin.ceep.databinding.FragmentAtributosPersonagemBinding;
 import com.kevin.ceep.model.Personagem;
@@ -32,21 +30,22 @@ import com.kevin.ceep.ui.viewModel.EstadoAppViewModel;
 import com.kevin.ceep.ui.viewModel.PersonagemViewModel;
 import com.kevin.ceep.ui.viewModel.factory.PersonagemViewModelFactory;
 
-public class ModificaPersonagemFragment extends Fragment implements MenuProvider{
+public class ModificaPersonagemFragment
+        extends BaseFragment<FragmentAtributosPersonagemBinding>
+        implements MenuProvider{
 
     private Personagem personagemRecebido;
     private EditText personagemNome, personagemEspacoProducao, personagemEmail, personagemSenha;
     private SwitchCompat personagemSwUso, personagemSwEstado, personagemSwAutoProducao;
-    private FragmentAtributosPersonagemBinding binding;
     private PersonagemViewModel personagemViewModel;
     private NavController controlador;
-
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = FragmentAtributosPersonagemBinding.inflate(inflater, container, false);
-        requireActivity().addMenuProvider(this, getViewLifecycleOwner(), androidx.lifecycle.Lifecycle.State.RESUMED);
-        return binding.getRoot();
+    protected FragmentAtributosPersonagemBinding inflateBinding(LayoutInflater inflater, ViewGroup container) {
+        return FragmentAtributosPersonagemBinding.inflate(
+                inflater,
+                container,
+                false
+        );
     }
 
     @Override
@@ -58,14 +57,19 @@ public class ModificaPersonagemFragment extends Fragment implements MenuProvider
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        requireActivity().addMenuProvider(this, getViewLifecycleOwner(), androidx.lifecycle.Lifecycle.State.RESUMED);
+        configuraComponentesVisuais();
+        inicializaComponentes();
+        pegaPersonagemSelecionado();
+        configuraBotaoExcluir();
+    }
+
+    private void configuraComponentesVisuais() {
         EstadoAppViewModel estadoAppViewModel = new ViewModelProvider(requireActivity()).get(EstadoAppViewModel.class);
         ComponentesVisuais componentesVisuais = new ComponentesVisuais();
         componentesVisuais.appBar = true;
         componentesVisuais.itemMenuConfirma = true;
         estadoAppViewModel.componentes.setValue(componentesVisuais);
-        inicializaComponentes();
-        pegaPersonagemSelecionado();
-        configuraBotaoExcluir();
     }
 
     @Override
@@ -105,11 +109,11 @@ public class ModificaPersonagemFragment extends Fragment implements MenuProvider
     private void removePersonagem() {
         personagemViewModel.removePersonagem(personagemRecebido).observe(getViewLifecycleOwner(), resultadoPersonagem -> {
             if (resultadoPersonagem.getErro() == null) {
-                Snackbar.make(binding.getRoot(), "Personagem: " + personagemRecebido.getId() + " foi removido!", Snackbar.LENGTH_LONG).show();
+                mostraMensagem("Personagem: " + personagemRecebido.getId() + " foi removido!");
                 voltaParaTrabalhosProducao();
                 return;
             }
-            Snackbar.make(binding.getRoot(), "Erro: "+resultadoPersonagem.getErro(), Snackbar.LENGTH_LONG).show();
+            mostraMensagem("Erro: "+resultadoPersonagem.getErro());
         });
     }
 
@@ -166,7 +170,7 @@ public class ModificaPersonagemFragment extends Fragment implements MenuProvider
                 voltaParaTrabalhosProducao();
                 return;
             }
-            Snackbar.make(binding.getRoot(), "Erro: "+resultadoModificaPersonagem.getErro(), Snackbar.LENGTH_LONG).show();
+            mostraMensagem("Erro: "+resultadoModificaPersonagem.getErro());
         });
     }
 

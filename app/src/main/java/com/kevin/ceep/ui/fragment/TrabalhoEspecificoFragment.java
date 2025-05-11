@@ -31,7 +31,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.core.view.MenuProvider;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
@@ -39,7 +38,6 @@ import androidx.navigation.Navigation;
 
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.kevin.ceep.R;
@@ -67,8 +65,9 @@ import com.kevin.ceep.ui.viewModel.factory.TrabalhosVendidosViewModelFactory;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class TrabalhoEspecificoFragment extends Fragment implements MenuProvider{
-    private FragmentTrabalhoEspecificoBinding binding;
+public class TrabalhoEspecificoFragment
+        extends BaseFragment<FragmentTrabalhoEspecificoBinding>
+        implements MenuProvider{
     private TrabalhoProducao trabalhoProducaoRecebido;
     private Trabalho trabalhoRecebido;
     private LinearLayoutCompat linearLayoutTrabalhoNecessario2, linearLayoutTrabalhoNecessario3;
@@ -93,17 +92,26 @@ public class TrabalhoEspecificoFragment extends Fragment implements MenuProvider
     private MutableLiveData<Boolean> confirmacao;
     private NavController controlador;
 
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = FragmentTrabalhoEspecificoBinding.inflate(inflater, container, false);
-        requireActivity().addMenuProvider(this, getViewLifecycleOwner(), androidx.lifecycle.Lifecycle.State.RESUMED);
-        return binding.getRoot();
+    protected FragmentTrabalhoEspecificoBinding inflateBinding(
+            LayoutInflater inflater,
+            ViewGroup container) {
+        return FragmentTrabalhoEspecificoBinding.inflate(
+                inflater,
+                container,
+                false
+        );
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(
+            @NonNull View view,
+            @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        requireActivity().addMenuProvider(
+                this,
+                getViewLifecycleOwner(),
+                androidx.lifecycle.Lifecycle.State.RESUMED);
         configuraComponentesVisuais();
         recebeDados();
         inicializaComponentes();
@@ -125,7 +133,6 @@ public class TrabalhoEspecificoFragment extends Fragment implements MenuProvider
 
             @Override
             public void afterTextChanged(Editable editable) {
-                Log.d("trabalho", "Editable: " + editable.toString());
                 String stringNivel = editable.toString();
                 if (stringNivel.isEmpty()) return;
                 String raridadeSelecionada = autoCompleteRaridade.getText().toString();
@@ -152,16 +159,16 @@ public class TrabalhoEspecificoFragment extends Fragment implements MenuProvider
         if (menuItem.getItemId() == R.id.itemMenuConfirma) {
             indicadorProgresso.setVisibility(View.VISIBLE);
             defineTrabalhoNecessario();
-            if (codigoRequisicao == CODIGO_REQUISICAO_ALTERA_TRABALHO_PRODUCAO) {
-                verificaModificacaoTrabalhoProducao();
-                return true;
-            }
-            if (codigoRequisicao == CODIGO_REQUISICAO_ALTERA_TRABALHO) {
-                verificaModificacaoTrabalho();
-                return true;
-            }
-            if (codigoRequisicao == CODIGO_REQUISICAO_INSERE_TRABALHO) {
-                verificaNovoTrabalho();
+            switch (codigoRequisicao) {
+                case CODIGO_REQUISICAO_ALTERA_TRABALHO_PRODUCAO:
+                    verificaModificacaoTrabalhoProducao();
+                    return true;
+                case CODIGO_REQUISICAO_ALTERA_TRABALHO:
+                    verificaModificacaoTrabalho();
+                    return true;
+                case CODIGO_REQUISICAO_INSERE_TRABALHO:
+                    verificaNovoTrabalho();
+                    return true;
             }
         }
         return false;
@@ -171,18 +178,18 @@ public class TrabalhoEspecificoFragment extends Fragment implements MenuProvider
         Trabalho trabalho = defineNovoTrabalho();
         if (camposNovoTrabalhoEhValido(trabalho)) {
             if (trabalhoViewModel.trabalhoEspecificoExiste(trabalho)) {
-                Snackbar.make(binding.getRoot(), trabalho.getNome()+" já existe!", Snackbar.LENGTH_LONG).show();
+                mostraMensagem(trabalho.getNome()+" já existe!");
                 indicadorProgresso.setVisibility(GONE);
                 return;
             }
             trabalhoViewModel.insereTrabalho(trabalho).observe(getViewLifecycleOwner(), resultadoInsereTrabalho -> {
                 indicadorProgresso.setVisibility(GONE);
                 if (resultadoInsereTrabalho.getErro() == null) {
-                    Snackbar.make(binding.getRoot(), trabalho.getNome()+" inserido!", Snackbar.LENGTH_LONG).show();
+                    mostraMensagem(trabalho.getNome()+" inserido!");
                     limpaCampos();
                     return;
                 }
-                Snackbar.make(binding.getRoot(), "Erro: "+resultadoInsereTrabalho.getErro(), Snackbar.LENGTH_LONG).show();
+                mostraMensagem("Erro: "+resultadoInsereTrabalho.getErro());
             });
             return;
         }
@@ -201,11 +208,11 @@ public class TrabalhoEspecificoFragment extends Fragment implements MenuProvider
             trabalhoViewModel.modificaTrabalho(trabalho).observe(getViewLifecycleOwner(), resultadoModificaTrabalho -> {
                 indicadorProgresso.setVisibility(GONE);
                 if (resultadoModificaTrabalho.getErro() == null) {
-                    Snackbar.make(binding.getRoot(), "Trabalho modificado com sucesso!", Snackbar.LENGTH_LONG).show();
+                    mostraMensagem("Trabalho modificado com sucesso!");
                     voltaParaListaTrabalhos();
                     return;
                 }
-                Snackbar.make(binding.getRoot(), "Erro: "+resultadoModificaTrabalho.getErro(), Snackbar.LENGTH_LONG).show();
+                mostraMensagem("Erro: "+resultadoModificaTrabalho.getErro());
             });
             return;
         }
@@ -231,7 +238,7 @@ public class TrabalhoEspecificoFragment extends Fragment implements MenuProvider
                 verficaEstadoTrabalhoProducaoModificado(trabalhoModificado);
                 return;
             }
-            Snackbar.make(binding.getRoot(), "Erro: "+resultado.getErro(), Snackbar.LENGTH_LONG).show();
+            mostraMensagem("Erro: "+resultado.getErro());
         });
         trabalhoProducaoViewModel.modificaTrabalhoProducao(trabalhoModificado);
     }
@@ -240,7 +247,7 @@ public class TrabalhoEspecificoFragment extends Fragment implements MenuProvider
         if (estadoTrabalhoProducaoEhModificado(trabalhoModificado)) {
             switch (trabalhoModificado.getEstado()) {
                 case CODIGO_TRABALHO_PARA_PRODUZIR:
-                    Snackbar.make(binding.getRoot(), trabalhoProducaoRecebido.getNome() + " foi modificado com sucesso!", Snackbar.LENGTH_LONG).show();
+                    mostraMensagem(trabalhoProducaoRecebido.getNome() + " foi modificado com sucesso!");
                     voltaParaListaTrabalhosProducao();
                     break;
                 case CODIGO_TRABALHO_PRODUZINDO:
@@ -254,20 +261,20 @@ public class TrabalhoEspecificoFragment extends Fragment implements MenuProvider
                                     trabalhoEncontrado.setQuantidade(trabalhoEncontrado.getQuantidade() - 1);
                                     trabalhoEstoqueViewModel.getModificacaoResultado().observe(getViewLifecycleOwner(), resultadoModificaTrabalho -> {
                                         if (resultadoModificaTrabalho.getErro() == null) {
-                                            Snackbar.make(binding.getRoot(), trabalhoProducaoRecebido.getNome() + " foi modificado com sucesso!", Snackbar.LENGTH_LONG).show();
+                                            mostraMensagem(trabalhoProducaoRecebido.getNome() + " foi modificado com sucesso!");
                                             voltaParaListaTrabalhosProducao();
                                         }
                                     });
                                     trabalhoEstoqueViewModel.modificaTrabalhoEstoque(trabalhoEncontrado);
                                     return;
                                 }
-                                Snackbar.make(binding.getRoot(), "Erro: "+ resultadoTrabalhoEncontrado.getErro(), Snackbar.LENGTH_LONG).show();
+                                mostraMensagem("Erro: "+ resultadoTrabalhoEncontrado.getErro());
                             });
                             trabalhoEstoqueViewModel.recuperaTrabalhoEstoquePorIdTrabalho(idTrabalho);
                         }
                         break;
                     }
-                    Snackbar.make(binding.getRoot(), trabalhoProducaoRecebido.getNome() + " foi modificado com sucesso!", Snackbar.LENGTH_LONG).show();
+                    mostraMensagem(trabalhoProducaoRecebido.getNome() + " foi modificado com sucesso!");
                     voltaParaListaTrabalhosProducao();
                     break;
                 case CODIGO_TRABALHO_FEITO:
@@ -286,7 +293,7 @@ public class TrabalhoEspecificoFragment extends Fragment implements MenuProvider
                 Profissao profissaoEncontrada = profissaoViewModel.retornaProfissaoModificada(resultadoProfissoes.getDado(), trabalho);
                 if (profissaoEncontrada == null){
                     indicadorProgresso.setVisibility(GONE);
-                    Snackbar.make(binding.getRoot(), "Profissão não encontrada: "+trabalho.getProfissao(), Snackbar.LENGTH_LONG).show();
+                    mostraMensagem("Profissão não encontrada: "+trabalho.getProfissao());
                     voltaParaListaTrabalhosProducao();
                     return;
                 }
@@ -297,18 +304,18 @@ public class TrabalhoEspecificoFragment extends Fragment implements MenuProvider
                         indicadorProgresso.setVisibility(GONE);
                         if (resultadoModificaExperiencia.getErro() == null){
                             if (Boolean.TRUE.equals(confirmacao.getValue())) {
-                                Snackbar.make(binding.getRoot(), trabalhoProducaoRecebido.getNome() + " foi modificado com sucesso!", Snackbar.LENGTH_LONG).show();
+                                mostraMensagem(trabalhoProducaoRecebido.getNome() + " foi modificado com sucesso!");
                                 voltaParaListaTrabalhosProducao();
                             }
                             return;
                         }
                         confirmacao.setValue(false);
-                        Snackbar.make(binding.getRoot(), "Erro: "+resultadoModificaExperiencia.getErro(), Snackbar.LENGTH_LONG).show();
+                        mostraMensagem("Erro: "+resultadoModificaExperiencia.getErro());
                     });
                 }
                 return;
             }
-            Snackbar.make(binding.getRoot(), "Erro: "+resultadoProfissoes.getErro(), Snackbar.LENGTH_LONG).show();
+            mostraMensagem("Erro: "+resultadoProfissoes.getErro());
         });
     }
 
@@ -323,7 +330,7 @@ public class TrabalhoEspecificoFragment extends Fragment implements MenuProvider
                         novoTrabalhoEstoque.setQuantidade(1);
                         trabalhoEstoqueViewModel.getInsercaoResultado().observe(getViewLifecycleOwner(), resultaSalvaTrabalhoEstoque -> {
                             if (resultaSalvaTrabalhoEstoque.getErro() == null) return;
-                            Snackbar.make(binding.getRoot(), "Erro: " + resultaSalvaTrabalhoEstoque.getErro(), Snackbar.LENGTH_LONG).show();
+                            mostraMensagem("Erro: " + resultaSalvaTrabalhoEstoque.getErro());
                             confirmacao.setValue(false);
                         });
                         trabalhoEstoqueViewModel.insereTrabalhoEstoque(novoTrabalhoEstoque);
@@ -333,7 +340,7 @@ public class TrabalhoEspecificoFragment extends Fragment implements MenuProvider
                 trabalhoEncontrado.setQuantidade(trabalhoEncontrado.getQuantidade()+1);
                 trabalhoEstoqueViewModel.getModificacaoResultado().observe(getViewLifecycleOwner(), resultaModificaQuantidade -> {
                     if (resultaModificaQuantidade.getErro() == null) return;
-                    Snackbar.make(binding.getRoot(), "Erro: "+resultaModificaQuantidade.getErro(), Snackbar.LENGTH_LONG).show();
+                    mostraMensagem("Erro: "+resultaModificaQuantidade.getErro());
                     confirmacao.setValue(false);
                 });
                 trabalhoEstoqueViewModel.modificaTrabalhoEstoque(trabalhoEncontrado);
@@ -467,10 +474,10 @@ public class TrabalhoEspecificoFragment extends Fragment implements MenuProvider
                 indicadorProgresso.setVisibility(GONE);
                 if (resultado.getErro() == null) {
                     trabalhoProducaoViewModel.getRemocaoReferenciaResultado().observe(getViewLifecycleOwner(), resultadoRemoveProducao -> {
-                        if (resultadoRemoveProducao.getErro() != null) Snackbar.make(binding.getRoot(), "Erro: "+ resultadoRemoveProducao.getErro(), Snackbar.LENGTH_LONG).show();
+                        if (resultadoRemoveProducao.getErro() != null) mostraMensagem("Erro: "+ resultadoRemoveProducao.getErro());
                     });
                     trabalhoEstoqueViewModel.getRemocaoReferenciaResultado().observe(getViewLifecycleOwner(), resultadoRemoveEstoque -> {
-                        if (resultadoRemoveEstoque.getErro() != null) Snackbar.make(binding.getRoot(), "Erro: " + resultadoRemoveEstoque.getErro(), Snackbar.LENGTH_LONG).show();
+                        if (resultadoRemoveEstoque.getErro() != null) mostraMensagem("Erro: " + resultadoRemoveEstoque.getErro());
                     });
                     trabalhoEstoqueViewModel.removeReferenciaTrabalhoEspecifico(trabalhoRecebido);
                     trabalhosVendidosViewModel.removeReferenciaTrabalhoEspecfico(trabalhoRecebido);
@@ -478,7 +485,7 @@ public class TrabalhoEspecificoFragment extends Fragment implements MenuProvider
                     trabalhoProducaoViewModel.removeReferenciaTrabalhoEspecifico(trabalhoRecebido);
                     return;
                 }
-                Snackbar.make(binding.getRoot(), "Erro: "+resultado.getErro(), Snackbar.LENGTH_LONG).show();
+                mostraMensagem("Erro: "+resultado.getErro());
             });
         });
     }
@@ -683,7 +690,7 @@ public class TrabalhoEspecificoFragment extends Fragment implements MenuProvider
             trabalhoViewModel.pegaTrabalhoPorId(idTrabalhosNecessarios[0]).observe(getViewLifecycleOwner(), resultadoBusca -> {
                 if (resultadoBusca.getDado() == null){
                     autoCompleteTrabalhoNecessario1.setText(getString(R.string.string_nao_encontrado));
-                    Snackbar.make(binding.getRoot(), "Erro: " + resultadoBusca.getErro(), Snackbar.LENGTH_LONG).show();
+                    mostraMensagem("Erro: " + resultadoBusca.getErro());
                     return;
                 }
                 autoCompleteTrabalhoNecessario1.setText(resultadoBusca.getDado().getNome());
@@ -693,7 +700,7 @@ public class TrabalhoEspecificoFragment extends Fragment implements MenuProvider
                 trabalhoViewModel.pegaTrabalhoPorId(idTrabalhosNecessarios[1]).observe(getViewLifecycleOwner(), resultadoBusca -> {
                     if (resultadoBusca.getDado() == null){
                         autoCompleteTrabalhoNecessario2.setText(getString(R.string.string_nao_encontrado));
-                        Snackbar.make(binding.getRoot(), "Erro: " + resultadoBusca.getErro(), Snackbar.LENGTH_LONG).show();
+                        mostraMensagem("Erro: " + resultadoBusca.getErro());
                         return;
                     }
                     autoCompleteTrabalhoNecessario2.setText(resultadoBusca.getDado().getNome());

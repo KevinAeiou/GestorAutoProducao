@@ -24,7 +24,6 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.view.MenuProvider;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -56,8 +55,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ListaEstoqueFragment extends Fragment implements MenuProvider {
-    private FragmentListaTrabalhosEstoqueBinding binding;
+public class ListaEstoqueFragment
+        extends BaseFragment<FragmentListaTrabalhosEstoqueBinding>
+        implements MenuProvider {
     private ListaTrabalhoEstoqueAdapter trabalhoEstoqueAdapter;
     private RecyclerView recyclerView;
     private ArrayList<TrabalhoEstoque> todosTrabalhosEstoque, trabalhosEstoqueFiltrada;
@@ -74,17 +74,19 @@ public class ListaEstoqueFragment extends Fragment implements MenuProvider {
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        binding = FragmentListaTrabalhosEstoqueBinding.inflate(inflater, container, false);
-        requireActivity().addMenuProvider(this, getViewLifecycleOwner(), androidx.lifecycle.Lifecycle.State.RESUMED);
-        return binding.getRoot();
+    protected FragmentListaTrabalhosEstoqueBinding inflateBinding(LayoutInflater inflater, ViewGroup container) {
+        return FragmentListaTrabalhosEstoqueBinding.inflate(
+                inflater,
+                container,
+                false
+        );
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        requireActivity().addMenuProvider(this, getViewLifecycleOwner(), androidx.lifecycle.Lifecycle.State.RESUMED);
         EstadoAppViewModel estadoAppViewModel = new ViewModelProvider(requireActivity()).get(EstadoAppViewModel.class);
         ComponentesVisuais componentesVisuais = new ComponentesVisuais();
         componentesVisuais.appBar = true;
@@ -324,11 +326,6 @@ public class ListaEstoqueFragment extends Fragment implements MenuProvider {
             if (resultadoRemoveTrabalho.getErro() != null) mostraMensagem(resultadoRemoveTrabalho.getErro());
         });
         trabalhoEstoqueViewModel.removeTrabalhoEstoque(trabalhoremovido);
-    }
-
-    private void mostraMensagem(String mensagem) {
-        if (binding == null) return;
-        Snackbar.make(binding.getRoot(), "Erro: "+ mensagem, Snackbar.LENGTH_LONG).show();
     }
 
     @Override

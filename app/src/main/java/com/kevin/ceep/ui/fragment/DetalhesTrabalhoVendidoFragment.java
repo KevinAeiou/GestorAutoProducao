@@ -23,12 +23,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.view.MenuProvider;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.kevin.ceep.R;
@@ -54,7 +52,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 
-public class DetalhesTrabalhoVendidoFragment extends Fragment implements MenuProvider{
+public class DetalhesTrabalhoVendidoFragment
+        extends BaseFragment<FragmentDetalhesTrabalhoVendidoBinding>
+        implements MenuProvider{
     public static final int TAXA = 70;
     public int mediaValorRecursoUnitarioComumMercado = 0;
     public int mediaValorRecursoUnitarioCompostoMercado = 0;
@@ -63,7 +63,6 @@ public class DetalhesTrabalhoVendidoFragment extends Fragment implements MenuPro
     private static final Double FATOR_PERCENTUAL = 0.01;
     public static final double FATOR_PERCENTUAL_MERCADO = 1.1;
     private static final int MEDIA_VALOR_LICENCA_INICIANTE = 1000;
-    private FragmentDetalhesTrabalhoVendidoBinding binding;
     private TextInputEditText edtDescricaoTrabalhoVendido, edtDataTrabalhoVendido, edtValorTrabalhoVendido, edtQuantidadeTrabalhoVendido, edtTaxaLucroTrabalhoVendido, edtValorProducaoTrabalhoVendido, edtValorLucroTrabalhoVendido;
     private AutoCompleteTextView autoCompleteNomeTrabalhoVendido;
     private TrabalhoVendido trabalhoRecebido;
@@ -76,19 +75,11 @@ public class DetalhesTrabalhoVendidoFragment extends Fragment implements MenuPro
     private int valorProducaoMelhorado;
     private int valorProducaoRaro;
     private int codigoRequisicao;
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = FragmentDetalhesTrabalhoVendidoBinding.inflate(inflater, container, false);
-        requireActivity().addMenuProvider(this, getViewLifecycleOwner(), androidx.lifecycle.Lifecycle.State.RESUMED);
-        return binding.getRoot();
-    }
-
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        requireActivity().addMenuProvider(this, getViewLifecycleOwner(), androidx.lifecycle.Lifecycle.State.RESUMED);
         configuraComponentesVisuais();
         recebeDados();
         inicializaComponentes();
@@ -144,11 +135,11 @@ public class DetalhesTrabalhoVendidoFragment extends Fragment implements MenuPro
     private void insereVenda(TrabalhoVendido novaVenda) {
         trabalhosVendidosViewModel.insereVenda(novaVenda).observe(getViewLifecycleOwner(), resultadoInsereVenda ->{
             if (resultadoInsereVenda.getErro() == null) {
-                Snackbar.make(binding.getRoot(), "Venda inserida com sucesso!", Snackbar.LENGTH_LONG).show();
                 voltaParaTrabalhosVendidos();
+                mostraMensagem("Venda inserida com sucesso!");
                 return;
             }
-            Snackbar.make(binding.getRoot(), "Erro ao inserir venda: " + resultadoInsereVenda.getErro(), Snackbar.LENGTH_LONG).show();
+            mostraMensagem("Erro ao inserir venda: " + resultadoInsereVenda.getErro());
             voltaParaTrabalhosVendidos();
         });
     }
@@ -325,7 +316,7 @@ public class DetalhesTrabalhoVendidoFragment extends Fragment implements MenuPro
             if (resultadoRecuperacao.getErro() == null) {
                 if (resultadoRecuperacao.getDado().isEmpty()) {
                     recursosProducaoViewModel.insereListaRecursos().observe(getViewLifecycleOwner(), resultadoInsereRecursos -> {
-                        if (resultadoInsereRecursos.getErro() != null) Snackbar.make(binding.getRoot(), "Erro: " + resultadoInsereRecursos.getErro(), Snackbar.LENGTH_LONG).show();
+                        if (resultadoInsereRecursos.getErro() != null) mostraMensagem("Erro: " + resultadoInsereRecursos.getErro());
                     });
                     return;
                 }
@@ -505,11 +496,11 @@ public class DetalhesTrabalhoVendidoFragment extends Fragment implements MenuPro
     private void modificaTrabalho(TrabalhoVendido trabalhoModificado) {
         trabalhosVendidosViewModel.modificaTrabalhoVendido(trabalhoModificado).observe(getViewLifecycleOwner(), resultadoModificaTrabalho -> {
             if (resultadoModificaTrabalho.getErro() == null) {
-                Snackbar.make(binding.getRoot(), "Venda modificada com sucesso!", Snackbar.LENGTH_LONG).show();
+                mostraMensagem("Venda modificada com sucesso!");
                 voltaParaTrabalhosVendidos();
                 return;
             }
-            Snackbar.make(binding.getRoot(), "Erro ao modificar trabalho: " + resultadoModificaTrabalho.getErro(), Snackbar.LENGTH_LONG).show();
+            mostraMensagem("Erro ao modificar trabalho: " + resultadoModificaTrabalho.getErro());
         });
     }
 
@@ -596,6 +587,15 @@ public class DetalhesTrabalhoVendidoFragment extends Fragment implements MenuPro
     public void onResume() {
         super.onResume();
         recuperaTrabalhos();
+    }
+
+    @Override
+    protected FragmentDetalhesTrabalhoVendidoBinding inflateBinding(LayoutInflater inflater, ViewGroup container) {
+        return FragmentDetalhesTrabalhoVendidoBinding.inflate(
+                inflater,
+                container,
+                false
+        );
     }
 
     @Override

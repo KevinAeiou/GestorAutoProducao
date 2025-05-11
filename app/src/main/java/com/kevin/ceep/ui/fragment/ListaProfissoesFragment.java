@@ -10,13 +10,11 @@ import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.kevin.ceep.databinding.FragmentListaProfissoesBinding;
 import com.kevin.ceep.model.Profissao;
 import com.kevin.ceep.repository.PersonagemRepository;
@@ -30,8 +28,8 @@ import com.kevin.ceep.ui.viewModel.factory.ProfissaoViewModelFactory;
 
 import java.util.ArrayList;
 
-public class ListaProfissoesFragment extends Fragment {
-    private FragmentListaProfissoesBinding binding;
+public class ListaProfissoesFragment
+        extends BaseFragment<FragmentListaProfissoesBinding> {
     private ListaProfissaoAdapter listaProfissaoAdapter;
     private String idPersonagem;
     private ArrayList<Profissao> todasProfissoes;
@@ -44,15 +42,12 @@ public class ListaProfissoesFragment extends Fragment {
     public ListaProfissoesFragment() {
     }
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        binding = FragmentListaProfissoesBinding.inflate(inflater, container, false);
-        return binding.getRoot();
+    protected FragmentListaProfissoesBinding inflateBinding(LayoutInflater inflater, ViewGroup container) {
+        return FragmentListaProfissoesBinding.inflate(
+                inflater,
+                container,
+                false
+        );
     }
 
     @Override
@@ -106,7 +101,7 @@ public class ListaProfissoesFragment extends Fragment {
                 if (todasProfissoes.isEmpty()) {
                     profissaoViewModel.insereProfissoes().observe(getViewLifecycleOwner(), resultadoInsereProfissoes -> {
                         if (resultadoInsereProfissoes.getErro() != null) {
-                            Snackbar.make(binding.getRoot(), "Erro: "+resultadoTodasProfissoes.getErro(), Snackbar.LENGTH_LONG).show();
+                            mostraMensagem("Erro: "+resultadoTodasProfissoes.getErro());
                         }
                     });
                 }
@@ -115,7 +110,7 @@ public class ListaProfissoesFragment extends Fragment {
                 listaProfissaoAdapter.atualiza(todasProfissoes);
             }
             if (resultadoTodasProfissoes.getErro() != null) {
-                Snackbar.make(binding.getRoot(), "Erro: "+resultadoTodasProfissoes.getErro(), Snackbar.LENGTH_LONG).show();
+                mostraMensagem("Erro: "+resultadoTodasProfissoes.getErro());
             }
         });
     }

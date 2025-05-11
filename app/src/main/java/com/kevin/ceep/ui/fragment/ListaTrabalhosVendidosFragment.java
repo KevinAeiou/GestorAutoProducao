@@ -24,7 +24,6 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.view.MenuProvider;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -50,8 +49,9 @@ import com.kevin.ceep.ui.viewModel.factory.TrabalhosVendidosViewModelFactory;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
-public class ListaTrabalhosVendidosFragment extends Fragment implements MenuProvider {
-    private FragmentListaTrabalhosVendidosBinding binding;
+public class ListaTrabalhosVendidosFragment
+        extends BaseFragment<FragmentListaTrabalhosVendidosBinding>
+        implements MenuProvider {
     private ListaTrabalhosVendidosAdapter trabalhosVendidosAdapter;
     private String idPersonagem, textoFiltro;
     private ArrayList<TrabalhoVendido> trabalhosVendidos, trabalhosFiltrados;
@@ -65,18 +65,19 @@ public class ListaTrabalhosVendidosFragment extends Fragment implements MenuProv
 
     public ListaTrabalhosVendidosFragment() {
     }
-
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        binding = FragmentListaTrabalhosVendidosBinding.inflate(inflater, container, false);
-        requireActivity().addMenuProvider(this, getViewLifecycleOwner(), androidx.lifecycle.Lifecycle.State.RESUMED);
-        return binding.getRoot();
+    protected FragmentListaTrabalhosVendidosBinding inflateBinding(LayoutInflater inflater, ViewGroup container) {
+        return FragmentListaTrabalhosVendidosBinding.inflate(
+                inflater,
+                container,
+                false
+        );
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        requireActivity().addMenuProvider(this, getViewLifecycleOwner(), androidx.lifecycle.Lifecycle.State.RESUMED);
         configuraComponentesVisuais();
         inicializaComponentes();
         configuraRecyclerView();
@@ -196,7 +197,7 @@ public class ListaTrabalhosVendidosFragment extends Fragment implements MenuProv
     private void removeTrabalhoDoBanco(TrabalhoVendido trabalhoRemovido) {
         trabalhosVendidosViewModel.removeVenda(trabalhoRemovido).observe(getViewLifecycleOwner(), resultadoRemoveVenda -> {
             if (resultadoRemoveVenda.getErro() != null) {
-                Snackbar.make(binding.getRoot(), "Erro ao remover venda: "+resultadoRemoveVenda.getErro(), Snackbar.LENGTH_LONG).show();
+                mostraMensagem("Erro ao remover venda: "+resultadoRemoveVenda.getErro());
             }
         });
     }
@@ -218,7 +219,7 @@ public class ListaTrabalhosVendidosFragment extends Fragment implements MenuProv
                 swipeRefreshLayout.setRefreshing(false);
                 return;
             }
-            Snackbar.make(binding.getRoot(), "Erro ao recuperar vendas: "+resultadoTodosTrabalhos.getErro(), Snackbar.LENGTH_LONG).show();
+            mostraMensagem("Erro ao recuperar vendas: "+resultadoTodosTrabalhos.getErro());
         });
     }
 
