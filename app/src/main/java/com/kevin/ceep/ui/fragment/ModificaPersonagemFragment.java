@@ -85,7 +85,7 @@ public class ModificaPersonagemFragment
                 MaterialAlertDialogBuilder dialogoDeAlerta = new MaterialAlertDialogBuilder(requireContext());
                 dialogoDeAlerta.setMessage("Deseja confirmar alterações?");
                 dialogoDeAlerta.setNegativeButton("Não", ((dialogInterface, i) -> onDestroy()));
-                dialogoDeAlerta.setPositiveButton("Sim", (dialogInterface, i) -> modificaPersonagemServidor(personagem));
+                dialogoDeAlerta.setPositiveButton("Sim", (dialogInterface, i) -> modificaPersonagem(personagem));
                 dialogoDeAlerta.show();
                 return true;
             }
@@ -107,7 +107,9 @@ public class ModificaPersonagemFragment
     }
 
     private void removePersonagem() {
-        personagemViewModel.removePersonagem(personagemRecebido).observe(getViewLifecycleOwner(), resultadoPersonagem -> {
+        personagemViewModel.getRemocaoResultado().observe(
+            getViewLifecycleOwner(),
+            resultadoPersonagem -> {
             if (resultadoPersonagem.getErro() == null) {
                 mostraMensagem("Personagem: " + personagemRecebido.getId() + " foi removido!");
                 voltaParaTrabalhosProducao();
@@ -115,6 +117,7 @@ public class ModificaPersonagemFragment
             }
             mostraMensagem("Erro: "+resultadoPersonagem.getErro());
         });
+        personagemViewModel.removePersonagem(personagemRecebido);
     }
 
     private void pegaPersonagemSelecionado() {
@@ -164,14 +167,15 @@ public class ModificaPersonagemFragment
         return personagemModificado;
     }
 
-    private void modificaPersonagemServidor(Personagem personagemModificado) {
-        personagemViewModel.modificaPersonagem(personagemModificado).observe(getViewLifecycleOwner(), resultadoModificaPersonagem -> {
+    private void modificaPersonagem(Personagem personagemModificado) {
+        personagemViewModel.getModificacaoResultado().observe(getViewLifecycleOwner(), resultadoModificaPersonagem -> {
             if (resultadoModificaPersonagem.getErro() == null) {
                 voltaParaTrabalhosProducao();
                 return;
             }
             mostraMensagem("Erro: "+resultadoModificaPersonagem.getErro());
         });
+        personagemViewModel.modificaPersonagem(personagemModificado);
     }
 
     private boolean personagemEhModificado(Personagem personagem) {

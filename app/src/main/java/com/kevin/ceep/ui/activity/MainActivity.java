@@ -242,11 +242,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-    private void recuperaPersonagensServidor(ArrayList<String> dado) {
+    private void recuperaPersonagens(ArrayList<String> dado) {
         personagens.clear();
         FirebaseUser usuarioID = FirebaseAuth.getInstance().getCurrentUser();
         if (usuarioID == null) return;
-        personagemViewModel.recuperaPersonagensServidor(dado).observe(this, resultadoPersonagens -> {
+        personagemViewModel.getPersonagensEncontrados().observe(this, resultadoPersonagens -> {
             if (resultadoPersonagens.getErro() == null) {
                 personagens = resultadoPersonagens.getDado();
                 if (personagens.isEmpty()) return;
@@ -257,6 +257,7 @@ public class MainActivity extends AppCompatActivity {
             }
             Snackbar.make(binding.getRoot(), "Erro: "+resultadoPersonagens.getErro(), Snackbar.LENGTH_LONG).show();
         });
+        personagemViewModel.recuperaPersonagens(dado);
     }
 
     private void configuraPersonagens() {
@@ -266,13 +267,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void pegaIdsPersonagens() {
-        personagemViewModel.pegaIdsPersonagens().observe(this, resultadoIdsPersonagens -> {
+        personagemViewModel.getIdsPersonagens().observe(this, resultadoIdsPersonagens -> {
             if (resultadoIdsPersonagens.getErro() == null) {
-                recuperaPersonagensServidor(resultadoIdsPersonagens.getDado());
+                recuperaPersonagens(resultadoIdsPersonagens.getDado());
                 return;
             }
             Snackbar.make(getApplicationContext(), Objects.requireNonNull(getCurrentFocus()), "Erro: " + resultadoIdsPersonagens.getErro(), Snackbar.LENGTH_LONG).show();
         });
+        personagemViewModel.pegaIdsPersonagens();
     }
 
     private void configuraDropDownPersonagens() {

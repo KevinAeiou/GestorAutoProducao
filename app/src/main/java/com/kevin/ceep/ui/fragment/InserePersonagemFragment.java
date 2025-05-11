@@ -67,8 +67,8 @@ public class InserePersonagemFragment
     public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
         if (menuItem.getItemId() == R.id.itemMenuConfirma) {
             if (verificaCamposValidos()){
-                Personagem novoPersonagem = definePersonagemModificado();
-                inserePersonagemServidor(novoPersonagem);
+                Personagem personagem = defineNovoPersonagem();
+                inserePersonagem(personagem);
                 return true;
             }
             configuraMensagemCamposValidos();
@@ -77,14 +77,17 @@ public class InserePersonagemFragment
         return false;
     }
 
-    private void inserePersonagemServidor(Personagem novoPersonagem) {
-        personagemViewModel.inserePersonagem(novoPersonagem).observe(getViewLifecycleOwner(), resultadoInserePersonagem -> {
+    private void inserePersonagem(Personagem personagem) {
+        personagemViewModel.getInsercaoResultado().observe(
+                getViewLifecycleOwner(),
+                resultadoInserePersonagem -> {
             if (resultadoInserePersonagem.getErro() == null) {
                 voltaParaTrabalhosProducao();
                 return;
             }
             mostraMensagem("Erro: "+resultadoInserePersonagem.getErro());
         });
+        personagemViewModel.inserePersonagem(personagem);
     }
     private void voltaParaTrabalhosProducao() {
         controlador.navigate(ModificaPersonagemFragmentDirections.vaiParaListaTrabalhosProducao());
@@ -122,16 +125,16 @@ public class InserePersonagemFragment
         personagemNomeTxt.setHelperTextEnabled(false);
     }
 
-    private Personagem definePersonagemModificado() {
-        Personagem personagemModificado = new Personagem();
-        personagemModificado.setNome(personagemNome.getText().toString());
-        personagemModificado.setEmail(personagemEmail.getText().toString());
-        personagemModificado.setSenha(personagemSenha.getText().toString());
-        personagemModificado.setEstado(personagemSwEstado.isChecked());
-        personagemModificado.setAutoProducao(personagemSwAutoProducao.isChecked());
-        personagemModificado.setUso(personagemSwUso.isChecked());
-        personagemModificado.setEspacoProducao(parseInt(personagemEspacoProducao.getText().toString()));
-        return personagemModificado;
+    private Personagem defineNovoPersonagem() {
+        Personagem novoPersonagem = new Personagem();
+        novoPersonagem.setNome(personagemNome.getText().toString());
+        novoPersonagem.setEmail(personagemEmail.getText().toString());
+        novoPersonagem.setSenha(personagemSenha.getText().toString());
+        novoPersonagem.setEstado(personagemSwEstado.isChecked());
+        novoPersonagem.setAutoProducao(personagemSwAutoProducao.isChecked());
+        novoPersonagem.setUso(personagemSwUso.isChecked());
+        novoPersonagem.setEspacoProducao(parseInt(personagemEspacoProducao.getText().toString()));
+        return novoPersonagem;
     }
 
     private boolean verificaCamposValidos() {
