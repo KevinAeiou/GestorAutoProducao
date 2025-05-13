@@ -121,23 +121,25 @@ public class ListaTodosTrabalhosFragment
 
     private void pegaTodosTrabalhos() {
         todosTrabalhos = new ArrayList<>();
-        trabalhoViewModel.recuperaTrabalhos().observe(getViewLifecycleOwner(), resultadoPegaTodosTrabalhos -> {
-            if (resultadoPegaTodosTrabalhos.getDado() != null) {
-                todosTrabalhos = resultadoPegaTodosTrabalhos.getDado();
+        trabalhoViewModel.getTrabalhos().observe(getViewLifecycleOwner(), resultadoRecuperaTrabalhos -> {
+            if (resultadoRecuperaTrabalhos.getDado() != null) {
+                todosTrabalhos = resultadoRecuperaTrabalhos.getDado();
                 filtraTrabalhosProfissao();
             }
-            if (resultadoPegaTodosTrabalhos.getErro() != null) {
-                mostraMensagem("Erro: "+resultadoPegaTodosTrabalhos.getErro());
+            if (resultadoRecuperaTrabalhos.getErro() != null) {
+                mostraMensagem("Erro: "+resultadoRecuperaTrabalhos.getErro());
             }
         });
+        trabalhoViewModel.recuperaTrabalhos();
     }
 
     private void sincronizaTrabalhos() {
-        trabalhoViewModel.sincronizaTrabalhos().observe(getViewLifecycleOwner(), resultadoSincroniza -> {
+        trabalhoViewModel.getSincronizacaoResultado().observe(getViewLifecycleOwner(), resultadoSincroniza -> {
             if (resultadoSincroniza.getErro() != null) {
                 mostraMensagem("Erro: "+resultadoSincroniza.getErro());
             }
         });
+        trabalhoViewModel.sincronizaTrabalhos();
     }
 
     private void configuraRecyclerView() {
@@ -154,7 +156,6 @@ public class ListaTodosTrabalhosFragment
     @Override
     public void onResume() {
         super.onResume();
-        sincronizaTrabalhos();
         pegaTodosTrabalhos();
     }
 

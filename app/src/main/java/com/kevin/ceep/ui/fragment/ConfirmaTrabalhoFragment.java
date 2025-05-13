@@ -68,12 +68,13 @@ public class ConfirmaTrabalhoFragment
         String[] idsTrabalhosNecessarios = trabalhoRecebido.getTrabalhoNecessario().split(",");
         nomesTrabalhosNecessarios = "";
         for (String id : idsTrabalhosNecessarios) {
-            trabalhoViewModel.pegaTrabalhoPorId(id).observe(getViewLifecycleOwner(), resultadoPegaTrabalho -> {
+            trabalhoViewModel.getTrabalhoPorIdResultado().observe(getViewLifecycleOwner(), resultadoPegaTrabalho -> {
                 if (resultadoPegaTrabalho.getErro() == null) {
                     nomesTrabalhosNecessarios += resultadoPegaTrabalho.getDado().getNome();
                 }
                 if (!nomesTrabalhosNecessarios.isEmpty()) binding.txtTrabalhoNecessarioConfirmaTrabalho.setText(nomesTrabalhosNecessarios);
             });
+            trabalhoViewModel.recuperaTrabalhoPorId(id);
         }
     }
 

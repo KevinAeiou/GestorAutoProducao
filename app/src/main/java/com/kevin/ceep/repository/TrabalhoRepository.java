@@ -150,7 +150,7 @@ public class TrabalhoRepository {
         });
         return liveData;
     }
-    public LiveData<Resource<ArrayList<Trabalho>>> pegaTodosTrabalhos() {
+    public LiveData<Resource<ArrayList<Trabalho>>> recuperaTrabalhos() {
         Cursor cursor = dbLeitura.query(
                 TABLE_TRABALHOS,
                 null,
@@ -176,7 +176,10 @@ public class TrabalhoRepository {
         }
         cursor.close();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            trabalhos.sort(Comparator.comparing(Trabalho::getProfissao).thenComparing(Trabalho::getRaridade).thenComparing(Trabalho::getNivel).thenComparing(Trabalho::getNome));
+            trabalhos.sort(Comparator.comparing(Trabalho::getProfissao)
+                    .thenComparing(Trabalho::getRaridade)
+                    .thenComparing(Trabalho::getNivel)
+                    .thenComparing(Trabalho::getNome));
         }
         trabalhosEncontrados.setValue(new Resource<>(trabalhos, null));
         return trabalhosEncontrados;
@@ -275,7 +278,13 @@ public class TrabalhoRepository {
                 " AND " + COLUMN_NAME_EXPERIENCIA + " == ?" +
                 " AND " + COLUMN_NAME_PROFISSAO + " == ?" +
                 " AND " + COLUMN_NAME_RARIDADE + " == ?";
-        String[] selectionArgs = {trabalho.getNome(), trabalho.getNomeProducao(), String.valueOf(trabalho.getNivel()), String.valueOf(trabalho.getExperiencia()), trabalho.getProfissao(), trabalho.getRaridade()};
+        String[] selectionArgs = {
+                trabalho.getNome(),
+                trabalho.getNomeProducao(),
+                String.valueOf(trabalho.getNivel()),
+                String.valueOf(trabalho.getExperiencia()),
+                trabalho.getProfissao(),
+                trabalho.getRaridade()};
         Cursor cursor = dbLeitura.rawQuery(
                 selection,
                 selectionArgs
@@ -285,7 +294,7 @@ public class TrabalhoRepository {
         return trabalhoEncontrado;
     }
 
-    public LiveData<Resource<ArrayList<Trabalho>>> pegaTrabalhosNecessarios(Trabalho trabalho) {
+    public LiveData<Resource<ArrayList<Trabalho>>> recuperaTrabalhosNecessarios(Trabalho trabalho) {
         MutableLiveData<Resource<ArrayList<Trabalho>>> liveData = new MutableLiveData<>();
         ArrayList<Trabalho> trabalhosEncontrados = new ArrayList<>();
         String selection = "SELECT *"+
@@ -312,7 +321,7 @@ public class TrabalhoRepository {
         return liveData;
     }
 
-    public LiveData<Resource<Trabalho>> pegaTrabalhoPorId(String id) {
+    public LiveData<Resource<Trabalho>> recuperaTrabalhoPorId(String id) {
         MutableLiveData<Resource<Trabalho>> liveData = new MutableLiveData<>();
         String selection = "SELECT *"+
                 " FROM " + TABLE_TRABALHOS +

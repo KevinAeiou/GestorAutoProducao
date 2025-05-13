@@ -182,7 +182,10 @@ public class TrabalhoEspecificoFragment
                 indicadorProgresso.setVisibility(GONE);
                 return;
             }
-            trabalhoViewModel.insereTrabalho(trabalho).observe(getViewLifecycleOwner(), resultadoInsereTrabalho -> {
+            trabalhoViewModel.getInsercaoResultado().observe(
+                    getViewLifecycleOwner(),
+                    resultadoInsereTrabalho
+            -> {
                 indicadorProgresso.setVisibility(GONE);
                 if (resultadoInsereTrabalho.getErro() == null) {
                     mostraMensagem(trabalho.getNome()+" inserido!");
@@ -191,6 +194,7 @@ public class TrabalhoEspecificoFragment
                 }
                 mostraMensagem("Erro: "+resultadoInsereTrabalho.getErro());
             });
+            trabalhoViewModel.insereTrabalho(trabalho);
             return;
         }
         indicadorProgresso.setVisibility(GONE);
@@ -205,7 +209,10 @@ public class TrabalhoEspecificoFragment
     private void verificaModificacaoTrabalho() {
         Trabalho trabalho = defineTrabalhoModificado();
         if (trabalhoEhModificado(trabalho)) {
-            trabalhoViewModel.modificaTrabalho(trabalho).observe(getViewLifecycleOwner(), resultadoModificaTrabalho -> {
+            trabalhoViewModel.getModificacaoResultado().observe(
+                    getViewLifecycleOwner(),
+                    resultadoModificaTrabalho
+            -> {
                 indicadorProgresso.setVisibility(GONE);
                 if (resultadoModificaTrabalho.getErro() == null) {
                     mostraMensagem("Trabalho modificado com sucesso!");
@@ -214,6 +221,7 @@ public class TrabalhoEspecificoFragment
                 }
                 mostraMensagem("Erro: "+resultadoModificaTrabalho.getErro());
             });
+            trabalhoViewModel.modificaTrabalho(trabalho);
             return;
         }
         voltaParaListaTrabalhos();
@@ -470,7 +478,7 @@ public class TrabalhoEspecificoFragment
         TrabalhosVendidosViewModel trabalhosVendidosViewModel= new ViewModelProvider(requireActivity(), trabalhosVendidosViewModelFactory).get(TrabalhosVendidosViewModel.class);
         btnExcluir.setOnClickListener(v -> {
             indicadorProgresso.setVisibility(View.VISIBLE);
-            trabalhoViewModel.removeTrabalhoEspecificoServidor(trabalhoRecebido).observe(getViewLifecycleOwner(), resultado -> {
+            trabalhoViewModel.getRemocaoResultado().observe(getViewLifecycleOwner(), resultado -> {
                 indicadorProgresso.setVisibility(GONE);
                 if (resultado.getErro() == null) {
                     trabalhoProducaoViewModel.getRemocaoReferenciaResultado().observe(getViewLifecycleOwner(), resultadoRemoveProducao -> {
@@ -487,6 +495,7 @@ public class TrabalhoEspecificoFragment
                 }
                 mostraMensagem("Erro: "+resultado.getErro());
             });
+            trabalhoViewModel.removeTrabalho(trabalhoRecebido);
         });
     }
     private void configuraDropdownProfissoes() {
@@ -546,7 +555,7 @@ public class TrabalhoEspecificoFragment
 
     private void recuperaTrabalhosNecessarios(ArrayList<String> stringTrabalhosNecessarios) {
         Trabalho trabalho = defineTrabalhoBusca();
-        trabalhoViewModel.pegaTrabalhosNecessarios(trabalho).observe(getViewLifecycleOwner(), resultadoPegaTrabalhosNecessarios -> {
+        trabalhoViewModel.getTrabalhosNecessariosResultado().observe(getViewLifecycleOwner(), resultadoPegaTrabalhosNecessarios -> {
             if (resultadoPegaTrabalhosNecessarios.getErro() == null) {
                 trabalhosNecessarios = resultadoPegaTrabalhosNecessarios.getDado();
                 if (trabalhosNecessarios.isEmpty()) return;
@@ -559,6 +568,7 @@ public class TrabalhoEspecificoFragment
                 configuraAdapterTrabalhoNecessario(stringTrabalhosNecessarios);
             }
         });
+        trabalhoViewModel.recuperaTrabalhosNecessarios(trabalho);
     }
 
     private void preencheCamposTrabalhosNecessarios() {
@@ -687,7 +697,7 @@ public class TrabalhoEspecificoFragment
             String[] idTrabalhosNecessarios = trabalhoProducaoRecebido.getTrabalhoNecessario().split(",");
             int tamanhoLista= idTrabalhosNecessarios.length;
             linearLayoutTrabalhoNecessario2.setVisibility(View.VISIBLE);
-            trabalhoViewModel.pegaTrabalhoPorId(idTrabalhosNecessarios[0]).observe(getViewLifecycleOwner(), resultadoBusca -> {
+            trabalhoViewModel.getTrabalhoPorIdResultado().observe(getViewLifecycleOwner(), resultadoBusca -> {
                 if (resultadoBusca.getDado() == null){
                     autoCompleteTrabalhoNecessario1.setText(getString(R.string.string_nao_encontrado));
                     mostraMensagem("Erro: " + resultadoBusca.getErro());
@@ -695,9 +705,10 @@ public class TrabalhoEspecificoFragment
                 }
                 autoCompleteTrabalhoNecessario1.setText(resultadoBusca.getDado().getNome());
             });
+            trabalhoViewModel.recuperaTrabalhoPorId(idTrabalhosNecessarios[0]);
             if (tamanhoLista > 1){
                 linearLayoutTrabalhoNecessario3.setVisibility(View.VISIBLE);
-                trabalhoViewModel.pegaTrabalhoPorId(idTrabalhosNecessarios[1]).observe(getViewLifecycleOwner(), resultadoBusca -> {
+                trabalhoViewModel.getTrabalhoPorIdResultado().observe(getViewLifecycleOwner(), resultadoBusca -> {
                     if (resultadoBusca.getDado() == null){
                         autoCompleteTrabalhoNecessario2.setText(getString(R.string.string_nao_encontrado));
                         mostraMensagem("Erro: " + resultadoBusca.getErro());
@@ -705,6 +716,7 @@ public class TrabalhoEspecificoFragment
                     }
                     autoCompleteTrabalhoNecessario2.setText(resultadoBusca.getDado().getNome());
                 });
+                trabalhoViewModel.recuperaTrabalhoPorId(idTrabalhosNecessarios[1]);
             }
         }
     }

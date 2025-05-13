@@ -514,14 +514,15 @@ public class DetalhesTrabalhoVendidoFragment
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void recuperaTrabalhos() {
-        trabalhoViewModel.recuperaTrabalhos().observe(getViewLifecycleOwner(), resultadoRecuperaTrabalhos -> {
-            ArrayList<Trabalho> todosTrabalhos;
+        trabalhoViewModel.getTrabalhos().observe(getViewLifecycleOwner(), resultadoRecuperaTrabalhos -> {
             if (resultadoRecuperaTrabalhos.getDado() != null) {
+                ArrayList<Trabalho> todosTrabalhos;
                 todosTrabalhos = resultadoRecuperaTrabalhos.getDado();
                 configuraAutoCompleteTrabalhos(todosTrabalhos);
                 cofiguraCampoValorProducao();
             }
         });
+        trabalhoViewModel.recuperaTrabalhos();
     }
 
     private void recebeDados() {
