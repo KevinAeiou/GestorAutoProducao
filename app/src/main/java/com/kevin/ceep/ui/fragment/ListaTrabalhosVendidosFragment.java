@@ -194,12 +194,16 @@ public class ListaTrabalhosVendidosFragment
         trabalhosFiltrados.remove(trabalhoVendidoRemovido);
     }
 
-    private void removeTrabalhoDoBanco(TrabalhoVendido trabalhoRemovido) {
-        trabalhosVendidosViewModel.removeVenda(trabalhoRemovido).observe(getViewLifecycleOwner(), resultadoRemoveVenda -> {
+    private void removeTrabalhoDoBanco(TrabalhoVendido trabalho) {
+        trabalhosVendidosViewModel.getRemocaoResultado().observe(
+                getViewLifecycleOwner(),
+                resultadoRemoveVenda
+        -> {
             if (resultadoRemoveVenda.getErro() != null) {
                 mostraMensagem("Erro ao remover venda: "+resultadoRemoveVenda.getErro());
             }
         });
+        trabalhosVendidosViewModel.removeVenda(trabalho);
     }
     private void configuraSwipeRefreshLayout() {
         swipeRefreshLayout.setOnRefreshListener(() -> {
@@ -210,7 +214,10 @@ public class ListaTrabalhosVendidosFragment
     }
 
     private void recuperaVendas() {
-        trabalhosVendidosViewModel.recuperaVendas().observe(getViewLifecycleOwner(), resultadoTodosTrabalhos -> {
+        trabalhosVendidosViewModel.getRecuperaVendasResultado().observe(
+                getViewLifecycleOwner(),
+                resultadoTodosTrabalhos
+        -> {
             if (resultadoTodosTrabalhos.getErro() == null) {
                 trabalhosVendidos = resultadoTodosTrabalhos.getDado();
                 trabalhosFiltrados = (ArrayList<TrabalhoVendido>) trabalhosVendidos.clone();
@@ -221,6 +228,7 @@ public class ListaTrabalhosVendidosFragment
             }
             mostraMensagem("Erro ao recuperar vendas: "+resultadoTodosTrabalhos.getErro());
         });
+        trabalhosVendidosViewModel.recuperaVendas();
     }
 
     private void configuraRecyclerView() {

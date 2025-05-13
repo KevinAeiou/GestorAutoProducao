@@ -133,7 +133,10 @@ public class DetalhesTrabalhoVendidoFragment
     }
 
     private void insereVenda(TrabalhoVendido novaVenda) {
-        trabalhosVendidosViewModel.insereVenda(novaVenda).observe(getViewLifecycleOwner(), resultadoInsereVenda ->{
+        trabalhosVendidosViewModel.getInsercaoResultado().observe(
+                getViewLifecycleOwner(),
+                resultadoInsereVenda
+        ->{
             if (resultadoInsereVenda.getErro() == null) {
                 voltaParaTrabalhosVendidos();
                 mostraMensagem("Venda inserida com sucesso!");
@@ -142,6 +145,7 @@ public class DetalhesTrabalhoVendidoFragment
             mostraMensagem("Erro ao inserir venda: " + resultadoInsereVenda.getErro());
             voltaParaTrabalhosVendidos();
         });
+        trabalhosVendidosViewModel.insereVenda(novaVenda);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -494,7 +498,10 @@ public class DetalhesTrabalhoVendidoFragment
     }
 
     private void modificaTrabalho(TrabalhoVendido trabalhoModificado) {
-        trabalhosVendidosViewModel.modificaTrabalhoVendido(trabalhoModificado).observe(getViewLifecycleOwner(), resultadoModificaTrabalho -> {
+        trabalhosVendidosViewModel.getModificacaoResultado().observe(
+                getViewLifecycleOwner(),
+                resultadoModificaTrabalho
+        -> {
             if (resultadoModificaTrabalho.getErro() == null) {
                 mostraMensagem("Venda modificada com sucesso!");
                 voltaParaTrabalhosVendidos();
@@ -502,6 +509,7 @@ public class DetalhesTrabalhoVendidoFragment
             }
             mostraMensagem("Erro ao modificar trabalho: " + resultadoModificaTrabalho.getErro());
         });
+        trabalhosVendidosViewModel.modificaVenda(trabalhoModificado);
     }
 
     private void voltaParaTrabalhosVendidos() {

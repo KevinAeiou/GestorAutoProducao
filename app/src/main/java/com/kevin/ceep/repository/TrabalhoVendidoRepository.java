@@ -124,7 +124,7 @@ public class TrabalhoVendidoRepository {
         return liveData;
     }
 
-    public LiveData<Resource<Void>> modificaTrabalhoVendido(TrabalhoVendido trabalho) {
+    public LiveData<Resource<Void>> modificaVenda(TrabalhoVendido trabalho) {
         MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
         if (vendaInvalida(trabalho)) {
             liveData.setValue(new Resource<>(null, "Venda inválida!"));
