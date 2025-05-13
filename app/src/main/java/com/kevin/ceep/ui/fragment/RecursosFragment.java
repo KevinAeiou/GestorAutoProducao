@@ -99,7 +99,10 @@ public class RecursosFragment
     }
 
     private void modificaRecursos(ArrayList<RecursoAvancado> recursosModificados) {
-        recursosProducaoViewModel.modificaListaRecursos(recursosModificados).observe(getViewLifecycleOwner(), resultadoModificaRecursos -> {
+        recursosProducaoViewModel.getModificacaoResultado().observe(
+                getViewLifecycleOwner(),
+                resultadoModificaRecursos
+        -> {
             if (resultadoModificaRecursos.getErro() == null) {
                 mostraMensagem("Recursos modificados com sucesso!");
                 voltaParaListaProducao();
@@ -107,6 +110,7 @@ public class RecursosFragment
             }
             mostraMensagem("Erro: " + resultadoModificaRecursos.getErro());
         });
+        recursosProducaoViewModel.modificaListaRecursos(recursosModificados);
     }
 
     private void voltaParaListaProducao() {
@@ -259,7 +263,10 @@ public class RecursosFragment
             idPersonagem = resultadoRecuperaPersonagem.getId();
             RecursosProducaoViewModelFactory recursosProducaoViewModelFactory = new RecursosProducaoViewModelFactory(idPersonagem, getContext());
             recursosProducaoViewModel = new ViewModelProvider(this, recursosProducaoViewModelFactory).get(RecursosProducaoViewModel.class);
-            recursosProducaoViewModel.recuperaRecursos().observe(getViewLifecycleOwner(), resultadoRecuperaRecursos -> {
+            recursosProducaoViewModel.getRecuperaRecursosResultado().observe(
+                    getViewLifecycleOwner(),
+                    resultadoRecuperaRecursos
+            -> {
                 if (resultadoRecuperaRecursos.getErro() == null) {
                     recursosRecebidos = resultadoRecuperaRecursos.getDado();
                     for (RecursoAvancado recurso : recursosRecebidos) {
@@ -306,6 +313,7 @@ public class RecursosFragment
                 }
                 mostraMensagem("Erro: " + resultadoRecuperaRecursos.getErro());
             });
+            recursosProducaoViewModel.recuperaRecursos();
         });
     }
 

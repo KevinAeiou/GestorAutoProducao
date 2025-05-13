@@ -316,12 +316,19 @@ public class DetalhesTrabalhoVendidoFragment
             edtValorProducaoTrabalhoVendido.setText(R.string.stringIndefinido);
             return;
         }
-        recursosProducaoViewModel.recuperaRecursos().observe(getViewLifecycleOwner(), resultadoRecuperacao -> {
+        recursosProducaoViewModel.getRecuperaRecursosResultado().observe(
+                getViewLifecycleOwner(),
+                resultadoRecuperacao
+        -> {
             if (resultadoRecuperacao.getErro() == null) {
                 if (resultadoRecuperacao.getDado().isEmpty()) {
-                    recursosProducaoViewModel.insereListaRecursos().observe(getViewLifecycleOwner(), resultadoInsereRecursos -> {
+                    recursosProducaoViewModel.getInsercaoResultado().observe(
+                            getViewLifecycleOwner(),
+                            resultadoInsereRecursos
+                    -> {
                         if (resultadoInsereRecursos.getErro() != null) mostraMensagem("Erro: " + resultadoInsereRecursos.getErro());
                     });
+                    recursosProducaoViewModel.insereListaRecursos();
                     return;
                 }
                 ArrayList<RecursoAvancado> recursosAvancados = resultadoRecuperacao.getDado();
@@ -422,6 +429,7 @@ public class DetalhesTrabalhoVendidoFragment
             }
             Log.d("trabalhoVendido", "Erro ao recuperar recursos: " + resultadoRecuperacao.getErro());
         });
+        recursosProducaoViewModel.recuperaRecursos();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
