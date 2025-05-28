@@ -202,7 +202,7 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment
         listaProfissoes.clear();
         ProfissaoViewModelFactory profissaoViewModelFactory = new ProfissaoViewModelFactory(idPersonagem);
         ProfissaoViewModel profissaoViewModel = new ViewModelProvider(this, profissaoViewModelFactory).get(ProfissaoViewModel.class);
-        profissaoViewModel.recuperaProfissoes().observe(getViewLifecycleOwner(), resultadoProfissoes -> {
+        profissaoViewModel.getRecuperacaoProfissoes().observe(getViewLifecycleOwner(), resultadoProfissoes -> {
             if (resultadoProfissoes.getErro() == null) {
                 for (Profissao profissao : resultadoProfissoes.getDado()) {
                     listaProfissoes.add(profissao.getNome());
@@ -212,6 +212,7 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment
             }
             mostraMensagem(resultadoProfissoes.getErro());
         });
+        profissaoViewModel.recuperaProfissoes();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)

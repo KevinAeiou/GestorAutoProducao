@@ -95,15 +95,16 @@ public class ListaProfissoesFragment
         });
     }
     private void pegaTodasProfissoes() {
-        profissaoViewModel.recuperaProfissoes().observe(getViewLifecycleOwner(), resultadoTodasProfissoes -> {
+        profissaoViewModel.getRecuperacaoProfissoes().observe(getViewLifecycleOwner(), resultadoTodasProfissoes -> {
             if (resultadoTodasProfissoes.getDado() != null) {
                 todasProfissoes = resultadoTodasProfissoes.getDado();
                 if (todasProfissoes.isEmpty()) {
-                    profissaoViewModel.insereProfissoes().observe(getViewLifecycleOwner(), resultadoInsereProfissoes -> {
+                    profissaoViewModel.getInsercaoResultado().observe(getViewLifecycleOwner(), resultadoInsereProfissoes -> {
                         if (resultadoInsereProfissoes.getErro() != null) {
                             mostraMensagem("Erro: "+resultadoTodasProfissoes.getErro());
                         }
                     });
+                    profissaoViewModel.insereProfissoes();
                 }
                 indicadorProgresso.setVisibility(View.GONE);
                 swipeRefreshLayout.setRefreshing(false);
@@ -113,6 +114,7 @@ public class ListaProfissoesFragment
                 mostraMensagem("Erro: "+resultadoTodasProfissoes.getErro());
             }
         });
+        profissaoViewModel.recuperaProfissoes();
     }
     private void configuraSwipeRefreshLayout() {
         swipeRefreshLayout.setOnRefreshListener(() -> {

@@ -217,7 +217,7 @@ public class ListaEstoqueFragment
         profissoes.clear();
         ProfissaoViewModelFactory profissaoViewModelFactory = new ProfissaoViewModelFactory(idPersonagem);
         ProfissaoViewModel profissaoViewModel = new ViewModelProvider(this, profissaoViewModelFactory).get(idPersonagem, ProfissaoViewModel.class);
-        profissaoViewModel.recuperaProfissoes().observe(getViewLifecycleOwner(), resultadoProfissoes -> {
+        profissaoViewModel.getRecuperacaoProfissoes().observe(getViewLifecycleOwner(), resultadoProfissoes -> {
             if (resultadoProfissoes.getErro() == null) {
                 for (Profissao profissao : resultadoProfissoes.getDado()) {
                     profissoes.add(profissao.getNome());
@@ -227,6 +227,7 @@ public class ListaEstoqueFragment
             }
             mostraMensagem(resultadoProfissoes.getErro());
         });
+        profissaoViewModel.recuperaProfissoes();
     }
 
     private void inicializaComponentes() {

@@ -296,7 +296,7 @@ public class TrabalhoEspecificoFragment
     }
 
     private void modificaProfissao(TrabalhoProducao trabalho) {
-        profissaoViewModel.recuperaProfissoes().observe(getViewLifecycleOwner(), resultadoProfissoes -> {
+        profissaoViewModel.getRecuperacaoProfissoes().observe(getViewLifecycleOwner(), resultadoProfissoes -> {
             if (resultadoProfissoes.getDado() != null) {
                 Profissao profissaoEncontrada = profissaoViewModel.retornaProfissaoModificada(resultadoProfissoes.getDado(), trabalho);
                 if (profissaoEncontrada == null){
@@ -308,7 +308,7 @@ public class TrabalhoEspecificoFragment
                 if (profissaoEncontrada.getExperiencia() < 996000) {
                     int novaExperiencia = profissaoEncontrada.getExperiencia()+ trabalho.getExperiencia();
                     profissaoEncontrada.setExperiencia(novaExperiencia);
-                    profissaoViewModel.modificaExperienciaProfissao(profissaoEncontrada).observe(getViewLifecycleOwner(), resultadoModificaExperiencia -> {
+                    profissaoViewModel.getModificacaoResultado().observe(getViewLifecycleOwner(), resultadoModificaExperiencia -> {
                         indicadorProgresso.setVisibility(GONE);
                         if (resultadoModificaExperiencia.getErro() == null){
                             if (Boolean.TRUE.equals(confirmacao.getValue())) {
@@ -320,11 +320,13 @@ public class TrabalhoEspecificoFragment
                         confirmacao.setValue(false);
                         mostraMensagem("Erro: "+resultadoModificaExperiencia.getErro());
                     });
+                    profissaoViewModel.modificaExperienciaProfissao(profissaoEncontrada);
                 }
                 return;
             }
             mostraMensagem("Erro: "+resultadoProfissoes.getErro());
         });
+        profissaoViewModel.recuperaProfissoes();
     }
 
     private void modificaEstoque(TrabalhoProducao trabalhoModificado) {
