@@ -7,6 +7,7 @@ import static com.kevin.ceep.ui.activity.Constantes.CODIGO_REQUISICAO_INSERE_TRA
 import static com.kevin.ceep.ui.fragment.ListaTrabalhosVendidosFragmentDirections.*;
 import static com.kevin.ceep.utilitario.Utilitario.stringContemString;
 
+import android.annotation.SuppressLint;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -47,6 +48,8 @@ import com.kevin.ceep.ui.viewModel.factory.PersonagemViewModelFactory;
 import com.kevin.ceep.ui.viewModel.factory.TrabalhosVendidosViewModelFactory;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class ListaTrabalhosVendidosFragment
@@ -152,8 +155,11 @@ public class ListaTrabalhosVendidosFragment
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void filtroLista() {
-        if (textoFiltro.isEmpty()) return;
-        trabalhosFiltrados = (ArrayList<TrabalhoVendido>) trabalhosVendidos.stream().filter(trabalho -> stringContemString(trabalho.getNome(), textoFiltro)).collect(Collectors.toList());
+        if (textoFiltro.trim().isEmpty()) return;
+        trabalhosFiltrados = trabalhosVendidos.stream()
+            .filter(Objects::nonNull)
+            .filter(trabalho -> stringContemString(trabalho.getNome(), textoFiltro))
+            .collect(Collectors.toCollection(ArrayList::new));
     }
 
     private void configuraDeslizeItem() {
@@ -213,6 +219,7 @@ public class ListaTrabalhosVendidosFragment
         });
     }
 
+    @SuppressLint("NewApi")
     private void recuperaVendas() {
         trabalhosVendidosViewModel.getRecuperaVendasResultado().observe(
                 getViewLifecycleOwner(),
@@ -220,6 +227,11 @@ public class ListaTrabalhosVendidosFragment
         -> {
             if (resultadoTodosTrabalhos.getErro() == null) {
                 trabalhosVendidos = resultadoTodosTrabalhos.getDado();
+                trabalhosVendidos = trabalhosVendidos.stream()
+                        .filter(Objects::nonNull)
+                        .filter(trabalho -> stringContemString(trabalho.getNome(), textoFiltro))
+                        .sorted(Comparator.comparing(TrabalhoVendido::getDataVenda).reversed())
+                        .collect(Collectors.toCollection(ArrayList::new));
                 trabalhosFiltrados = (ArrayList<TrabalhoVendido>) trabalhosVendidos.clone();
                 mostraListaFiltrada();
                 indicadorProgresso.setVisibility(View.GONE);
