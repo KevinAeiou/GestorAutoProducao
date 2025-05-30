@@ -2,7 +2,6 @@ package com.kevin.ceep.ui.recyclerview.adapter;
 
 import android.content.Context;
 import android.os.Build;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -107,7 +106,6 @@ public class ListaTrabalhosVendidosAdapter extends RecyclerView.Adapter<ListaTra
             String nome = trabalho.getNome();
             if (nome == null) nome = "Indefinido";
             itemNome.setText(nome);
-            Log.d("vendas", "data: " + trabalho.getDataVenda());
             itemData.setText(getDataParaExibicao(trabalho.getDataVenda()));
             itemValor.setText(context.getString(R.string.stringOuroValor, trabalho.getValor()));
             itemQuantidade.setText(context.getString(R.string.stringQuantidadeValor, trabalho.getQuantidade()));
