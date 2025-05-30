@@ -43,4 +43,8 @@
         <item name="android:windowEnterTransition">@transition/da_direita</item>
         <item name="android:windowExitTransition">@transition/da_esquerda</item>
     </style>
+    
+    <style name="TextAppearance.Texto" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:textColor">@color/text_color</item>
+    </style>
 </resources>

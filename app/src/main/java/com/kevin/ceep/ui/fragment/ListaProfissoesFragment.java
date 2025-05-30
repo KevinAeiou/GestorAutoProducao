@@ -94,7 +94,7 @@ public class ListaProfissoesFragment
             profissaoFragment.show(getChildFragmentManager(), "profissaoFragment");
         });
     }
-    private void pegaTodasProfissoes() {
+    private void recuperaProfissoes() {
         profissaoViewModel.getRecuperacaoProfissoes().observe(getViewLifecycleOwner(), resultadoTodasProfissoes -> {
             if (resultadoTodasProfissoes.getDado() != null) {
                 todasProfissoes = resultadoTodasProfissoes.getDado();
@@ -120,7 +120,7 @@ public class ListaProfissoesFragment
         swipeRefreshLayout.setOnRefreshListener(() -> {
             listaProfissaoAdapter.limpaLista();
             if (idPersonagem.isEmpty()) return;
-            pegaTodasProfissoes();
+            recuperaProfissoes();
         });
     }
     private void inicializaComponentes() {
@@ -136,7 +136,7 @@ public class ListaProfissoesFragment
     @Override
     public void onResume() {
         super.onResume();
-        pegaTodasProfissoes();
+        recuperaProfissoes();
     }
 
     private void atualizarViewModel(String novoIdPersonagem) {

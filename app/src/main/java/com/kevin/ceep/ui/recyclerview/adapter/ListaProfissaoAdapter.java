@@ -1,6 +1,7 @@
 package com.kevin.ceep.ui.recyclerview.adapter;
 
 import android.content.Context;
+import android.graphics.drawable.GradientDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -84,12 +85,19 @@ public class ListaProfissaoAdapter extends RecyclerView.Adapter<ListaProfissaoAd
             String barraExperiencia = profissao.getExperiencia() + " / " + profissao.getXpMaximo(profissao.getNivel(context));
             experiencia_profissao.setText(barraExperiencia);
             nome_profissao.setText(profissao.getNome());
-            if (profissao.isPrioridade()) {
-                cardProfissao.setCardBackgroundColor(ContextCompat.getColor(context,R.color.cor_background_feito));
-            } else {
-                cardProfissao.setCardBackgroundColor(ContextCompat.getColor(context,R.color.cor_background_card));
-            }
             nivelProfissao.setText(String.valueOf(profissao.getNivel(context)));
+            configuraCardPrioridade(profissao);
+        }
+
+        private void configuraCardPrioridade(Profissao profissao) {
+            int cor = profissao.isPrioridade() ?
+                ContextCompat.getColor(context, R.color.cor_background_feito) :
+                ContextCompat.getColor(context, R.color.cor_background_card);
+            GradientDrawable borda = new GradientDrawable();
+            borda.setShape(GradientDrawable.RECTANGLE);
+            borda.setCornerRadius(16f);
+            borda.setStroke(8, cor);
+            cardProfissao.setBackground(borda);
         }
     }
     private static class ItemDiffCallback extends DiffUtil.Callback {
