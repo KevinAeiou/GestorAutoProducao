@@ -7,10 +7,10 @@
 
     <TextView
         android:id="@+id/txtNomeProfissaoFragment"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:layout_margin="16dp"
+        android:layout_margin="32dp"
         android:paddingTop="8dp"
         android:paddingStart="8dp"
         android:paddingEnd="8dp"
@@ -24,14 +24,15 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/txtExperienciaProfissaoFragment"
-        android:layout_width="150dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
-        app:layout_constraintStart_toStartOf="@id/txtNomeProfissaoFragment"
-        app:layout_constraintEnd_toEndOf="@id/txtNomeProfissaoFragment"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/txtNomeProfissaoFragment"
-        tools:layout_editor_absoluteX="1dp"
-        tools:layout_editor_absoluteY="178dp">
+        android:layout_marginHorizontal="32dp"
+        >
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/edtExperienciaProfissaoFragment"
@@ -51,9 +52,168 @@
         android:textSize="24sp"
         android:layout_marginBottom="16dp"
         android:text="@string/stringPrioridade"
-        app:layout_constraintStart_toStartOf="@id/txtExperienciaProfissaoFragment"
-        app:layout_constraintEnd_toEndOf="@id/txtExperienciaProfissaoFragment"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/txtExperienciaProfissaoFragment"
-        app:layout_constraintBottom_toBottomOf="parent"
         />
+
+    <FrameLayout
+        android:id="@+id/frameProgressoProfissaoFragment"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/swtPrioridadeProfissaoFragment"
+        app:layout_constraintBottom_toTopOf="@id/linearLegendaProfissaoFragment"
+        >
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/indicador_experiencia_maxima"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:indicatorSize="180dp"
+            app:trackThickness="16dp"
+            android:layout_gravity="center"
+            app:trackColor="@color/cor_texto_licenca_novato"/>
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/indicador_experiencia_produzir"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:indicatorSize="180dp"
+            app:trackThickness="16dp"
+            android:layout_gravity="center"
+            app:indicatorColor="@color/cor_texto_licenca_principiante"/>
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/indicador_experiencia_produzindo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:indicatorSize="180dp"
+            app:trackThickness="16dp"
+            android:layout_gravity="center"
+            app:indicatorColor="@color/cor_background_produzindo"/>
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/indicador_experiencia_atual"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:indicatorSize="180dp"
+            app:trackThickness="16dp"
+            android:layout_gravity="center"
+            app:indicatorColor="@color/cor_background_feito"/>
+    </FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/linearValoresProfissaoFragment"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_margin="16dp"
+        app:layout_constraintStart_toStartOf="@id/frameProgressoProfissaoFragment"
+        app:layout_constraintEnd_toEndOf="@id/frameProgressoProfissaoFragment"
+        app:layout_constraintTop_toTopOf="@id/frameProgressoProfissaoFragment"
+        app:layout_constraintBottom_toBottomOf="@id/frameProgressoProfissaoFragment"
+        >
+
+        <TextView
+            android:id="@+id/txtExperienciaNecessariaProfissaoFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            tools:text="9999999"
+        />
+
+        <TextView
+            android:id="@+id/txtExperienciaRelativaProfissaoFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            tools:text="9999999"
+            />
+
+        <TextView
+            android:id="@+id/txtExperienciaProduzindoProfissaoFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            tools:text="9999999"
+            />
+
+        <TextView
+            android:id="@+id/txtExperienciaProduzirProfissaoFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            tools:text="9999999"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLegendaProfissaoFragment"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="32dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        app:layout_constraintStart_toStartOf="@id/frameProgressoProfissaoFragment"
+        app:layout_constraintEnd_toEndOf="@id/frameProgressoProfissaoFragment"
+        app:layout_constraintBottom_toBottomOf="parent"
+        >
+
+        <TextView
+            android:id="@+id/txtLegendaExperienciaNecessariaProfissaoFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:textColor="@color/cor_texto_licenca_novato"
+            android:text="@string/expNecessaria"
+            android:textStyle="bold"
+        />
+
+        <TextView
+            android:id="@+id/txtLegendaExperienciaRelativaProfissaoFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:textColor="@color/cor_background_feito"
+            android:text="@string/expRelativa"
+            android:textStyle="bold"
+            />
+
+        <TextView
+            android:id="@+id/txtLegendaExperienciaProduzindoProfissaoFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:textColor="@color/cor_background_produzindo"
+            android:text="@string/expProduzindo"
+            android:textStyle="bold"
+            />
+
+        <TextView
+            android:id="@+id/txtLegendaExperienciaProduzirProfissaoFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:textColor="@color/cor_texto_licenca_principiante"
+            android:text="@string/expProduzir"
+            android:textStyle="bold"
+            />
+    </LinearLayout>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

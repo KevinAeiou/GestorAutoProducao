@@ -1,9 +1,7 @@
 package com.kevin.ceep.model;
 
 import static org.junit.Assert.assertEquals;
-import android.content.Context;
-import org.junit.Before;
-import org.robolectric.RuntimeEnvironment;
+
 import org.testng.annotations.Test;
 
 public class ProfissaoTest {
@@ -11,28 +9,16 @@ public class ProfissaoTest {
     private final Profissao CAPOTES = new Profissao();
     private final Profissao ANEIS = new Profissao();
     private final Profissao AMULETOS = new Profissao();
-    private Context context;
-
-    @Before
-    public void setUp() {
-        context = RuntimeEnvironment.getApplication();
-    }
 
     @Test
     public void deve_RetornarNivelUm_QuandoXpAtualIgualADezenove() {
-        int nivel = BRACELETES.getNivel(context);
+        int nivel = BRACELETES.getNivel();
         assertEquals(1, nivel);
     }
     @Test
     public void deve_RetornarXpMaximoVinte_QuandoNivelUm() {
-        int xpMaximo = BRACELETES.getXpMaximo(1);
+        int xpMaximo = BRACELETES.getXpMaximo();
         assertEquals(20, xpMaximo);
-    }
-
-    @Test
-    public void deve_RetornarUm_QuandoXpAtualIgualADezenove() {
-        int xpNecessario = BRACELETES.getXpNecessario(20);
-        assertEquals(1, xpNecessario);
     }
 
     @Test
@@ -42,19 +28,13 @@ public class ProfissaoTest {
     }
     @Test
     public void deve_RetornarNivelDois_QuandoXpAtualIgualACentoENoventaENove() {
-        int nivel = CAPOTES.getNivel(context);
+        int nivel = CAPOTES.getNivel();
         assertEquals(2, nivel);
     }
     @Test
     public void deve_RetornarDuzentos_QuandoNivelDois() {
-        int xpMaximo = CAPOTES.getXpMaximo(2);
+        int xpMaximo = CAPOTES.getXpMaximo();
         assertEquals(200, xpMaximo);
-    }
-
-    @Test
-    public void deve_RetornarUm_QuandoXpAtualIgualACentoENoventaENove() {
-        int xpNecessario = CAPOTES.getXpNecessario(200);
-        assertEquals(1, xpNecessario);
     }
 
     @Test
@@ -64,24 +44,18 @@ public class ProfissaoTest {
     }
     @Test
     public void deve_RetornarNivelVinteESeis_QuandoXpAtualIgualACentoEOitocentoETrintaMilEUm() {
-        int nivel = AMULETOS.getNivel(context);
+        int nivel = AMULETOS.getNivel();
         assertEquals(26, nivel);
     }
     @Test
     public void deve_RetornarNivelVinteESeis_QuandoXpAtualIgualACentoEOitocentoETrintaMil() {
-        int nivel = ANEIS.getNivel(context);
+        int nivel = ANEIS.getNivel();
         assertEquals(26, nivel);
     }
     @Test
     public void deve_RetornarXpMaximoOitocentosETrintaMil_QuandoNivelVinteESeis() {
-        int xpMaximo = ANEIS.getXpMaximo(26);
+        int xpMaximo = ANEIS.getXpMaximo();
         assertEquals(830000, xpMaximo);
-    }
-
-    @Test
-    public void deve_RetornarXpNecessarioZero_QuandoXpAtualIgualAOitocentoETrintaMil() {
-        int xpNecessario = ANEIS.getXpNecessario(830000);
-        assertEquals(0, xpNecessario);
     }
 
     @Test

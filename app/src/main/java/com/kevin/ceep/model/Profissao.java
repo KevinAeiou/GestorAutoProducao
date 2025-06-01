@@ -1,7 +1,7 @@
 package com.kevin.ceep.model;
 
-import android.content.Context;
-import com.kevin.ceep.R;
+import static com.kevin.ceep.ui.activity.Constantes.EXPERIENCIAS;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,9 +12,12 @@ public class Profissao implements Serializable {
     private String nome;
     private Integer experiencia;
     private boolean prioridade;
-    private List<Integer> xpNiveis = new ArrayList<>();
+    private final List<Integer> xpNiveis;
 
-    public Profissao(){}
+    public Profissao(){
+        ArrayList<Integer> listaTemporaria = new ArrayList<>(EXPERIENCIAS);
+        this.xpNiveis = Collections.unmodifiableList(listaTemporaria);
+    }
 
     public String getNome() {
         return nome;
@@ -28,16 +31,10 @@ public class Profissao implements Serializable {
         return prioridade;
     }
 
-    public int getNivel(Context context) {
-        int[] arrayExperiencias = context.getResources().getIntArray(R.array.experiencias);
-        ArrayList<Integer> listaTemporaria = new ArrayList<>();
-        for (int exp : arrayExperiencias) {
-            listaTemporaria.add(exp);
-        }
-        this.xpNiveis = Collections.unmodifiableList(listaTemporaria);
+    public int getNivel() {
         int i;
         for (i = 0; i < xpNiveis.size() - 1; i ++){
-            if (i == 0 && experiencia <= xpNiveis.get(i)) {
+            if (i == 0 && experiencia < xpNiveis.get(i)) {
                 return i + 1;
             }
             if (experiencia >= xpNiveis.get(i) && experiencia < xpNiveis.get(i + 1)) {
@@ -54,13 +51,20 @@ public class Profissao implements Serializable {
         return experiencia - xpNiveis.get(nivel-2) - xpNecessario;
     }
 
-    public int getXpNecessario(int xpMaximo) {
-        return xpMaximo - experiencia;
+    public int getXpNecessario() {
+        int nivelAtual = getNivel();
+        if (nivelAtual == 1) return getXpMaximo();
+        return getXpMaximo() - getXpMaximo(nivelAtual - 1);
     }
 
-    public int getXpMaximo(int nivel) {
+    public int getXpMaximo(int nivelAtual) {
+        if (nivelAtual == 0) nivelAtual = getNivel();
         if (xpNiveis.isEmpty()) return 0;
-        return xpNiveis.get(nivel-1);
+        return xpNiveis.get(nivelAtual-1);
+    }
+
+    public int getXpMaximo() {
+        return getXpMaximo(0);
     }
 
     public String getId() {
@@ -82,6 +86,12 @@ public class Profissao implements Serializable {
 
     public void setPrioridade(boolean prioridade) {
         this.prioridade = prioridade;
+    }
+
+    public int getExperienciaRelativa() {
+        int nivel = getNivel();
+        if (nivel == 1) return experiencia;
+        return experiencia - getXpMaximo(nivel - 1);
     }
 }
 

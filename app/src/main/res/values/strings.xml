@@ -270,6 +270,10 @@
     <string name="stringEssencias">Essências</string>
     <string name="stringCatalisador">Catalisadores</string>
     <string name="stringCampoInvalido">Campo inválido</string>
+    <string name="expNecessaria">Exp necessária</string>
+    <string name="expRelativa">Exp relativa</string>
+    <string name="expProduzindo">Exp produzindo</string>
+    <string name="expProduzir">Exp produzir</string>
     <string-array name="substancias">
         <item>@string/stringSubstanciaComum</item>
         <item>@string/stringSubstanciaComposta</item>

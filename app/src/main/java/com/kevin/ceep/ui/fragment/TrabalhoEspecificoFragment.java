@@ -8,6 +8,7 @@ import static com.kevin.ceep.ui.activity.Constantes.CODIGO_REQUISICAO_ALTERA_TRA
 import static com.kevin.ceep.ui.activity.Constantes.CODIGO_REQUISICAO_ALTERA_TRABALHO_PRODUCAO;
 import static com.kevin.ceep.ui.activity.Constantes.CODIGO_REQUISICAO_INSERE_TRABALHO;
 import static com.kevin.ceep.ui.activity.Constantes.CODIGO_REQUISICAO_INVALIDA;
+import static com.kevin.ceep.ui.activity.Constantes.EXPERIENCIAS;
 import static com.kevin.ceep.ui.fragment.TrabalhoEspecificoFragmentDirections.vaiDeTrabalhoEspecficoParaTrabalhos;
 import static com.kevin.ceep.ui.fragment.TrabalhoEspecificoFragmentDirections.vaiParaListaTrabalhosProducao;
 import static com.kevin.ceep.utilitario.Utilitario.comparaString;
@@ -305,7 +306,7 @@ public class TrabalhoEspecificoFragment
                     voltaParaListaTrabalhosProducao();
                     return;
                 }
-                if (profissaoEncontrada.getExperiencia() < 996000) {
+                if (profissaoEncontrada.getExperiencia() < EXPERIENCIAS.get(-1)) {
                     int novaExperiencia = profissaoEncontrada.getExperiencia()+ trabalho.getExperiencia();
                     profissaoEncontrada.setExperiencia(novaExperiencia);
                     profissaoViewModel.getModificacaoResultado().observe(getViewLifecycleOwner(), resultadoModificaExperiencia -> {
@@ -321,7 +322,9 @@ public class TrabalhoEspecificoFragment
                         mostraMensagem("Erro: "+resultadoModificaExperiencia.getErro());
                     });
                     profissaoViewModel.modificaExperienciaProfissao(profissaoEncontrada);
+                    return;
                 }
+                voltaParaListaTrabalhosProducao();
                 return;
             }
             mostraMensagem("Erro: "+resultadoProfissoes.getErro());
@@ -684,7 +687,6 @@ public class TrabalhoEspecificoFragment
         edtNomeProducaoTrabalho.setText(trabalhoProducaoRecebido.getNomeProducao());
         autoCompleteProfissao.setText(trabalhoProducaoRecebido.getProfissao());
         int experiencia= trabalhoProducaoRecebido.getExperiencia();
-        if (trabalhoProducaoRecebido.getTipoLicenca().equals(getString(R.string.licencaIniciante))) experiencia= (int) (1.5* experiencia);
         edtExperienciaTrabalho.setText(String.valueOf(experiencia));
         edtNivelTrabalho.setText(String.valueOf(trabalhoProducaoRecebido.getNivel()));
         autoCompleteRaridade.setText(trabalhoProducaoRecebido.getRaridade());

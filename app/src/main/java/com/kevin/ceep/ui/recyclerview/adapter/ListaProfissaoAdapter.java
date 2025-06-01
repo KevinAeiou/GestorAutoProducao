@@ -82,10 +82,10 @@ public class ListaProfissaoAdapter extends RecyclerView.Adapter<ListaProfissaoAd
             preencheCampo(profissao);
         }
         private void preencheCampo(Profissao profissao) {
-            String barraExperiencia = profissao.getExperiencia() + " / " + profissao.getXpMaximo(profissao.getNivel(context));
+            String barraExperiencia = profissao.getExperiencia() + " / " + profissao.getXpMaximo();
             experiencia_profissao.setText(barraExperiencia);
             nome_profissao.setText(profissao.getNome());
-            nivelProfissao.setText(String.valueOf(profissao.getNivel(context)));
+            nivelProfissao.setText(String.valueOf(profissao.getNivel()));
             configuraCardPrioridade(profissao);
         }
 
