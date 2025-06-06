@@ -306,7 +306,7 @@ public class TrabalhoEspecificoFragment
                     voltaParaListaTrabalhosProducao();
                     return;
                 }
-                if (profissaoEncontrada.getExperiencia() < EXPERIENCIAS.get(-1)) {
+                if (profissaoEncontrada.getExperiencia() < EXPERIENCIAS.get(EXPERIENCIAS.size() - 1)) {
                     int novaExperiencia = profissaoEncontrada.getExperiencia()+ trabalho.getExperiencia();
                     profissaoEncontrada.setExperiencia(novaExperiencia);
                     profissaoViewModel.getModificacaoResultado().observe(getViewLifecycleOwner(), resultadoModificaExperiencia -> {

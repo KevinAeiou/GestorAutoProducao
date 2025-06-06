@@ -48,6 +48,7 @@ import com.kevin.ceep.ui.viewModel.factory.PersonagemViewModelFactory;
 import com.kevin.ceep.ui.viewModel.factory.TrabalhosVendidosViewModelFactory;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -229,7 +230,7 @@ public class ListaTrabalhosVendidosFragment
                 trabalhosVendidos = trabalhosVendidos.stream()
                         .filter(Objects::nonNull)
                         .filter(trabalho -> stringContemString(trabalho.getNome(), textoFiltro))
-
+                        .sorted(Comparator.comparing(TrabalhoVendido::getDataVenda).reversed())
                         .collect(Collectors.toCollection(ArrayList::new));
                 trabalhosFiltrados = (ArrayList<TrabalhoVendido>) trabalhosVendidos.clone();
                 mostraListaFiltrada();
