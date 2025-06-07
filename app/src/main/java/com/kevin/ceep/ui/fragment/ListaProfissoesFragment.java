@@ -17,7 +17,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.kevin.ceep.databinding.FragmentListaProfissoesBinding;
 import com.kevin.ceep.model.Profissao;
 import com.kevin.ceep.model.TrabalhoProducao;
@@ -59,7 +58,6 @@ public class ListaProfissoesFragment
         );
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -103,26 +101,26 @@ public class ListaProfissoesFragment
         });
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     private void configuraRecyclerView() {
         meuRecycler.setHasFixedSize(true);
         meuRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
         configuraAdapter(meuRecycler);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     private void configuraAdapter(RecyclerView meuRecycler) {
         listaProfissaoAdapter = new ListaProfissaoAdapter(getContext(), todasProfissoes);
         meuRecycler.setAdapter(listaProfissaoAdapter);
         configuraCliqueItemProfissao();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     private void configuraCliqueItemProfissao() {
         listaProfissaoAdapter.setOnItemClickListener((profissao, adapterPosition) -> {
-            ArrayList<TrabalhoProducao> producaoFiltrada = producao.stream()
-                    .filter(trabalho -> trabalho.getProfissao().equals(profissao.getNome()))
-                    .collect(Collectors.toCollection(ArrayList::new));
+            ArrayList<TrabalhoProducao> producaoFiltrada = new ArrayList<>(producao.size());
+            for (TrabalhoProducao trabalho : producao) {
+                if (trabalho.getProfissao().equals(profissao.getNome()) && (trabalho.ehProduzir() || trabalho.ehProduzindo())){
+                    producaoFiltrada.add(trabalho);
+                }
+            }
             ProfissaoFragment profissaoFragment = new ProfissaoFragment();
             Bundle argumento = new Bundle();
             argumento.putString(CHAVE_ID_PERSONAGEM, idPersonagem);

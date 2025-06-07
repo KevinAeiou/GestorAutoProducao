@@ -7,7 +7,6 @@ import static com.kevin.ceep.ui.activity.Constantes.CHAVE_ID_PERSONAGEM;
 import android.animation.ObjectAnimator;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -89,46 +88,70 @@ public class ProfissaoFragment extends DialogFragment {
     }
 
     private void configuraBarraProgressoCircular() {
+        int xpNecessario = defineValorMaximoIndicadores();
+        int experienciaRelativa = configuraIndicadorRelativo();
+        int experienciaProduzindo = configuraIndicadorProduzindo(experienciaRelativa);
+        int experienciaProduzir = configuraIndicadorProduzir(experienciaProduzindo);
+        configuraIndicadorNecessaria(xpNecessario, experienciaProduzir);
+        animaIndicadores(experienciaRelativa, experienciaProduzir, experienciaProduzindo);
+    }
+
+    private void animaIndicadores(int experienciaRelativa, int experienciaProduzir, int experienciaProduzindo) {
+        animateProgress(indicadorAtual, experienciaRelativa);
+        animateProgress(indicadorProduzir, experienciaProduzir);
+        animateProgress(indicadorProduzindo, experienciaProduzindo);
+    }
+
+    private void configuraIndicadorNecessaria(int xpNecessario, int totalEsperado) {
+        txtExpNecessaria.setText(String.valueOf(xpNecessario - totalEsperado));
+        configuraVisibilidadeTxt(xpNecessario, txtExpNecessaria);
+        configuraVisibilidadeTxt(xpNecessario, binding.txtLegendaExperienciaNecessariaProfissaoFragment);
+    }
+
+    private int configuraIndicadorProduzir(int experienciaProduzindo) {
+        txtExpProduzir.setTextColor(getContext().getColor(R.color.cor_texto_licenca_principiante));
+        int experienciaProduzir = 0;
+        for(TrabalhoProducao trabalho : producao) {
+            if (trabalho.ehProduzir()) {
+                experienciaProduzir += trabalho.getExperiencia();
+            }
+        }
+        configuraVisibilidadeTxt(experienciaProduzir, txtExpProduzir);
+        configuraVisibilidadeTxt(experienciaProduzir, binding.txtLegendaExperienciaProduzirProfissaoFragment);
+        txtExpProduzir.setText(String.valueOf(experienciaProduzir));
+        return experienciaProduzir + experienciaProduzindo;
+    }
+
+    private int configuraIndicadorRelativo() {
+        txtExpRelativa.setTextColor(getContext().getColor(R.color.cor_background_feito));
+        int experienciaAtual = profissaoRecebido.getExperienciaRelativa();
+        txtExpRelativa.setText(String.valueOf(experienciaAtual));
+        configuraVisibilidadeTxt(experienciaAtual, txtExpRelativa);
+        configuraVisibilidadeTxt(experienciaAtual, binding.txtLegendaExperienciaRelativaProfissaoFragment);
+        return experienciaAtual;
+    }
+
+    private int configuraIndicadorProduzindo(int experienciaRelativa) {
+        txtExpProduzindo.setTextColor(getContext().getColor(R.color.cor_background_produzindo));
+        int experienciaProduzindo = 0;
+        for(TrabalhoProducao trabalho : producao) {
+            if (trabalho.ehProduzindo()) {
+                experienciaProduzindo += trabalho.getExperiencia();
+            }
+        }
+        txtExpProduzindo.setText(String.valueOf(experienciaProduzindo));
+        configuraVisibilidadeTxt(experienciaProduzindo, binding.txtLegendaExperienciaProduzindoProfissaoFragment);
+        configuraVisibilidadeTxt(experienciaProduzindo, txtExpProduzindo);
+        return experienciaProduzindo + experienciaRelativa;
+    }
+
+    private int defineValorMaximoIndicadores() {
         int xpNecessario = profissaoRecebido.getXpNecessario();
         indicadorMaximo.setMax(xpNecessario);
         indicadorAtual.setMax(xpNecessario);
         indicadorProduzindo.setMax(xpNecessario);
         indicadorProduzir.setMax(xpNecessario);
-
-        int experienciaAtual = profissaoRecebido.getExperienciaRelativa();
-        int experienciaProduzindo = 0;
-        int experienciaProduzir = 0;
-        for(TrabalhoProducao trabalho : producao) {
-            if (trabalho.ehProduzindo()) {
-                experienciaProduzindo += trabalho.getExperiencia();
-            }
-            if (trabalho.ehProduzir()) {
-                experienciaProduzir += trabalho.getExperiencia();
-            }
-        }
-        txtExpNecessaria.setText(String.valueOf(xpNecessario));
-        txtExpRelativa.setText(String.valueOf(experienciaAtual));
-        txtExpProduzir.setText(String.valueOf(experienciaProduzir));
-        txtExpProduzindo.setText(String.valueOf(experienciaProduzindo));
-        txtExpRelativa.setTextColor(getContext().getColor(R.color.cor_background_feito));
-        txtExpProduzir.setTextColor(getContext().getColor(R.color.cor_texto_licenca_principiante));
-        txtExpProduzindo.setTextColor(getContext().getColor(R.color.cor_background_produzindo));
-        configuraVisibilidadeTxt(xpNecessario, txtExpNecessaria);
-        configuraVisibilidadeTxt(experienciaAtual, txtExpRelativa);
-        configuraVisibilidadeTxt(experienciaProduzir, txtExpProduzir);
-        configuraVisibilidadeTxt(experienciaProduzindo, txtExpProduzindo);
-        configuraVisibilidadeTxt(xpNecessario, binding.txtLegendaExperienciaNecessariaProfissaoFragment);
-        configuraVisibilidadeTxt(experienciaAtual, binding.txtLegendaExperienciaRelativaProfissaoFragment);
-        configuraVisibilidadeTxt(experienciaProduzindo, binding.txtLegendaExperienciaProduzindoProfissaoFragment);
-        configuraVisibilidadeTxt(experienciaProduzir, binding.txtLegendaExperienciaProduzirProfissaoFragment);
-
-
-        experienciaProduzindo += experienciaAtual;
-        experienciaProduzir += experienciaProduzindo;
-
-        animateProgress(indicadorAtual, experienciaAtual);
-        animateProgress(indicadorProduzir, experienciaProduzir);
-        animateProgress(indicadorProduzindo, experienciaProduzindo);
+        return xpNecessario;
     }
 
     private void configuraVisibilidadeTxt(int experiencia, TextView txtView) {
