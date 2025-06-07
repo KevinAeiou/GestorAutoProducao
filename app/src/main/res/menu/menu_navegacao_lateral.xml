@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="nav">
+
+    <group
+        android:id="@+id/grupo3">
+        <item
+            android:id="@+id/inserePersonagem"
+            android:title="@string/stringNovoPersonagem"/>
+
+        <item
+            android:id="@+id/nav_trabalhos"
+            android:title="@string/trabalhos" />
+
+        <item
+            android:id="@+id/recursosFragment"
+            android:title="@string/stringRecursos" />
+
+        <item
+            android:id="@+id/atributosPersonagem"
+            android:title="@string/stringConfiguracao"/>
+
+        <item
+            android:id="@+id/splashscreenFragment"
+            android:title="@string/sair"/>
+    </group>
+
+</menu>

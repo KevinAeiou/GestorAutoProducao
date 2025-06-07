@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.kevin.ceep.R;
@@ -18,7 +19,7 @@ import com.kevin.ceep.ui.recyclerview.adapter.listener.OnItemClickListener;
 import java.util.ArrayList;
 
 public class ListaTrabalhoEspecificoNovaProducaoAdapter extends RecyclerView.Adapter<ListaTrabalhoEspecificoNovaProducaoAdapter.TrabalhoEspecificoNovaProducaoViewHolder> {
-    private ArrayList<Trabalho> trabalhos;
+    private final ArrayList<Trabalho> trabalhos;
     private final Context context;
     private OnItemClickListener onItemClickListener;
 
@@ -30,9 +31,11 @@ public class ListaTrabalhoEspecificoNovaProducaoAdapter extends RecyclerView.Ada
     public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
     }
-    public void atualizaLista(ArrayList<Trabalho> listaFiltrada) {
-        this.trabalhos = listaFiltrada;
-        notifyDataSetChanged();
+    public void atualizaLista(ArrayList<Trabalho> trabalhosAtualizada) {
+        DiffUtil.DiffResult diffResult= DiffUtil.calculateDiff(new ItemDiffCallback(trabalhos, trabalhosAtualizada));
+        trabalhos.clear();
+        trabalhos.addAll(trabalhosAtualizada);
+        diffResult.dispatchUpdatesTo(this);
     }
     @NonNull
     @Override
@@ -49,9 +52,7 @@ public class ListaTrabalhoEspecificoNovaProducaoAdapter extends RecyclerView.Ada
 
     @Override
     public int getItemCount() {
-        if (trabalhos == null){
-            return 0;
-        }
+        if (trabalhos == null) return 0;
         return trabalhos.size();
     }
 
@@ -90,13 +91,29 @@ public class ListaTrabalhoEspecificoNovaProducaoAdapter extends RecyclerView.Ada
             String trabalhoNecessario = trabalho.getTrabalhoNecessario();
             if (trabalhoNecessario == null || trabalhoNecessario.isEmpty()) {
                 trabalhoNecessarioTrabalhoEspecifico.setVisibility(View.GONE);
-            } else {
-                trabalhoNecessarioTrabalhoEspecifico.setText(trabalho.getTrabalhoNecessario());
+                return;
+            }
+            String[] idTrabalhosNecessarios = trabalhoNecessario.split(",");
+            String nomeTrabalhoNecessario1 = "Não encontrado", nomeTrabalhoNecessario2 = "Não encontrado";
+            for (Trabalho trabalhoEncontrado : trabalhos) {
+                if (trabalhoEncontrado.getId().equals(idTrabalhosNecessarios[0])) {
+                    nomeTrabalhoNecessario1 = trabalhoEncontrado.getNome();
+                    break;
+                }
+            }
+            trabalhoNecessarioTrabalhoEspecifico.setText(nomeTrabalhoNecessario1);
+            if (idTrabalhosNecessarios.length > 1) {
+                for (Trabalho trabalhoEncontrado : trabalhos) {
+                    if (trabalhoEncontrado.getId().equals(idTrabalhosNecessarios[1])) {
+                        nomeTrabalhoNecessario2 = trabalhoEncontrado.getNome();
+                        break;
+                    }
+                }
+                trabalhoNecessarioTrabalhoEspecifico.setText(nomeTrabalhoNecessario1 + "," + nomeTrabalhoNecessario2);
             }
         }
         private void confiuraCorNomeTrabalho(Trabalho trabalho) {
-            String raridade = trabalho.getRaridade();
-            switch (raridade) {
+            switch (trabalho.getRaridade()) {
                 case "Comum":
                     nomeTrabalhoEspecifico.setTextColor(ContextCompat.getColor(context, R.color.cor_texto_raridade_comum));
                     break;
@@ -110,6 +127,34 @@ public class ListaTrabalhoEspecificoNovaProducaoAdapter extends RecyclerView.Ada
                     nomeTrabalhoEspecifico.setTextColor(ContextCompat.getColor(context, R.color.cor_texto_raridade_especial));
                     break;
             }
+        }
+    }
+    private static class ItemDiffCallback extends DiffUtil.Callback {
+        private final ArrayList<Trabalho> listaAntiga;
+        private final ArrayList<Trabalho> listaNova;
+        public ItemDiffCallback(ArrayList<Trabalho> listaAntiga, ArrayList<Trabalho> listaNova) {
+            this.listaAntiga= listaAntiga;
+            this.listaNova= listaNova;
+        }
+
+        @Override
+        public int getOldListSize() {
+            return listaAntiga.size();
+        }
+
+        @Override
+        public int getNewListSize() {
+            return listaNova.size();
+        }
+
+        @Override
+        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+            return listaAntiga.get(oldItemPosition).getId().equals(listaNova.get(newItemPosition).getId());
+        }
+
+        @Override
+        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+            return listaAntiga.get(oldItemPosition).equals(listaNova.get(newItemPosition));
         }
     }
 }

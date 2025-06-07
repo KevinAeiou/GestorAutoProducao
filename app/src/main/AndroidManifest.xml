@@ -11,46 +11,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Ceep">
         <activity
-            android:name=".ui.activity.AtributosProdutoVendidoActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.activity.ListaNovaProducaoActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.activity.SplashscreenActivity"
+            android:name=".ui.activity.MainActivity"
             android:exported="true"
-            android:theme="@style/TelaCheia">
+            android:theme="@style/Theme.Ceep.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".ui.activity.AtributosPersonagemActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.activity.TrabalhoEspecificoActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.activity.MainActivity"
-            android:exported="false"
-            android:theme="@style/Theme.Ceep.NoActionBar" />
-        <activity
-            android:name=".ui.activity.RecuperarSenhaActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.activity.CadastrarUsuarioActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.activity.EntrarUsuarioActivity"
-            android:exported="true" />
-        <activity
-            android:name=".ui.activity.ConfirmaTrabalhoActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.activity.ListaTodosTrabalhosActivity"
-            android:exported="false" />
     </application>
 
 </manifest>

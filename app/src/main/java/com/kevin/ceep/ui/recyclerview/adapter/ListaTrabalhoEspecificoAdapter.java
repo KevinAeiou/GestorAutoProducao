@@ -15,6 +15,7 @@ import com.kevin.ceep.R;
 import com.kevin.ceep.model.ProfissaoTrabalho;
 import com.kevin.ceep.model.Trabalho;
 import com.kevin.ceep.ui.recyclerview.adapter.listener.OnItemClickListener;
+import com.kevin.ceep.ui.recyclerview.adapter.listener.OnItemClickListenerTrabalho;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,9 +25,9 @@ public class ListaTrabalhoEspecificoAdapter extends RecyclerView.Adapter<ListaTr
     private final List<Trabalho> trabalhos;
     private final List<ProfissaoTrabalho> profissoesTrabalhos;
     private final Context context;
-    private OnItemClickListener onItemClickListener;
+    private OnItemClickListenerTrabalho onItemClickListener;
 
-    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+    public void setOnItemClickListener(OnItemClickListenerTrabalho onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
     }
 
@@ -75,7 +76,7 @@ public class ListaTrabalhoEspecificoAdapter extends RecyclerView.Adapter<ListaTr
             itemView.setOnClickListener(v -> {
                 ProfissaoTrabalho profissaoTrabalho = profissoesTrabalhos.get(ListaTodosTrabalhosAdapter.posicaoPai);
                 ArrayList<Trabalho> trabalhos = profissaoTrabalho.getTrabalhos();
-                onItemClickListener.onItemClick(trabalhos.get(getAdapterPosition()), getAdapterPosition());
+                onItemClickListener.onItemClick(itemView, trabalhos.get(getAdapterPosition()), getAdapterPosition());
             });
         }
         public void vincula(Trabalho trabalho){
@@ -94,9 +95,28 @@ public class ListaTrabalhoEspecificoAdapter extends RecyclerView.Adapter<ListaTr
             String trabalhoNecessario = trabalho.getTrabalhoNecessario();
             if (trabalhoNecessario == null || trabalhoNecessario.isEmpty()) {
                 trabalhoNecessarioTrabalhoEspecifico.setVisibility(View.GONE);
-            } else {
-                trabalhoNecessarioTrabalhoEspecifico.setText(trabalho.getTrabalhoNecessario());
+                return;
             }
+            String[] idTrabalhosNecessarios = trabalhoNecessario.split(",");
+            String nomeTrabalhoNecessario1 = "", nomeTrabalhoNecessario2 = "";
+            for (Trabalho trabalhoEncontrado : trabalhos) {
+                if (trabalhoEncontrado.getId().equals(idTrabalhosNecessarios[0])) {
+                    nomeTrabalhoNecessario1 = trabalhoEncontrado.getNome();
+                    break;
+                }
+            }
+            trabalhoNecessario = nomeTrabalhoNecessario1;
+            if (idTrabalhosNecessarios.length > 1) {
+                for (Trabalho trabalhoEncontrado : trabalhos) {
+                    if (trabalhoEncontrado.getId().equals(idTrabalhosNecessarios[1])) {
+                        nomeTrabalhoNecessario2 = trabalhoEncontrado.getNome();
+                        break;
+                    }
+                }
+                trabalhoNecessario = trabalhoNecessario + ", " + nomeTrabalhoNecessario2;
+
+            }
+            trabalhoNecessarioTrabalhoEspecifico.setText(trabalhoNecessario);
         }
 
         private void confiuraCorNomeTrabalho(Trabalho trabalho) {

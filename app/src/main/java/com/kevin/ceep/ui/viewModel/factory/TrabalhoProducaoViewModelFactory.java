@@ -8,15 +8,18 @@ import com.kevin.ceep.repository.TrabalhoProducaoRepository;
 import com.kevin.ceep.ui.viewModel.TrabalhoProducaoViewModel;
 
 public class TrabalhoProducaoViewModelFactory implements ViewModelProvider.Factory {
-    private final TrabalhoProducaoRepository repository;
+    private final String idPersonagem;
 
-    public TrabalhoProducaoViewModelFactory(TrabalhoProducaoRepository repository) {
-        this.repository = repository;
+    public TrabalhoProducaoViewModelFactory(String idPersonagem) {
+        this.idPersonagem = idPersonagem;
     }
 
     @NonNull
     @Override
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-        return (T) new TrabalhoProducaoViewModel(repository);
+        if (modelClass.isAssignableFrom(TrabalhoProducaoViewModel.class)) {
+            return (T) new TrabalhoProducaoViewModel(TrabalhoProducaoRepository.getInstance(idPersonagem));
+        }
+        throw new IllegalArgumentException("Classe ViewModel desconhecida");
     }
 }

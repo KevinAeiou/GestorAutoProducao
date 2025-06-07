@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.fragment.DetalhesTrabalhoVendidoFragment">
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/txtInputDescricaoTrabalhoVendido"
+        style="@style/txtInputLayout"
+        app:layout_constraintWidth_max="488dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:hint="@string/stringDescricao"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        >
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/edtInputDescricaoTrabalhoVendido"
+            style="@style/edtInputLayout"
+            tools:text="Descrição"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/txtInputNomeTrabalhoVendido"
+        android:hint="@string/string_nome"
+        android:layout_width="0dp"
+        android:padding="8dp"
+        android:layout_height="wrap_content"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
+        app:layout_constraintStart_toStartOf="@id/txtInputDescricaoTrabalhoVendido"
+        app:layout_constraintEnd_toEndOf="@id/txtInputDescricaoTrabalhoVendido"
+        app:layout_constraintTop_toBottomOf="@id/txtInputDescricaoTrabalhoVendido">
+
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+            android:id="@+id/autoCompleteNomeTrabalhoVendido"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:textSize="24sp"
+            android:inputType="none"
+            />
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/txtInputDataTrabalhoVendido"
+        style="@style/txtInputLayout"
+        android:hint="@string/stringData"
+        app:layout_constraintStart_toStartOf="@id/txtInputNomeTrabalhoVendido"
+        app:layout_constraintEnd_toEndOf="@id/txtInputNomeTrabalhoVendido"
+        app:layout_constraintTop_toBottomOf="@id/txtInputNomeTrabalhoVendido"
+        >
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/edtInputDataTrabalhoVendido"
+            style="@style/edtInputLayout"
+            android:inputType="date"
+            tools:text="dd.MM.yyy"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/linearLayoutTrabalhoVendido"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="@id/txtInputDataTrabalhoVendido"
+        app:layout_constraintEnd_toEndOf="@id/txtInputDataTrabalhoVendido"
+        app:layout_constraintTop_toBottomOf="@id/txtInputDataTrabalhoVendido">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/txtInputValorTrabalhoVendido"
+            style="@style/txtInputLayout"
+            android:layout_weight="1"
+            android:hint="@string/stringValor">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edtInputValorTrabalhoVendido"
+                style="@style/edtInputLayout"
+                android:inputType="numberSigned"
+                tools:text="Valor"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/txtInputQuantidadeTrabalhoVendido"
+            style="@style/txtInputLayout"
+            android:layout_weight="1"
+            android:hint="@string/stringQuantidade">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edtInputQuantidadeTrabalhoVendido"
+                style="@style/edtInputLayout"
+                android:inputType="numberSigned"
+                tools:text="Und"/>
+        </com.google.android.material.textfield.TextInputLayout>
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/linearLayout2TrabalhoVendido"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="@id/linearLayoutTrabalhoVendido"
+        app:layout_constraintEnd_toEndOf="@id/linearLayoutTrabalhoVendido"
+        app:layout_constraintTop_toBottomOf="@id/linearLayoutTrabalhoVendido">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/txtInputValorProducaoTrabalhoVendido"
+            style="@style/txtInputLayout"
+            android:layout_weight="1"
+            android:hint="@string/stringValorProducao">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edtInputValorProducaoTrabalhoVendido"
+                style="@style/edtInputLayout"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/txtInputTaxaLucroTrabalhoVendido"
+            style="@style/txtInputLayout"
+            android:layout_weight="1"
+            android:hint="@string/stringTaxaLucro">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edtInputTaxaLucroTrabalhoVendido"
+                android:inputType="numberSigned"
+                style="@style/edtInputLayout"
+                />
+        </com.google.android.material.textfield.TextInputLayout>
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/txtInputValorLucroTrabalhoVendido"
+        style="@style/txtInputLayout"
+        android:hint="@string/stringValorLucro"
+        app:layout_constraintStart_toStartOf="@id/linearLayout2TrabalhoVendido"
+        app:layout_constraintEnd_toEndOf="@id/linearLayout2TrabalhoVendido"
+        app:layout_constraintTop_toBottomOf="@id/linearLayout2TrabalhoVendido">
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/edtInputValorLucroTrabalhoVendido"
+            style="@style/edtInputLayout"
+            android:inputType="numberSigned"
+            />
+    </com.google.android.material.textfield.TextInputLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

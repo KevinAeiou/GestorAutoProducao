@@ -10,30 +10,33 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.kevin.ceep.R;
 import com.kevin.ceep.model.TrabalhoProducao;
-import com.kevin.ceep.ui.recyclerview.adapter.listener.OnItemClickListener;
+import com.kevin.ceep.ui.recyclerview.adapter.listener.OnItemClickListenerTrabalhoProducao;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class ListaTrabalhoProducaoAdapter extends RecyclerView.Adapter<ListaTrabalhoProducaoAdapter.TrabalhoProducaoViewHolder> {
-    private List<TrabalhoProducao> trabalhosProducao;
+    private final ArrayList<TrabalhoProducao> trabalhosProducao;
     private final Context context;
-    private OnItemClickListener onItemClickListener;
+    private OnItemClickListenerTrabalhoProducao onItemClickListener;
 
-    public ListaTrabalhoProducaoAdapter(Context context,List<TrabalhoProducao> trabalhosProducao) {
+    public ListaTrabalhoProducaoAdapter(Context context, ArrayList<TrabalhoProducao> trabalhosProducao) {
         this.trabalhosProducao = trabalhosProducao;
         this.context = context;
     }
 
-    public void setOnItemClickListener(OnItemClickListener onItemClickListener) {
+    public void setOnItemClickListener(OnItemClickListenerTrabalhoProducao onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
     }
-    public void atualiza(List<TrabalhoProducao> listaFiltrada){
-        this.trabalhosProducao=listaFiltrada;
-        notifyDataSetChanged();
+    public void atualiza(ArrayList<TrabalhoProducao> trabalhosProducaoAtualizada){
+        DiffUtil.DiffResult diffResult= DiffUtil.calculateDiff(new ItemDiffCallback(trabalhosProducao, trabalhosProducaoAtualizada));
+        trabalhosProducao.clear();
+        trabalhosProducao.addAll(trabalhosProducaoAtualizada);
+        diffResult.dispatchUpdatesTo(this);
     }
     @NonNull
     @Override
@@ -70,8 +73,7 @@ public class ListaTrabalhoProducaoAdapter extends RecyclerView.Adapter<ListaTrab
         notifyItemRangeChanged(posicao,trabalhosProducao.size());
     }
     public void limpaLista() {
-        trabalhosProducao.clear();
-        notifyDataSetChanged();
+        atualiza(new ArrayList<>());
     }
 
     public class TrabalhoProducaoViewHolder extends RecyclerView.ViewHolder{
@@ -89,7 +91,7 @@ public class ListaTrabalhoProducaoAdapter extends RecyclerView.Adapter<ListaTrab
             tipo_licenca = itemView.findViewById(R.id.itemTipoLicenca);
             profissao_trabalho = itemView.findViewById(R.id.itemProfissaoTrabalho);
             nivel_trabalho = itemView.findViewById(R.id.itemNivelTrabalho);
-            itemView.setOnClickListener(view -> onItemClickListener.onItemClick(trabalhoProducao, getAdapterPosition()));
+            itemView.setOnClickListener(view -> onItemClickListener.onItemClick(trabalhoProducao));
         }
 
         public void vincula(TrabalhoProducao trabalhoProducao) {
@@ -100,7 +102,7 @@ public class ListaTrabalhoProducaoAdapter extends RecyclerView.Adapter<ListaTrab
         private void preencheCampo(TrabalhoProducao trabalhoProducao) {
             nome_trabalho.setText(trabalhoProducao.getNome());
             configuraCorNomeTrabalhoProducao(trabalhoProducao);
-            tipo_licenca.setText(trabalhoProducao.getTipo_licenca());
+            tipo_licenca.setText(trabalhoProducao.getTipoLicenca());
             configuraCorLicencaTrabalhoProducao(trabalhoProducao);
             profissao_trabalho.setText(this.trabalhoProducao.getProfissao());
             profissao_trabalho.setTextColor(Color.WHITE);
@@ -121,13 +123,15 @@ public class ListaTrabalhoProducaoAdapter extends RecyclerView.Adapter<ListaTrab
         }
 
         private void configuraCorLicencaTrabalhoProducao(TrabalhoProducao trabalhoProducao) {
-            String licenca = trabalhoProducao.getTipo_licenca();
-            if (licenca.equals("Licença de produção do iniciante")){
-                tipo_licenca.setTextColor(ContextCompat.getColor(context,R.color.cor_texto_licenca_iniciante));
-            } else if (licenca.equals("Licença de produção do aprendiz")) {
-                tipo_licenca.setTextColor(ContextCompat.getColor(context,R.color.cor_texto_licenca_aprediz));
-            }else{
-                tipo_licenca.setTextColor(ContextCompat.getColor(context,R.color.cor_texto_licenca_mestre));
+            String licenca = trabalhoProducao.getTipoLicenca();
+            if (licenca != null) {
+                if (licenca.equals("Licença de Artesanato de Novato")){
+                    tipo_licenca.setTextColor(ContextCompat.getColor(context,R.color.cor_texto_licenca_novato));
+                } else if (licenca.equals("Licença de Artesanato de Aprendiz")) {
+                    tipo_licenca.setTextColor(ContextCompat.getColor(context,R.color.cor_texto_licenca_aprediz));
+                }else{
+                    tipo_licenca.setTextColor(ContextCompat.getColor(context,R.color.cor_texto_licenca_mestre));
+                }
             }
         }
 
@@ -147,6 +151,34 @@ public class ListaTrabalhoProducaoAdapter extends RecyclerView.Adapter<ListaTrab
                     nome_trabalho.setTextColor(ContextCompat.getColor(context, R.color.cor_texto_raridade_especial));
                     break;
             }
+        }
+    }
+    private static class ItemDiffCallback extends DiffUtil.Callback {
+        private final ArrayList<TrabalhoProducao> listaAntiga;
+        private final ArrayList<TrabalhoProducao> listaNova;
+        public ItemDiffCallback(ArrayList<TrabalhoProducao> listaAntiga, ArrayList<TrabalhoProducao> listaNova) {
+            this.listaAntiga= listaAntiga;
+            this.listaNova= listaNova;
+        }
+
+        @Override
+        public int getOldListSize() {
+            return listaAntiga.size();
+        }
+
+        @Override
+        public int getNewListSize() {
+            return listaNova.size();
+        }
+
+        @Override
+        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+            return listaAntiga.get(oldItemPosition).getId().equals(listaNova.get(newItemPosition).getId());
+        }
+
+        @Override
+        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+            return listaAntiga.get(oldItemPosition).equals(listaNova.get(newItemPosition));
         }
     }
 }

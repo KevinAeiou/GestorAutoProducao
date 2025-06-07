@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:fillViewport="true">
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/app_background"
+        tools:context=".ui.fragment.EntrarUsuarioFragment">
+
+        <View
+            android:id="@+id/conteinerComponentes"
+            style="@style/conteinerComponentes"
+            android:layout_width="match_parent"
+            android:layout_height="425dp"
+            app:layout_constraintWidth_max="500dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/txtTitulo"
+            style="@style/txtTitulo"
+            android:text="@string/string_ola"
+            app:layout_constraintEnd_toEndOf="@id/conteinerComponentes"
+            app:layout_constraintStart_toStartOf="@id/conteinerComponentes"
+            app:layout_constraintTop_toTopOf="@id/conteinerComponentes" />
+
+        <TextView
+            android:id="@+id/txtSubTitulo"
+            style="@style/txtSubTitulo"
+            android:text="@string/string_entre_em_sua_conta"
+            app:layout_constraintEnd_toEndOf="@id/conteinerComponentes"
+            app:layout_constraintStart_toStartOf="@id/conteinerComponentes"
+            app:layout_constraintTop_toBottomOf="@id/txtTitulo" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/txtEmail"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="40dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginRight="40dp"
+            app:layout_constraintEnd_toEndOf="@id/conteinerComponentes"
+            app:layout_constraintStart_toStartOf="@id/conteinerComponentes"
+            app:layout_constraintTop_toBottomOf="@id/txtSubTitulo">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edtEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/string_email"
+                android:inputType="textEmailAddress"
+                android:maxLength="30"
+                android:padding="20dp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/txtSenha"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="40dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginRight="40dp"
+            app:passwordToggleEnabled="true"
+            app:layout_constraintEnd_toEndOf="@id/conteinerComponentes"
+            app:layout_constraintStart_toStartOf="@id/conteinerComponentes"
+            app:layout_constraintTop_toBottomOf="@+id/txtEmail">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edtSenha"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/string_senha"
+                android:inputType="textPassword"
+                android:maxLength="20"
+                android:padding="20dp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/txtEsqueceuSenha"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:layout_marginEnd="40dp"
+            android:gravity="end"
+            android:text="@string/string_esqueceu_sua_senha"
+            android:textSize="17sp"
+            android:textColor="@color/black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txtSenha" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/botaoEntrar"
+            style="@style/btn"
+            android:text="@string/string_entrar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txtEsqueceuSenha" />
+
+        <TextView
+            android:id="@+id/txtRodape"
+            style="@style/txtRodape"
+            android:gravity="end"
+            android:text="@string/string_nao_possui_uma_conta"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/txtLinkCadastro"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/conteinerComponentes" />
+
+        <TextView
+            android:id="@+id/txtLinkCadastro"
+            style="@style/txtRodape"
+            android:gravity="start"
+            android:text="@string/string_cadastre_se"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/txtRodape"
+            app:layout_constraintTop_toBottomOf="@id/conteinerComponentes" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+</androidx.core.widget.NestedScrollView>

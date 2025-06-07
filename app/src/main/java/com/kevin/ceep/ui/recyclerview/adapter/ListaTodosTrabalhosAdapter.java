@@ -1,11 +1,8 @@
 package com.kevin.ceep.ui.recyclerview.adapter;
 
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_NOME_TRABALHO;
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_TRABALHO;
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CODIGO_REQUISICAO_ALTERA_TRABALHO;
+import static com.kevin.ceep.ui.activity.Constantes.CODIGO_REQUISICAO_ALTERA_TRABALHO;
 
 import android.content.Context;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,34 +10,36 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.textview.MaterialTextView;
 import com.kevin.ceep.R;
-import com.kevin.ceep.model.ProdutoVendido;
 import com.kevin.ceep.model.ProfissaoTrabalho;
 import com.kevin.ceep.model.Trabalho;
-import com.kevin.ceep.model.TrabalhoEstoque;
-import com.kevin.ceep.ui.activity.TrabalhoEspecificoActivity;
-import com.kevin.ceep.ui.recyclerview.adapter.listener.OnItemClickListener;
+import com.kevin.ceep.ui.fragment.ListaTodosTrabalhosFragmentDirections;
+import com.kevin.ceep.ui.fragment.ListaTodosTrabalhosFragmentDirections.ActionListaTodosTrabalhosFragmentToTrabalhoEspecificoFragment;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class ListaTodosTrabalhosAdapter extends RecyclerView.Adapter<ListaTodosTrabalhosAdapter.ProfissaoTrabalhoViewHolder> {
-    private List<ProfissaoTrabalho> profissoes;
-    private List<Trabalho> trabalhos;
+    private final ArrayList<ProfissaoTrabalho> profissoes;
+    private ArrayList<Trabalho> trabalhos;
     private final Context context;
     public static int posicaoPai = -1;
 
-    public ListaTodosTrabalhosAdapter(List<ProfissaoTrabalho> profissaoTrabalhos, Context context) {
+    public ListaTodosTrabalhosAdapter(ArrayList<ProfissaoTrabalho> profissaoTrabalhos, Context context) {
         this.profissoes = profissaoTrabalhos;
         this.context = context;
     }
-    public void atualiza(List<ProfissaoTrabalho> listaFiltrada) {
-        this.profissoes = listaFiltrada;
-        notifyDataSetChanged();
+    public void atualiza(ArrayList<ProfissaoTrabalho> profissoesAtualizada) {
+        DiffUtil.DiffResult diffResult= DiffUtil.calculateDiff(new ItemDiffCallback(profissoes, profissoesAtualizada));
+        profissoes.clear();
+        profissoes.addAll(profissoesAtualizada);
+        diffResult.dispatchUpdatesTo(this);
     }
     @NonNull
     @Override
@@ -51,7 +50,7 @@ public class ListaTodosTrabalhosAdapter extends RecyclerView.Adapter<ListaTodosT
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ListaTodosTrabalhosAdapter.ProfissaoTrabalhoViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ProfissaoTrabalhoViewHolder holder, int position) {
         ProfissaoTrabalho profissaoTrabalho = profissoes.get(position);
         trabalhos = profissaoTrabalho.getTrabalhos();
         holder.vincula(profissaoTrabalho);
@@ -68,31 +67,11 @@ public class ListaTodosTrabalhosAdapter extends RecyclerView.Adapter<ListaTodosT
             profissaoTrabalho.setExpandable(!profissaoTrabalho.isExpandable());
             notifyItemChanged(holder.getAdapterPosition());
         });
-        trabalhoEspecificoAdapter.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(Trabalho trabalho, int adapterPosition) {
-                Intent iniciaVaiParaCadastraNovoTrabalho = new Intent(context,
-                        TrabalhoEspecificoActivity.class);
-                iniciaVaiParaCadastraNovoTrabalho.putExtra(CHAVE_TRABALHO, CODIGO_REQUISICAO_ALTERA_TRABALHO);
-                iniciaVaiParaCadastraNovoTrabalho.putExtra(CHAVE_NOME_TRABALHO, trabalho);
-                iniciaVaiParaCadastraNovoTrabalho.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                context.startActivity(iniciaVaiParaCadastraNovoTrabalho);
-            }
-
-            @Override
-            public void onItemClick(ListaTrabalhoEspecificoAdapter trabalhoEspecificoAdapter) {
-
-            }
-
-            @Override
-            public void onItemClick(TrabalhoEstoque trabalhoEstoque, int adapterPosition, int botaoId) {
-
-            }
-
-            @Override
-            public void onItemClick(ProdutoVendido produtoVendido) {
-
-            }
+        trabalhoEspecificoAdapter.setOnItemClickListener((view, trabalho, posicao) -> {
+            ActionListaTodosTrabalhosFragmentToTrabalhoEspecificoFragment acao = ListaTodosTrabalhosFragmentDirections.actionListaTodosTrabalhosFragmentToTrabalhoEspecificoFragment(null);
+            acao.setCodigoRequisicao(CODIGO_REQUISICAO_ALTERA_TRABALHO);
+            acao.setTrabalho(trabalho);
+            Navigation.findNavController(view).navigate(acao);
         });
         boolean isExpandable = profissaoTrabalho.isExpandable();
         holder.constraintLayoutItemProfissaoTrabalho.setVisibility(isExpandable ? View.VISIBLE : View.GONE);
@@ -127,6 +106,34 @@ public class ListaTodosTrabalhosAdapter extends RecyclerView.Adapter<ListaTodosT
 
         private void preencheCampos(ProfissaoTrabalho profissaoTrabalho) {
             txtNomeItemProfissaoTrabalho.setText(profissaoTrabalho.getNome());
+        }
+    }
+    private static class ItemDiffCallback extends DiffUtil.Callback {
+        private final ArrayList<ProfissaoTrabalho> listaAntiga;
+        private final ArrayList<ProfissaoTrabalho> listaNova;
+        public ItemDiffCallback(ArrayList<ProfissaoTrabalho> listaAntiga, ArrayList<ProfissaoTrabalho> listaNova) {
+            this.listaAntiga= listaAntiga;
+            this.listaNova= listaNova;
+        }
+
+        @Override
+        public int getOldListSize() {
+            return listaAntiga.size();
+        }
+
+        @Override
+        public int getNewListSize() {
+            return listaNova.size();
+        }
+
+        @Override
+        public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+            return listaAntiga.get(oldItemPosition).getNome().equals(listaNova.get(newItemPosition).getNome());
+        }
+
+        @Override
+        public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+            return listaAntiga.get(oldItemPosition).equals(listaNova.get(newItemPosition));
         }
     }
 }

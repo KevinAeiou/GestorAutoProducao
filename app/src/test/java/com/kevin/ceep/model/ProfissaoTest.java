@@ -2,13 +2,13 @@ package com.kevin.ceep.model;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 public class ProfissaoTest {
-    private final Profissao BRACELETES = new Profissao("1", "Braceletes", 19, false);
-    private final Profissao CAPOTES = new Profissao("2", "Capotes", 199, false);
-    private final Profissao ANEIS = new Profissao("3", "Anéis", 830000, false);
-    private final Profissao AMULETOS = new Profissao("4", "Amuletos", 830001, false);
+    private final Profissao BRACELETES = new Profissao();
+    private final Profissao CAPOTES = new Profissao();
+    private final Profissao ANEIS = new Profissao();
+    private final Profissao AMULETOS = new Profissao();
 
     @Test
     public void deve_RetornarNivelUm_QuandoXpAtualIgualADezenove() {
@@ -17,14 +17,8 @@ public class ProfissaoTest {
     }
     @Test
     public void deve_RetornarXpMaximoVinte_QuandoNivelUm() {
-        int xpMaximo = BRACELETES.getXpMaximo(1);
+        int xpMaximo = BRACELETES.getXpMaximo();
         assertEquals(20, xpMaximo);
-    }
-
-    @Test
-    public void deve_RetornarUm_QuandoXpAtualIgualADezenove() {
-        int xpNecessario = BRACELETES.getXpNecessario(20);
-        assertEquals(1, xpNecessario);
     }
 
     @Test
@@ -39,14 +33,8 @@ public class ProfissaoTest {
     }
     @Test
     public void deve_RetornarDuzentos_QuandoNivelDois() {
-        int xpMaximo = CAPOTES.getXpMaximo(2);
+        int xpMaximo = CAPOTES.getXpMaximo();
         assertEquals(200, xpMaximo);
-    }
-
-    @Test
-    public void deve_RetornarUm_QuandoXpAtualIgualACentoENoventaENove() {
-        int xpNecessario = CAPOTES.getXpNecessario(200);
-        assertEquals(1, xpNecessario);
     }
 
     @Test
@@ -66,14 +54,8 @@ public class ProfissaoTest {
     }
     @Test
     public void deve_RetornarXpMaximoOitocentosETrintaMil_QuandoNivelVinteESeis() {
-        int xpMaximo = ANEIS.getXpMaximo(26);
+        int xpMaximo = ANEIS.getXpMaximo();
         assertEquals(830000, xpMaximo);
-    }
-
-    @Test
-    public void deve_RetornarXpNecessarioZero_QuandoXpAtualIgualAOitocentoETrintaMil() {
-        int xpNecessario = ANEIS.getXpNecessario(830000);
-        assertEquals(0, xpNecessario);
     }
 
     @Test

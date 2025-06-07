@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/scrollViewTrabalhoEspecifico"
+    tools:context=".ui.fragment.TrabalhoEspecificoFragment">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp">
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/indicadorProgressoTrabalhoEspecifico"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            style="@style/Widget.Material3.LinearProgressIndicator"
+            android:theme="@style/Theme.Material3.DayNight"
+            android:indeterminate="true"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/txtLayoutNomeTrabalho"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/txtLayoutNomeTrabalho"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintWidth_max="320dp"
+            android:layout_margin="16dp"
+            android:hint="@string/string_nome"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edtNomeTrabalho"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textMultiLine"
+                android:textSize="24sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/txtLayoutNomeProducaoTrabalho"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:hint="@string/stringNomeProducao"
+            app:layout_constraintTop_toBottomOf="@+id/txtLayoutNomeTrabalho"
+            app:layout_constraintEnd_toEndOf="@+id/txtLayoutNomeTrabalho"
+            app:layout_constraintStart_toStartOf="@+id/txtLayoutNomeTrabalho">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edtNomeProducaoTrabalho"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textMultiLine"
+                android:textSize="24sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/txtLayoutProfissaoTrabalho"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:hint="@string/stringProfissoes"
+            android:labelFor="@id/txtAutoCompleteProfissaoTrabalho"
+            app:layout_constraintTop_toBottomOf="@+id/txtLayoutNomeProducaoTrabalho"
+            app:layout_constraintEnd_toEndOf="@+id/txtLayoutNomeProducaoTrabalho"
+            app:layout_constraintStart_toStartOf="@+id/txtLayoutNomeProducaoTrabalho">
+
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                android:id="@+id/txtAutoCompleteProfissaoTrabalho"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:inputType="none"
+                android:padding="8dp"
+                android:textSize="24sp"
+                android:text="@string/stringProfissoes"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/linearLayout1TrabalhoEspecifico"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
+            app:layout_constraintStart_toStartOf="@id/txtLayoutProfissaoTrabalho"
+            app:layout_constraintTop_toBottomOf="@id/txtLayoutProfissaoTrabalho"
+            app:layout_constraintEnd_toEndOf="@id/txtLayoutProfissaoTrabalho">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/txtLayoutExperienciaTrabalho"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="4dp"
+                android:hint="@string/stringExperiencia">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edtExperienciaTrabalho"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="start"
+                    android:inputType="numberSigned"
+                    android:text="0"
+                    android:textSize="24sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/txtLayoutNivelTrabalho"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="4dp"
+                android:hint="@string/stringNivel">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/edtNivelTrabalho"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="start"
+                    android:inputType="numberSigned"
+                    android:text="0"
+                    android:textSize="24sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/txtLayoutRaridadeTrabalho"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:hint="@string/stringRaridade"
+            app:layout_constraintTop_toBottomOf="@+id/linearLayout1TrabalhoEspecifico"
+            app:layout_constraintEnd_toEndOf="@+id/linearLayout1TrabalhoEspecifico"
+            app:layout_constraintStart_toStartOf="@+id/linearLayout1TrabalhoEspecifico">
+
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                android:id="@+id/txtAutoCompleteRaridadeTrabalho"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="start"
+                android:inputType="none"
+                android:padding="8dp"
+                android:textSize="24sp"
+                android:text="@string/stringRaridade"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/linearLayout2TrabalhoEspecifico"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintTop_toBottomOf="@+id/txtLayoutRaridadeTrabalho"
+            app:layout_constraintStart_toStartOf="@+id/txtLayoutRaridadeTrabalho"
+            app:layout_constraintEnd_toEndOf="@id/txtLayoutRaridadeTrabalho">
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/linearLayoutTrabalhoNecessario2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/txtLayoutTrabalhoNecessario"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="@string/stringTrabalhoNecessario">
+
+                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                        android:id="@+id/txtAutoCompleteTrabalhoNecessario"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="start"
+                        android:inputType="none"
+                        android:padding="8dp"
+                        android:textSize="24sp"
+                        android:text="@string/stringSelecioneTrabalho"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/imagemTrabalhoNecessario1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_adiciona"/>
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/linearLayoutTrabalhoNecessario3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:orientation="horizontal">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/txtLayoutTrabalhoNecessario2"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="@string/stringTrabalhoNecessario">
+
+                    <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                        android:id="@+id/txtAutoCompleteTrabalhoNecessario2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="start"
+                        android:inputType="none"
+                        android:padding="8dp"
+                        android:textSize="24sp"
+                        android:text="@string/stringSelecioneTrabalho" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/imagemTrabalhoNecessario2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_subtrai"/>
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <CheckBox
+                android:id="@+id/checkBoxRecorrenciaTrabalho"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:textSize="24sp"
+                android:text="@string/stringRecorrente" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/txtLayoutLicencaTrabalho"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/stringLicenca">
+
+                <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                    android:id="@+id/txtAutoCompleteLicencaTrabalho"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="start"
+                    android:inputType="none"
+                    android:padding="8dp"
+                    android:textSize="24sp"
+                    android:text="@string/stringLicenca"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/txtLayoutEstadoTrabalho"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:hint="@string/string_estado"
+                android:labelFor="@id/txtAutoCompleteEstadoTrabalho"
+                android:layout_marginTop="8dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <AutoCompleteTextView
+                    android:id="@+id/txtAutoCompleteEstadoTrabalho"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="start"
+                    android:inputType="none"
+                    android:padding="8dp"
+                    android:textSize="24sp"
+                    android:text="@string/string_estado"/>
+            </com.google.android.material.textfield.TextInputLayout>
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnExcluiTrabalhoEspecifico"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/botao_estados_background"
+            android:padding="8dp"
+            android:text="@string/stringExcluir"
+            android:textAllCaps="false"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@id/linearLayout1TrabalhoEspecifico"
+            app:layout_constraintEnd_toEndOf="@+id/linearLayout1TrabalhoEspecifico"
+            app:layout_constraintTop_toBottomOf="@id/linearLayout2TrabalhoEspecifico"
+            app:layout_constraintVertical_bias="1.0" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

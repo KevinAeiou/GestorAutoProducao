@@ -1,161 +1,274 @@
 package com.kevin.ceep.repository;
 
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_LISTA_ESTOQUE;
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_LISTA_PERSONAGEM;
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_USUARIOS;
-import static com.kevin.ceep.utilitario.Utilitario.comparaString;
-import static com.kevin.ceep.utilitario.Utilitario.geraIdAleatorio;
+import static com.kevin.ceep.repository.TrabalhoProducaoRepository.destroyInstance;
+import static com.kevin.ceep.ui.activity.Constantes.CHAVE_ESTOQUE;
+import static com.kevin.ceep.ui.activity.Constantes.CHAVE_LISTA_TRABALHO;
 
 import android.os.Build;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.kevin.ceep.model.Trabalho;
 import com.kevin.ceep.model.TrabalhoEstoque;
-import com.kevin.ceep.model.TrabalhoProducao;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class TrabalhoEstoqueRepository {
-    private final DatabaseReference minhaReferencia;
-    private final MutableLiveData<Resource<ArrayList<TrabalhoEstoque>>> trabalhosEstoqueEncontrados;
+    private static TrabalhoEstoqueRepository instancia;
+    private DatabaseReference referenciaEstoqueIdPersonagem;
+    private DatabaseReference referenciaEstoque;
+    private DatabaseReference referenciaTrabalhos;
+    private String idPersonagem;
+    private ValueEventListener ouvinteEstoque;
+    private ValueEventListener ouvinteRecuperaEstoque;
+    private ValueEventListener ouvinteRecuperaEstoqueIdTrabalho;
+    private final Executor backgroundExecutor = Executors.newFixedThreadPool(2);
+    private MutableLiveData<Resource<ArrayList<TrabalhoEstoque>>> estoqueEncontrado;
 
-    public TrabalhoEstoqueRepository(String personagemID) {
-        String usuarioID = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
-        this.minhaReferencia = FirebaseDatabase.getInstance().getReference(CHAVE_USUARIOS).child(usuarioID).child(CHAVE_LISTA_PERSONAGEM)
-                .child(personagemID).child(CHAVE_LISTA_ESTOQUE);
-        this.trabalhosEstoqueEncontrados = new MutableLiveData<>();
+    public TrabalhoEstoqueRepository(String idPersonagem) {
+        this.idPersonagem = idPersonagem;
+        FirebaseDatabase meuBanco = FirebaseDatabase.getInstance();
+        this.referenciaEstoqueIdPersonagem = meuBanco.getReference(CHAVE_ESTOQUE).child(idPersonagem);
+        this.referenciaTrabalhos = meuBanco.getReference(CHAVE_LISTA_TRABALHO);
+    }
+    public TrabalhoEstoqueRepository() {
+        this.referenciaEstoque= FirebaseDatabase.getInstance().getReference(CHAVE_ESTOQUE);
     }
 
-    public void modificaQuantidadeTrabalhoNecessarioNoEstoque(TrabalhoProducao trabalhoProducao) {
-        String[] listaTrabalhosNecessarios = trabalhoProducao.getTrabalhoNecessario().split(",");
-        minhaReferencia.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        for (DataSnapshot dn:dataSnapshot.getChildren()){
-                            TrabalhoEstoque trabalho = dn.getValue(TrabalhoEstoque.class);
-                            if (trabalho != null) {
-                                for (String nome: listaTrabalhosNecessarios) {
-                                    if (comparaString(trabalho.getNome(), nome)) {
-                                        int novaQuantidade = trabalho.getQuantidade() - 1;
-                                        if (novaQuantidade < 0) {
-                                            novaQuantidade = 0;
-                                        }
-                                        trabalho.setQuantidade(novaQuantidade);
-                                        modificaQuantidadeTrabalhoEspecificoNoEstoque(trabalho);
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                    }
-                });
-    }
-
-    public LiveData<Resource<Void>> modificaQuantidadeTrabalhoEspecificoNoEstoque(TrabalhoEstoque trabalho) {
-        MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
-        if (trabalho.getId() != null) {
-            minhaReferencia.child(trabalho.getId()).child("quantidade").setValue(trabalho.getQuantidade()).addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    liveData.setValue(new Resource<>(null, null));
-                } else if (task.isCanceled()) {
-                    liveData.setValue(new Resource<>(null, task.getException().getMessage()));
-                }
-            });
+    public static TrabalhoEstoqueRepository getInstance(String idPersonagem) {
+        if (instancia == null || !instancia.idPersonagem.equals(idPersonagem)) {
+            destroyInstance();
+            instancia = new TrabalhoEstoqueRepository(idPersonagem);
         }
+        return instancia;
+    }
+
+    public LiveData<Resource<Void>> modificaTrabalhoEstoque(TrabalhoEstoque trabalho) {
+        TrabalhoEstoque trabalhoModificado= new TrabalhoEstoque();
+        MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
+        if (trabalhoInvalido(trabalho)) {
+            liveData.postValue(new Resource<>(null, "Trabalho inválido"));
+            return liveData;
+        }
+        trabalhoModificado.setId(trabalho.getId());
+        trabalhoModificado.setIdTrabalho(trabalho.getIdTrabalho());
+        trabalhoModificado.setQuantidade(trabalho.getQuantidade());
+        referenciaEstoqueIdPersonagem.child(trabalhoModificado.getId()).setValue(trabalhoModificado).addOnCompleteListener(backgroundExecutor, task -> {
+            if (task.isSuccessful()) {
+                liveData.postValue(new Resource<>(null, null));
+                return;
+            }
+            Exception exception = task.getException();
+            String erro = recuperaErro(exception, "Erro desconhecido ao remover trabalho no estoque");
+            liveData.postValue(new Resource<>(null, erro));
+        });
         return liveData;
     }
-    public LiveData<Resource<ArrayList<TrabalhoEstoque>>> pegaTodosTrabalhosEstoque() {
-        minhaReferencia.addListenerForSingleValueEvent(new ValueEventListener() {
+
+    private boolean trabalhoInvalido(TrabalhoEstoque trabalho) {
+        return idTrabalhoInvalido(trabalho) || trabalho.getIdTrabalho() == null || trabalho.getIdTrabalho().isEmpty() || trabalho.getQuantidade() == null;
+    }
+
+    private String recuperaErro(Exception exception, String erro) {
+        return exception == null ? erro : exception.getMessage();
+    }
+
+    private static boolean idTrabalhoInvalido(TrabalhoEstoque trabalho) {
+        return trabalho == null || trabalho.getId() == null || trabalho.getId().isEmpty();
+    }
+
+    public LiveData<Resource<ArrayList<TrabalhoEstoque>>> recuperaEstoque() {
+        estoqueEncontrado = new MutableLiveData<>();
+        ouvinteRecuperaEstoque = new ValueEventListener() {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                ArrayList<TrabalhoEstoque> trabalhosEstoque = new ArrayList<>();
-                for (DataSnapshot dn:dataSnapshot.getChildren()){
-                    TrabalhoEstoque trabalho = dn.getValue(TrabalhoEstoque.class);
-                    if (trabalho.getProfissao() == null) {
-                        trabalho.setProfissao("");
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                ArrayList<TrabalhoEstoque> estoque = new ArrayList<>();
+                for (DataSnapshot ds : snapshot.getChildren()) {
+                    TrabalhoEstoque trabalho = ds.getValue(TrabalhoEstoque.class);
+                    if (trabalho == null) continue;
+                    estoque.add(trabalho);
+                }
+                if (estoque.isEmpty()) {
+                    estoqueEncontrado.postValue(new Resource<>(estoque, null));
+                    return;
+                }
+                List<TrabalhoEstoque> trabalhosServidor = Collections.synchronizedList(new ArrayList<>());
+                ArrayList<Task<DataSnapshot>> tarefas = new ArrayList<>(estoque.size());
+                for (TrabalhoEstoque trabalho : estoque) {
+                    tarefas.add(referenciaTrabalhos.child(trabalho.getIdTrabalho()).get());
+                }
+                Tasks.whenAllSuccess(tarefas).addOnCompleteListener(backgroundExecutor, tarefasCombinadas -> {
+                    if (tarefasCombinadas.isSuccessful()) {
+                        for (int i = 0; i < tarefasCombinadas.getResult().size(); i ++) {
+                            DataSnapshot ds = (DataSnapshot) tarefasCombinadas.getResult().get(i);
+                            Trabalho trabalho = ds.getValue(Trabalho.class);
+                            if (trabalho == null) return;
+                            TrabalhoEstoque trabalhoEstoque1 = defineAtributosTrabalho(estoque.get(i), trabalho);
+                            trabalhosServidor.add(trabalhoEstoque1);
+                        }
+                        trabalhosServidor.sort(Comparator.comparing(TrabalhoEstoque::getProfissao).thenComparing(TrabalhoEstoque::getRaridade).thenComparing(TrabalhoEstoque::getNivel));
+                        estoqueEncontrado.postValue(new Resource<>(new ArrayList<>(trabalhosServidor), null));
+                        return;
                     }
-                    trabalhosEstoque.add(trabalho);
-                }
-                if (!trabalhosEstoque.isEmpty()) {
-                    trabalhosEstoque.sort(Comparator.comparing(TrabalhoEstoque::getProfissao).thenComparing(TrabalhoEstoque::getRaridade).thenComparing(TrabalhoEstoque::getNivel).thenComparing(TrabalhoEstoque::getNome));
-                }
-                trabalhosEstoqueEncontrados.setValue(new Resource<>(trabalhosEstoque, null));
+                    Exception exception = tarefasCombinadas.getException();
+                    String erro = recuperaErro(exception, "Erro desconhecido ao recuperar estoque");
+                    estoqueEncontrado.postValue(new Resource<>( null, erro));
+                });
             }
+
             @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Resource<ArrayList<TrabalhoEstoque>> resourceAtual = trabalhosEstoqueEncontrados.getValue();
-                Resource<ArrayList<TrabalhoEstoque>> resourceCriado;
-                if (resourceAtual != null) {
-                    resourceCriado = new Resource<>(resourceAtual.dado, databaseError.getMessage());
-                } else {
-                    resourceCriado = new Resource<>(null, databaseError.getMessage());
-                }
-                trabalhosEstoqueEncontrados.setValue(resourceCriado);
+            public void onCancelled(@NonNull DatabaseError error) {
+                estoqueEncontrado.postValue(new Resource<>(null, error.getMessage()));
             }
-        });
-        return trabalhosEstoqueEncontrados;
+        };
+        referenciaEstoqueIdPersonagem.addValueEventListener(ouvinteRecuperaEstoque);
+        return estoqueEncontrado;
     }
 
-    public TrabalhoEstoque defineNovoTrabalhoEstoque(TrabalhoProducao trabalhoConcluido) {
-        return new TrabalhoEstoque(
-                null,
-                trabalhoConcluido.getNome(),
-                trabalhoConcluido.getProfissao(),
-                trabalhoConcluido.getRaridade(),
-                trabalhoConcluido.getNivel(),
-                1,
-                null);
+    private TrabalhoEstoque defineAtributosTrabalho(TrabalhoEstoque trabalhoEstoque, Trabalho trabalho) {
+        trabalhoEstoque.setNome(trabalho.getNome());
+        trabalhoEstoque.setRaridade(trabalho.getRaridade());
+        trabalhoEstoque.setNivel(trabalho.getNivel());
+        trabalhoEstoque.setProfissao(trabalho.getProfissao());
+        return trabalhoEstoque;
     }
-    public TrabalhoEstoque retornaTrabalhoEspecificoEstoque(ArrayList<TrabalhoEstoque> trabalhosEstoque, String nomeTrabalho) {
-        for (TrabalhoEstoque trabalhoEstoque : trabalhosEstoque) {
-            if (comparaString(trabalhoEstoque.getNome(), nomeTrabalho)) {
-                return trabalhoEstoque;
-            }
+
+    public LiveData<Resource<TrabalhoEstoque>> recuperaTrabalhoEstoquePorIdTrabalho(String idTrabalho) {
+        MutableLiveData<Resource<TrabalhoEstoque>> liveData = new MutableLiveData<>();
+        if (idTrabalho == null || idTrabalho.isEmpty()) {
+            liveData.postValue(new Resource<>(null, "Id trabalho inválido"));
+            return liveData;
         }
-        return null;
+        ouvinteRecuperaEstoqueIdTrabalho = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot ds : snapshot.getChildren()) {
+                    Log.d("estoque", "Snapshot: " + ds);
+                    if (ds.exists()) {
+                        TrabalhoEstoque trabalho = ds.getValue(TrabalhoEstoque.class);
+                        Log.d("estoque", "Trabalho estoque: " + trabalho);
+                        if (trabalho == null) continue;
+                        if (trabalho.getIdTrabalho().equals(idTrabalho)) {
+                            liveData.postValue(new Resource<>(trabalho, null));
+                            return;
+                        }
+                    }
+                }
+                liveData.postValue(new Resource<>(null, null));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                liveData.postValue(new Resource<>(null, error.getMessage()));
+            }
+        };
+        referenciaEstoqueIdPersonagem.addListenerForSingleValueEvent(ouvinteRecuperaEstoqueIdTrabalho);
+        return liveData;
     }
 
-    public LiveData<Resource<Void>> salvaNovoTrabalhoEstoque(TrabalhoEstoque novoTrabalho) {
+    public LiveData<Resource<Void>> insereTrabalhoEstoque(@NonNull TrabalhoEstoque trabalho) {
         MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
-        String novoId = geraIdAleatorio();
-        novoTrabalho.setId(novoId);
-        minhaReferencia.child(novoTrabalho.getId()).setValue(novoTrabalho).addOnCompleteListener(task -> {
+        if (trabalhoInvalido(trabalho)) {
+            liveData.postValue(new Resource<>(null, "Trabalho inválido"));
+            return liveData;
+        }
+        referenciaEstoqueIdPersonagem.child(trabalho.getId()).setValue(trabalho).addOnCompleteListener(backgroundExecutor, task -> {
             if (task.isSuccessful()) {
-                liveData.setValue(new Resource<>(null, null));
-            } else if (task.isCanceled()) {
-                liveData.setValue(new Resource<>(null, task.getException().getMessage()));
+                liveData.postValue(new Resource<>(null, null));
+                return;
             }
+            Exception exception = task.getException();
+            String erro = recuperaErro(exception, "Erro desconhecido ao inserir trabalho no estoque");
+            liveData.postValue(new Resource<>(null, erro));
         });
         return liveData;
     }
 
-    public LiveData<Resource<Void>> deletaTrabalhoEstoque(TrabalhoEstoque trabalhoRemovido) {
+    public LiveData<Resource<Void>> removeTrabalhoEstoque(TrabalhoEstoque trabalho) {
         MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
-        minhaReferencia.child(trabalhoRemovido.getId()).removeValue().addOnCompleteListener(task -> {
+        if (idTrabalhoInvalido(trabalho)) {
+            liveData.postValue(new Resource<>(null, "Id do trabalho inválido"));
+            return liveData;
+        }
+        referenciaEstoqueIdPersonagem.child(trabalho.getId()).removeValue().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 liveData.setValue(new Resource<>(null, null));
-            } else if (task.isCanceled()) {
-                liveData.setValue(new Resource<>(null, task.getException().getMessage()));
+                return;
             }
+            Exception exception = task.getException();
+            String erro = recuperaErro(exception, "Erro desconhecido ao remover trabalho no estoque");
+            liveData.postValue(new Resource<>(null, erro));
         });
         return liveData;
+    }
+
+    public LiveData<Resource<Void>> removeReferenciaTrabalhoEspecifico(Trabalho trabalho) {
+        MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
+        if (trabalho == null || trabalho.getId() == null || trabalho.getId().isEmpty()) {
+            liveData.postValue(new Resource<>(null, "Id do trabalho inválido"));
+            return liveData;
+        }
+        List<Task<Void>> tarefas = new ArrayList<>();
+        ouvinteEstoque = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot dn : snapshot.getChildren()) {
+                    referenciaEstoqueIdPersonagem = referenciaEstoque.child(Objects.requireNonNull(dn.getKey()));
+                    for (DataSnapshot dn2 : dn.getChildren()) {
+                        TrabalhoEstoque trabalhoEncontrado = dn2.getValue(TrabalhoEstoque.class);
+                        assert trabalhoEncontrado != null;
+                        if (trabalhoEncontrado.getIdTrabalho().equals(trabalho.getId())) {
+                            tarefas.add(referenciaEstoqueIdPersonagem.child(trabalho.getId()).removeValue());
+                        }
+                    }
+                }
+                Tasks.whenAllComplete(tarefas).addOnCompleteListener(backgroundExecutor, task -> {
+                    if (task.isSuccessful()) {
+                        liveData.postValue(new Resource<>(null, null));
+                        return;
+                    }
+                    Exception exception = task.getException();
+                    String erro = recuperaErro(exception, "Erro desconhecido ao remover a referência do trabalho no estoque");
+                    liveData.postValue(new Resource<>(null, erro));
+                });
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                liveData.postValue(new Resource<>(null, error.getMessage()));
+            }
+        };
+        referenciaEstoque.addListenerForSingleValueEvent(ouvinteEstoque);
+        return liveData;
+    }
+
+    public void removeOuvinte() {
+        if (referenciaEstoque != null && ouvinteEstoque != null) {
+            referenciaEstoque.removeEventListener(ouvinteEstoque);
+        }
+        if (referenciaEstoqueIdPersonagem != null && ouvinteRecuperaEstoque != null) {
+            referenciaEstoqueIdPersonagem.removeEventListener(ouvinteRecuperaEstoque);
+        }
+        if (referenciaEstoqueIdPersonagem != null && ouvinteRecuperaEstoqueIdTrabalho != null) {
+            referenciaEstoqueIdPersonagem.removeEventListener(ouvinteRecuperaEstoqueIdTrabalho);
+        }
     }
 }

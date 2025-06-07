@@ -9,19 +9,29 @@
     android:padding="20dp"
     android:id="@+id/linearLayoutCabecalho">
 
-    <TextView
-        android:id="@+id/txtCabecalhoNomePersonagem"
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:text="Nome"
-        android:textColor="@color/white"
-        android:textSize="24sp" />
+        android:layout_marginBottom="8dp"
+        >
+
+        <AutoCompleteTextView
+            android:id="@+id/autoCompleteCabecalhoNomePersonagem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="Nome"
+            android:inputType="none"
+            android:textColor="@color/white"
+            android:textSize="24sp" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <TextView
         android:id="@+id/txtCabecalhoEstadoPersonagem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:text="Estado"
+        android:layout_marginStart="16dp"
+        tools:text="@string/string_estado"
         android:textSize="14sp"
         android:textColor="@color/white"/>
 
@@ -29,7 +39,17 @@
         android:id="@+id/txtCabecalhoUsoPersonagem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:text="Uso"
+        android:layout_marginStart="16dp"
+        tools:text="@string/string_uso"
+        android:textSize="14sp"
+        android:textColor="@color/white"/>
+
+    <TextView
+        android:id="@+id/txtCabecalhoAutoProducaoPersonagem"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        tools:text="@string/stringAutoProducao"
         android:textSize="14sp"
         android:textColor="@color/white"/>
 
@@ -37,7 +57,8 @@
         android:id="@+id/txtCabecalhoEspacoProducaoPersonagem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:text="Espaço de produção"
+        android:layout_marginStart="16dp"
+        tools:text="@string/string_espaco_producao"
         android:textSize="14sp"
         android:textColor="@color/white"/>
 </LinearLayout>

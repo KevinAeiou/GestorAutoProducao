@@ -1,14 +1,18 @@
 package com.kevin.ceep.ui.fragment;
 
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_NOME_TRABALHO;
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_PERSONAGEM;
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CHAVE_TRABALHO;
-import static com.kevin.ceep.ui.activity.NotaActivityConstantes.CODIGO_REQUISICAO_ALTERA_TRABALHO_PRODUCAO;
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+import static com.kevin.ceep.ui.activity.Constantes.CODIGO_REQUISICAO_ALTERA_TRABALHO_PRODUCAO;
+import static com.kevin.ceep.ui.activity.Constantes.CODIGO_REQUISICAO_INSERE_TRABALHO_PRODUCAO;
+import static com.kevin.ceep.utilitario.Utilitario.stringContemString;
 
-import android.annotation.SuppressLint;
-import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -17,8 +21,12 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.widget.SearchView;
+import androidx.core.view.MenuProvider;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -26,56 +34,72 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.kevin.ceep.R;
 import com.kevin.ceep.databinding.FragmentListaTrabalhosProducaoBinding;
-import com.kevin.ceep.model.ProdutoVendido;
-import com.kevin.ceep.model.Trabalho;
-import com.kevin.ceep.model.TrabalhoEstoque;
 import com.kevin.ceep.model.TrabalhoProducao;
-import com.kevin.ceep.repository.TrabalhoProducaoRepository;
-import com.kevin.ceep.ui.activity.ListaNovaProducaoActivity;
-import com.kevin.ceep.ui.activity.TrabalhoEspecificoActivity;
-import com.kevin.ceep.ui.recyclerview.adapter.ListaTrabalhoEspecificoAdapter;
+import com.kevin.ceep.repository.PersonagemRepository;
+import com.kevin.ceep.ui.fragment.ListaTrabalhosProducaoFragmentDirections.VaiParaListaTrabalhos;
+import com.kevin.ceep.ui.fragment.ListaTrabalhosProducaoFragmentDirections.VaiParaTrabalhoEspecifico;
 import com.kevin.ceep.ui.recyclerview.adapter.ListaTrabalhoProducaoAdapter;
-import com.kevin.ceep.ui.recyclerview.adapter.listener.OnItemClickListener;
+import com.kevin.ceep.ui.viewModel.ComponentesVisuais;
+import com.kevin.ceep.ui.viewModel.EstadoAppViewModel;
+import com.kevin.ceep.ui.viewModel.PersonagemViewModel;
 import com.kevin.ceep.ui.viewModel.TrabalhoProducaoViewModel;
+import com.kevin.ceep.ui.viewModel.factory.PersonagemViewModelFactory;
 import com.kevin.ceep.ui.viewModel.factory.TrabalhoProducaoViewModelFactory;
 
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
-public class ListaTrabalhosProducaoFragment extends Fragment {
-    private FragmentListaTrabalhosProducaoBinding binding;
+public class ListaTrabalhosProducaoFragment
+        extends BaseFragment<FragmentListaTrabalhosProducaoBinding>
+        implements MenuProvider {
     private ListaTrabalhoProducaoAdapter trabalhoAdapter;
     private RecyclerView recyclerView;
     private ArrayList<TrabalhoProducao> trabalhos, trabalhosFiltrados;
-    private String personagemId;
+    private String idPersonagem, textoFiltro;
     private SwipeRefreshLayout swipeRefreshLayout;
     private ProgressBar indicadorProgresso;
     private ChipGroup grupoChipsEstados;
     private ImageView iconeListaVazia;
     private TextView txtListaVazia;
+    private PersonagemViewModel personagemViewModel;
     private TrabalhoProducaoViewModel trabalhoProducaoViewModel;
+    private EstadoAppViewModel estadoAppViewModel;
 
     public ListaTrabalhosProducaoFragment() {
     }
+
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        recebeDadosIntent();
+    protected FragmentListaTrabalhosProducaoBinding inflateBinding(
+            LayoutInflater inflater,
+            ViewGroup container) {
+        return FragmentListaTrabalhosProducaoBinding.inflate(
+                inflater,
+                container,
+                false
+        );
     }
 
-    @SuppressLint("ResourceType")
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        binding = FragmentListaTrabalhosProducaoBinding.inflate(inflater, container, false);
-        return binding.getRoot();
-    }
-
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        requireActivity().addMenuProvider(
+                this,
+                getViewLifecycleOwner(),
+                androidx.lifecycle.Lifecycle.State.RESUMED
+        );
+        FirebaseUser usuarioID = FirebaseAuth.getInstance().getCurrentUser();
+        if (usuarioID == null) {
+            NavDirections acao = ListaTrabalhosProducaoFragmentDirections.vaiParaSlashScreen();
+            Navigation.findNavController(binding.getRoot()).navigate(acao);
+            return;
+        }
         inicializaComponentes();
+        configuraComponentesVisuais();
         configuraRecyclerView();
         configuraSwipeRefreshLayout();
         configuraBotaoInsereTrabalho();
@@ -83,11 +107,76 @@ public class ListaTrabalhosProducaoFragment extends Fragment {
         configuraChipSelecionado();
     }
 
+    private void configuraComponentesVisuais() {
+        ComponentesVisuais componentesVisuais = new ComponentesVisuais();
+        componentesVisuais.appBar = true;
+        componentesVisuais.itemMenuBusca = true;
+        componentesVisuais.menuNavegacaoLateral = true;
+        componentesVisuais.menuNavegacaoInferior = true;
+        estadoAppViewModel.componentes.setValue(componentesVisuais);
+    }
+
+    @Override
+    public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+
+    }
+
+    @Override
+    public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+        if (menuItem.getItemId() == R.id.itemMenuBusca) {
+            configuraComportamentoBuscaPorTexto(menuItem);
+            return true;
+        }
+        return false;
+    }
+
+    private void configuraComportamentoBuscaPorTexto(@NonNull MenuItem menuItem) {
+        SearchView busca = (SearchView) menuItem.getActionView();
+        assert busca != null;
+        busca.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String texto) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    textoFiltro = texto;
+                    filtroLista();
+                    mostraListaFiltrada();
+                }
+                return false;
+            }
+        });
+    }
+
+    private void mostraListaFiltrada() {
+        if (trabalhosFiltrados.isEmpty()) {
+            iconeListaVazia.setVisibility(VISIBLE);
+            txtListaVazia.setVisibility(VISIBLE);
+            trabalhoAdapter.limpaLista();
+            return;
+        }
+        txtListaVazia.setVisibility(GONE);
+        iconeListaVazia.setVisibility(GONE);
+        trabalhoAdapter.atualiza(trabalhosFiltrados);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void filtroLista() {
+        if (textoFiltro.isEmpty()) return;
+        trabalhosFiltrados = (ArrayList<TrabalhoProducao>) trabalhosFiltrados.stream().filter(trabalho -> stringContemString(trabalho.getNome(), textoFiltro)).collect(Collectors.toList());
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private void configuraChipSelecionado() {
         grupoChipsEstados.setOnCheckedStateChangeListener((group, checkedId) -> filtraListaPorEstado(checkedId.get(0)));
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private void filtraListaPorEstado(int checkedId) {
+        Log.d("trabalhoProducao", "filtraListaPorEstado: " + checkedId);
         int estado = -1;
         switch (checkedId){
             case (R.id.chipFiltroTodos):
@@ -102,42 +191,35 @@ public class ListaTrabalhosProducaoFragment extends Fragment {
                 estado = 2;
                 break;
         }
-        trabalhosFiltrados = filtroListaChip(estado);
+        filtroListaChip(estado);
+        filtroLista();
         if (trabalhosFiltrados.isEmpty()) {
             trabalhoAdapter.limpaLista();
             iconeListaVazia.setVisibility(View.VISIBLE);
             txtListaVazia.setVisibility(View.VISIBLE);
-        } else {
-            iconeListaVazia.setVisibility(View.GONE);
-            txtListaVazia.setVisibility(View.GONE);
-            trabalhoAdapter.atualiza(trabalhosFiltrados);
+            return;
         }
+        iconeListaVazia.setVisibility(View.GONE);
+        txtListaVazia.setVisibility(View.GONE);
+        trabalhoAdapter.atualiza(trabalhosFiltrados);
     }
-
-    private void recebeDadosIntent() {
-        Bundle dadosRecebidos = getArguments();
-        if (dadosRecebidos != null) {
-            if (dadosRecebidos.containsKey(CHAVE_PERSONAGEM)){
-                personagemId = dadosRecebidos.getString(CHAVE_PERSONAGEM);
-                if (personagemId != null) {
-                    TrabalhoProducaoViewModelFactory trabalhoProducaoViewModelFactory = new TrabalhoProducaoViewModelFactory(new TrabalhoProducaoRepository(personagemId));
-                    trabalhoProducaoViewModel = new ViewModelProvider(this, trabalhoProducaoViewModelFactory).get(TrabalhoProducaoViewModel.class);
-                }
-            }
-        }
-    }
-    private ArrayList<TrabalhoProducao> filtroListaChip(int estado) {
-        ArrayList<TrabalhoProducao> listaFiltrada = new ArrayList<>();
+    private void filtroListaChip(int estado) {
+        Log.d("trabalhoProducao", "Estado: " + estado);
+        trabalhosFiltrados.clear();
+        Log.d("trabalhoProducao", "Limpou a lista de trabalhos filtrados");
         if (estado == -1){
-            listaFiltrada = (ArrayList<TrabalhoProducao>) trabalhos.clone();
-        }else {
-            for (TrabalhoProducao item : trabalhos) {
-                if (item.getEstado() == estado) {
-                    listaFiltrada.add(item);
-                }
+            Log.d("trabalhoProducao", "Estado é igual a -1, clonando lista de trabalhos");
+            trabalhosFiltrados = (ArrayList<TrabalhoProducao>) trabalhos.clone();
+            return;
+        }
+        Log.d("trabalhoProducao", "Tamanho da lista trabalhos: " + trabalhos.size());
+        for (TrabalhoProducao item : trabalhos) {
+            if (item.getEstado() == estado) {
+                Log.d("trabalhoProducao", "Item inserido na lista filtrada: " + item.getId());
+                trabalhosFiltrados.add(item);
+                Log.d("trabalhoProducao", "Tamanho da lista filtrada: " + trabalhosFiltrados.size());
             }
         }
-        return listaFiltrada;
     }
     private void configuraDeslizeItem() {
         ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.RIGHT) {
@@ -153,18 +235,23 @@ public class ListaTrabalhosProducaoFragment extends Fragment {
                 if (trabalhoAdapter != null) {
                     TrabalhoProducao trabalhoremovido = trabalhosFiltrados.get(itemPosicao);
                     trabalhoAdapter.remove(itemPosicao);
+                    trabalhosFiltrados.remove(trabalhoremovido);
                     Snackbar snackbarDesfazer = Snackbar.make(binding.getRoot(), trabalhoremovido.getNome()+ " excluido", Snackbar.LENGTH_LONG);
                     snackbarDesfazer.addCallback(new Snackbar.Callback(){
                         @Override
                         public void onDismissed(Snackbar transientBottomBar, int event) {
                             super.onDismissed(transientBottomBar, event);
                             if (event != DISMISS_EVENT_ACTION){
-                                removeTrabalhoDoBanco(trabalhoremovido);
+                                removeTrabalhoProducao(trabalhoremovido);
                                 removeTrabalhoDaLista(trabalhoremovido);
                             }
                         }
                     });
-                    snackbarDesfazer.setAction(getString(R.string.stringDesfazer), v -> trabalhoAdapter.adiciona(trabalhoremovido, itemPosicao));
+                    snackbarDesfazer.setAnchorView(binding.floatingActionButton);
+                    snackbarDesfazer.setAction(getString(R.string.stringDesfazer), v -> {
+                        trabalhoAdapter.adiciona(trabalhoremovido, itemPosicao);
+                        trabalhosFiltrados.add(itemPosicao, trabalhoremovido);
+                    });
                     snackbarDesfazer.show();
                 }
             }
@@ -177,39 +264,53 @@ public class ListaTrabalhosProducaoFragment extends Fragment {
         trabalhos.remove(trabalhoremovido);
     }
 
-    private void removeTrabalhoDoBanco(TrabalhoProducao trabalhoRemovido) {
-        trabalhoProducaoViewModel.deletaTrabalhoProducao(trabalhoRemovido).observe(this, resultadoRemoveTrabalho -> {
-            if (resultadoRemoveTrabalho.getErro() != null) {
-                Snackbar.make(binding.getRoot(), "Erro: "+resultadoRemoveTrabalho.getErro(), Snackbar.LENGTH_LONG).show();
-            }
+    private void removeTrabalhoProducao(TrabalhoProducao trabalho) {
+        trabalhoProducaoViewModel.getRemocaoResultado().observe(getViewLifecycleOwner(), resultadoRemoveTrabalho -> {
+            if (resultadoRemoveTrabalho.getErro() == null) return;
+            mostraMensagemAncorada("Erro: "+ resultadoRemoveTrabalho.getErro(), binding.floatingActionButton);
         });
+        trabalhoProducaoViewModel.removeTrabalhoProducao(trabalho);
     }
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private void configuraSwipeRefreshLayout() {
-        swipeRefreshLayout.setOnRefreshListener(() -> {
-            if (personagemId != null){
-                pegaTodosTrabalhos();
-            }
-        });
+        swipeRefreshLayout.setOnRefreshListener(() -> personagemViewModel.pegaPersonagemSelecionado().observe(getViewLifecycleOwner(), personagemSelecionado -> {
+            if (personagemSelecionado == null) return;
+            idPersonagem = personagemSelecionado.getId();
+            recuperaTrabalhosProducao();
+        }));
     }
     private void configuraBotaoInsereTrabalho() {
-        binding.floatingActionButton.setOnClickListener(v -> vaiParaListaNovaProducaoActivity());
-    }
-    private void vaiParaListaNovaProducaoActivity() {
-        Intent iniciaVaiParaListaNovaProducaoActivity =
-                new Intent(getContext(), ListaNovaProducaoActivity.class);
-        iniciaVaiParaListaNovaProducaoActivity.putExtra(CHAVE_PERSONAGEM, personagemId);
-        startActivity(iniciaVaiParaListaNovaProducaoActivity);
+        binding.floatingActionButton.setOnClickListener(v -> {
+            personagemViewModel.pegaPersonagemSelecionado().observe(getViewLifecycleOwner(), personagemSelecionado -> {
+                if (personagemSelecionado == null) return;
+                idPersonagem = personagemSelecionado.getId();
+            });
+            if (idPersonagem.isEmpty()) {
+                mostraMensagemAncorada("Selecione um personagem para continuar", binding.floatingActionButton);
+                return;
+            }
+            VaiParaListaTrabalhos acao = ListaTrabalhosProducaoFragmentDirections.vaiParaListaTrabalhos(idPersonagem);
+            acao.setRequisicao(CODIGO_REQUISICAO_INSERE_TRABALHO_PRODUCAO);
+            Navigation.findNavController(v).navigate(acao);
+        });
     }
 
     private void inicializaComponentes() {
+        idPersonagem = "";
+        textoFiltro = "";
         trabalhos = new ArrayList<>();
+        trabalhosFiltrados = new ArrayList<>();
         recyclerView = binding.listaTrabalhoRecyclerView;
         swipeRefreshLayout = binding.swipeRefreshLayoutTrabalhos;
         indicadorProgresso = binding.indicadorProgressoListaTrabalhosFragment;
         grupoChipsEstados = binding.chipGrupId;
         iconeListaVazia = binding.iconeVazia;
         txtListaVazia = binding.txtListaVazia;
+        PersonagemViewModelFactory personagemViewModelFactory = new PersonagemViewModelFactory(PersonagemRepository.getInstance());
+        personagemViewModel = new ViewModelProvider(requireActivity(), personagemViewModelFactory).get(PersonagemViewModel.class);
+        estadoAppViewModel = new ViewModelProvider(requireActivity()).get(EstadoAppViewModel.class);
     }
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private void atualizaListaTrabalho() {
         int chipId = grupoChipsEstados.getCheckedChipId();
         filtraListaPorEstado(chipId);
@@ -222,61 +323,60 @@ public class ListaTrabalhosProducaoFragment extends Fragment {
     private void configuraAdapter(RecyclerView listaTrabalhos) {
         trabalhoAdapter = new ListaTrabalhoProducaoAdapter(getContext(), trabalhos);
         listaTrabalhos.setAdapter(trabalhoAdapter);
-        trabalhoAdapter.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(Trabalho trabalho, int adapterPosition) {
-                vaiParaTrabalhoEspecificoActivity(trabalho);
-            }
+        trabalhoAdapter.setOnItemClickListener(this::vaiParaTrabalhoEspecificoActivity);
+    }
+    private void vaiParaTrabalhoEspecificoActivity(TrabalhoProducao trabalho) {
+         VaiParaTrabalhoEspecifico acao = ListaTrabalhosProducaoFragmentDirections.vaiParaTrabalhoEspecifico(idPersonagem);
+         acao.setTrabalhoProducao(trabalho);
+         acao.setCodigoRequisicao(CODIGO_REQUISICAO_ALTERA_TRABALHO_PRODUCAO);
+         Navigation.findNavController(binding.getRoot()).navigate(acao);
+    }
 
-            @Override
-            public void onItemClick(ListaTrabalhoEspecificoAdapter trabalhoEspecificoAdapter) {
-
-            }
-
-            @Override
-            public void onItemClick(TrabalhoEstoque trabalhoEstoque, int adapterPosition, int botaoId) {
-
-            }
-
-            @Override
-            public void onItemClick(ProdutoVendido produtoVendido) {
-
-            }
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    @Override
+    public void onResume() {
+        super.onResume();
+        personagemViewModel.pegaPersonagemSelecionado().observe(getViewLifecycleOwner(), personagemSelecionado -> {
+            if (personagemSelecionado == null) return;
+            idPersonagem = personagemSelecionado.getId();
+            TrabalhoProducaoViewModelFactory trabalhoProducaoViewModelFactory = new TrabalhoProducaoViewModelFactory(idPersonagem);
+            trabalhoProducaoViewModel = new ViewModelProvider(this, trabalhoProducaoViewModelFactory).get(idPersonagem, TrabalhoProducaoViewModel.class);
+            recuperaTrabalhosProducao();
         });
     }
-    private void vaiParaTrabalhoEspecificoActivity(Trabalho trabalho) {
-        Intent iniciaTrabalhoEspecificoActivity=
-                new Intent(getActivity(), TrabalhoEspecificoActivity.class);
-        iniciaTrabalhoEspecificoActivity.putExtra(CHAVE_TRABALHO, CODIGO_REQUISICAO_ALTERA_TRABALHO_PRODUCAO);
-        iniciaTrabalhoEspecificoActivity.putExtra(CHAVE_NOME_TRABALHO, trabalho);
-        iniciaTrabalhoEspecificoActivity.putExtra(CHAVE_PERSONAGEM, personagemId);
-        startActivity(iniciaTrabalhoEspecificoActivity);
-    }
-    private void pegaTodosTrabalhos() {
-        trabalhoProducaoViewModel.pegaTodosTrabalhosProducao().observe(getViewLifecycleOwner(), resultadoTodosTrabalhos -> {
-            if (resultadoTodosTrabalhos.getDado() != null) {
-                trabalhos = resultadoTodosTrabalhos.getDado();
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void recuperaTrabalhosProducao() {
+        trabalhos.clear();
+        trabalhoProducaoViewModel.getTrabalhosProducao().observe(getViewLifecycleOwner(), resultadoTrabalhosRecuperados -> {
+            if (resultadoTrabalhosRecuperados.getDado() != null) {
+                trabalhos = resultadoTrabalhosRecuperados.getDado();
+                trabalhosFiltrados= (ArrayList<TrabalhoProducao>) trabalhos.clone();
                 indicadorProgresso.setVisibility(View.GONE);
                 swipeRefreshLayout.setRefreshing(false);
                 atualizaListaTrabalho();
             }
-            if (resultadoTodosTrabalhos.getErro() != null) {
-                Snackbar.make(binding.getRoot(), "Erro: "+resultadoTodosTrabalhos.getErro(), Snackbar.LENGTH_LONG).show();
-            }
+            if (resultadoTrabalhosRecuperados.getErro() == null) return;
+            mostraMensagemAncorada(resultadoTrabalhosRecuperados.getErro(), binding.floatingActionButton);
         });
+        trabalhoProducaoViewModel.recuperaTrabalhosProducao();
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        if (personagemId != null){
-            pegaTodosTrabalhos();
-        }
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onDestroyView() {
+        super.onDestroyView();
+        removeOuvinteProducao();
+        removeOuvintePersonagem();
         binding = null;
+    }
+
+    private void removeOuvintePersonagem() {
+        if (personagemViewModel == null) return;
+        personagemViewModel.removeOuvinte();
+    }
+
+    private void removeOuvinteProducao() {
+        if (trabalhoProducaoViewModel == null) return;
+        trabalhoProducaoViewModel.removeOuvinte();
     }
 }

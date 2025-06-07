@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/itemCardViewProdutoVendido"
+    style="@style/card">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/itemNomeTrabalhoVendido"
+            style="@style/txtTituloCard"
+            android:gravity="start"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Nome" />
+
+        <TextView
+            android:id="@+id/itemDataTrabalhoVendido"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:paddingTop="8dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="@+id/itemNomeTrabalhoVendido"
+            app:layout_constraintStart_toStartOf="@id/itemNomeTrabalhoVendido"
+            app:layout_constraintTop_toBottomOf="@id/itemNomeTrabalhoVendido"
+            tools:text="Data" />
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/linearLayoutItemProdutoVendido"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintStart_toStartOf="@id/itemDataTrabalhoVendido"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/itemDataTrabalhoVendido"
+            app:layout_constraintTop_toBottomOf="@id/itemDataTrabalhoVendido">
+
+            <TextView
+                android:id="@+id/itemValorTrabalhoVendido"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="8dp"
+                android:textSize="20sp"
+                tools:text="Valor" />
+
+            <TextView
+                android:id="@+id/itemQuantidadeTrabalhoVendido"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:textSize="20sp"
+                android:padding="8dp"
+                android:layout_marginEnd="8dp"
+                tools:text="Quantidade" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>

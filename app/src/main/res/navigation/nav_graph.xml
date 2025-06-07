@@ -5,52 +5,298 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/listaTrabalhosProducao">
 
-    <fragment
-        android:id="@+id/listaTrabalhosProducao"
-        android:name="com.kevin.ceep.ui.fragment.ListaTrabalhosProducaoFragment"
-        android:label="Lista de produtos"
-        tools:layout="@layout/fragment_lista_trabalhos_producao">
-        <action
-            android:id="@+id/action_listaTrabalhosProducaoFragment_to_listaEstoqueFragment"
-            app:destination="@id/listaEstoque" />
-        <argument
-            android:name="CHAVE_PERSONAGEM"
-            app:argType="string" />
-    </fragment>
-    <fragment
-        android:id="@+id/listaEstoque"
-        android:name="com.kevin.ceep.ui.fragment.ListaEstoqueFragment"
-        android:label="Estoque"
-        tools:layout="@layout/fragment_lista_estoque">
-        <action
-            android:id="@+id/action_listaEstoqueFragment_to_listaProdutosVendidosFragment"
-            app:destination="@id/listaProdutosVendidos" />
-        <action
-            android:id="@+id/action_listaEstoqueFragment_to_listaTrabalhosProducaoFragment"
-            app:destination="@id/listaTrabalhosProducao" />
-        <argument
-            android:name="CHAVE_PERSONAGEM"
-            app:argType="string" />
-    </fragment>
-    <fragment
-        android:id="@+id/listaProdutosVendidos"
-        android:name="com.kevin.ceep.ui.fragment.ListaProdutosVendidosFragment"
-        android:label="Produtos vendidos"
-        tools:layout="@layout/fragment_lista_produtos_vendidos">
-        <action
-            android:id="@+id/action_listaProdutosVendidosFragment_to_listaProfissoesFragment"
-            app:destination="@id/listaProfissoes" />
-        <action
-            android:id="@+id/action_listaProdutosVendidosFragment_to_listaEstoqueFragment"
-            app:destination="@id/listaEstoque" />
-    </fragment>
+    <action
+        android:id="@+id/vai_para_lista_trabalhos_producao"
+        app:destination="@+id/listaTrabalhosProducao"
+        app:enterAnim="@animator/nav_default_enter_anim"
+        app:exitAnim="@animator/nav_default_exit_anim"
+        app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+        app:popExitAnim="@animator/nav_default_pop_exit_anim"
+        app:popUpTo="@id/listaTrabalhosProducao"
+        app:popUpToInclusive="true" />
+
+    <action
+        android:id="@+id/vai_para_lista_trabalhos_vendidos"
+        app:destination="@+id/listaTrabalhosVendidos"
+        app:enterAnim="@animator/nav_default_enter_anim"
+        app:exitAnim="@animator/nav_default_exit_anim"
+        app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+        app:popExitAnim="@animator/nav_default_pop_exit_anim"
+        app:popUpTo="@id/listaTrabalhosProducao"
+        app:popUpToInclusive="false" />
+
+    <action
+        android:id="@+id/vai_para_lista_profissoes"
+        app:destination="@+id/listaProfissoes"
+        app:enterAnim="@animator/nav_default_enter_anim"
+        app:exitAnim="@animator/nav_default_exit_anim"
+        app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+        app:popExitAnim="@animator/nav_default_pop_exit_anim"
+        app:popUpTo="@id/listaProfissoes"
+        app:popUpToInclusive="true" />
+
+    <action
+        android:id="@+id/vai_para_lista_trabalhos_estoque"
+        app:destination="@+id/listaTrabalhosEstoque"
+        app:enterAnim="@animator/nav_default_enter_anim"
+        app:exitAnim="@animator/nav_default_exit_anim"
+        app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+        app:popExitAnim="@animator/nav_default_pop_exit_anim"
+        app:popUpTo="@id/listaTrabalhosProducao"
+        app:popUpToInclusive="false" />
+
+    <action
+        android:id="@+id/vaiParaSlashScreen"
+        app:destination="@+id/splashscreenFragment"
+        app:enterAnim="@animator/nav_default_enter_anim"
+        app:exitAnim="@animator/nav_default_exit_anim"
+        app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+        app:popExitAnim="@animator/nav_default_pop_exit_anim"
+        app:popUpTo="@id/nav_graph"
+        app:popUpToInclusive="true" />
     <fragment
         android:id="@+id/listaProfissoes"
         android:name="com.kevin.ceep.ui.fragment.ListaProfissoesFragment"
-        android:label="Profissões"
-        tools:layout="@layout/fragment_lista_profissoes">
+        android:label="@string/stringProfissoes"
+        tools:layout="@layout/fragment_lista_profissoes" />
+    <fragment
+        android:id="@+id/listaTrabalhosEstoque"
+        android:name="com.kevin.ceep.ui.fragment.ListaEstoqueFragment"
+        android:label="@string/estoque"
+        tools:layout="@layout/fragment_lista_trabalhos_estoque" >
         <action
-            android:id="@+id/action_listaProfissoesFragment_to_listaProdutosVendidosFragment"
-            app:destination="@id/listaProdutosVendidos" />
+            android:id="@+id/vai_de_estoque_para_trabalhos"
+            app:destination="@id/listaTrabalhosInsereNovoTrabalhoFragment"
+            app:enterAnim="@animator/nav_default_enter_anim"
+            app:exitAnim="@animator/nav_default_exit_anim"
+            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+            app:popExitAnim="@animator/nav_default_pop_exit_anim" />
     </fragment>
+    <fragment
+        android:id="@+id/listaTrabalhosVendidos"
+        android:name="com.kevin.ceep.ui.fragment.ListaTrabalhosVendidosFragment"
+        android:label="@string/stringVendas"
+        tools:layout="@layout/fragment_lista_trabalhos_vendidos" >
+        <action
+            android:id="@+id/vaiDeTrabalhosVendidosParaDetalhesTrabalhoVendido"
+            app:destination="@id/detalhesTrabalhoVendidoFragment"
+            app:enterAnim="@animator/nav_default_enter_anim"
+            app:exitAnim="@animator/nav_default_exit_anim"
+            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+            app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/vai_de_vendas_para_trabalhos"
+            app:destination="@id/listaTrabalhosInsereNovoTrabalhoFragment"
+            app:enterAnim="@animator/nav_default_enter_anim"
+            app:exitAnim="@animator/nav_default_exit_anim"
+            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+            app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/listaTrabalhosProducao"
+        android:name="com.kevin.ceep.ui.fragment.ListaTrabalhosProducaoFragment"
+        android:label="@string/stringProducao"
+        tools:layout="@layout/fragment_lista_trabalhos_producao" >
+        <action
+            android:id="@+id/vai_para_lista_trabalhos"
+            app:destination="@id/listaTrabalhosInsereNovoTrabalhoFragment"
+            app:enterAnim="@animator/nav_default_enter_anim"
+            app:exitAnim="@animator/nav_default_exit_anim"
+            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+            app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/vai_para_trabalho_especifico"
+            app:destination="@id/trabalhoEspecificoFragment"
+            app:enterAnim="@animator/nav_default_enter_anim"
+            app:exitAnim="@animator/nav_default_exit_anim"
+            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+            app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/listaTrabalhosInsereNovoTrabalhoFragment"
+        android:name="com.kevin.ceep.ui.fragment.ListaTrabalhosInsereNovoTrabalhoFragment"
+        android:label="Trabalhos"
+        tools:layout="@layout/fragment_lista_trabalhos_insere_novo_trabalho">
+
+        <argument
+            android:name="idPersonagem"
+            app:argType="string" />
+        <action
+            android:id="@+id/vai_para_confirma_trabalho"
+            app:destination="@id/confirmaTrabalhoFragment"
+            app:enterAnim="@animator/nav_default_enter_anim"
+            app:exitAnim="@animator/nav_default_exit_anim"
+            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+            app:popExitAnim="@animator/nav_default_pop_exit_anim"
+            app:popUpTo="@id/listaTrabalhosInsereNovoTrabalhoFragment"
+            app:popUpToInclusive="true" />
+        <argument
+            android:name="requisicao"
+            app:argType="integer"
+            android:defaultValue="-1" />
+        <action
+            android:id="@+id/vai_de_trabalhos_para_estoque"
+            app:destination="@id/listaTrabalhosEstoque"
+            app:enterAnim="@animator/nav_default_enter_anim"
+            app:exitAnim="@animator/nav_default_exit_anim"
+            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+            app:popExitAnim="@animator/nav_default_pop_exit_anim"
+            app:popUpTo="@id/listaTrabalhosInsereNovoTrabalhoFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/vai_de_Trabalhos_para_detalhes_venda"
+            app:destination="@id/detalhesTrabalhoVendidoFragment"
+            app:enterAnim="@animator/nav_default_enter_anim"
+            app:exitAnim="@animator/nav_default_exit_anim"
+            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+            app:popExitAnim="@animator/nav_default_pop_exit_anim"
+            app:popUpTo="@id/listaTrabalhosInsereNovoTrabalhoFragment"
+            app:popUpToInclusive="true"  />
+    </fragment>
+    <fragment
+        android:id="@+id/confirmaTrabalhoFragment"
+        android:name="com.kevin.ceep.ui.fragment.ConfirmaTrabalhoFragment"
+        android:label="Detalhes nova produção"
+        tools:layout="@layout/fragment_confirma_trabalho">
+        <argument
+            android:name="idPersonagem"
+            app:argType="string" />
+        <argument
+            android:name="trabalho"
+            android:defaultValue="@null"
+            app:argType="com.kevin.ceep.model.Trabalho"
+            app:nullable="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/trabalhoEspecificoFragment"
+        android:name="com.kevin.ceep.ui.fragment.TrabalhoEspecificoFragment"
+        android:label="Detalhes"
+        tools:layout="@layout/fragment_trabalho_especifico">
+        <argument
+            android:name="codigoRequisicao"
+            android:defaultValue="-1"
+            app:argType="integer" />
+        <argument
+            android:name="idPersonagem"
+            app:argType="string"
+            app:nullable="true" />
+        <argument
+            android:name="trabalho"
+            android:defaultValue="@null"
+            app:argType="com.kevin.ceep.model.Trabalho"
+            app:nullable="true" />
+        <argument
+            android:name="trabalhoProducao"
+            android:defaultValue="@null"
+            app:argType="com.kevin.ceep.model.TrabalhoProducao"
+            app:nullable="true" />
+        <action
+            android:id="@+id/vaiDeTrabalhoEspecficoParaTrabalhos"
+            app:destination="@id/nav_trabalhos"
+            app:enterAnim="@animator/nav_default_enter_anim"
+            app:exitAnim="@animator/nav_default_exit_anim"
+            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+            app:popExitAnim="@animator/nav_default_pop_exit_anim"
+            app:popUpTo="@id/nav_trabalhos"
+            app:popUpToInclusive="false" />
+    </fragment>
+    <fragment
+        android:id="@+id/atributosPersonagem"
+        android:name="com.kevin.ceep.ui.fragment.ModificaPersonagemFragment"
+        android:label="Atributos"
+        tools:layout="@layout/fragment_atributos_personagem" >
+    </fragment>
+    <fragment
+        android:id="@+id/nav_trabalhos"
+        android:name="com.kevin.ceep.ui.fragment.ListaTodosTrabalhosFragment"
+        android:label="@string/trabalhos"
+        tools:layout="@layout/fragment_lista_todos_trabalhos">
+        <action
+            android:id="@+id/action_listaTodosTrabalhosFragment_to_trabalhoEspecificoFragment"
+            app:destination="@id/trabalhoEspecificoFragment"
+            app:enterAnim="@animator/nav_default_enter_anim"
+            app:exitAnim="@animator/nav_default_exit_anim"
+            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+            app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/entrarFragment"
+        android:name="com.kevin.ceep.ui.fragment.EntrarUsuarioFragment"
+        android:label="Entrar"
+        tools:layout="@layout/fragment_entrar_usuario">
+        <action
+            android:id="@+id/vai_de_entrar_para_recuperar_senha"
+            app:destination="@id/recuperarSenhaFragment"
+            app:enterAnim="@animator/nav_default_enter_anim"
+            app:exitAnim="@animator/nav_default_exit_anim"
+            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+            app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/vai_de_entrar_para_cadastrar"
+            app:destination="@id/cadastrarUsuarioFragment"
+            app:enterAnim="@animator/nav_default_enter_anim"
+            app:exitAnim="@animator/nav_default_exit_anim"
+            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+            app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/cadastrarUsuarioFragment"
+        android:name="com.kevin.ceep.ui.fragment.CadastrarUsuarioFragment"
+        android:label="fragment_cadastrar_usuario"
+        tools:layout="@layout/fragment_cadastrar_usuario" />
+    <fragment
+        android:id="@+id/recuperarSenhaFragment"
+        android:name="com.kevin.ceep.ui.fragment.RecuperarSenhaFragment"
+        android:label="fragment_recuperar_senha"
+        tools:layout="@layout/fragment_recuperar_senha" />
+    <fragment
+        android:id="@+id/splashscreenFragment"
+        android:name="com.kevin.ceep.ui.fragment.SplashscreenFragment"
+        android:label="activity_splashscreen"
+        tools:layout="@layout/fragment_splashscreen" >
+        <action
+            android:id="@+id/vaiDeSplashscreenParaEntrar"
+            app:destination="@id/entrarFragment"
+            app:enterAnim="@animator/nav_default_enter_anim"
+            app:exitAnim="@animator/nav_default_exit_anim"
+            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+            app:popExitAnim="@animator/nav_default_pop_exit_anim"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/detalhesTrabalhoVendidoFragment"
+        android:name="com.kevin.ceep.ui.fragment.DetalhesTrabalhoVendidoFragment"
+        android:label="Detalhes da venda"
+        tools:layout="@layout/fragment_detalhes_trabalho_vendido" >
+        <action
+            android:id="@+id/vaiDeDetalhesTrabalhoVendidoParaTrabalhosVendidos"
+            app:destination="@id/listaTrabalhosVendidos"
+            app:enterAnim="@animator/nav_default_enter_anim"
+            app:exitAnim="@animator/nav_default_exit_anim"
+            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+            app:popExitAnim="@animator/nav_default_pop_exit_anim"
+            app:popUpTo="@id/listaTrabalhosVendidos"
+            app:popUpToInclusive="true" />
+        <argument
+            android:name="trabalhoVendido"
+            app:argType="com.kevin.ceep.model.TrabalhoVendido" />
+        <argument
+            android:name="idPersonagem"
+            app:argType="string" />
+        <argument
+            android:name="codigoRequisicao"
+            android:defaultValue="-1"
+            app:argType="integer" />
+    </fragment>
+    <fragment
+        android:id="@+id/inserePersonagem"
+        android:name="com.kevin.ceep.ui.fragment.InserePersonagemFragment"
+        android:label="Personagem"
+        tools:layout="@layout/fragment_atributos_personagem"/>
+    <fragment
+        android:id="@+id/recursosFragment"
+        android:name="com.kevin.ceep.ui.fragment.RecursosFragment"
+        android:label="@string/stringRecursos"
+        tools:layout="@layout/fragment_recursos" />
 </navigation>
