@@ -40,11 +40,10 @@ import com.kevin.gestorproducao.repository.TrabalhoEstoqueRepository;
 import com.kevin.gestorproducao.repository.TrabalhoProducaoRepository;
 import com.kevin.gestorproducao.repository.TrabalhoRepository;
 import com.kevin.gestorproducao.rules.exception.ProducaoException;
-import com.kevin.gestorproducao.service.ConsumoMateriaisService;
 import com.kevin.gestorproducao.service.PlanejamentoProducaoService;
-import com.kevin.gestorproducao.service.ProducaoEstoqueService;
 import com.kevin.gestorproducao.service.ProducaoFluxoService;
-import com.kevin.gestorproducao.service.ProfissaoPersonagemService;
+import com.kevin.gestorproducao.service.ProducaoServicosFactory;
+import com.kevin.gestorproducao.service.ServicosProducaoPersonagem;
 import com.kevin.gestorproducao.ui.fragment.ListaTrabalhosProducaoFragmentDirections.VaiDeProducaoParaFiltro;
 import com.kevin.gestorproducao.ui.recyclerview.adapter.ListaTrabalhoProducaoAdapter;
 import com.kevin.gestorproducao.ui.viewModel.ComponentesVisuais;
@@ -206,26 +205,7 @@ public class ListaTrabalhosProducaoFragment
 
                 producaoViewModel.setIdPersonagem(personagem.getId());
 
-                ConsumoMateriaisService consumoMateriaisService = new ConsumoMateriaisService(
-                    trabalhoRepo,
-                    estoqueRepo,
-                    personagem.getId(),
-                    context
-                );
-
-                ProducaoEstoqueService producaoEstoqueService = new ProducaoEstoqueService(
-                    trabalhoRepo,
-                    estoqueRepo,
-                    personagem.getId(),
-                    context
-                );
-
-                ProfissaoPersonagemService profissaoPersonagemService = new ProfissaoPersonagemService(
-                    personagem.getId(),
-                    profissaoPersonagemRepo
-                );
-
-                planejamentoProducaoService = new PlanejamentoProducaoService(
+                ServicosProducaoPersonagem servicos = ProducaoServicosFactory.cria(
                     trabalhoRepo,
                     estoqueRepo,
                     producaoRepo,
@@ -234,13 +214,8 @@ public class ListaTrabalhosProducaoFragment
                     context
                 );
 
-                producaoFluxoService = new ProducaoFluxoService(
-                    consumoMateriaisService,
-                    producaoEstoqueService,
-                    profissaoPersonagemService,
-                    planejamentoProducaoService
-                );
-
+                planejamentoProducaoService = servicos.getPlanejamentoProducaoService();
+                producaoFluxoService = servicos.getProducaoFluxoService();
             }
         );
     }
