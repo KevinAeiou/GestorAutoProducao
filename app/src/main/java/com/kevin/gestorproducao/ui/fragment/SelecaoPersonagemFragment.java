@@ -117,13 +117,23 @@ public class SelecaoPersonagemFragment extends DialogFragment {
 
     private MaterialRadioButton criaRadio(Personagem personagem) {
         MaterialRadioButton radio = new MaterialRadioButton(radioGroup.getContext());
+        radio.setId(View.generateViewId());
         radio.setText(personagem.getNome());
         radio.setTag(personagem);
+
         RadioGroup.LayoutParams layout = new RadioGroup.LayoutParams(
             RadioGroup.LayoutParams.MATCH_PARENT,
             RadioGroup.LayoutParams.WRAP_CONTENT
         );
+        layout.bottomMargin = getResources().getDimensionPixelSize(R.dimen.espacamento_item_personagem);
         radio.setLayoutParams(layout);
+
+        radio.setBackgroundResource(R.drawable.bg_item_personagem);
+        radio.setMinHeight(getResources().getDimensionPixelSize(R.dimen.altura_item_personagem));
+
+        int paddingHorizontal = getResources().getDimensionPixelSize(R.dimen.padding_item_personagem);
+        radio.setPadding(paddingHorizontal, radio.getPaddingTop(), paddingHorizontal, radio.getPaddingBottom());
+
         radio.setClickable(true);
 
         return radio;

@@ -379,6 +379,7 @@
     <string name="stringPersonagemInseridoComSucessoValor">%1$s inserido com sucesso!</string>
     <string name="stringDesconhecido">Desconhecido</string>
 
+    <string name="stringEscolhaPersonagemContinuar">Escolha o personagem para continuar</string>
     <string name="stringAlterarTema">Alterar tema</string>
     <string name="stringEscolhaOTema">Escolha o tema</string>
     <string name="stringTemaClaro">Claro</string>

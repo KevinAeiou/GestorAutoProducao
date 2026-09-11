@@ -42,6 +42,7 @@
         <item name="materialButtonStyle">@style/Widget.Material3.Button</item>
         <item name="textInputStyle">@style/txtInputLayout</item>
         <item name="android:dialogTheme">@style/CustomAlertDialogTheme</item>
+        <item name="materialAlertDialogTheme">@style/CustomAlertDialogTheme</item>
         <item name="bottomSheetDialogTheme">@style/ThemeOverlay.Material3.DayNight.BottomSheetDialog</item>
         <item name="autoCompleteTextViewStyle">@style/CustomAutoCompleteTextView</item>
         <item name="switchStyle">@style/Widget.Material3.CompoundButton.MaterialSwitch</item>
