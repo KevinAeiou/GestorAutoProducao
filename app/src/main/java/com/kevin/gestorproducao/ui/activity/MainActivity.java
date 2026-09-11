@@ -11,7 +11,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.TextView;
 
@@ -34,6 +33,7 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -45,6 +45,7 @@ import com.kevin.gestorproducao.ui.viewModel.ComponentesVisuais;
 import com.kevin.gestorproducao.ui.viewModel.EstadoAppViewModel;
 import com.kevin.gestorproducao.ui.viewModel.PersonagemViewModel;
 import com.kevin.gestorproducao.ui.viewModel.factory.ViewModelFactory;
+import com.kevin.gestorproducao.utilitario.TemaUtil;
 
 import java.util.ArrayList;
 
@@ -77,9 +78,14 @@ public class MainActivity extends AppCompatActivity {
         configuraBotaoSair();
 
         navigationView.setNavigationItemSelectedListener(item -> {
-            NavigationUI.onNavDestinationSelected(item, controlador);
-
             drawerLayout.closeDrawer(GravityCompat.START);
+
+            if (item.getItemId() == R.id.itemAlterarTema) {
+                mostraDialogoAlterarTema();
+                return true;
+            }
+
+            NavigationUI.onNavDestinationSelected(item, controlador);
             return true;
         });
 
@@ -99,6 +105,20 @@ public class MainActivity extends AppCompatActivity {
             drawerLayout.closeDrawer(GravityCompat.START);
             fazerLogout();
         });
+    }
+
+    private void mostraDialogoAlterarTema() {
+        String[] opcoes = getResources().getStringArray(R.array.arrayOpcoesTema);
+        int indiceSelecionado = TemaUtil.pegaIndiceOpcaoSelecionada(this);
+
+        new MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.stringEscolhaOTema)
+            .setSingleChoiceItems(opcoes, indiceSelecionado, (dialog, which) -> {
+                TemaUtil.salvaEAplicaTema(this, TemaUtil.pegaModoNoturnoPorIndice(which));
+                dialog.dismiss();
+            })
+            .setNegativeButton(android.R.string.cancel, null)
+            .show();
     }
 
     private void configuraTituloSelecaoPersonagem() {
@@ -271,13 +291,11 @@ public class MainActivity extends AppCompatActivity {
             navigationView.getHeaderView(0)
         );
         View header = navigationView.getHeaderView(0);
+        int headerBasePaddingTop = header.getPaddingTop();
         ViewCompat.setOnApplyWindowInsetsListener(header, (v, insets) -> {
             int topInset = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top;
 
-            ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) header.getLayoutParams();
-
-            params.topMargin = topInset;
-            header.setLayoutParams(params);
+            v.setPadding(v.getPaddingLeft(), headerBasePaddingTop + topInset, v.getPaddingRight(), v.getPaddingBottom());
 
             return insets;
         });

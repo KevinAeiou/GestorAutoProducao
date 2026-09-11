@@ -378,4 +378,15 @@
     <string name="stringVendaRemovida">Venda removida: </string>
     <string name="stringPersonagemInseridoComSucessoValor">%1$s inserido com sucesso!</string>
     <string name="stringDesconhecido">Desconhecido</string>
+
+    <string name="stringAlterarTema">Alterar tema</string>
+    <string name="stringEscolhaOTema">Escolha o tema</string>
+    <string name="stringTemaClaro">Claro</string>
+    <string name="stringTemaEscuro">Escuro</string>
+    <string name="stringTemaSistema">Automático (sistema)</string>
+    <string-array name="arrayOpcoesTema">
+        <item>@string/stringTemaClaro</item>
+        <item>@string/stringTemaEscuro</item>
+        <item>@string/stringTemaSistema</item>
+    </string-array>
 </resources>

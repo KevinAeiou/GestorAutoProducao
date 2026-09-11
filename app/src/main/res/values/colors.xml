@@ -51,4 +51,9 @@
     <color name="skeleton">#66000000</color>
     <color name="text_color">#000</color>
     <color name="ripple_color">#33000000</color>
+
+    <!-- Menu lateral -->
+    <color name="cor_texto_menu_padrao">#475569</color>
+    <color name="cor_selecao_menu">#1A115588</color>
+    <color name="cor_item_menu_selecionado">@color/cor_azul</color>
 </resources>

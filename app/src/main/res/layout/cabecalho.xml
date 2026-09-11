@@ -1,22 +1,118 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:background="@drawable/bg_cabecalho"
-    android:padding="16dp"
+    android:paddingHorizontal="20dp"
+    android:paddingTop="28dp"
+    android:paddingBottom="20dp"
     android:gravity="bottom">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="16dp">
+
+        <FrameLayout
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:background="@drawable/bg_selo_marca">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_gravity="center"
+                android:scaleType="centerCrop"
+                app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.SeloMarcaCircular"
+                android:src="@mipmap/ic_launcher"
+                android:contentDescription="@null" />
+        </FrameLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="@string/app_name"
+            android:textAllCaps="true"
+            android:textStyle="bold"
+            android:textSize="11sp"
+            android:letterSpacing="0.14"
+            android:textColor="@color/cor_texto_marca" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/txtCabecalhoNomePersonagem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="14dp"
         android:textStyle="bold"
-        android:textSize="20sp"
-        android:textColor="@color/design_default_color_on_primary"
+        android:textSize="21sp"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="@color/white"
         tools:text="Personagem"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        android:layout_marginBottom="8dp">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_marginEnd="6dp"
+                android:src="@drawable/ic_person_outline"
+                android:tint="@color/cor_texto_marca"
+                android:contentDescription="@null" />
+
+            <TextView
+                android:id="@+id/txtCabecalhoEstadoPersonagem"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:textSize="12sp"
+                android:textColor="@color/cor_texto_marca"
+                android:layout_height="wrap_content"
+                tools:text="Estado: Ativo" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_marginEnd="6dp"
+                android:src="@drawable/ic_work"
+                android:tint="@color/cor_texto_marca"
+                android:contentDescription="@null" />
+
+            <TextView
+                android:id="@+id/txtCabecalhoUsoPersonagem"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="12sp"
+                android:textColor="@color/cor_texto_marca"
+                tools:text="Uso: Ativo" />
+        </LinearLayout>
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -24,40 +120,52 @@
         android:orientation="horizontal"
         android:weightSum="2">
 
-        <TextView
-            android:id="@+id/txtCabecalhoEstadoPersonagem"
+        <LinearLayout
             android:layout_width="0dp"
-            android:layout_weight="1"
-            android:textSize="13sp"
-            android:textColor="@color/design_default_color_on_primary"
             android:layout_height="wrap_content"
-            tools:text="Estado: Ativo"
-            />
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-        <TextView
-            android:id="@+id/txtCabecalhoUsoPersonagem"
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_marginEnd="6dp"
+                android:src="@drawable/ic_producao"
+                android:contentDescription="@null" />
+
+            <TextView
+                android:id="@+id/txtCabecalhoAutoProducaoPersonagem"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:textColor="@color/cor_texto_marca"
+                tools:text="Auto Produção: Ativo"/>
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textSize="13sp"
-            android:textColor="@color/design_default_color_on_primary"
-            tools:text="Uso: Ativo"
-            />
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_marginEnd="6dp"
+                android:src="@drawable/ic_estoque"
+                android:contentDescription="@null" />
+
+            <TextView
+                android:id="@+id/txtCabecalhoEspacoProducaoPersonagem"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:textColor="@color/cor_texto_marca"
+                tools:text="Espaço: 10"/>
+        </LinearLayout>
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/txtCabecalhoAutoProducaoPersonagem"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="13sp"
-        android:textColor="@color/design_default_color_on_primary"
-        tools:text="Auto Produção: Ativo"/>
-
-    <TextView
-        android:id="@+id/txtCabecalhoEspacoProducaoPersonagem"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="13sp"
-        android:textColor="@color/design_default_color_on_primary"
-        tools:text="Espaço: 10"/>
 </LinearLayout>
