@@ -191,11 +191,16 @@ public class  TrabalhoProducaoRepository {
     }
 
     public LiveData<Resource<ArrayList<TrabalhoProducao>>> recuperaProducoes(String idPersonagem) {
-        ArrayList<TrabalhoProducao> producoes = new ArrayList<>(
-            producaoDao.recuperaProducoes(idPersonagem)
-        );
-
-        producoesEncontradas.setValue(new Resource<>(producoes, null));
+        backgroundExecutor.execute(() -> {
+            try {
+                ArrayList<TrabalhoProducao> producoes = new ArrayList<>(
+                    producaoDao.recuperaProducoes(idPersonagem)
+                );
+                producoesEncontradas.postValue(new Resource<>(producoes, null));
+            } catch (RuntimeException e) {
+                producoesEncontradas.postValue(new Resource<>(null, e.getMessage()));
+            }
+        });
 
         return producoesEncontradas;
     }

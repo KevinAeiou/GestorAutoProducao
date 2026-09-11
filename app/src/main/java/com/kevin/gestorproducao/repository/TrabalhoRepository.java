@@ -152,9 +152,14 @@ public class TrabalhoRepository {
         return liveData;
     }
     public LiveData<Resource<ArrayList<Trabalho>>> recuperaTrabalhos() {
-        ArrayList<Trabalho> trabalhos = new ArrayList<>(trabalhoDao.recuperaTrabalhos());
-
-        trabalhosEncontrados.setValue(new Resource<>(trabalhos, null));
+        backgroundExecutor.execute(() -> {
+            try {
+                ArrayList<Trabalho> trabalhos = new ArrayList<>(trabalhoDao.recuperaTrabalhos());
+                trabalhosEncontrados.postValue(new Resource<>(trabalhos, null));
+            } catch (RuntimeException e) {
+                trabalhosEncontrados.postValue(new Resource<>(null, e.getMessage()));
+            }
+        });
 
         return trabalhosEncontrados;
     }
@@ -203,9 +208,15 @@ public class TrabalhoRepository {
 
     public LiveData<Resource<ArrayList<Trabalho>>> recuperaTrabalhosNecessarios(Trabalho trabalho) {
         MutableLiveData<Resource<ArrayList<Trabalho>>> liveData = new MutableLiveData<>();
-        ArrayList<Trabalho> trabalhos = new ArrayList<>(trabalhoDao.recuperaTrabalhosNecessarios(trabalho));
 
-        liveData.setValue(new Resource<>(trabalhos, null));
+        backgroundExecutor.execute(() -> {
+            try {
+                ArrayList<Trabalho> trabalhos = new ArrayList<>(trabalhoDao.recuperaTrabalhosNecessarios(trabalho));
+                liveData.postValue(new Resource<>(trabalhos, null));
+            } catch (RuntimeException e) {
+                liveData.postValue(new Resource<>(null, e.getMessage()));
+            }
+        });
 
         return liveData;
     }

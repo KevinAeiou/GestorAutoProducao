@@ -47,9 +47,14 @@ public class PersonagemRepository {
     public LiveData<Resource<ArrayList<Personagem>>> recuperaPersonagens() {
         MutableLiveData<Resource<ArrayList<Personagem>>> personagensEncontrados = new MutableLiveData<>();
 
-        ArrayList<Personagem> personagens = new ArrayList<>(personagemDao.recuperaPersonagens());
-
-        personagensEncontrados.setValue(new Resource<>(personagens, null));
+        backgroundExecutor.execute(() -> {
+            try {
+                ArrayList<Personagem> personagens = new ArrayList<>(personagemDao.recuperaPersonagens());
+                personagensEncontrados.postValue(new Resource<>(personagens, null));
+            } catch (RuntimeException e) {
+                personagensEncontrados.postValue(new Resource<>(null, e.getMessage()));
+            }
+        });
 
         return personagensEncontrados;
     }
