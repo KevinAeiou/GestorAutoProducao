@@ -18,6 +18,10 @@ android {
 
     buildTypes {
         release {
+            // proguard-rules.pro já cobre os POJOs de model/ (reflexão do Firebase) e o
+            // MPAndroidChart. Antes de virar "true": gerar um release assinado localmente
+            // e testar manualmente (login, CRUD de personagem/trabalho/estoque/venda via
+            // Firebase, e o gráfico de XP) — não há como validar isso neste ambiente.
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
