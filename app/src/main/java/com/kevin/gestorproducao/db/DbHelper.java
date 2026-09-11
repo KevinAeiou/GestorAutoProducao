@@ -57,7 +57,7 @@ public class DbHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL(
-            "CREATE TABLE " + TABLE_TRABALHOS + " (" +
+            "CREATE TABLE IF NOT EXISTS " + TABLE_TRABALHOS + " (" +
             COLUMN_NAME_ID + " VARCHAR(30) PRIMARY KEY," +
             COLUMN_NAME_NOME + " TEXT," +
             COLUMN_NAME_NOME_PRODUCAO + " TEXT," +
@@ -70,7 +70,7 @@ public class DbHelper extends SQLiteOpenHelper {
             ")"
         );
         sqLiteDatabase.execSQL(
-            "CREATE TABLE " + TABLE_TRABALHOS_NECESSARIOS + " (" +
+            "CREATE TABLE IF NOT EXISTS " + TABLE_TRABALHOS_NECESSARIOS + " (" +
                 COLUMN_NAME_ID_TRABALHO + " VARCHAR(30)," +
                 COLUMN_TRABALHO_NECESSARIO_ID + " VARCHAR(30)," +
                 "PRIMARY KEY(" + COLUMN_NAME_ID_TRABALHO + ", " + COLUMN_TRABALHO_NECESSARIO_ID + ")," +
@@ -81,7 +81,7 @@ public class DbHelper extends SQLiteOpenHelper {
             ")"
         );
         sqLiteDatabase.execSQL(
-            "CREATE TABLE " + TABLE_PERSONAGENS + " (" +
+            "CREATE TABLE IF NOT EXISTS " + TABLE_PERSONAGENS + " (" +
                 COLUMN_NAME_ID + " VARCHAR(30) PRIMARY KEY," +
                 COLUMN_NAME_NOME + " TEXT," +
                 COLUMN_NAME_EMAIL + " TEXT," +
@@ -93,7 +93,7 @@ public class DbHelper extends SQLiteOpenHelper {
             ")"
         );
         sqLiteDatabase.execSQL(
-            "CREATE TABLE " + TABLE_TRABALHOS_PRODUCAO + " (" +
+            "CREATE TABLE IF NOT EXISTS " + TABLE_TRABALHOS_PRODUCAO + " (" +
                 COLUMN_NAME_ID + " VARCHAR(30) PRIMARY KEY," +
                 COLUMN_NAME_ID_TRABALHO + " VARCHAR(30)," +
                 COLUMN_NAME_ID_PERSONAGEM + " VARCHAR(30)," +
@@ -107,7 +107,7 @@ public class DbHelper extends SQLiteOpenHelper {
             ")"
         );
         sqLiteDatabase.execSQL(
-            "CREATE TABLE " + TABLE_ESTOQUE + " (" +
+            "CREATE TABLE IF NOT EXISTS " + TABLE_ESTOQUE + " (" +
                 COLUMN_NAME_ID + " VARCHAR(30) PRIMARY KEY," +
                 COLUMN_NAME_ID_TRABALHO + " VARCHAR(30)," +
                 COLUMN_NAME_ID_PERSONAGEM + " VARCHAR(30)," +
@@ -115,7 +115,7 @@ public class DbHelper extends SQLiteOpenHelper {
             ")"
         );
         sqLiteDatabase.execSQL(
-            "CREATE TABLE " + TABLE_TRABALHOS_VENDIDOS + " (" +
+            "CREATE TABLE IF NOT EXISTS " + TABLE_TRABALHOS_VENDIDOS + " (" +
                 COLUMN_NAME_ID + " VARCHAR(30) PRIMARY KEY," +
                 COLUMN_NAME_ID_PERSONAGEM + " VARCHAR(30), " +
                 COLUMN_NAME_ID_TRABALHO + " VARCHAR(30), " +
@@ -131,13 +131,13 @@ public class DbHelper extends SQLiteOpenHelper {
             ")"
         );
         sqLiteDatabase.execSQL(
-            "CREATE TABLE " + TABLE_PROFISSOES + " (" +
+            "CREATE TABLE IF NOT EXISTS " + TABLE_PROFISSOES + " (" +
                 COLUMN_NAME_ID + " VARCHAR(30) PRIMARY KEY," +
                 COLUMN_NAME_NOME + " TEXT" +
             ")"
         );
         sqLiteDatabase.execSQL(
-            "CREATE TABLE " + TABLE_PROFISSOES_PERSONAGEM + " (" +
+            "CREATE TABLE IF NOT EXISTS " + TABLE_PROFISSOES_PERSONAGEM + " (" +
                 COLUMN_NAME_ID + " VARCHAR(30) NOT NULL, " +
                 COLUMN_NAME_ID_PERSONAGEM + " TEXT NOT NULL, " +
                 COLUMN_NAME_EXPERIENCIA + " INTEGER, " +
@@ -151,16 +151,14 @@ public class DbHelper extends SQLiteOpenHelper {
         );
     }
 
+    // Upgrades não derrubam mais tabelas (isso apagava os dados do usuário a cada subida de
+    // versão). onCreate agora usa CREATE TABLE IF NOT EXISTS, então repeti-lo já preserva
+    // tudo até a versão 13. Uma mudança real de schema deve ganhar seu próprio passo aqui
+    // (`if (oldVersion < N) { db.execSQL("ALTER TABLE ...") }`) — nunca um DROP TABLE.
     @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_TRABALHOS);
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_PERSONAGENS);
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_TRABALHOS_PRODUCAO);
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_ESTOQUE);
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_TRABALHOS_VENDIDOS);
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_PROFISSOES);
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_PROFISSOES_PERSONAGEM);
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_TRABALHOS_NECESSARIOS);
-        onCreate(sqLiteDatabase);
+    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
+        if (oldVersion < 13) {
+            onCreate(sqLiteDatabase);
+        }
     }
 }
