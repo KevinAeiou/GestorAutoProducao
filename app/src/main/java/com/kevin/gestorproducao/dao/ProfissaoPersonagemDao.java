@@ -11,7 +11,6 @@ import static com.kevin.gestorproducao.db.contracts.TrabalhoProducaoContract.Tra
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 
 import androidx.annotation.NonNull;
 
@@ -20,14 +19,10 @@ import com.kevin.gestorproducao.model.ProfissaoPersonagem;
 
 import java.util.ArrayList;
 
-public class ProfissaoPersonagemDao {
-    private final SQLiteDatabase db;
-
+public class ProfissaoPersonagemDao extends BaseDao {
 
     public ProfissaoPersonagemDao(Context context) {
-        DbHelper dbHelper = DbHelper.getInstance(context);
-
-        this.db = dbHelper.getWritableDatabase();
+        super(DbHelper.getInstance(context).getWritableDatabase());
     }
 
     public ProfissaoPersonagem recuperaProfissaoPorNome(
@@ -64,9 +59,7 @@ public class ProfissaoPersonagemDao {
         ArrayList<ProfissaoPersonagem> profissoes,
         String idPersonagem
     ) {
-        db.beginTransaction();
-
-        try {
+        executaEmTransacao(() -> {
             db.delete(
                 TABLE_PROFISSOES_PERSONAGEM,
                 COLUMN_NAME_ID_PERSONAGEM +"= ?",
@@ -78,11 +71,7 @@ public class ProfissaoPersonagemDao {
 
                 db.insert(TABLE_PROFISSOES_PERSONAGEM, null, values);
             }
-
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
+        });
     }
 
     public ArrayList<ProfissaoPersonagem> recuperaProfissoes(String idPersonagem) {
@@ -182,25 +171,12 @@ public class ProfissaoPersonagemDao {
         ProfissaoPersonagem profissao,
         String idPersonagem
     ) {
-        db.beginTransaction();
+        ContentValues values = getContentValues(profissao, idPersonagem);
 
-        try {
-            ContentValues values = getContentValues(profissao, idPersonagem);
+        String selection = COLUMN_NAME_ID + " = ? AND " + COLUMN_NAME_ID_PERSONAGEM + " = ?";
+        String[] selectionArgs = {profissao.getId(), idPersonagem};
 
-            String selection = COLUMN_NAME_ID + " = ? AND " + COLUMN_NAME_ID_PERSONAGEM + " = ?";
-            String[] selectionArgs = {profissao.getId(), idPersonagem};
-
-            db.update(
-                TABLE_PROFISSOES_PERSONAGEM,
-                values,
-                selection,
-                selectionArgs
-            );
-
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
+        atualizaEmTransacao(TABLE_PROFISSOES_PERSONAGEM, values, selection, selectionArgs);
     }
 
     @NonNull
@@ -222,34 +198,20 @@ public class ProfissaoPersonagemDao {
         String idPersonagem,
         ArrayList<ProfissaoPersonagem> profissoes
     ) {
-        db.beginTransaction();
-
-        try {
+        executaEmTransacao(() -> {
             for (ProfissaoPersonagem profissao : profissoes) {
                 ContentValues values = getContentValues(profissao, idPersonagem);
 
                 db.insert(TABLE_PROFISSOES_PERSONAGEM, null, values);
             }
-
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
+        });
     }
 
     public void removeProfissoes(String idPersonagem) {
-        db.beginTransaction();
-
-        try {
-            db.delete(
-                TABLE_PROFISSOES_PERSONAGEM,
-                COLUMN_NAME_ID_PERSONAGEM +"= ?",
-                new String[]{idPersonagem}
-            );
-
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
+        removeEmTransacao(
+            TABLE_PROFISSOES_PERSONAGEM,
+            COLUMN_NAME_ID_PERSONAGEM +"= ?",
+            new String[]{idPersonagem}
+        );
     }
 }

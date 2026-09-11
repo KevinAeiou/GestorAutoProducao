@@ -15,7 +15,6 @@ import static com.kevin.gestorproducao.db.contracts.TrabalhoDbContract.TrabalhoE
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 
 import androidx.annotation.NonNull;
 
@@ -25,21 +24,16 @@ import com.kevin.gestorproducao.model.TrabalhoEstoque;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EstoqueDao {
-    private final SQLiteDatabase db;
+public class EstoqueDao extends BaseDao {
     public EstoqueDao(Context context) {
-        DbHelper db_helper = DbHelper.getInstance(context);
-
-        this.db = db_helper.getWritableDatabase();
+        super(DbHelper.getInstance(context).getWritableDatabase());
     }
 
     public void substituirTodas(
         List<TrabalhoEstoque> estoque,
         String idPersonagem
     ) {
-        db.beginTransaction();
-
-        try {
+        executaEmTransacao(() -> {
             String selection = COLUMN_NAME_ID_PERSONAGEM + " LIKE ?";
             String[] selectionArgs = {idPersonagem};
             db.delete(TABLE_ESTOQUE, selection, selectionArgs);
@@ -49,11 +43,7 @@ public class EstoqueDao {
 
                 db.insert(TABLE_ESTOQUE, null, values);
             }
-
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
+        });
     }
 
     @NonNull
@@ -155,67 +145,30 @@ public class EstoqueDao {
     }
 
     public void modificaEstoque(TrabalhoEstoque trabalho, String idPersonagem) {
-        db.beginTransaction();
+        ContentValues values = getContentValues(idPersonagem, trabalho);
+        String selection = COLUMN_NAME_ID + " LIKE ?";
+        String[] selectionArgs = {trabalho.getId()};
 
-        try {
-
-            ContentValues values = getContentValues(idPersonagem, trabalho);
-            String selection = COLUMN_NAME_ID + " LIKE ?";
-            String[] selectionArgs = {trabalho.getId()};
-
-            db.update(
-                TABLE_ESTOQUE,
-                values,
-                selection,
-                selectionArgs
-            );
-
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
+        atualizaEmTransacao(TABLE_ESTOQUE, values, selection, selectionArgs);
     }
 
     public void insereEstoque(TrabalhoEstoque trabalho, String idPersonagem) {
-        db.beginTransaction();
+        ContentValues values = getContentValues(idPersonagem, trabalho);
 
-        try {
-            ContentValues values = getContentValues(idPersonagem, trabalho);
-
-            db.insert(TABLE_ESTOQUE, null, values);
-
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
+        insereEmTransacao(TABLE_ESTOQUE, values);
     }
 
     public void removeEstoque(TrabalhoEstoque trabalho) {
-        db.beginTransaction();
+        String selection = COLUMN_NAME_ID + " LIKE ?";
+        String[] selectionArgs = {trabalho.getId()};
 
-        try {
-            String selection = COLUMN_NAME_ID + " LIKE ?";
-            String[] selectionArgs = {trabalho.getId()};
-
-            db.delete(TABLE_ESTOQUE, selection, selectionArgs);
-
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
+        removeEmTransacao(TABLE_ESTOQUE, selection, selectionArgs);
     }
 
     public void removeEstoques(String idPersonagem) {
-        db.beginTransaction();
+        String selection = COLUMN_NAME_ID_PERSONAGEM + " LIKE ?";
+        String[] selectionArgs = {idPersonagem};
 
-        try {
-            String selection = COLUMN_NAME_ID_PERSONAGEM + " LIKE ?";
-            String[] selectionArgs = {idPersonagem};
-            db.delete(TABLE_ESTOQUE, selection, selectionArgs);
-
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
+        removeEmTransacao(TABLE_ESTOQUE, selection, selectionArgs);
     }
 }

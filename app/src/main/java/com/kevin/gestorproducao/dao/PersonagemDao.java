@@ -12,19 +12,15 @@ import static com.kevin.gestorproducao.db.contracts.TrabalhoDbContract.TrabalhoE
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 
 import com.kevin.gestorproducao.db.DbHelper;
 import com.kevin.gestorproducao.model.Personagem;
 import com.kevin.gestorproducao.utilitario.CriptografiaUtil;
 import java.util.ArrayList;
 
-public class PersonagemDao {
-    private final SQLiteDatabase db;
-
+public class PersonagemDao extends BaseDao {
     public PersonagemDao(Context context) {
-        DbHelper dbHelper = DbHelper.getInstance(context);
-        this.db = dbHelper.getWritableDatabase();
+        super(DbHelper.getInstance(context).getWritableDatabase());
     }
 
     public ArrayList<Personagem> recuperaPersonagens() {
@@ -58,8 +54,7 @@ public class PersonagemDao {
     }
 
     public void substituirTodos(ArrayList<Personagem> personagens) {
-        db.beginTransaction();
-        try {
+        executaEmTransacao(() -> {
             db.delete(TABLE_PERSONAGENS, null, null);
 
             for (Personagem personagem : personagens) {
@@ -67,25 +62,13 @@ public class PersonagemDao {
 
                 db.insert(TABLE_PERSONAGENS, null, values);
             }
-
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
+        });
     }
 
     public void inserePersonagem(Personagem personagem) {
-        db.beginTransaction();
+        ContentValues values = getValues(personagem);
 
-        try {
-            ContentValues values = getValues(personagem);
-
-            db.insert(TABLE_PERSONAGENS, null, values);
-
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
+        insereEmTransacao(TABLE_PERSONAGENS, values);
     }
 
     private ContentValues getValues(Personagem personagem) {
@@ -107,32 +90,17 @@ public class PersonagemDao {
     }
 
     public void removePersonagem(String idPersonagem) {
-        db.beginTransaction();
-        try {
-            String whereClause = COLUMN_NAME_ID + " = ?";
-            String[] whereArgs = {idPersonagem};
+        String whereClause = COLUMN_NAME_ID + " = ?";
+        String[] whereArgs = {idPersonagem};
 
-            db.delete(TABLE_PERSONAGENS, whereClause, whereArgs);
-
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
+        removeEmTransacao(TABLE_PERSONAGENS, whereClause, whereArgs);
     }
 
     public void modificaPersonagem(Personagem personagem) {
-        db.beginTransaction();
+        ContentValues values = getValues(personagem);
+        String[] whereArgs = {personagem.getId()};
+        String whereClause = COLUMN_NAME_ID + " = ?";
 
-        try {
-            ContentValues values = getValues(personagem);
-            String[] whereArgs = {personagem.getId()};
-            String whereClause = COLUMN_NAME_ID + " = ?";
-
-            db.update(TABLE_PERSONAGENS, values, whereClause, whereArgs);
-
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
+        atualizaEmTransacao(TABLE_PERSONAGENS, values, whereClause, whereArgs);
     }
 }
