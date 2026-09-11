@@ -101,9 +101,9 @@ public class FiltroBottomSheetFragment extends BottomSheetDialogFragment {
             chipGroupEstados.removeAllViews();
 
             List<String> estados = new ArrayList<>();
-            estados.add("Para produzir");
-            estados.add("Produzindo");
-            estados.add("Feito");
+            estados.add(getString(R.string.stringFiltroParaProduzir));
+            estados.add(getString(R.string.stringFiltroProduzindo));
+            estados.add(getString(R.string.stringFiltroFeito));
 
             LayoutInflater inflater = LayoutInflater.from(requireContext());
 
@@ -134,10 +134,10 @@ public class FiltroBottomSheetFragment extends BottomSheetDialogFragment {
         chipGroupRaridades.removeAllViews();
 
         List<String> raridades = new ArrayList<>();
-        raridades.add("Comum");
-        raridades.add("Melhorado");
-        raridades.add("Raro");
-        raridades.add("Especial");
+        raridades.add(getString(R.string.stringComum));
+        raridades.add(getString(R.string.stringMelhorado));
+        raridades.add(getString(R.string.stringRaro));
+        raridades.add(getString(R.string.stringEspecial));
 
         LayoutInflater inflater = LayoutInflater.from(requireContext());
 

@@ -154,7 +154,7 @@ public class ListaProfissoesFragment extends BaseFragment<FragmentListaProfissoe
                     profissoesAdapter.atualiza(profissoes);
                 }
                 if (resultadoProfissoes.getErro() != null) {
-                    mostraMensagemAncorada("Erro" + resultadoProfissoes.getErro());
+                    mostraMensagemAncorada(getString(R.string.stringErroValor, resultadoProfissoes.getErro()));
                 }
             }
         );
@@ -163,7 +163,7 @@ public class ListaProfissoesFragment extends BaseFragment<FragmentListaProfissoe
             getViewLifecycleOwner(),
             resultado -> {
                 if (resultado.getErro() != null) {
-                    mostraMensagemAncorada("Erro: " + resultado.getErro());
+                    mostraMensagemAncorada(getString(R.string.stringErroValor, resultado.getErro()));
                 }
 
                 profissaoViewModel.recuperaProfissoes();

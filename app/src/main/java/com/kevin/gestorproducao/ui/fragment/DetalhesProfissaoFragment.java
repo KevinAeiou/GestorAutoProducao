@@ -97,8 +97,8 @@ public class DetalhesProfissaoFragment
             );
 
             ConfirmacaoDialog dialog = ConfirmacaoDialog.novaInstancia(
-                "Excluir profissão",
-                "Tem certeza que deseja excluir esta profissão?",
+                getString(R.string.stringExcluirProfissao),
+                getString(R.string.stringConfirmaExclusaoProfissao),
                 () -> profissaoViewModel.removeProfissao(profissao),
                 () -> pararLoadingBotao(btnConfirmarProfissao, loadingBotaoConfirmar)
             );
@@ -166,7 +166,7 @@ public class DetalhesProfissaoFragment
         String nome = edtDescricaoProfissao.getText().toString().trim();
 
         if (nome.isEmpty()) {
-            txtNomeProfissao.setError("Campo obrigatório");
+            txtNomeProfissao.setError(getString(R.string.stringCampoObrigatorio));
             pararLoadingBotao(
                 btnConfirmarProfissao,
                 loadingBotaoConfirmar

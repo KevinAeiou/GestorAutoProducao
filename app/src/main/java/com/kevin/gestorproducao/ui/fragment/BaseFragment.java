@@ -300,7 +300,7 @@ public abstract class BaseFragment<T extends ViewBinding> extends Fragment {
     protected boolean validarConexao() {
 
         if (estaSemInternet()) {
-            mostraMensagemAncorada("Erro de conexão");
+            mostraMensagemAncorada(getString(R.string.stringErroConexao));
             return false;
         }
 

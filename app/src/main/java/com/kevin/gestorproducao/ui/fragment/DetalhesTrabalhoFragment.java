@@ -2,7 +2,6 @@ package com.kevin.gestorproducao.ui.fragment;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
-import static com.kevin.gestorproducao.ui.activity.Constantes.CHAVE_NOVO_TRABALHO;
 import static com.kevin.gestorproducao.ui.activity.Constantes.CODIGO_REQUISICAO_ALTERA_TRABALHO;
 import static com.kevin.gestorproducao.ui.activity.Constantes.CODIGO_REQUISICAO_INSERE_TRABALHO;
 import static com.kevin.gestorproducao.ui.activity.Constantes.CODIGO_REQUISICAO_INVALIDA;
@@ -59,7 +58,7 @@ public class DetalhesTrabalhoFragment
     private TextInputLayout txtInputNome, txtInputNomeProducao, txtInputProfissao, txtInputExperiencia, txtInputNivel, txtInputRaridade;
     private AutoCompleteTextView autoCompleteProfissao, autoCompleteRaridade;
     private MaterialButton btnExcluir;
-    private final String[] mensagemErro={"Campo requerido!","Inválido!"};
+    private String[] mensagemErro;
     private int codigoRequisicao = CODIGO_REQUISICAO_INVALIDA;
     private TrabalhoViewModel trabalhoViewModel;
     private TrabalhoEstoqueViewModel estoqueViewModel;
@@ -99,7 +98,7 @@ public class DetalhesTrabalhoFragment
     @Override
     protected ComponentesVisuais fornecerComponentesVisuais() {
         String titulo = trabalhoRecebido == null ?
-            CHAVE_NOVO_TRABALHO :
+            getString(R.string.stringNovoTrabalho) :
             trabalhoRecebido.getNome();
 
         return new ComponentesVisuais(
@@ -148,7 +147,7 @@ public class DetalhesTrabalhoFragment
             getViewLifecycleOwner(),
             resultado -> {
                 if (resultado.getErro() != null)
-                    mostraMensagemAncorada("Erro: "+ resultado.getErro());
+                    mostraMensagemAncorada(getString(R.string.stringErroValor, resultado.getErro()));
             }
         );
     }
@@ -165,7 +164,7 @@ public class DetalhesTrabalhoFragment
                 if (resultado == null) return;
 
                 if (resultado.getErro() == null) {
-                    mostraMensagemAncorada("Trabalho inserido!");
+                    mostraMensagemAncorada(getString(R.string.stringTrabalhoInserido));
 
                     trabalhoViewModel.limpaInsercaoResultado();
 
@@ -175,7 +174,7 @@ public class DetalhesTrabalhoFragment
                     return;
                 }
 
-                mostraMensagemAncorada("Erro: "+resultado.getErro());
+                mostraMensagemAncorada(getString(R.string.stringErroValor, resultado.getErro()));
             }
         );
 
@@ -185,7 +184,7 @@ public class DetalhesTrabalhoFragment
                 if (resultado == null) return;
 
                 if (resultado.getErro() == null) {
-                    mostraMensagemAncorada("Trabalho modificado com sucesso!");
+                    mostraMensagemAncorada(getString(R.string.stringTrabalhoModificadoComSucesso));
                     trabalhoViewModel.limpaModificacaoResultado();
                     voltaParaListaTrabalhos();
                     return;
@@ -196,7 +195,7 @@ public class DetalhesTrabalhoFragment
                     loadingBotaoConfirmar
                 );
 
-                mostraMensagemAncorada("Erro: "+resultado.getErro());
+                mostraMensagemAncorada(getString(R.string.stringErroValor, resultado.getErro()));
             }
         );
 
@@ -218,7 +217,7 @@ public class DetalhesTrabalhoFragment
                     loadingBotaoExcluir
                 );
 
-                mostraMensagemAncorada("Erro: "+resultado.getErro());
+                mostraMensagemAncorada(getString(R.string.stringErroValor, resultado.getErro()));
             }
         );
 
@@ -296,7 +295,7 @@ public class DetalhesTrabalhoFragment
                 return;
             }
 
-            mostraMensagemAncorada(trabalho.getNome()+" já existe!");
+            mostraMensagemAncorada(getString(R.string.stringJaExisteValor, trabalho.getNome()));
             pararLoadingBotao(
                 btnConfirmar,
                 loadingBotaoConfirmar
@@ -327,7 +326,7 @@ public class DetalhesTrabalhoFragment
                 return;
             }
 
-            mostraMensagemAncorada(trabalho.getNome()+" já existe!");
+            mostraMensagemAncorada(getString(R.string.stringJaExisteValor, trabalho.getNome()));
             pararLoadingBotao(
                 btnConfirmar,
                 loadingBotaoConfirmar
@@ -344,6 +343,10 @@ public class DetalhesTrabalhoFragment
 
     private void inicializaComponentes() {
         trabalhosNecessarios = new ArrayList<>();
+        mensagemErro = new String[]{
+            getString(R.string.stringCampoRequerido),
+            getString(R.string.stringInvalido)
+        };
 
         edtNomeTrabalho = binding.edtNomeDetalhesTrabalho;
         edtNomeProducaoTrabalho = binding.edtNomeProducaoDetalhesTrabalho;
@@ -423,8 +426,8 @@ public class DetalhesTrabalhoFragment
                 );
 
                 ConfirmacaoDialog dialog = ConfirmacaoDialog.novaInstancia(
-                    "Excluir trabalho",
-                    "Tem certeza que deseja excluir este trabalho?",
+                    getString(R.string.stringExcluirTrabalho),
+                    getString(R.string.stringConfirmaExclusaoTrabalho),
                     () -> trabalhoViewModel.removeTrabalho(trabalhoRecebido),
                     () -> pararLoadingBotao(btnConfirmar, loadingBotaoConfirmar)
                 );

@@ -15,6 +15,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.radiobutton.MaterialRadioButton;
 import com.google.android.material.snackbar.Snackbar;
+import com.kevin.gestorproducao.R;
 import com.kevin.gestorproducao.databinding.FragmentSelecaoPersonagemBinding;
 import com.kevin.gestorproducao.model.Personagem;
 import com.kevin.gestorproducao.ui.viewModel.FiltroViewModel;
@@ -98,7 +99,7 @@ public class SelecaoPersonagemFragment extends DialogFragment {
                     }
                     return;
                 }
-                Snackbar.make(binding.getRoot(), "Erro: "+resultado.getErro(), Snackbar.LENGTH_LONG).show();
+                Snackbar.make(binding.getRoot(), getString(R.string.stringErroValor, resultado.getErro()), Snackbar.LENGTH_LONG).show();
             }
         );
     }

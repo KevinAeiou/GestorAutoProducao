@@ -130,7 +130,7 @@ public class RecursosFragment
                     return;
                 }
 
-                mostraMensagemAncorada("Erro: " + resultado.getErro());
+                mostraMensagemAncorada(getString(R.string.stringErroValor, resultado.getErro()));
             }
         );
 
@@ -138,12 +138,12 @@ public class RecursosFragment
             getViewLifecycleOwner(),
             resultado -> {
                 if (resultado.getErro() == null) {
-                    mostraMensagemAncorada("Recursos modificados com sucesso!");
+                    mostraMensagemAncorada(getString(R.string.stringRecursosModificadosComSucesso));
                     voltaParaListaProducao();
                     return;
                 }
 
-                mostraMensagemAncorada("Erro: " + resultado.getErro());
+                mostraMensagemAncorada(getString(R.string.stringErroValor, resultado.getErro()));
             }
         );
     }

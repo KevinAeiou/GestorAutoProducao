@@ -123,7 +123,7 @@ public class ListaEstoqueFragment
             getViewLifecycleOwner(),
             resultado -> {
                 if (resultado.getErro() != null) {
-                    mostraMensagemAncorada("Erro: "+resultado.getErro());
+                    mostraMensagemAncorada(getString(R.string.stringErroValor, resultado.getErro()));
                     return;
                 }
 

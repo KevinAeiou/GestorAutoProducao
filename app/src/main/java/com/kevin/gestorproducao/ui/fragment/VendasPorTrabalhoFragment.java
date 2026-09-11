@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.kevin.gestorproducao.R;
 import com.kevin.gestorproducao.databinding.FragmentVendasPorTrabalhoBinding;
 import com.kevin.gestorproducao.model.TrabalhoVendido;
 import com.kevin.gestorproducao.ui.fragment.VendasPorTrabalhoFragmentDirections.VaiDeVendasPorTrabalhoParaDetalhesVenda;
@@ -135,7 +136,7 @@ public class VendasPorTrabalhoFragment
                 }
 
                 if (resultado.getErro() != null) {
-                    mostraMensagemAncorada("Erro: " + resultado.getErro());
+                    mostraMensagemAncorada(getString(R.string.stringErroValor, resultado.getErro()));
                 }
             }
         );

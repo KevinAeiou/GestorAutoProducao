@@ -97,7 +97,7 @@ public class ModificaPersonagemFragment
                     voltaParaTrabalhosProducao();
                     return;
                 }
-                mostraMensagemAncorada("Erro: "+resultado.getErro());
+                mostraMensagemAncorada(getString(R.string.stringErroValor, resultado.getErro()));
             }
         );
 
@@ -111,12 +111,12 @@ public class ModificaPersonagemFragment
 
                     personagemFluxoService.processarPosRemocao(personagemRecebido.getId());
 
-                    mostraMensagemAncorada("Personagem: " + personagemRecebido.getId() + " foi removido!");
+                    mostraMensagemAncorada(getString(R.string.stringPersonagemRemovidoValor, personagemRecebido.getId()));
                     personagemViewModel.definePersonagemSelecionado(null);
                     voltaParaTrabalhosProducao();
                     return;
                 }
-                mostraMensagemAncorada("Erro: "+resultado.getErro());
+                mostraMensagemAncorada(getString(R.string.stringErroValor, resultado.getErro()));
             }
         );
     }
@@ -157,8 +157,8 @@ public class ModificaPersonagemFragment
     private void configuraBotaoExcluir() {
         binding.btnExcluiPersonagem.setOnClickListener(view -> {
             ConfirmacaoDialog dialog = ConfirmacaoDialog.novaInstancia(
-                "Personagem será removido permanentemente",
-                "Deseja continuar?",
+                getString(R.string.stringPersonagemSeraRemovido),
+                getString(R.string.stringDesejaContinuar),
                 () -> personagemViewModel.removePersonagem(personagemRecebido.getId()),
                 () -> {}
             );

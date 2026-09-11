@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.kevin.gestorproducao.R;
 import com.kevin.gestorproducao.databinding.FragmentDetalhesEstoqueBinding;
 import com.kevin.gestorproducao.model.TrabalhoEstoque;
 import com.kevin.gestorproducao.ui.viewModel.ComponentesVisuais;
@@ -106,8 +107,8 @@ public class DetalhesEstoqueFragment
             );
 
             ConfirmacaoDialog dialog = ConfirmacaoDialog.novaInstancia(
-                "Excluir trabalho em estoque",
-                "Tem certeza que deseja excluir este trabalho?",
+                getString(R.string.stringExcluirTrabalhoEmEstoque),
+                getString(R.string.stringConfirmaExclusaoTrabalho),
                 () -> {
                     btnExcluir.setEnabled(false);
                     estoqueViewModel.removeTrabalhoEstoque(trabalho);
@@ -172,7 +173,7 @@ public class DetalhesEstoqueFragment
 
                 if (resultado.getErro() == null) {
                     voltaParaEstoque();
-                    mostraMensagemAncorada("Item removido com sucesso");
+                    mostraMensagemAncorada(getString(R.string.stringItemRemovidoComSucesso));
                     return;
                 }
 
@@ -180,7 +181,7 @@ public class DetalhesEstoqueFragment
                     btnConfirmar,
                     loadingBotaoConfirmar
                 );
-                mostraMensagemAncorada("Erro: " + resultado.getErro());
+                mostraMensagemAncorada(getString(R.string.stringErroValor, resultado.getErro()));
             }
         );
     }
@@ -205,7 +206,7 @@ public class DetalhesEstoqueFragment
     private Integer defineValorQuantidade() {
         String quantidade = edtQuantidadeTrabalho.getText().toString().trim();
         if (quantidade.isEmpty()) {
-            txtQuantidadeTrabalho.setError("Campo obrigatório");
+            txtQuantidadeTrabalho.setError(getString(R.string.stringCampoObrigatorio));
             return null;
         }
 
@@ -214,7 +215,7 @@ public class DetalhesEstoqueFragment
             quantidadeNova = obterValorNumerico(edtQuantidadeTrabalho);
 
             if (quantidadeNova < 0) {
-                throw new NumberFormatException("A quantidade não pode ser negativa");
+                throw new NumberFormatException(getString(R.string.stringQuantidadeNaoPodeSerNegativa));
             }
         } catch (NumberFormatException e) {
             txtQuantidadeTrabalho.setError(e.getMessage());

@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.kevin.gestorproducao.R;
 import com.kevin.gestorproducao.databinding.FragmentRecuperarSenhaBinding;
 import com.kevin.gestorproducao.ui.viewModel.AutenticacaoViewModel;
 import com.kevin.gestorproducao.ui.viewModel.ComponentesVisuais;
@@ -64,11 +65,11 @@ public class RecuperarSenhaFragment
                 if (resultado.getErro() == null) {
                     NavController controlador = Navigation.findNavController(binding.getRoot());
                     controlador.navigate(vaiParaSlashScreen());
-                    mostraMensagemAncorada("Confira seu email");
+                    mostraMensagemAncorada(getString(R.string.stringConfiraSeuEmail));
                     return;
                 }
 
-                mostraMensagemAncorada("Confira se seu email está correto e tente novamente");
+                mostraMensagemAncorada(getString(R.string.stringConfiraEmailCorretoTenteNovamente));
             }
         );
     }
@@ -133,10 +134,10 @@ public class RecuperarSenhaFragment
 
     private void configuraMenssagemAjuda(String email) {
         if (!configuraEditEmail(Patterns.EMAIL_ADDRESS.matcher(email).matches())){
-            txtRecuperaSenha.setError("Por favor, informe um email válido!");
+            txtRecuperaSenha.setError(getString(R.string.stringEmailInvalidoErro));
         }
         if (!configuraEditEmail(!email.isEmpty()) & email.isEmpty()){
-            txtRecuperaSenha.setError("Campo requerido!");
+            txtRecuperaSenha.setError(getString(R.string.stringCampoRequerido));
         }
     }
 

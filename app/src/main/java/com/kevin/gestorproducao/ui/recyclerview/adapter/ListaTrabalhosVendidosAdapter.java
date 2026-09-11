@@ -87,7 +87,7 @@ public class ListaTrabalhosVendidosAdapter
         private void preencheCampos(TrabalhoVendido trabalho) {
             configuraCorNomeTrabalhoProducao(trabalho);
             String nome = trabalho.getNome();
-            if (nome == null) nome = "Indefinido";
+            if (nome == null) nome = context.getString(R.string.stringIndefinido);
             itemNome.setText(nome);
             itemValor.setText(context.getString(
                 R.string.stringOuroValor,

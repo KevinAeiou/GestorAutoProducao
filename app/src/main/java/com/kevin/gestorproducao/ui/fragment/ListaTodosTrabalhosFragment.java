@@ -143,7 +143,7 @@ public class ListaTodosTrabalhosFragment
                     aplicarFiltros();
                 }
                 if (resultado.getErro() != null) {
-                    mostraMensagemAncorada("Erro: "+resultado.getErro());
+                    mostraMensagemAncorada(getString(R.string.stringErroValor, resultado.getErro()));
                 }
             }
         );
@@ -152,7 +152,7 @@ public class ListaTodosTrabalhosFragment
             getViewLifecycleOwner(),
             resultado -> {
                 if (resultado.getErro() != null) {
-                    mostraMensagemAncorada("Erro: "+resultado.getErro());
+                    mostraMensagemAncorada(getString(R.string.stringErroValor, resultado.getErro()));
                     return;
                 }
 
@@ -184,7 +184,7 @@ public class ListaTodosTrabalhosFragment
             false,
             false,
             false,
-            "Trabalhos",
+            getString(R.string.trabalhos),
             false
         );
     }
