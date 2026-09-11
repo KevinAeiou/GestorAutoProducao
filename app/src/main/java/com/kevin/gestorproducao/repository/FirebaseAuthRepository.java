@@ -1,6 +1,5 @@
 package com.kevin.gestorproducao.repository;
 
-import static com.kevin.gestorproducao.repository.TrabalhoProducaoRepository.destroyInstance;
 import static com.kevin.gestorproducao.ui.activity.Constantes.CHAVE_USUARIOS2;
 
 import androidx.lifecycle.LiveData;
@@ -19,7 +18,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 public class FirebaseAuthRepository {
-    private static FirebaseAuthRepository instancia;
+    private static volatile FirebaseAuthRepository instancia;
     private final FirebaseAuth minhaInstancia;
     private final DatabaseReference minhaReferencia;
     private final Executor backgroundExecutor = Executors.newFixedThreadPool(2);
@@ -29,9 +28,8 @@ public class FirebaseAuthRepository {
         this.minhaReferencia = FirebaseDatabase.getInstance().getReference(CHAVE_USUARIOS2);
     }
 
-    public static FirebaseAuthRepository getInstance() {
+    public static synchronized FirebaseAuthRepository getInstance() {
         if (instancia == null) {
-            destroyInstance();
             instancia = new FirebaseAuthRepository();
         }
         return instancia;

@@ -1,6 +1,5 @@
 package com.kevin.gestorproducao.repository;
 
-import static com.kevin.gestorproducao.repository.TrabalhoProducaoRepository.destroyInstance;
 import static com.kevin.gestorproducao.ui.activity.Constantes.CHAVE_PROFISSOES;
 
 import android.content.Context;
@@ -42,7 +41,6 @@ public class ProfissaoPersonagemRepository {
     }
     public static synchronized ProfissaoPersonagemRepository getInstance(Context context) {
         if (instancia == null) {
-            destroyInstance();
             instancia = new ProfissaoPersonagemRepository(context);
         }
         return instancia;

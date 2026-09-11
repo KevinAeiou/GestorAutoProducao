@@ -1,6 +1,5 @@
 package com.kevin.gestorproducao.repository;
 
-import static com.kevin.gestorproducao.repository.TrabalhoProducaoRepository.destroyInstance;
 import static com.kevin.gestorproducao.ui.activity.Constantes.CHAVE_PERSONAGENS;
 import static com.kevin.gestorproducao.ui.activity.Constantes.CHAVE_USUARIOS2;
 
@@ -39,7 +38,6 @@ public class PersonagemRepository {
 
     public static synchronized PersonagemRepository getInstance(Context context) {
         if (instancia == null) {
-            destroyInstance();
             instancia = new PersonagemRepository(context);
         }
 
