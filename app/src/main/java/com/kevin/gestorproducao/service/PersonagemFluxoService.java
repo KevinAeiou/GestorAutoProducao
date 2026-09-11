@@ -34,7 +34,10 @@ public class PersonagemFluxoService {
     }
 
     public void processarPosRemocao(String idPersonagem) {
-        personagemRepository.removePersonagem(idPersonagem);
+        // Chamado só após o Personagem em si já ter sido removido (ver ModificaPersonagemFragment):
+        // o índice de posse em Usuarios2 precisa sair por último, pois as regras do Realtime
+        // Database usam esse índice para autorizar a remoção do próprio Personagem.
+        personagemRepository.removePersonagemUsuario(idPersonagem);
         producaoRepository.removeProducoes(idPersonagem);
         estoqueRepository.removeEstoque(idPersonagem);
         vendaRepository.removeVendas(idPersonagem);

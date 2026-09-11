@@ -160,14 +160,33 @@ public class PersonagemRepository {
         return liveData;
     }
 
-    public void removePersonagem(String idPersonagem) {
+    public LiveData<Resource<Void>> removePersonagem(String idPersonagem) {
+        MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
+
+        if (idPersonagem == null || idPersonagem.isEmpty()) {
+            liveData.setValue(new Resource<>(null, "Erro id do personagem inválido"));
+            return liveData;
+        }
+
         referenciaPersonagens.child(idPersonagem).removeValue().addOnCompleteListener(
             backgroundExecutor, task -> {
-               if (task.isSuccessful()) {
-                   personagemDao.removePersonagem(idPersonagem);
-               }
+                if (task.isSuccessful()) {
+                    try {
+                        personagemDao.removePersonagem(idPersonagem);
+                        liveData.postValue(new Resource<>(null, null));
+                    } catch (RuntimeException e) {
+                        liveData.postValue(new Resource<>(null, e.getMessage()));
+                    }
+                    return;
+                }
+
+                Exception exception = task.getException();
+                String erro = recuperaErro(exception, "Erro desconhecido ao remover personagem");
+                liveData.postValue(new Resource<>(null, erro));
             }
         );
+
+        return liveData;
     }
 
     public void removeOuvinte() {

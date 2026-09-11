@@ -159,7 +159,7 @@ public class ModificaPersonagemFragment
             ConfirmacaoDialog dialog = ConfirmacaoDialog.novaInstancia(
                 "Personagem será removido permanentemente",
                 "Deseja continuar?",
-                () -> personagemViewModel.removePersonagemUsuario(personagemRecebido.getId()),
+                () -> personagemViewModel.removePersonagem(personagemRecebido.getId()),
                 () -> {}
             );
 

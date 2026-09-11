@@ -75,8 +75,8 @@ public class PersonagemViewModel extends ViewModel {
         });
     }
 
-    public void removePersonagemUsuario(String idPersonagem) {
-        LiveData<Resource<Void>> source = repository.removePersonagemUsuario(idPersonagem);
+    public void removePersonagem(String idPersonagem) {
+        LiveData<Resource<Void>> source = repository.removePersonagem(idPersonagem);
 
         remocaoResultado.addSource(source, resultado -> {
             remocaoResultado.setValue(resultado);
