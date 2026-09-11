@@ -17,6 +17,34 @@ import java.util.List;
 import java.util.Map;
 
 public class Trabalho extends BaseEntity implements Serializable {
+    // Comparada em ehProducaoDeRecursos() contra um nome já normalizado por limpaString()
+    // (sem acento, minúsculo, sem espaço) — toda entrada aqui precisa nascer já normalizada,
+    // senão a comparação nunca bate (era o bug do achado A1: 4 entradas tinham acento).
+    static final List<String> LISTA_PRODUCAO_RECURSOS = List.of(
+        "melhorarlicencacomum","licencadeproducaodoaprendiz","grandecolecaoderecursoscomuns",
+        "grandecolecaoderecursosavancados","coletaemmassaderecursosavancados","melhoriadaessenciacomum",
+        "melhoriadasubstanciacomum","melhoriadocatalizadorcomum","melhoriadaessenciacomposta",
+        "melhoriadasubtanciacomposta","melhoriadocatalizadoramplificado","criaresferadoaprendiz",
+        "produzindoavarinhademadeira","produzindocabecadocajadodejade","produzindocabecadecajadodeonix",
+        "criaresferadoneofito","produzindoavarinhadeaco","extracaodelascas",
+        "manipulacaodelascas","fazermodoaprendiz","preparandolascasdequartzo",
+        "manipulacaodemineriodecobre","fazermodoprincipiante","adquirirtesouradoaprendiz",
+        "produzindofioresistente","fazendotecidodelinho","fazendotecidodecetim",
+        "comprartesouradoprincipiante","produzindofiogrosso","adquirirfacadoaprendiz",
+        "recebendoescamasdaserpente","concluindocouroresistente","adquirirfacadoprincipiante",
+        "recebendoescamasdolagarto","curtindocourogrosso","adquirirmarretaodoaprendiz",
+        "forjandoplacasdecobre","fazendoplacasdebronze","adquirirmarretaodoprincipiante",
+        "forjandoplacasdeferro","fazendoaneisdeaco","adquirirmoldedoaprendiz",
+        "extracaodepepitasdecobre","recebendogemadassombras","adquirirmoldedoprincipiante",
+        "extracaodepepitasdeprata","recebendogemadaluz","adquirirpincadoaprendiz",
+        "extracaodejadebruta","recebendoenergiainicial","adquirirpincasdoprincipiante",
+        "extracaodeonixextraordinaria","recebendoeterinicial","adquirirfuradordoaprendiz",
+        "produzindotecidodelicado","extracaodesubstanciainstavel","adquirirfuradordoprincipiante",
+        "produzindotecidodenso","extracaodesubstanciaestavel","recebendofibradebronze",
+        "recebendoprata","recebendoinsigniadeestudante","recebendofibradeplatina",
+        "recebendoambar","recebendodistintivodeaprendiz"
+    );
+
     private String id;
     private String nome;
     private String nomeProducao;
@@ -121,32 +149,7 @@ public class Trabalho extends BaseEntity implements Serializable {
         this.experiencia = experiencia;
     }
     public boolean ehProducaoDeRecursos() {
-        ArrayList<String> listaProducaoRecursos = new ArrayList<>(List.of(
-            "melhorarlicencacomum","licencadeproducaodoaprendiz","grandecolecaoderecursoscomuns",
-            "grandecolecaoderecursosavancados","coletaemmassaderecursosavancados","melhoriadaessenciacomum",
-            "melhoriadasubstanciacomum","melhoriadocatalizadorcomum","melhoriadaessenciacomposta",
-            "melhoriadasubtanciacomposta","melhoriadocatalizadoramplificado","criaresferadoaprendiz",
-            "produzindoavarinhademadeira","produzindocabecadocajadodejade","produzindocabecadecajadodeonix",
-            "criaresferadoneofito","produzindoavarinhadeaço","extracaodelascas",
-            "manipulacaodelascas","fazermodoaprendiz","preparandolascasdequartzo",
-            "manipulacaodemineriodecobre","fazermodoprincipiante","adquirirtesouradoaprendiz",
-            "produzindofioresistente","fazendotecidodelinho","fazendotecidodecetim",
-            "comprartesouradoprincipiante","produzindofiogrosso","adquirirfacadoaprendiz",
-            "recebendoescamasdaserpente","concluindocouroresistente","adquirirfacadoprincipiante",
-            "recebendoescamasdolagarto","curtindocourogrosso","adquirirmarretaodoaprendiz",
-            "forjandoplacasdecobre","fazendoplacasdebronze","adquirirmarretaodoprincipiante",
-            "forjandoplacasdeferro","fazendoaneisdeaco","adquirirmoldedoaprendiz",
-            "extracaodepepitasdecobre","recebendogemadassombras","adquirirmoldedoprincipiante",
-            "extracaodepepitasdeprata","recebendogemadaluz","adquirirpincadoaprendiz",
-            "extracaodejadebruta","recebendoenergiainicial","adquirirpinçasdoprincipiante",
-            "extracaodeonixextraordinaria","recebendoeterinicial","adquirirfuradordoaprendiz",
-            "produzindotecidodelicado","extracaodesubstanciainstável","adquirirfuradordoprincipiante",
-            "produzindotecidodenso","extracaodesubstanciaestável","recebendofibradebronze",
-            "recebendoprata","recebendoinsigniadeestudante","recebendofibradeplatina",
-            "recebendoambar","recebendodistintivodeaprendiz"
-        ));
-
-        return listaProducaoRecursos.contains(limpaString(nomeProducao));
+        return LISTA_PRODUCAO_RECURSOS.contains(limpaString(nomeProducao));
     }
 
     public void geraNovoId() {
