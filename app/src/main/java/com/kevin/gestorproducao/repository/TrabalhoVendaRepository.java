@@ -290,13 +290,25 @@ public class TrabalhoVendaRepository {
         return maisVendidos;
     }
 
-    public void removeVendas(String idPersoangem) {
-        referenciaVendas.child(idPersoangem).removeValue().addOnCompleteListener(
-            backgroundExecutor, task -> {
+    public LiveData<Resource<Void>> removeVendas(String idPersoangem) {
+        return FirebaseTimeoutHelper.execute(callback -> referenciaVendas
+            .child(idPersoangem)
+            .removeValue()
+            .addOnCompleteListener(backgroundExecutor, task -> {
                 if (task.isSuccessful()) {
-                    vendaDao.removeVendas(idPersoangem);
+                    try {
+                        vendaDao.removeVendas(idPersoangem);
+                        callback.sucesso();
+                    } catch (RuntimeException e) {
+                        callback.erro(e.getMessage());
+                    }
+                    return;
                 }
-            }
+
+                Exception exception = task.getException();
+                String erro = recuperaErro(exception, "Erro desconhecido ao remover vendas");
+                callback.erro(erro);
+            })
         );
     }
 }

@@ -294,13 +294,25 @@ public class TrabalhoEstoqueRepository {
         return estoqueDao.recuperaTrabalhoPorId(idPersonagem, idTrabalho);
     }
 
-    public void removeEstoque(String idPersonagem) {
-        referenciaEstoqueIdPersonagem.child(idPersonagem).removeValue().addOnCompleteListener(
-            backgroundExecutor, task -> {
+    public LiveData<Resource<Void>> removeEstoque(String idPersonagem) {
+        return FirebaseTimeoutHelper.execute(callback -> referenciaEstoqueIdPersonagem
+            .child(idPersonagem)
+            .removeValue()
+            .addOnCompleteListener(backgroundExecutor, task -> {
                 if (task.isSuccessful()) {
-                    estoqueDao.removeEstoques(idPersonagem);
+                    try {
+                        estoqueDao.removeEstoques(idPersonagem);
+                        callback.sucesso();
+                    } catch (RuntimeException e) {
+                        callback.erro(e.getMessage());
+                    }
+                    return;
                 }
-            }
+
+                Exception exception = task.getException();
+                String erro = recuperaErro(exception, "Erro desconhecido ao remover estoque");
+                callback.erro(erro);
+            })
         );
     }
 }

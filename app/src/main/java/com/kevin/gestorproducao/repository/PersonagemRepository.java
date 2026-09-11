@@ -118,13 +118,25 @@ public class PersonagemRepository {
             })
         );
     }
-    public void inserePersonagem(Personagem personagem) {
-        referenciaPersonagens.child(personagem.getId()).setValue(personagem).addOnCompleteListener(
-            backgroundExecutor, task -> {
+    public LiveData<Resource<Void>> inserePersonagem(Personagem personagem) {
+        return FirebaseTimeoutHelper.execute(callback -> referenciaPersonagens
+            .child(personagem.getId())
+            .setValue(personagem)
+            .addOnCompleteListener(backgroundExecutor, task -> {
                 if (task.isSuccessful()) {
-                    personagemDao.inserePersonagem(personagem);
+                    try {
+                        personagemDao.inserePersonagem(personagem);
+                        callback.sucesso();
+                    } catch (RuntimeException e) {
+                        callback.erro(e.getMessage());
+                    }
+                    return;
                 }
-            }
+
+                Exception exception = task.getException();
+                String erro = recuperaErro(exception, "Erro desconhecido ao inserir personagem");
+                callback.erro(erro);
+            })
         );
     }
 

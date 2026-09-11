@@ -276,7 +276,7 @@ public class ProfissaoPersonagemRepository {
         return liveData;
     }
 
-    public void insereProfissoesNovoPersonagem(String idPersonagem) {
+    public LiveData<Resource<Void>> insereProfissoesNovoPersonagem(String idPersonagem) {
         MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
 
         backGroundExecutor.execute(() -> {
@@ -337,15 +337,29 @@ public class ProfissaoPersonagemRepository {
                 liveData.postValue(new Resource<>(null, e.getMessage()));
             }
         });
+
+        return liveData;
     }
 
-    public void removeProfissoesPersonagem(String idPersonagem) {
-        referenciaProfissoesPersonagem.child(idPersonagem).removeValue().addOnCompleteListener(
-            backGroundExecutor, task -> {
+    public LiveData<Resource<Void>> removeProfissoesPersonagem(String idPersonagem) {
+        return FirebaseTimeoutHelper.execute(callback -> referenciaProfissoesPersonagem
+            .child(idPersonagem)
+            .removeValue()
+            .addOnCompleteListener(backGroundExecutor, task -> {
                 if (task.isSuccessful()) {
-                    profissaoPersonagemDao.removeProfissoes(idPersonagem);
+                    try {
+                        profissaoPersonagemDao.removeProfissoes(idPersonagem);
+                        callback.sucesso();
+                    } catch (RuntimeException e) {
+                        callback.erro(e.getMessage());
+                    }
+                    return;
                 }
-            }
+
+                Exception exception = task.getException();
+                String erro = recuperaErro(exception, "Erro desconhecido ao remover profissões do personagem");
+                callback.erro(erro);
+            })
         );
     }
 }
