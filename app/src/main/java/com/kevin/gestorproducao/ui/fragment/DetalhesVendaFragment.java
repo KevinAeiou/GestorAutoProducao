@@ -34,6 +34,7 @@ import com.kevin.gestorproducao.databinding.FragmentDetalhesVendaBinding;
 import com.kevin.gestorproducao.model.RecursoComumAvancado;
 import com.kevin.gestorproducao.model.Trabalho;
 import com.kevin.gestorproducao.model.TrabalhoVendido;
+import com.kevin.gestorproducao.service.PricingService;
 import com.kevin.gestorproducao.ui.viewModel.PersonagemViewModel;
 import com.kevin.gestorproducao.ui.viewModel.RecursosProducaoViewModel;
 import com.kevin.gestorproducao.ui.viewModel.ComponentesVisuais;
@@ -43,7 +44,6 @@ import com.kevin.gestorproducao.ui.viewModel.factory.ViewModelFactory;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
 
 public class DetalhesVendaFragment
     extends BaseFragment<FragmentDetalhesVendaBinding>
@@ -53,9 +53,6 @@ public class DetalhesVendaFragment
     public int mediaValorRecursoUnitarioCompostoMercado = 0;
     private int mediaValorRecursoUnitarioEnergiaMercado = 0;
     private int mediaValorRecursoUnitarioEtereoMercado = 0;
-    private static final Double FATOR_PERCENTUAL = 0.01;
-    public static final double FATOR_PERCENTUAL_MERCADO = 1.1;
-    private static final int MEDIA_VALOR_LICENCA_INICIANTE = 1000;
     private TextInputEditText edtDescricaoTrabalhoVendido,
         edtValorTrabalhoVendido, edtQuantidadeTrabalhoVendido, edtTaxaLucroTrabalhoVendido, 
         edtValorProducaoTrabalhoVendido, edtValorLucroTrabalhoVendido;
@@ -213,60 +210,17 @@ public class DetalhesVendaFragment
                     }
                     ArrayList<RecursoComumAvancado> recursosAvancados = resultado.getDado();
                     if (trabalhoSelecionado == null) return;
-                    if (trabalhoSelecionado.ehAmuletos(getContext()) || trabalhoSelecionado.ehAneis(getContext()) || trabalhoSelecionado.ehCapotes(getContext()) || trabalhoSelecionado.ehBraceletes(getContext())) {
-                        for (RecursoComumAvancado recursoAvancado : recursosAvancados) {
-                            switch (recursoAvancado.getId()) {
-                                case "e580e375-abc1-44f8-b332-774b7f1a490c":
-                                    mediaValorRecursoUnitarioComumMercado = recursoAvancado.getValor();
-                                    continue;
-                                case "94b66657-c7c6-41c0-b6f0-922614182549":
-                                    mediaValorRecursoUnitarioCompostoMercado = recursoAvancado.getValor();
-                                    continue;
-                                case "c9751ecc-f528-4a80-88c3-d2a8af2804fa":
-                                    mediaValorRecursoUnitarioEnergiaMercado = recursoAvancado.getValor();
-                                    continue;
-                                case "7c27a18c-fc60-484c-9545-99030a623129":
-                                    mediaValorRecursoUnitarioEtereoMercado = recursoAvancado.getValor();
-                                    break;
-                            }
-                        }
-                    }
-                    if (trabalhoSelecionado.ehLongoAlcance(getContext()) || trabalhoSelecionado.ehCorpoCorpo(getContext())) {
-                        for (RecursoComumAvancado recursoAvancado : recursosAvancados) {
-                            switch (recursoAvancado.getId()) {
-                                case "b7f69638-c9b7-4c69-865e-cbacef5c45b1":
-                                    mediaValorRecursoUnitarioComumMercado = recursoAvancado.getValor();
-                                    continue;
-                                case "3a085587-5093-471d-9187-27b2370e4b38":
-                                    mediaValorRecursoUnitarioCompostoMercado = recursoAvancado.getValor();
-                                    continue;
-                                case "259d5a95-72fd-4b36-b17f-c7b6a2a6897f":
-                                    mediaValorRecursoUnitarioEnergiaMercado = recursoAvancado.getValor();
-                                    continue;
-                                case "2d8c434a-50eb-4269-bc70-725ded6bc7e9":
-                                    mediaValorRecursoUnitarioEtereoMercado = recursoAvancado.getValor();
-                                    break;
-                            }
-                        }
-                    }
-                    if (trabalhoSelecionado.ehArmaduraPesada(getContext()) || trabalhoSelecionado.ehArmaduraLeve(getContext()) || trabalhoSelecionado.ehArmaduraTecido(getContext())) {
-                        for (RecursoComumAvancado recursoAvancado : recursosAvancados) {
-                            switch (recursoAvancado.getId()) {
-                                case "6ac21d44-1e8d-4bf8-bd62-53248e568417":
-                                    mediaValorRecursoUnitarioComumMercado = recursoAvancado.getValor();
-                                    continue;
-                                case "6250e394-4a82-4ccb-b697-c788b9094c41":
-                                    mediaValorRecursoUnitarioCompostoMercado = recursoAvancado.getValor();
-                                    continue;
-                                case "b2f158f9-5b52-444a-a27b-7ac1284063c6":
-                                    mediaValorRecursoUnitarioEnergiaMercado = recursoAvancado.getValor();
-                                    continue;
-                                case "e12c1346-9343-414e-a0b5-631e494423b2":
-                                    mediaValorRecursoUnitarioEtereoMercado = recursoAvancado.getValor();
-                                    break;
-                            }
-                        }
-                    }
+
+                    PricingService.ValoresMercadoRecursos valoresMercado = PricingService.mapeiaValoresMercado(
+                        trabalhoSelecionado,
+                        recursosAvancados,
+                        getContext()
+                    );
+                    mediaValorRecursoUnitarioComumMercado = valoresMercado.mediaComum;
+                    mediaValorRecursoUnitarioCompostoMercado = valoresMercado.mediaComposto;
+                    mediaValorRecursoUnitarioEnergiaMercado = valoresMercado.mediaEnergia;
+                    mediaValorRecursoUnitarioEtereoMercado = valoresMercado.mediaEtereo;
+
                     if (trabalhoSelecionado.ehComum()) {
                         calculaValorProducaoComum();
                         edtValorProducaoTrabalhoVendido.setText(String.valueOf(valorProducaoComum));
@@ -465,10 +419,7 @@ public class DetalhesVendaFragment
     }
 
     private void calculaTaxa(int valorProducao) {
-        int valorLucroSemTaxaMercado = (int) Math.round(novoValorLucro / FATOR_PERCENTUAL_MERCADO);
-        double taxa = (double) valorLucroSemTaxaMercado / valorProducao;
-        taxa = taxa >= 1 ? (taxa - 1) * 100 : (1 - taxa) * -100;
-        int porcentual = (int) Math.round(taxa);
+        int porcentual = PricingService.calculaTaxa(novoValorLucro, valorProducao);
         edtTaxaLucroTrabalhoVendido.setText(String.valueOf(porcentual));
     }
 
@@ -522,38 +473,34 @@ public class DetalhesVendaFragment
     }
 
     private void calculcaValorProducaoRaro() {
-        int quantidadeRecursoEtereo = trabalhoSelecionado.recuperaQuantidadeMaximaRecursosEtereo(getContext());
-        valorProducaoRaro = valorProducaoMelhorado + (mediaValorRecursoUnitarioEtereoMercado * quantidadeRecursoEtereo) + MEDIA_VALOR_LICENCA_INICIANTE;
+        valorProducaoRaro = PricingService.calculaValorProducaoRaro(
+            trabalhoSelecionado,
+            getContext(),
+            valorProducaoMelhorado,
+            mediaValorRecursoUnitarioEtereoMercado
+        );
     }
 
     private void calculcaValorProducaoMelhorado() {
-        List<String> listaTrabalhosNecessarios = trabalhoSelecionado.getListaTrabalhosNecessarios();
-        int quantidadeTrabalhosComunsNecessarios = listaTrabalhosNecessarios.size();
-        int quantidadeRecursoEnerga = trabalhoSelecionado.recuperaQuantidadeMaximaRecursosEnergia(getContext());
-        valorProducaoMelhorado = (valorProducaoComum * quantidadeTrabalhosComunsNecessarios) + (mediaValorRecursoUnitarioEnergiaMercado * quantidadeRecursoEnerga) + MEDIA_VALOR_LICENCA_INICIANTE;
+        valorProducaoMelhorado = PricingService.calculaValorProducaoMelhorado(
+            trabalhoSelecionado,
+            getContext(),
+            valorProducaoComum,
+            mediaValorRecursoUnitarioEnergiaMercado
+        );
     }
 
     private void calculaValorProducaoComum() {
-        int quantidadeMaximaRecursos = trabalhoSelecionado.recuperaQuantidadeMaximaRecursos(getContext());
-        int quantidadeTotalRecursos = quantidadeMaximaRecursos * 3 + 3;
-        int quantidadeMaximaRecursosProduzido = trabalhoSelecionado.getNivel() > 14 ? 24 : 18;
-        int quantidadeRecursosNecessarios = trabalhoSelecionado.getNivel() > 14 ? 8 : 4;
-        int valorRecursoUnitario = (mediaValorRecursoUnitarioCompostoMercado * quantidadeRecursosNecessarios) / quantidadeMaximaRecursosProduzido;
-        int valorLicencaComum = 80;
-        int valorLicencaAprendiz = mediaValorRecursoUnitarioComumMercado * 4 / 2 + 80;
-        double resultado = (double) quantidadeTotalRecursos / quantidadeMaximaRecursosProduzido;
-        int quantidadeLicencaAprendizUtilizada = (int) Math.max(Math.round(resultado), 1);
-        int valorLicencas = valorLicencaComum + (valorLicencaAprendiz * quantidadeLicencaAprendizUtilizada);
-        int valorRecursoTotal = quantidadeTotalRecursos * valorRecursoUnitario;
-        valorProducaoComum = valorRecursoTotal + valorLicencas;
+        valorProducaoComum = PricingService.calculaValorProducaoComum(
+            trabalhoSelecionado,
+            getContext(),
+            mediaValorRecursoUnitarioComumMercado,
+            mediaValorRecursoUnitarioCompostoMercado
+        );
     }
 
     private void atualizaValorLucro(int valorProducao) {
-        double v = novaTaxa * FATOR_PERCENTUAL;
-        double porcentagem = v >= 0 ? v + 1 : v + 1.0;
-        int valorProducaoTaxa = (int) (valorProducao * porcentagem);
-        int valorTotalLucro = (int) (valorProducaoTaxa * FATOR_PERCENTUAL_MERCADO);
-        valorTotalLucro = Math.max(valorTotalLucro, 0);
+        int valorTotalLucro = PricingService.calculaValorLucro(novaTaxa, valorProducao);
         edtValorLucroTrabalhoVendido.setText(String.valueOf(valorTotalLucro));
     }
 
