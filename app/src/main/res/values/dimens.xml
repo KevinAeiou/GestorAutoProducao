@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="row_layout_height">100dp</dimen>
+
+    <!-- Selecao de personagem -->
+    <dimen name="altura_item_personagem">52dp</dimen>
+    <dimen name="espacamento_item_personagem">10dp</dimen>
+    <dimen name="padding_item_personagem">14dp</dimen>
 </resources>

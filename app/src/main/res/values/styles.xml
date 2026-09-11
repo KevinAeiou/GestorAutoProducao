@@ -143,6 +143,7 @@
 
     <style name="CustomAlertDialogTheme" parent="ThemeOverlay.Material3.MaterialAlertDialog">
         <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.CustomDialog</item>
+        <item name="android:backgroundDimAmount">0.7</item>
     </style>
 
     <style name="ShapeAppearance.CustomDialog" parent="ShapeAppearance.Material3.MediumComponent">
