@@ -16,13 +16,13 @@ import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.kevin.gestorproducao.R;
 import com.kevin.gestorproducao.databinding.FragmentRecuperarSenhaBinding;
 import com.kevin.gestorproducao.ui.viewModel.AutenticacaoViewModel;
-import com.kevin.gestorproducao.ui.viewModel.ComponentesVisuais;
 import com.kevin.gestorproducao.ui.viewModel.factory.ViewModelFactory;
 
 import java.util.Objects;
@@ -33,8 +33,10 @@ public class RecuperarSenhaFragment
     private TextInputLayout txtRecuperaSenha;
     private TextInputEditText edtRecuperaSenha;
     private AppCompatButton botaoRecuperarSenha;
+    private TextView txtLinkEntrar;
     private String email;
     private AutenticacaoViewModel autenticacaoViewModel;
+    private NavController controlador;
 
     @Override
     protected FragmentRecuperarSenhaBinding inflateBinding(
@@ -52,10 +54,15 @@ public class RecuperarSenhaFragment
         configuraCamposTexto();
         observarAutenticacao();
         configuraBotaoRecuperacao();
+        configuraLinkEntrar();
     }
 
     private void configuraBotaoRecuperacao() {
         botaoRecuperarSenha.setOnClickListener(v -> autenticacaoViewModel.recuperaSenha(email));
+    }
+
+    private void configuraLinkEntrar() {
+        txtLinkEntrar.setOnClickListener(v -> controlador.navigate(vaiParaSlashScreen()));
     }
 
     private void observarAutenticacao() {
@@ -63,7 +70,6 @@ public class RecuperarSenhaFragment
             getViewLifecycleOwner(),
             resultado -> {
                 if (resultado.getErro() == null) {
-                    NavController controlador = Navigation.findNavController(binding.getRoot());
                     controlador.navigate(vaiParaSlashScreen());
                     mostraMensagemAncorada(getString(R.string.stringConfiraSeuEmail));
                     return;
@@ -98,6 +104,9 @@ public class RecuperarSenhaFragment
         botaoRecuperarSenha = binding.botaoRecuperarSenha;
         txtRecuperaSenha = binding.txtRecuperarSenha;
         edtRecuperaSenha = binding.edtRecuperarSenha;
+        txtLinkEntrar = binding.txtLinkEntrar;
+
+        controlador = Navigation.findNavController(binding.getRoot());
 
         ViewModelFactory viewModelFactory = new ViewModelFactory(getContext());
 
@@ -105,21 +114,6 @@ public class RecuperarSenhaFragment
             this,
             viewModelFactory
         ).get(AutenticacaoViewModel.class);
-    }
-
-    @Override
-    protected ComponentesVisuais fornecerComponentesVisuais() {
-
-        return new ComponentesVisuais(
-            true,
-            false,
-            false,
-            false,
-            false,
-            false,
-            null,
-            false
-        );
     }
 
     private void verificaEmailValido(String email) {
