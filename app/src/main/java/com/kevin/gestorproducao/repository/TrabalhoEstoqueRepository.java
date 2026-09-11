@@ -16,6 +16,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.kevin.gestorproducao.dao.EstoqueDao;
 import com.kevin.gestorproducao.model.TrabalhoEstoque;
+import com.kevin.gestorproducao.repository.helper.FirebaseTimeoutHelper;
 
 import org.jspecify.annotations.Nullable;
 
@@ -65,26 +66,27 @@ public class TrabalhoEstoqueRepository {
         trabalhoModificado.setIdTrabalho(trabalho.getIdTrabalho());
         trabalhoModificado.setQuantidade(trabalho.getQuantidade());
 
-        referenciaEstoqueIdPersonagem.child(idPersonagem).child(trabalhoModificado.getId()).setValue(trabalhoModificado)
+        return FirebaseTimeoutHelper.execute(callback -> referenciaEstoqueIdPersonagem
+            .child(idPersonagem)
+            .child(trabalhoModificado.getId())
+            .setValue(trabalhoModificado)
             .addOnCompleteListener(backgroundExecutor, task -> {
                 if (task.isSuccessful()) {
                     try {
                         estoqueDao.modificaEstoque(trabalho, idPersonagem);
-                        liveData.postValue(new Resource<>(null, null));
+                        callback.sucesso();
 
                     } catch (RuntimeException e) {
-                        liveData.postValue(new Resource<>(null, e.getMessage()));
+                        callback.erro(e.getMessage());
                     }
                     return;
                 }
 
                 Exception exception = task.getException();
                 String erro = recuperaErro(exception, "Erro desconhecido ao remover trabalho no estoque");
-                liveData.postValue(new Resource<>(null, erro));
-            }
+                callback.erro(erro);
+            })
         );
-
-        return liveData;
     }
 
     private boolean trabalhoInvalido(TrabalhoEstoque trabalho) {
@@ -156,24 +158,26 @@ public class TrabalhoEstoqueRepository {
             liveData.postValue(new Resource<>(null, "Trabalho inválido"));
             return liveData;
         }
-        referenciaEstoqueIdPersonagem.child(idPersonagem).child(trabalho.getId()).setValue(trabalho)
+        return FirebaseTimeoutHelper.execute(callback -> referenciaEstoqueIdPersonagem
+            .child(idPersonagem)
+            .child(trabalho.getId())
+            .setValue(trabalho)
             .addOnCompleteListener(backgroundExecutor, task -> {
                 if (task.isSuccessful()) {
                     try {
                         estoqueDao.insereEstoque(trabalho, idPersonagem);
-                        liveData.postValue(new Resource<>(null, null));
+                        callback.sucesso();
                     } catch (RuntimeException e) {
-                        liveData.postValue(new Resource<>(null, e.getMessage()));
+                        callback.erro(e.getMessage());
                     }
                     return;
                 }
 
                 Exception exception = task.getException();
                 String erro = recuperaErro(exception, "Erro desconhecido ao inserir trabalho no estoque");
-                liveData.postValue(new Resource<>(null, erro));
-            }
+                callback.erro(erro);
+            })
         );
-        return liveData;
     }
 
     public LiveData<Resource<Void>> removeTrabalhoEstoque(
@@ -186,26 +190,27 @@ public class TrabalhoEstoqueRepository {
             return liveData;
         }
 
-        referenciaEstoqueIdPersonagem.child(idPersonagem).child(trabalho.getId()).removeValue()
-            .addOnCompleteListener(backgroundExecutor,task -> {
+        return FirebaseTimeoutHelper.execute(callback -> referenciaEstoqueIdPersonagem
+            .child(idPersonagem)
+            .child(trabalho.getId())
+            .removeValue()
+            .addOnCompleteListener(backgroundExecutor, task -> {
                 if (task.isSuccessful()) {
                     try {
                         estoqueDao.removeEstoque(trabalho);
-                        liveData.postValue(new Resource<>(null, null));
+                        callback.sucesso();
 
                     } catch (RuntimeException e) {
-                        liveData.postValue(new Resource<>(null, e.getMessage()));
+                        callback.erro(e.getMessage());
                     }
                     return;
                 }
 
                 Exception exception = task.getException();
                 String erro = recuperaErro(exception, "Erro desconhecido ao remover trabalho no estoque");
-                liveData.postValue(new Resource<>(null, erro));
-            }
+                callback.erro(erro);
+            })
         );
-
-        return liveData;
     }
 
     public void removeReferenciaTrabalhoEspecifico(String idTrabalho) {

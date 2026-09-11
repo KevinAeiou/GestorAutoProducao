@@ -15,6 +15,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.kevin.gestorproducao.dao.TrabalhoDao;
 import com.kevin.gestorproducao.model.Trabalho;
+import com.kevin.gestorproducao.repository.helper.FirebaseTimeoutHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -101,7 +102,6 @@ public class TrabalhoRepository {
     }
 
     public LiveData<Resource<Void>> insereTrabalho(Trabalho trabalho) {
-        MutableLiveData<Resource<Void>> liveData = new  MutableLiveData<>();
         mapaProfissoes = profissaoRepository.recuperaMapaProfissoesLocal();
         mapaProfissoes = mapaProfissoesInvertido();
 
@@ -110,46 +110,48 @@ public class TrabalhoRepository {
             trabalho.setProfissao(idProfissao);
         }
 
-        referenciaTrabalho.child(trabalho.getId()).setValue(trabalho).addOnCompleteListener(
-            backgroundExecutor,
-            task -> {
-            if (task.isSuccessful()) {
-                try {
-                    trabalhoDao.insereTrabalho(trabalho);
-                    liveData.postValue(new Resource<>(null, null));
+        return FirebaseTimeoutHelper.execute(callback -> referenciaTrabalho
+            .child(trabalho.getId())
+            .setValue(trabalho)
+            .addOnCompleteListener(backgroundExecutor, task -> {
+                if (task.isSuccessful()) {
+                    try {
+                        trabalhoDao.insereTrabalho(trabalho);
+                        callback.sucesso();
 
-                } catch (RuntimeException e) {
-                    liveData.postValue(new Resource<>(null, e.getMessage()));
+                    } catch (RuntimeException e) {
+                        callback.erro(e.getMessage());
+                    }
+                    return;
                 }
-                return;
-            }
 
-            Exception exception = task.getException();
-            String erro = recuperaErro(exception, "Erro desconhecido ao inserir trabalho");
-            liveData.postValue(new Resource<>(null, erro));
-        });
-
-        return liveData;
+                Exception exception = task.getException();
+                String erro = recuperaErro(exception, "Erro desconhecido ao inserir trabalho");
+                callback.erro(erro);
+            })
+        );
     }
 
     public LiveData<Resource<Void>> removeTrabalho(Trabalho trabalho) {
-        MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
-        referenciaTrabalho.child(trabalho.getId()).removeValue().addOnCompleteListener(backgroundExecutor, task -> {
-            if (task.isSuccessful()) {
-                try {
-                    trabalhoDao.removerTrabalho(trabalho);
+        return FirebaseTimeoutHelper.execute(callback -> referenciaTrabalho
+            .child(trabalho.getId())
+            .removeValue()
+            .addOnCompleteListener(backgroundExecutor, task -> {
+                if (task.isSuccessful()) {
+                    try {
+                        trabalhoDao.removerTrabalho(trabalho);
 
-                    liveData.postValue(new Resource<>(null, null));
-                } catch (Exception e) {
-                    liveData.postValue(new Resource<>(null, e.getMessage()));
+                        callback.sucesso();
+                    } catch (Exception e) {
+                        callback.erro(e.getMessage());
+                    }
+                    return;
                 }
-                return;
-            }
-            Exception exception = task.getException();
-            String erro = recuperaErro(exception, "Erro desconhecido ao remover trabalho");
-            liveData.postValue(new Resource<>(null, erro));
-        });
-        return liveData;
+                Exception exception = task.getException();
+                String erro = recuperaErro(exception, "Erro desconhecido ao remover trabalho");
+                callback.erro(erro);
+            })
+        );
     }
     public LiveData<Resource<ArrayList<Trabalho>>> recuperaTrabalhos() {
         backgroundExecutor.execute(() -> {

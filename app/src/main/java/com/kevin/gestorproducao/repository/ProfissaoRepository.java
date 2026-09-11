@@ -16,6 +16,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.kevin.gestorproducao.dao.ProfissaoDao;
 import com.kevin.gestorproducao.model.ProfissaoBase;
+import com.kevin.gestorproducao.repository.helper.FirebaseTimeoutHelper;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -117,15 +118,16 @@ public class ProfissaoRepository {
     }
 
     public LiveData<Resource<Void>> modificaProfissao(ProfissaoBase profissao) {
-        MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
-        referenciaListaProfissoes.child(profissao.getId()).setValue(profissao).addOnCompleteListener(
-            backGroundExecutor, task -> {
+        return FirebaseTimeoutHelper.execute(callback -> referenciaListaProfissoes
+            .child(profissao.getId())
+            .setValue(profissao)
+            .addOnCompleteListener(backGroundExecutor, task -> {
                if (task.isSuccessful()) {
                    try {
                         profissaoDao.modificaProfissao(profissao);
-                        liveData.postValue(new Resource<>(null, null));
+                        callback.sucesso();
                    } catch (RuntimeException e) {
-                       liveData.postValue(new Resource<>(null, e.getMessage()));
+                       callback.erro(e.getMessage());
                    }
                    return;
                }
@@ -136,11 +138,9 @@ public class ProfissaoRepository {
                    "Erro desconhecido ao modificar profissão"
                );
 
-               liveData.postValue(new Resource<>(null, erro));
-            }
+               callback.erro(erro);
+            })
         );
-
-        return liveData;
     }
 
     private String recuperaErro(Exception exception, String erroPadrao) {

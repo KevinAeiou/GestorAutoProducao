@@ -16,6 +16,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.kevin.gestorproducao.dao.VendaDao;
 import com.kevin.gestorproducao.model.TrabalhoVendido;
+import com.kevin.gestorproducao.repository.helper.FirebaseTimeoutHelper;
 
 import java.util.ArrayList;
 import java.util.concurrent.Executor;
@@ -76,24 +77,25 @@ public class TrabalhoVendaRepository {
             liveData.setValue(new Resource<>(null, "Venda está nula ou id vazio!"));
             return liveData;
         }
-        referenciaVendasIdPersonagem.child(idPersonagem).child(trabalho.getId())
+        return FirebaseTimeoutHelper.execute(callback -> referenciaVendasIdPersonagem
+            .child(idPersonagem)
+            .child(trabalho.getId())
             .removeValue()
             .addOnCompleteListener(backgroundExecutor, task -> {
-            if (task.isSuccessful()) {
-                try {
-                    vendaDao.removeTrabalho(trabalho);
-                    liveData.postValue(new Resource<>(null, null));
-                } catch (RuntimeException e) {
-                    liveData.postValue(new Resource<>(null, e.getMessage()));
+                if (task.isSuccessful()) {
+                    try {
+                        vendaDao.removeTrabalho(trabalho);
+                        callback.sucesso();
+                    } catch (RuntimeException e) {
+                        callback.erro(e.getMessage());
+                    }
+                    return;
                 }
-                return;
-            }
-            Exception exception = task.getException();
-            String erroEncontrado = recuperaErro(exception, "Erro desconhecido ao remover venda");
-            liveData.postValue(new Resource<>(null, erroEncontrado));
-        });
-
-        return liveData;
+                Exception exception = task.getException();
+                String erroEncontrado = recuperaErro(exception, "Erro desconhecido ao remover venda");
+                callback.erro(erroEncontrado);
+            })
+        );
     }
 
     public LiveData<Resource<Void>> modificaVenda(
@@ -108,24 +110,26 @@ public class TrabalhoVendaRepository {
             return liveData;
         }
 
-        referenciaVendasIdPersonagem.child(idPersonagem).child(trabalho.getId()).setValue(trabalho)
+        return FirebaseTimeoutHelper.execute(callback -> referenciaVendasIdPersonagem
+            .child(idPersonagem)
+            .child(trabalho.getId())
+            .setValue(trabalho)
             .addOnCompleteListener(backgroundExecutor, task -> {
                 if (task.isSuccessful()) {
                     try {
                         vendaDao.modificaVenda(trabalho, idPersonagem);
-                        liveData.postValue(new Resource<>(null, null));
+                        callback.sucesso();
                     } catch (RuntimeException e) {
-                        liveData.postValue(new Resource<>(null, e.getMessage()));
+                        callback.erro(e.getMessage());
                     }
                     return;
                 }
 
                 Exception exception = task.getException();
                 String erroRecuperado = recuperaErro(exception, "Erro desconhecido ao modificar venda");
-                liveData.postValue(new Resource<>(null, erroRecuperado));
-            }
+                callback.erro(erroRecuperado);
+            })
         );
-        return liveData;
     }
 
     private String validarVenda(TrabalhoVendido trabalho) {
@@ -185,25 +189,26 @@ public class TrabalhoVendaRepository {
             return liveData;
         }
 
-        referenciaVendasIdPersonagem.child(idPersonagem).child(trabalho.getId()).setValue(trabalho)
+        return FirebaseTimeoutHelper.execute(callback -> referenciaVendasIdPersonagem
+            .child(idPersonagem)
+            .child(trabalho.getId())
+            .setValue(trabalho)
             .addOnCompleteListener(backgroundExecutor, task -> {
                 if (task.isSuccessful()) {
                     try {
                         vendaDao.insereVenda(trabalho, idPersonagem);
-                        liveData.postValue(new Resource<>(null, null));
+                        callback.sucesso();
 
                     } catch (RuntimeException e) {
-                        liveData.postValue(new Resource<>(null, e.getMessage()));
+                        callback.erro(e.getMessage());
                     }
                     return;
                 }
                 Exception exception = task.getException();
                 String erroRecuperado = recuperaErro(exception, "Erro desconhecido ao inserir venda");
-                liveData.postValue(new Resource<>(null, erroRecuperado));
-            }
+                callback.erro(erroRecuperado);
+            })
         );
-
-        return liveData;
     }
 
     private String recuperaErro(Exception exception, String erroPadrao) {
