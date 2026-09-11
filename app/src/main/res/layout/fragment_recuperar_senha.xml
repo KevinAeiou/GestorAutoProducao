@@ -26,11 +26,13 @@
             android:layout_height="64dp"
             android:background="@drawable/bg_selo_marca">
 
-            <ImageView
+            <com.google.android.material.imageview.ShapeableImageView
                 android:layout_width="42dp"
                 android:layout_height="42dp"
                 android:layout_gravity="center"
-                android:src="@mipmap/ic_launcher_round"
+                android:scaleType="centerCrop"
+                app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.SeloMarcaCircular"
+                android:src="@mipmap/ic_launcher"
                 android:contentDescription="@null" />
         </FrameLayout>
 

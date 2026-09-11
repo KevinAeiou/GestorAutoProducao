@@ -188,4 +188,9 @@
     <style name="MeuChipShape">
         <item name="cornerSize">16dp</item>
     </style>
+
+    <style name="ShapeAppearanceOverlay.SeloMarcaCircular" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
 </resources>
