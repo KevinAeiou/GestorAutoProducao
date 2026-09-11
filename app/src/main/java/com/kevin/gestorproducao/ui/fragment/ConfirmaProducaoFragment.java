@@ -30,11 +30,10 @@ import com.kevin.gestorproducao.repository.ProfissaoPersonagemRepository;
 import com.kevin.gestorproducao.repository.TrabalhoEstoqueRepository;
 import com.kevin.gestorproducao.repository.TrabalhoProducaoRepository;
 import com.kevin.gestorproducao.repository.TrabalhoRepository;
-import com.kevin.gestorproducao.service.ConsumoMateriaisService;
 import com.kevin.gestorproducao.service.PlanejamentoProducaoService;
-import com.kevin.gestorproducao.service.ProducaoEstoqueService;
 import com.kevin.gestorproducao.service.ProducaoFluxoService;
-import com.kevin.gestorproducao.service.ProfissaoPersonagemService;
+import com.kevin.gestorproducao.service.ProducaoServicosFactory;
+import com.kevin.gestorproducao.service.ServicosProducaoPersonagem;
 import com.kevin.gestorproducao.ui.viewModel.ComponentesVisuais;
 import com.kevin.gestorproducao.ui.viewModel.PersonagemViewModel;
 import com.kevin.gestorproducao.ui.viewModel.TrabalhoProducaoViewModel;
@@ -170,26 +169,7 @@ public class ConfirmaProducaoFragment
 
                 producaoViewModel.setIdPersonagem(personagem.getId());
 
-                ConsumoMateriaisService consumoMateriaisService = new ConsumoMateriaisService(
-                    trabalhoRepo,
-                    estoqueRepo,
-                    personagem.getId(),
-                    context
-                );
-
-                ProducaoEstoqueService producaoEstoqueService = new ProducaoEstoqueService(
-                    trabalhoRepo,
-                    estoqueRepo,
-                    personagem.getId(),
-                    context
-                );
-
-                ProfissaoPersonagemService profissaoPersonagemService = new ProfissaoPersonagemService(
-                    personagem.getId(),
-                    profissaoPersonagemRepo
-                );
-
-                planejamentoProducaoService = new PlanejamentoProducaoService(
+                ServicosProducaoPersonagem servicos = ProducaoServicosFactory.cria(
                     trabalhoRepo,
                     estoqueRepo,
                     producaoRepo,
@@ -198,12 +178,8 @@ public class ConfirmaProducaoFragment
                     context
                 );
 
-                producaoFluxoService = new ProducaoFluxoService(
-                    consumoMateriaisService,
-                    producaoEstoqueService,
-                    profissaoPersonagemService,
-                    planejamentoProducaoService
-                );
+                planejamentoProducaoService = servicos.getPlanejamentoProducaoService();
+                producaoFluxoService = servicos.getProducaoFluxoService();
             }
         );
     }

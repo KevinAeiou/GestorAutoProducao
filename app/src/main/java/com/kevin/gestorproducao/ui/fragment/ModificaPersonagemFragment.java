@@ -192,9 +192,9 @@ public class ModificaPersonagemFragment
 
         Context context = requireContext().getApplicationContext();
 
-        ProfissaoPersonagemRepository profissaoPersonagemRepository = new ProfissaoPersonagemRepository(context);
-        PersonagemRepository personagemRepository = new PersonagemRepository(context);
-        TrabalhoProducaoRepository producaoRepository = new TrabalhoProducaoRepository(context);
+        ProfissaoPersonagemRepository profissaoPersonagemRepository = ProfissaoPersonagemRepository.getInstance(context);
+        PersonagemRepository personagemRepository = PersonagemRepository.getInstance(context);
+        TrabalhoProducaoRepository producaoRepository = TrabalhoProducaoRepository.getInstance(context);
 
         TrabalhoEstoqueRepository estoqueRepository = TrabalhoEstoqueRepository.getInstance(context);
         TrabalhoVendaRepository vendaRepository = TrabalhoVendaRepository.getInstance(context);
