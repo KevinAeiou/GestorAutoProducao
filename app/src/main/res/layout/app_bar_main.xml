@@ -16,7 +16,8 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:navigationIcon="@drawable/ic_menu" >
+            app:navigationIcon="@drawable/ic_menu"
+            app:navigationContentDescription="@string/abre_menu_navegacao" >
 
             <TextView
                 android:id="@+id/txtTituloCentral"
