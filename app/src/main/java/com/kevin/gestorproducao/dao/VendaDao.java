@@ -20,7 +20,6 @@ import static com.kevin.gestorproducao.db.contracts.TrabalhoVendidoContract.Trab
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 
 import androidx.annotation.NonNull;
 
@@ -29,19 +28,13 @@ import com.kevin.gestorproducao.model.TrabalhoVendido;
 
 import java.util.ArrayList;
 
-public class VendaDao {
-    private final SQLiteDatabase db;
-
+public class VendaDao extends BaseDao {
     public VendaDao(Context context) {
-        DbHelper dbHelper = DbHelper.getInstance(context);
-
-        this.db = dbHelper.getWritableDatabase();
+        super(DbHelper.getInstance(context).getWritableDatabase());
     }
 
     public void substituirTodos(ArrayList<TrabalhoVendido> vendas, String idPersonagem) {
-        db.beginTransaction();
-
-        try {
+        executaEmTransacao(() -> {
             db.delete(
                 TABLE_TRABALHOS_VENDIDOS,
                 COLUMN_NAME_ID_PERSONAGEM + " = ? ",
@@ -53,10 +46,7 @@ public class VendaDao {
 
                 db.insert(TABLE_TRABALHOS_VENDIDOS, null, values);
             }
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
+        });
     }
 
     @NonNull
@@ -216,66 +206,30 @@ public class VendaDao {
     }
 
     public void removeTrabalho(TrabalhoVendido trabalho) {
-        db.beginTransaction();
+        String selection = COLUMN_NAME_ID + " = ?";
+        String[] selectionArgs = {trabalho.getId()};
 
-        try {
-            String selection = COLUMN_NAME_ID + " = ?";
-            String[] selectionArgs = {trabalho.getId()};
-            db.delete(TABLE_TRABALHOS_VENDIDOS, selection, selectionArgs);
-
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
+        removeEmTransacao(TABLE_TRABALHOS_VENDIDOS, selection, selectionArgs);
     }
 
     public void modificaVenda(TrabalhoVendido trabalho, String idPersonagem) {
-        db.beginTransaction();
+        ContentValues values = getContentValues(idPersonagem, trabalho);
+        String selection = COLUMN_NAME_ID + " = ?";
+        String[] selectionArgs = {trabalho.getId()};
 
-        try {
-            ContentValues values = getContentValues(idPersonagem, trabalho);
-            String selection = COLUMN_NAME_ID + " = ?";
-            String[] selectionArgs = {trabalho.getId()};
-
-            db.update(
-                TABLE_TRABALHOS_VENDIDOS,
-                values,
-                selection,
-                selectionArgs
-            );
-
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
+        atualizaEmTransacao(TABLE_TRABALHOS_VENDIDOS, values, selection, selectionArgs);
     }
 
     public void insereVenda(TrabalhoVendido trabalho, String idPersonagem) {
-        db.beginTransaction();
+        ContentValues values = getContentValues(idPersonagem, trabalho);
 
-        try {
-            ContentValues values = getContentValues(idPersonagem, trabalho);
-
-            db.insert(TABLE_TRABALHOS_VENDIDOS, null, values);
-
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
+        insereEmTransacao(TABLE_TRABALHOS_VENDIDOS, values);
     }
 
     public void removeVendas(String idPersonagem) {
-        db.beginTransaction();
+        String whereClause = COLUMN_NAME_ID_PERSONAGEM + " = ? ";
+        String[] whereArgs = {idPersonagem};
 
-        try {
-            String whereClause = COLUMN_NAME_ID_PERSONAGEM + " = ? ";
-            String[] whereArgs = {idPersonagem};
-
-            db.delete(TABLE_TRABALHOS_VENDIDOS, whereClause, whereArgs);
-
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
+        removeEmTransacao(TABLE_TRABALHOS_VENDIDOS, whereClause, whereArgs);
     }
 }

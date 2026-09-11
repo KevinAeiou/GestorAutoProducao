@@ -7,7 +7,6 @@ import static com.kevin.gestorproducao.db.contracts.TrabalhoDbContract.TrabalhoE
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 
 import androidx.annotation.NonNull;
 
@@ -19,13 +18,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ProfissaoDao {
-    private final SQLiteDatabase db;
+public class ProfissaoDao extends BaseDao {
 
     public ProfissaoDao(Context context) {
-        DbHelper dbHelper = DbHelper.getInstance(context);
-
-        this.db = dbHelper.getWritableDatabase();
+        super(DbHelper.getInstance(context).getWritableDatabase());
     }
 
     public Map<String, String> recuperaMapaProfissoes() {
@@ -48,8 +44,7 @@ public class ProfissaoDao {
     }
 
     public void substituirTodas(List<ProfissaoBase> profissoes) {
-        db.beginTransaction();
-        try {
+        executaEmTransacao(() -> {
             db.delete(TABLE_PROFISSOES, null, null);
 
             for (ProfissaoBase profissao : profissoes) {
@@ -57,11 +52,7 @@ public class ProfissaoDao {
 
                 db.insert(TABLE_PROFISSOES, null, values);
             }
-
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
+        });
     }
 
     @NonNull
@@ -75,65 +66,25 @@ public class ProfissaoDao {
     }
 
     public void modificaProfissao(ProfissaoBase profissao) {
-        db.beginTransaction();
+        ContentValues values = getContentValues(profissao);
 
-        try {
-            ContentValues values = getContentValues(profissao);
+        String selection = COLUMN_NAME_ID + " = ?";
+        String[] selectionArgs = {profissao.getId()};
 
-            String selection = COLUMN_NAME_ID + " = ?";
-            String[] selectionArgs = {profissao.getId()};
-
-            db.update(
-                TABLE_PROFISSOES,
-                values,
-                selection,
-                selectionArgs
-            );
-
-            db.setTransactionSuccessful();
-
-        } finally {
-            db.endTransaction();
-        }
+        atualizaEmTransacao(TABLE_PROFISSOES, values, selection, selectionArgs);
     }
 
     public void insereProfissao(ProfissaoBase profissao) {
-        db.beginTransaction();
+        ContentValues values = getContentValues(profissao);
 
-        try {
-            ContentValues values = getContentValues(profissao);
-
-            db.insert(
-                TABLE_PROFISSOES,
-                null,
-                values
-            );
-
-            db.setTransactionSuccessful();
-
-        } finally {
-            db.endTransaction();
-        }
+        insereEmTransacao(TABLE_PROFISSOES, values);
     }
 
     public void removeProfissao(ProfissaoBase profissao) {
-        db.beginTransaction();
+        String selection = COLUMN_NAME_ID + " = ?";
+        String[] selectionArgs = {profissao.getId()};
 
-        try {
-            String selection = COLUMN_NAME_ID + " = ?";
-            String[] selectionArgs = {profissao.getId()};
-
-            db.delete(
-                TABLE_PROFISSOES,
-                selection,
-                selectionArgs
-            );
-
-            db.setTransactionSuccessful();
-
-        } finally {
-            db.endTransaction();
-        }
+        removeEmTransacao(TABLE_PROFISSOES, selection, selectionArgs);
     }
 
     public ArrayList<ProfissaoBase> recuperaProfissoesBase() {

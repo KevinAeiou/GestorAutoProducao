@@ -18,7 +18,6 @@ import static com.kevin.gestorproducao.db.contracts.TrabalhoVendidoContract.Trab
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 
 import androidx.annotation.NonNull;
 
@@ -30,13 +29,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TrabalhoDao {
-    private final SQLiteDatabase db;
-
+public class TrabalhoDao extends BaseDao {
     public TrabalhoDao(Context context) {
-        DbHelper dbHelper = DbHelper.getInstance(context);
-
-        this.db = dbHelper.getWritableDatabase();
+        super(DbHelper.getInstance(context).getWritableDatabase());
     }
 
     public ArrayList<Trabalho> recuperaTrabalhos () {
@@ -108,9 +103,7 @@ public class TrabalhoDao {
     }
 
     public void substituirTodos(ArrayList<Trabalho> trabalhosServidor) {
-        db.beginTransaction();
-
-        try {
+        executaEmTransacao(() -> {
             db.delete(TABLE_TRABALHOS, null, null);
             db.delete(TABLE_TRABALHOS_NECESSARIOS, null, null);
 
@@ -128,11 +121,7 @@ public class TrabalhoDao {
                     }
                 }
             }
-
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
+        });
     }
 
     @NonNull
@@ -151,9 +140,7 @@ public class TrabalhoDao {
     }
 
     public void removerTrabalho(Trabalho trabalho) {
-        db.beginTransaction();
-
-        try {
+        executaEmTransacao(() -> {
             String selection = COLUMN_NAME_ID + " = ?";
             String[] selectionArgs = {trabalho.getId()};
             db.delete(TABLE_TRABALHOS, selection, selectionArgs);
@@ -163,11 +150,7 @@ public class TrabalhoDao {
                 COLUMN_NAME_ID_TRABALHO + " = ?",
                 selectionArgs
             );
-
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
+        });
     }
 
     public ArrayList<Trabalho> recuperaTrabalhosNecessarios(Trabalho trabalho) {
@@ -496,9 +479,7 @@ public class TrabalhoDao {
     }
 
     public void insereTrabalho(Trabalho trabalho) {
-        db.beginTransaction();
-
-        try {
+        executaEmTransacao(() -> {
             ContentValues values = getValues(trabalho);
 
             db.insert(TABLE_TRABALHOS, null, values);
@@ -511,17 +492,11 @@ public class TrabalhoDao {
                     db.insert(TABLE_TRABALHOS_NECESSARIOS, null, values1);
                 }
             }
-
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
+        });
     }
 
     public void modificaTrabalho(Trabalho trabalho) {
-        db.beginTransaction();
-
-        try {
+        executaEmTransacao(() -> {
             ContentValues values = getValues(trabalho);
 
             String selection = COLUMN_NAME_ID + " = ?";
@@ -562,12 +537,7 @@ public class TrabalhoDao {
                     );
                 }
             }
-
-            db.setTransactionSuccessful();
-
-        } finally {
-            db.endTransaction();
-        }
+        });
     }
 
     public Trabalho recuperaTrabalhoPorIdTrabalhoNecessario(String idTrabalho) {

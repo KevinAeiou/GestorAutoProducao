@@ -25,7 +25,6 @@ import static com.kevin.gestorproducao.ui.activity.Constantes.CODIGO_TRABALHO_PR
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 
 import androidx.annotation.NonNull;
 
@@ -34,13 +33,9 @@ import com.kevin.gestorproducao.model.TrabalhoProducao;
 
 import java.util.ArrayList;
 
-public class ProducaoDao {
-    private final SQLiteDatabase db;
-
+public class ProducaoDao extends BaseDao {
     public ProducaoDao(Context context) {
-        DbHelper dbHelper = DbHelper.getInstance(context);
-
-        this.db = dbHelper.getWritableDatabase();
+        super(DbHelper.getInstance(context).getWritableDatabase());
     }
 
     public TrabalhoProducao recuperaProducaoParaProduzirProduzindoPorId(
@@ -80,9 +75,7 @@ public class ProducaoDao {
         ArrayList<TrabalhoProducao> producoes,
         String idPersonagem
     ) {
-        db.beginTransaction();
-
-        try {
+        executaEmTransacao(() -> {
             String selection = COLUMN_NAME_ID_PERSONAGEM + " LIKE ?";
             String[] selectionArgs = {idPersonagem};
             db.delete(TABLE_TRABALHOS_PRODUCAO, selection, selectionArgs);
@@ -92,11 +85,7 @@ public class ProducaoDao {
 
                 db.insert(TABLE_TRABALHOS_PRODUCAO, null, values);
             }
-
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
+        });
     }
 
     @NonNull
@@ -255,66 +244,30 @@ public class ProducaoDao {
     }
 
     public void insereProducao(TrabalhoProducao trabalho, String idPersonagem) {
-        db.beginTransaction();
+        ContentValues values = getContentValues(idPersonagem, trabalho);
 
-        try {
-            ContentValues values = getContentValues(idPersonagem, trabalho);
-
-            db.insert(TABLE_TRABALHOS_PRODUCAO, null, values);
-
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
+        insereEmTransacao(TABLE_TRABALHOS_PRODUCAO, values);
     }
 
     public void removeProducao(TrabalhoProducao trabalho) {
-        db.beginTransaction();
+        String selection = COLUMN_NAME_ID + " LIKE ?";
+        String[] selectionArgs = {trabalho.getId()};
 
-        try {
-            String selection = COLUMN_NAME_ID + " LIKE ?";
-            String[] selectionArgs = {trabalho.getId()};
-            db.delete(TABLE_TRABALHOS_PRODUCAO, selection, selectionArgs);
-
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
+        removeEmTransacao(TABLE_TRABALHOS_PRODUCAO, selection, selectionArgs);
     }
 
     public void modificaProducao(TrabalhoProducao trabalho, String idPersonagem) {
-        db.beginTransaction();
+        ContentValues values = getContentValues(idPersonagem, trabalho);
+        String selection = COLUMN_NAME_ID + " LIKE ?";
+        String[] selectionArgs = {trabalho.getId()};
 
-        try {
-            ContentValues values = getContentValues(idPersonagem, trabalho);
-            String selection = COLUMN_NAME_ID + " LIKE ?";
-            String[] selectionArgs = {trabalho.getId()};
-
-            db.update(
-                TABLE_TRABALHOS_PRODUCAO,
-                values,
-                selection,
-                selectionArgs
-            );
-
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
+        atualizaEmTransacao(TABLE_TRABALHOS_PRODUCAO, values, selection, selectionArgs);
     }
 
     public void removeProducoes(String idPersonagem) {
-        db.beginTransaction();
+        String selection = COLUMN_NAME_ID_PERSONAGEM + " LIKE ?";
+        String[] selectionArgs = {idPersonagem};
 
-        try {
-            String selection = COLUMN_NAME_ID_PERSONAGEM + " LIKE ?";
-            String[] selectionArgs = {idPersonagem};
-
-            db.delete(TABLE_TRABALHOS_PRODUCAO, selection, selectionArgs);
-
-            db.setTransactionSuccessful();
-        } finally {
-            db.endTransaction();
-        }
+        removeEmTransacao(TABLE_TRABALHOS_PRODUCAO, selection, selectionArgs);
     }
 }
