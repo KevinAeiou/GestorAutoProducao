@@ -201,7 +201,7 @@ public class ListaProfissoesFragment extends BaseFragment<FragmentListaProfissoe
 
     private void removeOuvinteProfissao() {
         if (profissaoViewModel == null) return;
-        profissaoViewModel.removeOuvinte();
+        profissaoViewModel.removeObservador();
     }
 
 }

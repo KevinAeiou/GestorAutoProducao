@@ -57,7 +57,7 @@ public class RecursosProducaoViewModel extends ViewModel {
             modificacaoResultado.removeSource(source);
         });
     }
-    public void removeOuvinte() {
+    public void removeObservador() {
         repository.removeOuvinte();
     }
 

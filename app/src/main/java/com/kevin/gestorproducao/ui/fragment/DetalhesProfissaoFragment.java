@@ -234,7 +234,7 @@ public class DetalhesProfissaoFragment
         profissao = null;
 
         if (profissaoViewModel != null) {
-            profissaoViewModel.removeOuvinte();
+            profissaoViewModel.removeObservador();
         }
     }
 }

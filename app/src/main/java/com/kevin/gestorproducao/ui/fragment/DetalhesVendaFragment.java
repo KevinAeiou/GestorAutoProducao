@@ -675,6 +675,6 @@ public class DetalhesVendaFragment
 
     private void removeObservadorRecurso() {
         if (recursosProducaoViewModel == null) return;
-        recursosProducaoViewModel.removeOuvinte();
+        recursosProducaoViewModel.removeObservador();
     }
 }

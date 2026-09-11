@@ -70,7 +70,7 @@ public class ProfissaoViewModel extends ViewModel {
         });
     }
 
-    public void removeOuvinte() {
+    public void removeObservador() {
         repository.removeOuvinte();
     }
 
