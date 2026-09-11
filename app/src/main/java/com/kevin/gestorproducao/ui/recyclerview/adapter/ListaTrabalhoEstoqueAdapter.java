@@ -96,23 +96,7 @@ public class ListaTrabalhoEstoqueAdapter
             nivelTrabalho.setTextColor(ContextCompat.getColor(context,R.color.cor_texto_nivel));
         }
         private void configuraCorNomeTrabalho(TrabalhoEstoque trabalho) {
-            String raridade = trabalho.getRaridade();
-            if (raridade == null) return;
-
-            switch (raridade) {
-                case "Melhorado":
-                    nomeTrabalho.setTextColor(ContextCompat.getColor(context, R.color.cor_texto_raridade_melhorado));
-                    break;
-                case "Raro":
-                    nomeTrabalho.setTextColor(ContextCompat.getColor(context, R.color.cor_texto_raridade_raro));
-                    break;
-                case "Especial":
-                    nomeTrabalho.setTextColor(ContextCompat.getColor(context, R.color.cor_texto_raridade_especial));
-                    break;
-                default:
-                    nomeTrabalho.setTextColor(ContextCompat.getColor(context, R.color.cor_texto_raridade_comum));
-                    break;
-            }
+            nomeTrabalho.setTextColor(Formatador.corPorRaridade(context, trabalho.getRaridade()));
         }
     }
 }

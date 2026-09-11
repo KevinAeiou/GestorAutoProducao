@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.kevin.gestorproducao.R;
 import com.kevin.gestorproducao.model.Trabalho;
 import com.kevin.gestorproducao.ui.recyclerview.adapter.listener.OnItemClickListener;
+import com.kevin.gestorproducao.utilitario.Formatador;
 
 import java.util.List;
 
@@ -94,20 +95,7 @@ public class ListaTrabalhoEspecificoNovaProducaoAdapter
             nivelTrabalhoEspecifico.setTextColor(ContextCompat.getColor(context,R.color.cor_texto_nivel));
         }
         private void confiuraCorNomeTrabalho(Trabalho trabalho) {
-            switch (trabalho.getRaridade()) {
-                case "Comum":
-                    nomeTrabalhoEspecifico.setTextColor(ContextCompat.getColor(context, R.color.cor_texto_raridade_comum));
-                    break;
-                case "Melhorado":
-                    nomeTrabalhoEspecifico.setTextColor(ContextCompat.getColor(context, R.color.cor_texto_raridade_melhorado));
-                    break;
-                case "Raro":
-                    nomeTrabalhoEspecifico.setTextColor(ContextCompat.getColor(context, R.color.cor_texto_raridade_raro));
-                    break;
-                case "Especial":
-                    nomeTrabalhoEspecifico.setTextColor(ContextCompat.getColor(context, R.color.cor_texto_raridade_especial));
-                    break;
-            }
+            nomeTrabalhoEspecifico.setTextColor(Formatador.corPorRaridade(context, trabalho.getRaridade()));
         }
     }
 }

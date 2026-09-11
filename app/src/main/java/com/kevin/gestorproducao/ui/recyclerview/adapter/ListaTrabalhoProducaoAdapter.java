@@ -16,6 +16,7 @@ import com.google.android.material.card.MaterialCardView;
 import com.kevin.gestorproducao.R;
 import com.kevin.gestorproducao.model.TrabalhoProducao;
 import com.kevin.gestorproducao.ui.recyclerview.adapter.listener.OnItemClickListenerTrabalhoProducao;
+import com.kevin.gestorproducao.utilitario.Formatador;
 
 import java.util.List;
 
@@ -131,23 +132,7 @@ public class ListaTrabalhoProducaoAdapter
         }
 
         private void configuraCorNomeTrabalhoProducao(TrabalhoProducao trabalhoProducao) {
-            String raridade = trabalhoProducao.getRaridade();
-            nome_trabalho.setTextColor(ContextCompat.getColor(context, R.color.cor_texto_raridade_comum));
-            if (raridade == null) return;
-            switch (raridade) {
-                case "Comum":
-                    nome_trabalho.setTextColor(ContextCompat.getColor(context, R.color.cor_texto_raridade_comum));
-                    break;
-                case "Raro":
-                    nome_trabalho.setTextColor(ContextCompat.getColor(context, R.color.cor_texto_raridade_raro));
-                    break;
-                case "Melhorado":
-                    nome_trabalho.setTextColor(ContextCompat.getColor(context, R.color.cor_texto_raridade_melhorado));
-                    break;
-                case "Especial":
-                    nome_trabalho.setTextColor(ContextCompat.getColor(context, R.color.cor_texto_raridade_especial));
-                    break;
-            }
+            nome_trabalho.setTextColor(Formatador.corPorRaridade(context, trabalhoProducao.getRaridade()));
         }
     }
 }
