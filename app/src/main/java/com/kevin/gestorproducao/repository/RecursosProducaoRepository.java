@@ -5,7 +5,6 @@ import static com.kevin.gestorproducao.ui.activity.Constantes.CHAVE_RECURSO;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
@@ -160,7 +159,6 @@ public class RecursosProducaoRepository {
             for (String item : array) {
                 RecursoComum novoRecursoComum = new RecursoComum();
                 novoRecursoComum.setNome(item);
-                Log.d("recursos", "RecursoComum: " + novoRecursoComum);
                 referenciaListaRecursos.child(novoRecursoComum.getId()).setValue(novoRecursoComum);
             }
         }
