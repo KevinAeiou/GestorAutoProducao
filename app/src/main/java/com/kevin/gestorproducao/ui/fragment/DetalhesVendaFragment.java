@@ -11,7 +11,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,7 +42,6 @@ import com.kevin.gestorproducao.ui.viewModel.TrabalhosVendidosViewModel;
 import com.kevin.gestorproducao.ui.viewModel.factory.ViewModelFactory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
@@ -214,86 +212,68 @@ public class DetalhesVendaFragment
                         return;
                     }
                     ArrayList<RecursoComumAvancado> recursosAvancados = resultado.getDado();
-                    Log.d("trabalhoVendido", "Recursos avançados: " + recursosAvancados);
                     if (trabalhoSelecionado == null) return;
                     if (trabalhoSelecionado.ehAmuletos(getContext()) || trabalhoSelecionado.ehAneis(getContext()) || trabalhoSelecionado.ehCapotes(getContext()) || trabalhoSelecionado.ehBraceletes(getContext())) {
-                        Log.d("trabalhoVendido", "Trabalho selecionado uso ESSÊNCIAS");
                         for (RecursoComumAvancado recursoAvancado : recursosAvancados) {
                             switch (recursoAvancado.getId()) {
                                 case "e580e375-abc1-44f8-b332-774b7f1a490c":
                                     mediaValorRecursoUnitarioComumMercado = recursoAvancado.getValor();
-                                    Log.d("trabalhoVendido", "Valor essência comum: " + mediaValorRecursoUnitarioComumMercado);
                                     continue;
                                 case "94b66657-c7c6-41c0-b6f0-922614182549":
                                     mediaValorRecursoUnitarioCompostoMercado = recursoAvancado.getValor();
-                                    Log.d("trabalhoVendido", "Valor essência composta: " + mediaValorRecursoUnitarioCompostoMercado);
                                     continue;
                                 case "c9751ecc-f528-4a80-88c3-d2a8af2804fa":
                                     mediaValorRecursoUnitarioEnergiaMercado = recursoAvancado.getValor();
-                                    Log.d("trabalhoVendido", "Valor essência de energia: " + mediaValorRecursoUnitarioEnergiaMercado);
                                     continue;
                                 case "7c27a18c-fc60-484c-9545-99030a623129":
                                     mediaValorRecursoUnitarioEtereoMercado = recursoAvancado.getValor();
-                                    Log.d("trabalhoVendido", "Valor essência etérea: " + mediaValorRecursoUnitarioEtereoMercado);
                                     break;
                             }
                         }
                     }
                     if (trabalhoSelecionado.ehLongoAlcance(getContext()) || trabalhoSelecionado.ehCorpoCorpo(getContext())) {
-                        Log.d("trabalhoVendido", "Trabalho selecionado uso CATALIZADORES");
                         for (RecursoComumAvancado recursoAvancado : recursosAvancados) {
                             switch (recursoAvancado.getId()) {
                                 case "b7f69638-c9b7-4c69-865e-cbacef5c45b1":
                                     mediaValorRecursoUnitarioComumMercado = recursoAvancado.getValor();
-                                    Log.d("trabalhoVendido", "Valor catalizador Comum: " + mediaValorRecursoUnitarioComumMercado);
                                     continue;
                                 case "3a085587-5093-471d-9187-27b2370e4b38":
                                     mediaValorRecursoUnitarioCompostoMercado = recursoAvancado.getValor();
-                                    Log.d("trabalhoVendido", "Valor catalizador composto: " + mediaValorRecursoUnitarioCompostoMercado);
                                     continue;
                                 case "259d5a95-72fd-4b36-b17f-c7b6a2a6897f":
                                     mediaValorRecursoUnitarioEnergiaMercado = recursoAvancado.getValor();
-                                    Log.d("trabalhoVendido", "Valor catalizador energia: " + mediaValorRecursoUnitarioEnergiaMercado);
                                     continue;
                                 case "2d8c434a-50eb-4269-bc70-725ded6bc7e9":
                                     mediaValorRecursoUnitarioEtereoMercado = recursoAvancado.getValor();
-                                    Log.d("trabalhoVendido", "Valor catalizador etereo: " + mediaValorRecursoUnitarioEtereoMercado);
                                     break;
                             }
                         }
                     }
                     if (trabalhoSelecionado.ehArmaduraPesada(getContext()) || trabalhoSelecionado.ehArmaduraLeve(getContext()) || trabalhoSelecionado.ehArmaduraTecido(getContext())) {
-                        Log.d("trabalhoVendido", "Trabalho selecionado uso SUBSTÂNCIAS");
                         for (RecursoComumAvancado recursoAvancado : recursosAvancados) {
                             switch (recursoAvancado.getId()) {
                                 case "6ac21d44-1e8d-4bf8-bd62-53248e568417":
                                     mediaValorRecursoUnitarioComumMercado = recursoAvancado.getValor();
-                                    Log.d("trabalhoVendido", "Valor substância comum: " + mediaValorRecursoUnitarioComumMercado);
                                     continue;
                                 case "6250e394-4a82-4ccb-b697-c788b9094c41":
                                     mediaValorRecursoUnitarioCompostoMercado = recursoAvancado.getValor();
-                                    Log.d("trabalhoVendido", "Valor substância composta: " + mediaValorRecursoUnitarioCompostoMercado);
                                     continue;
                                 case "b2f158f9-5b52-444a-a27b-7ac1284063c6":
                                     mediaValorRecursoUnitarioEnergiaMercado = recursoAvancado.getValor();
-                                    Log.d("trabalhoVendido", "Valor substância de energia: " + mediaValorRecursoUnitarioEnergiaMercado);
                                     continue;
                                 case "e12c1346-9343-414e-a0b5-631e494423b2":
                                     mediaValorRecursoUnitarioEtereoMercado = recursoAvancado.getValor();
-                                    Log.d("trabalhoVendido", "Valor substância etérea: " + mediaValorRecursoUnitarioEtereoMercado);
                                     break;
                             }
                         }
                     }
                     if (trabalhoSelecionado.ehComum()) {
-                        Log.d("trabalhoVendido", "Trabalho selecionado é COMUM");
                         calculaValorProducaoComum();
                         edtValorProducaoTrabalhoVendido.setText(String.valueOf(valorProducaoComum));
                         atualizaValorLucro(valorProducaoComum);
                         return;
                     }
                     if (trabalhoSelecionado.ehMelhorado()) {
-                        Log.d("trabalhoVendido", "Trabalho selecionado é MELHORADO");
                         calculaValorProducaoComum();
                         calculcaValorProducaoMelhorado();
                         edtValorProducaoTrabalhoVendido.setText(String.valueOf(valorProducaoMelhorado));
@@ -301,7 +281,6 @@ public class DetalhesVendaFragment
                         return;
                     }
                     if (trabalhoSelecionado.ehRaro()) {
-                        Log.d("trabalhoVendido", "Trabalho selecionado é RARO");
                         calculaValorProducaoComum();
                         calculcaValorProducaoMelhorado();
                         calculcaValorProducaoRaro();
@@ -486,15 +465,10 @@ public class DetalhesVendaFragment
     }
 
     private void calculaTaxa(int valorProducao) {
-        Log.d("trabalhoVendido", "Valor lucro: " + novoValorLucro);
         int valorLucroSemTaxaMercado = (int) Math.round(novoValorLucro / FATOR_PERCENTUAL_MERCADO);
-        Log.d("trabalhoVendido", "Valor lucro sem taxa mercado: " + valorLucroSemTaxaMercado + " valor de produção: " + valorProducao);
         double taxa = (double) valorLucroSemTaxaMercado / valorProducao;
-        Log.d("trabalhoVendido", "Valor taxa: " + taxa);
         taxa = taxa >= 1 ? (taxa - 1) * 100 : (1 - taxa) * -100;
-        Log.d("trabalhoVendido", "Valor taxa: " + taxa);
         int porcentual = (int) Math.round(taxa);
-        Log.d("trabalhoVendido", "Valor taxa porcentual: " + porcentual);
         edtTaxaLucroTrabalhoVendido.setText(String.valueOf(porcentual));
     }
 
@@ -537,12 +511,9 @@ public class DetalhesVendaFragment
 
     private void cofiguraCampoValorProducao() {
         if (trabalhoSelecionado == null) {
-            Log.d("trabalhoVendido", "Trabalho selecionado é nulo");
             return;
         }
-        Log.d("trabalhoVendido", "Trabalho selecionado: "+ trabalhoSelecionado);
         if (trabalhoSelecionado.ehProducaoDeRecursos()) {
-            Log.d("trabalhoVendido", "Trabalho selecionado é produção de recuros");
             edtTaxaLucroTrabalhoVendido.setEnabled(false);
             edtValorLucroTrabalhoVendido.setEnabled(false);
             edtValorLucroTrabalhoVendido.setText(R.string.stringIndefinido);
@@ -552,60 +523,37 @@ public class DetalhesVendaFragment
 
     private void calculcaValorProducaoRaro() {
         int quantidadeRecursoEtereo = trabalhoSelecionado.recuperaQuantidadeMaximaRecursosEtereo(getContext());
-        Log.d("trabalhoVendido", "Quantidade de recursos etéreos necessarios: " + quantidadeRecursoEtereo);
         valorProducaoRaro = valorProducaoMelhorado + (mediaValorRecursoUnitarioEtereoMercado * quantidadeRecursoEtereo) + MEDIA_VALOR_LICENCA_INICIANTE;
-        Log.d("trabalhoVendido", "Valor producao raro: " + valorProducaoRaro);
     }
 
     private void calculcaValorProducaoMelhorado() {
-        Log.d("trabalhoVendido", "Trabalhos necessarios: " + trabalhoSelecionado.getListaTrabalhosNecessarios());
         List<String> listaTrabalhosNecessarios = trabalhoSelecionado.getListaTrabalhosNecessarios();
-        Log.d("trabalhoVendido", "Lista trabalhos necessarios: " + Arrays.toString(new List[]{listaTrabalhosNecessarios}));
         int quantidadeTrabalhosComunsNecessarios = listaTrabalhosNecessarios.size();
-        Log.d("trabalhoVendido", "Quantidade de trabalhos comuns necessarios: " + quantidadeTrabalhosComunsNecessarios);
         int quantidadeRecursoEnerga = trabalhoSelecionado.recuperaQuantidadeMaximaRecursosEnergia(getContext());
-        Log.d("trabalhoVendido", "Quantidade de recursos de energia necessarios: " + quantidadeRecursoEnerga);
         valorProducaoMelhorado = (valorProducaoComum * quantidadeTrabalhosComunsNecessarios) + (mediaValorRecursoUnitarioEnergiaMercado * quantidadeRecursoEnerga) + MEDIA_VALOR_LICENCA_INICIANTE;
-        Log.d("trabalhoVendido", "Valor de produção melhorado: " + valorProducaoMelhorado);
     }
 
     private void calculaValorProducaoComum() {
         int quantidadeMaximaRecursos = trabalhoSelecionado.recuperaQuantidadeMaximaRecursos(getContext());
-        Log.d("trabalhoVendido", "Trabalho selecionado possui quantidade máxima de recursos: " + quantidadeMaximaRecursos);
         int quantidadeTotalRecursos = quantidadeMaximaRecursos * 3 + 3;
-        Log.d("trabalhoVendido", "Trabalho selecionado possui quantidade final de recursos: " + quantidadeTotalRecursos);
         int quantidadeMaximaRecursosProduzido = trabalhoSelecionado.getNivel() > 14 ? 24 : 18;
-        Log.d("trabalhoVendido", "Trabalho selecionado possui quantidade máxima de recursos produzidos: " + quantidadeMaximaRecursosProduzido);
         int quantidadeRecursosNecessarios = trabalhoSelecionado.getNivel() > 14 ? 8 : 4;
-        Log.d("trabalhoVendido", "Trabalho selecionado possui quantidade máxima de recursos (Comum/Composto): " + quantidadeRecursosNecessarios);
         int valorRecursoUnitario = (mediaValorRecursoUnitarioCompostoMercado * quantidadeRecursosNecessarios) / quantidadeMaximaRecursosProduzido;
-        Log.d("trabalhoVendido", "Trabalho selecionado possui recurso necessário com valor unitário: " + valorRecursoUnitario);
         int valorLicencaComum = 80;
         int valorLicencaAprendiz = mediaValorRecursoUnitarioComumMercado * 4 / 2 + 80;
-        Log.d("trabalhoVendido", "Trabalho selecionado possui valor da licença do aprendiz: " + valorLicencaAprendiz);
         double resultado = (double) quantidadeTotalRecursos / quantidadeMaximaRecursosProduzido;
-        Log.d("trabalhoVendido", "Trabalho selecionado possui quantidade de licenças do aprendiz utilizadas: " + resultado);
         int quantidadeLicencaAprendizUtilizada = (int) Math.max(Math.round(resultado), 1);
-        Log.d("trabalhoVendido", "Trabalho selecionado possui quantidade de licenças do aprendiz utilizadas (inteiro): " + quantidadeLicencaAprendizUtilizada);
         int valorLicencas = valorLicencaComum + (valorLicencaAprendiz * quantidadeLicencaAprendizUtilizada);
-        Log.d("trabalhoVendido", "Trabalho selecionado possui valor total de licenças utilizadas: " + valorLicencas);
         int valorRecursoTotal = quantidadeTotalRecursos * valorRecursoUnitario;
-        Log.d("trabalhoVendido", "Trabalho selecionado possui valor total de recursos: " + valorRecursoTotal);
         valorProducaoComum = valorRecursoTotal + valorLicencas;
-        Log.d("trabalhoVendido", "Trabalho selecionado possui valor de produção: " + valorProducaoComum);
     }
 
     private void atualizaValorLucro(int valorProducao) {
-        Log.d("trabalhoVendido", "Trabalho selecionado possui novaTaxa: " + novaTaxa);
         double v = novaTaxa * FATOR_PERCENTUAL;
-        Log.d("trabalhoVendido", "Trabalho selecionado possui v: " + v);
         double porcentagem = v >= 0 ? v + 1 : v + 1.0;
-        Log.d("trabalhoVendido", "Trabalho selecionado possui porcentagem: " + porcentagem);
         int valorProducaoTaxa = (int) (valorProducao * porcentagem);
-        Log.d("trabalhoVendido", "Trabalho selecionado possui valor com lucro (" + novaTaxa + "%): " + valorProducaoTaxa);
         int valorTotalLucro = (int) (valorProducaoTaxa * FATOR_PERCENTUAL_MERCADO);
         valorTotalLucro = Math.max(valorTotalLucro, 0);
-        Log.d("trabalhoVendido", "Trabalho selecionado possui valor com lucro (" + novaTaxa + "%) + taxa do mercado (10%): " + valorTotalLucro);
         edtValorLucroTrabalhoVendido.setText(String.valueOf(valorTotalLucro));
     }
 
@@ -724,7 +672,6 @@ public class DetalhesVendaFragment
             id
         ) -> {
             trabalhoSelecionado = adapterEstado.getItem(position);
-            Log.d("VENDA", "configuraAutoCompleteTrabalhos: " + trabalhoSelecionado.getId());
         });
 
         selecionarTrabalhoRecebido(trabalhos);

@@ -4,7 +4,6 @@ import static com.kevin.gestorproducao.rules.exception.ProducaoException.TipoErr
 import static com.kevin.gestorproducao.rules.exception.ProducaoException.TipoErroProducao.TRABALHO_SEM_DEPENDENCIA;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.kevin.gestorproducao.R;
 import com.kevin.gestorproducao.model.Profissao;
@@ -21,7 +20,6 @@ import com.kevin.gestorproducao.rules.CatalogoRecursos;
 import com.kevin.gestorproducao.rules.exception.ProducaoException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -53,15 +51,11 @@ public class PlanejamentoProducaoService {
 
     public void incluirMaisVendidos() throws ProducaoException {
         ArrayList<Trabalho> maisVendidos = trabalhoRepo.recuperaMaisVendidos(idPersonagem);
-        Log.d("PRODUCAO", "TAMANHO_LISTA: " + maisVendidos.size());
 
         int LIMITE_PRODUCAO_RAROS = 6;
         int contador = 0;
         for (Trabalho raroMaisVendido : maisVendidos) {
-            Log.d("PRODUCAO_COMUM", "-----------------------");
-            Log.d("PRODUCAO_COMUM", "raroMaisVendido: " + raroMaisVendido);
             if (contador == LIMITE_PRODUCAO_RAROS) {
-                Log.d("PRODUCAO", "QUEBROU: ");
                 break;
             }
 
@@ -101,13 +95,11 @@ public class PlanejamentoProducaoService {
 
                         producaoRepo.insereTrabalhoProducao(novaProducao, idPersonagem);
 
-                        Log.d("PRODUCAO", "INCREMENTOU1: "+ contador);
                         contador++;
                         continue;
                     }
 
                     for (String melhoradoFaltante : melhoradosFaltantes) {
-                        Log.d("PRODUCAO_COMUM", "melhoradoFaltante: " + melhoradoFaltante);
                         TrabalhoProducao melhoradoEmProducao = producaoRepo.recuperaProducaoParaProduzirProduzindoPorId(
                             idPersonagem,
                             melhoradoFaltante
@@ -115,7 +107,6 @@ public class PlanejamentoProducaoService {
 
                         if (melhoradoEmProducao == null) {
                             Trabalho melhoradoNecessario = trabalhoRepo.recuperaTrabalhoPorId(melhoradoFaltante);
-                            Log.d("PRODUCAO_COMUM", "melhoradoNecessario: " + melhoradoNecessario);
 
                             if (melhoradoNecessario == null) continue;
 
@@ -129,7 +120,6 @@ public class PlanejamentoProducaoService {
 
                             List<String> comunsFaltantes = recuperaRecursosFaltantes(comumNecessarios);
 
-                            Log.d("PRODUCAO_COMUM", "comunsFaltantes: " + comunsFaltantes);
                             if (comunsFaltantes.isEmpty()) {
                                 String licenca = profissaoPersonagem.getNivel() == 28 ?
                                     context.getString(R.string.licencaMestre) :
@@ -141,25 +131,21 @@ public class PlanejamentoProducaoService {
                                 novaProducao.setExperiencia(melhoradoNecessario.getExperiencia());
 
                                 producaoRepo.insereTrabalhoProducao(novaProducao, idPersonagem);
-                                Log.d("PRODUCAO", "INCREMENTOU2: "+ contador);
                                 contador++;
                                 continue;
                             }
 
                             for (String comumFaltante : comunsFaltantes) {
-                                Log.d("PRODUCAO_COMUM", "comumFaltante: " + comumFaltante);
                                 TrabalhoProducao comumEmProducao = producaoRepo.recuperaProducaoParaProduzirProduzindoPorId(
                                     idPersonagem,
                                     comumFaltante
                                 );
 
-                                Log.d("PRODUCAO_COMUM", "comumEmProducao: " + comumEmProducao);
                                 if (comumEmProducao == null) {
                                     Trabalho comumNecessario = trabalhoRepo.recuperaTrabalhoPorId(comumFaltante);
 
                                     if (comumNecessario == null) continue;
 
-                                    Log.d("PRODUCAO_COMUM", "comumNecessario: " + comumNecessario);
                                     if (temRecursosProducaoSuficientes(idPersonagem, comumNecessario)) {
                                         String licenca = profissaoPersonagem.getNivel() == 28 ?
                                             context.getString(R.string.licencaMestre) :
@@ -191,35 +177,27 @@ public class PlanejamentoProducaoService {
                                         novaProducao.setRecorrencia(true);
 
                                         producaoRepo.insereTrabalhoProducao(novaProducao, idPersonagem);
-                                        Log.d("PRODUCAO", "INCREMENTOU3: "+ contador);
                                         contador++;
                                     }
                                     continue;
                                 }
 
-                                Log.d("PRODUCAO", "INCREMENTOU4: "+ contador);
                                 contador++;
                             }
                             continue;
                         }
-                        Log.d("PRODUCAO", "INCREMENTOU5: "+ contador);
                         contador++;
                     }
                     continue;
                 }
-                Log.d("PRODUCAO", "incluirMaisVendidos: " + raroEmProducao.getEstado());
                 if (raroEmProducao.ehProduzindo()) {
-                    Log.d("PRODUCAO", "INCREMENTOU6: "+ contador);
                     contador += 1;
                 }
             }
         }
-        Log.d("PRODUCAO", "FIM_DA_LISTA: ");
     }
 
     private boolean temRecursosProducaoSuficientes(String idPersonagem, Trabalho trabalho) {
-        Log.d("PRODUCAO_COMUM", "idPersonagem: " + idPersonagem);
-        Log.d("PRODUCAO_COMUM", "trabalho: " + trabalho.getNome());
         return true;
     }
 
@@ -292,7 +270,6 @@ public class PlanejamentoProducaoService {
             int tamanhoDesejado = trabalhosComuns.size();
 
             if (totalEmProducao >= tamanhoDesejado) continue;
-            Log.d("PRODUCAO", "totalEmProducao: " + totalEmProducao);
 
             int restanteParaInserir = tamanhoDesejado - totalEmProducao;
 
@@ -300,9 +277,7 @@ public class PlanejamentoProducaoService {
 
                 Trabalho trabalhoComum = trabalhosComuns.get(0);
                 int nivel = trabalhoComum.getNivel();
-                Log.d("PRODUCAO", "nivel: " + nivel);
                 String profissaoStr = trabalhoComum.getProfissao();
-                Log.d("PRODUCAO", "profissaoStr: " + profissaoStr);
 
                 Profissao profissaoEnum = Profissao.fromKey(profissaoStr);
                 if (profissaoEnum == null) continue;
@@ -319,7 +294,6 @@ public class PlanejamentoProducaoService {
                 int terciario = primario - 2;
 
                 int[] quantidadesBase = { primario, secundario, terciario };
-                Log.d("PRODUCAO", "quantidadesBase: " + Arrays.toString(quantidadesBase));
 
                 int maxProduzivel = Integer.MAX_VALUE;
                 for (int i = 0; i < 3; i++ ) {
@@ -328,16 +302,13 @@ public class PlanejamentoProducaoService {
                     Recurso recurso = entry.getKey();
                     Trabalho recursoProducao = trabalhoRepo.recuperaTrabalhoPorNome(recurso.getKey());
                     if (recursoProducao == null) continue;
-                    Log.d("PRODUCAO", "recurso: " + recursoProducao.getNome());
 
                     TrabalhoEstoque recursoEstoque = estoqueRepo.recuperaTrabalhoPorId(idPersonagem, recursoProducao.getId());
                     if (recursoEstoque == null) continue;
-                    Log.d("PRODUCAO", "quantidade: " + recursoEstoque.getQuantidade());
 
                     int produzivel = recursoEstoque.getQuantidade() / quantidadesBase[i];
                     maxProduzivel = Math.min(maxProduzivel, produzivel);
                 }
-                Log.d("PRODUCAO", "quantidadeProduzivel: " + maxProduzivel);
 
                 if (maxProduzivel <= 0) {
                     Trabalho producaoEmMassaRecursos = trabalhoRepo.recuperaTrabalhoProducaoRecursos(trabalhoComum);
@@ -404,14 +375,12 @@ public class PlanejamentoProducaoService {
 
         if (trabalho == null) return;
 
-        Log.d("PRODUCAO", "trabalho: " + trabalho.getNome() + " " + trabalho.getRaridade() + " " + trabalho.getNivel());
         ProfissaoPersonagem profissao = profissaoPersonagemRepo.recuperaProfissaoPorNome(
             idPersonagem,
             trabalho.getProfissao()
         );
 
         if (profissao == null) return;
-        Log.d("PRODUCAO", "profissao: " + profissao.getNome());
 
         String licenca = profissao.getNivel() == 28 ?
             context.getString(R.string.licencaMestre) :
