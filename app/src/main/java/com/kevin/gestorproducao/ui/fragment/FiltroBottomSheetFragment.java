@@ -14,7 +14,6 @@ import androidx.lifecycle.ViewModelProvider;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
@@ -41,7 +40,6 @@ public class FiltroBottomSheetFragment extends BottomSheetDialogFragment {
     private ProfissaoPersonagemViewModel profissaoPersonagemViewModel;
     private PersonagemViewModel personagemViewModel;
     private MaterialButton btnAplicar;
-    private ImageView btnFechar;
     private TextInputEditText edtDescricaoFiltro;
     private ArrayList<ProfissaoPersonagem> profissoes;
     private ChipGroup chipGroupProfissoes, chipGroupRaridades, chipGroupEstados;
@@ -77,7 +75,6 @@ public class FiltroBottomSheetFragment extends BottomSheetDialogFragment {
         inicializaComponentes();
         configuraLayoutEstado();
         configuraBotaoAplicar();
-        configuraBotaoFechar();
         popularChipsRaridades();
         popularChipsEstados();
         preencherCampos();
@@ -234,10 +231,6 @@ public class FiltroBottomSheetFragment extends BottomSheetDialogFragment {
         );
     }
 
-    private void configuraBotaoFechar() {
-        btnFechar.setOnClickListener(v -> dismiss());
-    }
-
     private void configuraBotaoAplicar() {
         btnAplicar.setOnClickListener(v-> {
             String textoFiltro = edtDescricaoFiltro.getText().toString().trim();
@@ -302,7 +295,6 @@ public class FiltroBottomSheetFragment extends BottomSheetDialogFragment {
 
     private void inicializaComponentes() {
         btnAplicar = binding.btnAplicarFiltroFragment;
-        btnFechar = binding.btnFecharFiltroFragment;
         edtDescricaoFiltro = binding.edtDescricaoFiltroFragment;
         profissoes = new ArrayList<>();
         chipGroupProfissoes = binding.chipGroupProfissoes;
