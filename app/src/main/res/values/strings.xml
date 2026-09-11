@@ -328,4 +328,54 @@
         <item>@string/stringCatalisadorEnergia</item>
         <item>@string/stringCatalisadorEtereo</item>
     </string-array>
+
+    <string name="stringCampoObrigatorio">Campo obrigatório</string>
+    <string name="stringQuantidadeNaoPodeSerNegativa">A quantidade não pode ser negativa</string>
+    <string name="stringExperienciaNaoPodeSerNegativa">A experiência não pode ser negativa</string>
+    <string name="stringItemRemovidoComSucesso">Item removido com sucesso</string>
+    <string name="stringErroValor">Erro: %1$s</string>
+    <string name="stringExcluirTrabalhoEmEstoque">Excluir trabalho em estoque</string>
+    <string name="stringConfirmaExclusaoTrabalho">Tem certeza que deseja excluir este trabalho?</string>
+    <string name="stringExcluirProfissao">Excluir profissão</string>
+    <string name="stringConfirmaExclusaoProfissao">Tem certeza que deseja excluir esta profissão?</string>
+    <string name="stringExcluirProducao">Excluir produção</string>
+    <string name="stringConfirmaExclusaoProducao">Tem certeza que deseja excluir esta produção?</string>
+    <string name="stringExcluirTrabalho">Excluir trabalho</string>
+    <string name="stringExcluirVenda">Excluir venda</string>
+    <string name="stringConfirmaExclusaoVenda">Tem certeza que deseja excluir esta venda?</string>
+    <string name="stringPersonagemSeraRemovido">Personagem será removido permanentemente</string>
+    <string name="stringDesejaContinuar">Deseja continuar?</string>
+    <string name="stringPersonagemRemovidoValor">Personagem: %1$s foi removido!</string>
+    <string name="stringInformeQuantidade">Informe uma quantidade</string>
+    <string name="stringQuantidadeMaiorQueZero">A quantidade deve ser maior que zero</string>
+    <string name="stringInseridoComSucessoValor">%1$s foi inserido com sucesso!</string>
+    <string name="stringJaExisteValor">%1$s já existe!</string>
+    <string name="stringTrabalhoInserido">Trabalho inserido!</string>
+    <string name="stringTrabalhoModificadoComSucesso">Trabalho modificado com sucesso!</string>
+    <string name="stringInvalido">Inválido!</string>
+    <string name="stringVendaInseridaComSucesso">Venda inserida com sucesso!</string>
+    <string name="stringErroAoInserirVendaValor">Erro ao inserir venda: %1$s</string>
+    <string name="stringVendaModificadaComSucesso">Venda modificada com sucesso!</string>
+    <string name="stringErroAoModificarTrabalhoValor">Erro ao modificar trabalho: %1$s</string>
+    <string name="stringVendaRemovidaComSucesso">Venda removida com sucesso!</string>
+    <string name="stringErroAoExcluirVendaValor">Erro ao excluir venda: %1$s</string>
+    <string name="stringConfiraSeuEmail">Confira seu email</string>
+    <string name="stringConfiraEmailCorretoTenteNovamente">Confira se seu email está correto e tente novamente</string>
+    <string name="stringEmailInvalidoErro">Por favor, informe um email válido!</string>
+    <string name="stringEmailInvalidoAjuda">Email inválido!</string>
+    <string name="stringSenhaInvalidaAjuda">Senha inválida!</string>
+    <string name="stringRecursosModificadosComSucesso">Recursos modificados com sucesso!</string>
+    <string name="stringPreencherTodosCampos">Preencha todos os campos</string>
+    <string name="stringUsuarioCadastradoComSucesso">Usuário cadastrado com sucesso!</string>
+    <string name="stringNovoEstoque">Novo estoque</string>
+    <string name="stringNovaProducao">Nova produção</string>
+    <string name="stringNaoIniciado">Não iniciado</string>
+    <string name="stringNaoFinalizado">Não finalizado</string>
+    <string name="stringErroConexao">Erro de conexão</string>
+    <string name="stringFiltroParaProduzir">Para produzir</string>
+    <string name="stringFiltroProduzindo">Produzindo</string>
+    <string name="stringFiltroFeito">Feito</string>
+    <string name="stringVendaRemovida">Venda removida: </string>
+    <string name="stringPersonagemInseridoComSucessoValor">%1$s inserido com sucesso!</string>
+    <string name="stringDesconhecido">Desconhecido</string>
 </resources>

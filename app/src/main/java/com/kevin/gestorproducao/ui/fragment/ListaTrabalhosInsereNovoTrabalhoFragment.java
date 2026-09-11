@@ -253,14 +253,14 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment
 
         switch (codigoRequisicao) {
             case CODIGO_REQUISICAO_INSERE_TRABALHO_ESTOQUE:
-                titulo = "Novo estoque";
+                titulo = getString(R.string.stringNovoEstoque);
                 break;
 
             case CODIGO_REQUISICAO_INSERE_TRABALHO_VENDAS:
-                titulo = "Nova venda";
+                titulo = getString(R.string.stringNovaVenda);
                 break;
             default:
-                titulo = "Trabalhos";
+                titulo = getString(R.string.trabalhos);
                 break;
         }
 

@@ -139,7 +139,7 @@ public class ListaTrabalhosProducaoFragment
             getViewLifecycleOwner(),
             resultado -> {
                 if (resultado.getErro() != null) {
-                    mostraMensagemAncorada("Erro: " + resultado.getErro());
+                    mostraMensagemAncorada(getString(R.string.stringErroValor, resultado.getErro()));
                     return;
                 }
 
@@ -182,7 +182,7 @@ public class ListaTrabalhosProducaoFragment
                     return;
                 }
 
-                mostraMensagemAncorada("Erro: "+ resultado.getErro());
+                mostraMensagemAncorada(getString(R.string.stringErroValor, resultado.getErro()));
             }
         );
     }

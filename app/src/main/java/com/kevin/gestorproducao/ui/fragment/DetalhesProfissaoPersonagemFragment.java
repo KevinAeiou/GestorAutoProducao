@@ -218,7 +218,7 @@ public class DetalhesProfissaoPersonagemFragment
         String experiencia = edtExperiencia.getText().toString().trim();
 
         if (experiencia.isEmpty()) {
-            txtExperiencia.setError("Campo obrigatório");
+            txtExperiencia.setError(getString(R.string.stringCampoObrigatorio));
             return null;
         }
 
@@ -227,7 +227,7 @@ public class DetalhesProfissaoPersonagemFragment
             novaExperiencia = obterValorNumerico(edtExperiencia);
 
             if (novaExperiencia < 0) {
-                throw new NumberFormatException("A experiência não pode ser negativa");
+                throw new NumberFormatException(getString(R.string.stringExperienciaNaoPodeSerNegativa));
             }
         } catch (NumberFormatException e) {
             txtExperiencia.setError(e.getMessage());

@@ -98,14 +98,14 @@ public class ConfirmaProducaoFragment
                 .trim();
 
             if (valorQuantidade.isEmpty()) {
-                txtQuantidade.setError("Informe uma quantidade");
+                txtQuantidade.setError(getString(R.string.stringInformeQuantidade));
                 return;
             }
 
             int quantidade = Integer.parseInt(valorQuantidade);
 
             if (quantidade <= 0) {
-                txtQuantidade.setError("A quantidade deve ser maior que zero");
+                txtQuantidade.setError(getString(R.string.stringQuantidadeMaiorQueZero));
                 return;
             }
 
@@ -145,7 +145,7 @@ public class ConfirmaProducaoFragment
                         );
 
                         mostraMensagemAncorada(
-                            trabalhoRecebido.getNome() + " foi inserido com sucesso!"
+                            getString(R.string.stringInseridoComSucessoValor, trabalhoRecebido.getNome())
                         );
                         voltaParaListaProducao();
                     }
@@ -290,7 +290,7 @@ public class ConfirmaProducaoFragment
             .getSavedStateHandle()
             .set(
                 "mensagem_sucesso",
-                trabalhoRecebido.getNome() + " foi inserido com sucesso!"
+                getString(R.string.stringInseridoComSucessoValor, trabalhoRecebido.getNome())
             );
 
         controlador.popBackStack(

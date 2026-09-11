@@ -124,7 +124,7 @@ public class TrabalhosNovaProducaoFragment
                 }
 
                 if (resultado.getErro() != null) {
-                    mostraMensagemAncorada("Erro: "+resultado.getErro());
+                    mostraMensagemAncorada(getString(R.string.stringErroValor, resultado.getErro()));
                 }
             }
         );
@@ -205,7 +205,7 @@ public class TrabalhosNovaProducaoFragment
             false,
             false,
             false,
-            "Nova produção",
+            getString(R.string.stringNovaProducao),
             false
         );
     }

@@ -166,8 +166,8 @@ public class DetalhesVendaFragment
                 );
 
                 ConfirmacaoDialog dialog = ConfirmacaoDialog.novaInstancia(
-                    "Excluir venda",
-                    "Tem certeza que deseja excluir esta venda?",
+                    getString(R.string.stringExcluirVenda),
+                    getString(R.string.stringConfirmaExclusaoVenda),
                     () -> vendaViewModel.removeVenda(trabalhoRecebido),
                     () -> pararLoadingBotao(btnConfirmar, loadingBotaoConfirmar)
                 );
@@ -196,7 +196,7 @@ public class DetalhesVendaFragment
         recursosProducaoViewModel.getInsercaoResultado().observe(
             getViewLifecycleOwner(),
             resultado -> {
-                if (resultado.getErro() != null) mostraMensagemAncorada("Erro: " + resultado.getErro());
+                if (resultado.getErro() != null) mostraMensagemAncorada(getString(R.string.stringErroValor, resultado.getErro()));
             }
         );
 
@@ -252,7 +252,7 @@ public class DetalhesVendaFragment
             resultado -> {
                 if (resultado.getErro() == null) {
 
-                    mostraMensagemAncorada("Venda inserida com sucesso!");
+                    mostraMensagemAncorada(getString(R.string.stringVendaInseridaComSucesso));
                     voltaParaTrabalhosVendidos();
                     return;
                 }
@@ -262,7 +262,7 @@ public class DetalhesVendaFragment
                     loadingBotaoConfirmar
                 );
 
-                mostraMensagemAncorada("Erro ao inserir venda: " + resultado.getErro());
+                mostraMensagemAncorada(getString(R.string.stringErroAoInserirVendaValor, resultado.getErro()));
             }
         );
 
@@ -270,7 +270,7 @@ public class DetalhesVendaFragment
             getViewLifecycleOwner(),
             resultado -> {
                 if (resultado.getErro() == null) {
-                    mostraMensagemAncorada("Venda modificada com sucesso!");
+                    mostraMensagemAncorada(getString(R.string.stringVendaModificadaComSucesso));
                     voltaParaTrabalhosVendidos();
                     return;
                 }
@@ -280,7 +280,7 @@ public class DetalhesVendaFragment
                     loadingBotaoConfirmar
                 );
 
-                mostraMensagemAncorada("Erro ao modificar trabalho: " + resultado.getErro());
+                mostraMensagemAncorada(getString(R.string.stringErroAoModificarTrabalhoValor, resultado.getErro()));
             }
         );
 
@@ -289,7 +289,7 @@ public class DetalhesVendaFragment
             resultado -> {
                 if (resultado.getErro() == null) {
                     voltaParaTrabalhosVendidos();
-                    mostraMensagemAncorada("Venda removida com sucesso!");
+                    mostraMensagemAncorada(getString(R.string.stringVendaRemovidaComSucesso));
                     return;
                 }
 
@@ -298,7 +298,7 @@ public class DetalhesVendaFragment
                     loadingBotaoConfirmar
                 );
 
-                mostraMensagemAncorada("Erro ao excluir venda: " + resultado.getErro());
+                mostraMensagemAncorada(getString(R.string.stringErroAoExcluirVendaValor, resultado.getErro()));
             }
         );
     }

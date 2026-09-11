@@ -97,7 +97,7 @@ public class InserePersonagemFragment
                     personagemViewModel.limpaInsercaoResultado();
 
                     personagemFluxoService.processarPosInsercao(personagem);
-                    mostraMensagemAncorada(personagem.getNome() + "inserido com sucesso!");
+                    mostraMensagemAncorada(getString(R.string.stringPersonagemInseridoComSucessoValor, personagem.getNome()));
 
                     voltaParaTrabalhosProducao();
                     return;
@@ -108,7 +108,7 @@ public class InserePersonagemFragment
                     loadingBotaoConfirmar
                 );
 
-                mostraMensagemAncorada("Erro: "+resultado.getErro());
+                mostraMensagemAncorada(getString(R.string.stringErroValor, resultado.getErro()));
             }
         );
     }
@@ -183,7 +183,7 @@ public class InserePersonagemFragment
 
     private void configuraMensagem(EditText personagemNome, TextInputLayout personagemNomeTxt) {
         if (personagemNome.getText().toString().isEmpty()) {
-            personagemNomeTxt.setError("Campo requerido!");
+            personagemNomeTxt.setError(getString(R.string.stringCampoRequerido));
             return;
         }
 

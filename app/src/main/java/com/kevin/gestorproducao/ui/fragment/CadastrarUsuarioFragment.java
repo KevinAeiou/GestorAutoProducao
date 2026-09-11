@@ -38,7 +38,6 @@ public class CadastrarUsuarioFragment
     private TextInputLayout txtSenha;
     private TextInputEditText edtNome;
     private TextInputEditText edtSenha;
-    String[] menssagens = {"Preencha todos os campos", "Usuário cadastrado com sucesso!"};
     private AutenticacaoViewModel autenticacaoViewModel;
     private NavController controlador;
 
@@ -58,12 +57,12 @@ public class CadastrarUsuarioFragment
             getViewLifecycleOwner(),
             resultado -> {
                 if (resultado.getErro() == null) {
-                    mostraMensagemAncorada(menssagens[1]);
+                    mostraMensagemAncorada(getString(R.string.stringUsuarioCadastradoComSucesso));
                     controlador.navigate(vaiParaSlashScreen());
                     return;
                 }
 
-                mostraMensagemAncorada("Erro: " + resultado.getErro());
+                mostraMensagemAncorada(getString(R.string.stringErroValor, resultado.getErro()));
             }
         );
     }
@@ -199,7 +198,7 @@ public class CadastrarUsuarioFragment
             );
             return;
         }
-        mostraMensagemAncorada(menssagens[0]);
+        mostraMensagemAncorada(getString(R.string.stringPreencherTodosCampos));
     }
 
     private void salvarDadosUsuario() {

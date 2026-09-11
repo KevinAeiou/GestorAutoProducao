@@ -42,7 +42,6 @@ public class EntrarUsuarioFragment
     private AutenticacaoViewModel autenticacaoViewModel;
     private PersonagemViewModel personagemViewModel;
     private NavController controlador;
-    String [] menssagens = {"Campo requerido!", "Login efetuado com sucesso!"};
 
     @Override
     protected FragmentEntrarUsuarioBinding inflateBinding(
@@ -133,7 +132,7 @@ public class EntrarUsuarioFragment
 
     private void configuraErroCampoEmailVazio(Usuario usuario) {
         if (usuario.getEmail().isEmpty()) {
-            txtEmail.setError(menssagens[0]);
+            txtEmail.setError(getString(R.string.stringCampoRequerido));
             return;
         }
         txtEmail.setErrorEnabled(false);
@@ -141,7 +140,7 @@ public class EntrarUsuarioFragment
 
     private void configuraErroCampoSenhaVazia(Usuario usuario) {
         if (usuario.getSenha().isEmpty()) {
-            txtSenha.setError(menssagens[0]);
+            txtSenha.setError(getString(R.string.stringCampoRequerido));
             return;
         }
         txtSenha.setErrorEnabled(false);
@@ -170,11 +169,11 @@ public class EntrarUsuarioFragment
     private void configuraErroExecoesCampos(String mensagem) {
         botao_entrar.setEnabled(true);
         if (mensagem.equals("A network error (such as timeout, interrupted connection or unreachable host) has occurred.")) {
-            mostraMensagemAncorada("Sem conexão com a internet!");
+            mostraMensagemAncorada(getString(R.string.stringSemConexaoComInternet));
             return;
         }
-        txtEmail.setHelperText("Email inválido!");
-        txtSenha.setHelperText("Senha inválida!");
+        txtEmail.setHelperText(getString(R.string.stringEmailInvalidoAjuda));
+        txtSenha.setHelperText(getString(R.string.stringSenhaInvalidaAjuda));
     }
 
     private void vaiParaMenuNavegacao() {

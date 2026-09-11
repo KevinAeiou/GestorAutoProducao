@@ -142,7 +142,7 @@ public class VendasFragment
                 }
 
                 if (resultado.getErro() != null) {
-                    mostraMensagemAncorada("Erro: " + resultado.getErro());
+                    mostraMensagemAncorada(getString(R.string.stringErroValor, resultado.getErro()));
                 }
             }
         );
@@ -151,7 +151,7 @@ public class VendasFragment
             getViewLifecycleOwner(),
             resultado -> {
                 if (resultado.getErro() != null) {
-                    mostraMensagemAncorada("Erro: " + resultado.getErro());
+                    mostraMensagemAncorada(getString(R.string.stringErroValor, resultado.getErro()));
                     return;
                 }
 
@@ -218,7 +218,7 @@ public class VendasFragment
             String nomeTrabalho = trabalho.getNome();
 
             if (nomeTrabalho == null || nomeTrabalho.isEmpty()) {
-                nomeTrabalho = "Desconhecido";
+                nomeTrabalho = getString(R.string.stringDesconhecido);
             }
 
             int quantidadeAtual = mapa.getOrDefault(nomeTrabalho, 0);
@@ -330,7 +330,7 @@ public class VendasFragment
                     vendasAdapter.remove(itemPosicao);
                     Snackbar snackbarDesfazer = Snackbar.make(
                         binding.getRoot(),
-                        "Venda removida: ", Snackbar.LENGTH_LONG
+                        getString(R.string.stringVendaRemovida), Snackbar.LENGTH_LONG
                     );
                     snackbarDesfazer.addCallback(new Snackbar.Callback(){
                         @Override

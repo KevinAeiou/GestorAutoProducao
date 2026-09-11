@@ -116,8 +116,8 @@ public class DetalhesProducaoFragment
             );
 
             ConfirmacaoDialog dialog = ConfirmacaoDialog.novaInstancia(
-                "Excluir produção",
-                "Tem certeza que deseja excluir esta produção?",
+                getString(R.string.stringExcluirProducao),
+                getString(R.string.stringConfirmaExclusaoProducao),
                 () -> {
                     btnExcluir.setEnabled(false);
                     producaoViewModel.removeTrabalhoProducao(trabalho);
@@ -153,7 +153,7 @@ public class DetalhesProducaoFragment
                     loadingBotaoConfirmar
                 );
 
-                mostraMensagemAncorada("Erro: "+resultado.getErro());
+                mostraMensagemAncorada(getString(R.string.stringErroValor, resultado.getErro()));
             }
         );
 
@@ -172,7 +172,7 @@ public class DetalhesProducaoFragment
                     loadingBotaoConfirmar
                 );
 
-                mostraMensagemAncorada("Erro: "+resultado.getErro());
+                mostraMensagemAncorada(getString(R.string.stringErroValor, resultado.getErro()));
             }
         );
     }
@@ -200,11 +200,11 @@ public class DetalhesProducaoFragment
         layoutCamposDatas.setVisibility(VISIBLE);
 
         String dataInicio = trabalho.getIniciadoEm() == null
-            ? "Não iniciado"
+            ? getString(R.string.stringNaoIniciado)
             : formatarTimestamp(trabalho.getIniciadoEm());
 
         String dataFim = trabalho.getFinalizadoEm() == null
-            ? "Não finalizado"
+            ? getString(R.string.stringNaoFinalizado)
             : formatarTimestamp(trabalho.getFinalizadoEm());
 
         txtIniciadoEm.setText(dataInicio);
