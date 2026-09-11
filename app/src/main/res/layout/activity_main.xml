@@ -42,19 +42,23 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:orientation="vertical"
-        android:background="@drawable/bg_drawer">
+        android:background="@drawable/bg_drawer"
+        android:elevation="8dp">
 
         <com.google.android.material.navigation.NavigationView
             android:id="@+id/navegacao_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            android:background="@android:color/transparent"
             android:fitsSystemWindows="true"
             app:headerLayout="@layout/cabecalho"
             app:itemHorizontalPadding="16dp"
             app:itemIconPadding="12dp"
+            app:itemIconTint="@color/cor_item_menu"
+            app:itemTextColor="@color/cor_item_menu"
+            app:itemBackground="@drawable/bg_item_menu"
             app:itemRippleColor="@color/ripple_color"
-            app:itemShapeAppearanceOverlay="@style/NavItemShape"
             app:subheaderInsetStart="16dp"
             app:menu="@menu/menu_navegacao_lateral" />
 
@@ -64,7 +68,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSair"
-            style="@style/Widget.Material3.Button.TextButton"
+            style="@style/BotaoAcaoDestrutiva"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"

@@ -157,11 +157,6 @@
         <item name="minHeight">48dp</item>
     </style>
 
-    <style name="NavItemShape">
-        <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">12dp</item>
-    </style>
-
     <style name="layoutTxtField">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
