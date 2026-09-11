@@ -16,6 +16,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.kevin.gestorproducao.dao.PersonagemDao;
 import com.kevin.gestorproducao.model.Personagem;
+import com.kevin.gestorproducao.repository.helper.FirebaseTimeoutHelper;
 
 import java.util.ArrayList;
 import java.util.concurrent.Executor;
@@ -67,27 +68,26 @@ public class PersonagemRepository {
             return liveData;
         }
 
-        referenciaPersonagens.child(personagem.getId()).setValue(personagem).addOnCompleteListener(
-            backgroundExecutor,
-            task -> {
+        return FirebaseTimeoutHelper.execute(callback -> referenciaPersonagens
+            .child(personagem.getId())
+            .setValue(personagem)
+            .addOnCompleteListener(backgroundExecutor, task -> {
                 if (task.isSuccessful()) {
                     try {
                         personagemDao.modificaPersonagem(personagem);
-                        liveData.postValue(new Resource<>(null, null));
+                        callback.sucesso();
 
                     } catch (RuntimeException e) {
-                        liveData.postValue(new Resource<>(null, e.getMessage()));
+                        callback.erro(e.getMessage());
                     }
                     return;
                 }
 
                 Exception exception = task.getException();
                 String erro = recuperaErro(exception, "Erro desconhecido ao modificar personagem");
-                liveData.postValue(new Resource<>(null, erro));
-            }
+                callback.erro(erro);
+            })
         );
-
-        return liveData;
     }
 
     public LiveData<Resource<Void>> inserePersonagemUsuario(Personagem personagem) {
@@ -100,21 +100,23 @@ public class PersonagemRepository {
 
         String idUsuario = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        referenciaUsuarios.child(idUsuario).child(CHAVE_PERSONAGENS).child(personagem.getId()).setValue(true)
+        return FirebaseTimeoutHelper.execute(callback -> referenciaUsuarios
+            .child(idUsuario)
+            .child(CHAVE_PERSONAGENS)
+            .child(personagem.getId())
+            .setValue(true)
             .addOnCompleteListener(backgroundExecutor, task -> {
                 if (task.isSuccessful()) {
-                    liveData.postValue(new Resource<>(null, null));
+                    callback.sucesso();
                     return;
                 }
 
                 Exception exception = task.getException();
                 String erro = recuperaErro(exception, "Erro desconhecido ao inserir personagem");
 
-                liveData.postValue(new Resource<>(null, erro));
-            }
+                callback.erro(erro);
+            })
         );
-
-        return liveData;
     }
     public void inserePersonagem(Personagem personagem) {
         referenciaPersonagens.child(personagem.getId()).setValue(personagem).addOnCompleteListener(
@@ -147,20 +149,22 @@ public class PersonagemRepository {
 
         String idUsuario = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        referenciaUsuarios.child(idUsuario).child(CHAVE_PERSONAGENS).child(idPersonagem).removeValue()
+        return FirebaseTimeoutHelper.execute(callback -> referenciaUsuarios
+            .child(idUsuario)
+            .child(CHAVE_PERSONAGENS)
+            .child(idPersonagem)
+            .removeValue()
             .addOnCompleteListener(backgroundExecutor, task -> {
                 if (task.isSuccessful()) {
-                    liveData.postValue(new Resource<>(null, null));
+                    callback.sucesso();
                     return;
                 }
 
                 Exception exception = task.getException();
                 String erro = recuperaErro(exception, "Erro desconhecido ao remover personagem");
-                liveData.postValue(new Resource<>(null, erro));
-            }
+                callback.erro(erro);
+            })
         );
-
-        return liveData;
     }
 
     public LiveData<Resource<Void>> removePersonagem(String idPersonagem) {
@@ -171,25 +175,25 @@ public class PersonagemRepository {
             return liveData;
         }
 
-        referenciaPersonagens.child(idPersonagem).removeValue().addOnCompleteListener(
-            backgroundExecutor, task -> {
+        return FirebaseTimeoutHelper.execute(callback -> referenciaPersonagens
+            .child(idPersonagem)
+            .removeValue()
+            .addOnCompleteListener(backgroundExecutor, task -> {
                 if (task.isSuccessful()) {
                     try {
                         personagemDao.removePersonagem(idPersonagem);
-                        liveData.postValue(new Resource<>(null, null));
+                        callback.sucesso();
                     } catch (RuntimeException e) {
-                        liveData.postValue(new Resource<>(null, e.getMessage()));
+                        callback.erro(e.getMessage());
                     }
                     return;
                 }
 
                 Exception exception = task.getException();
                 String erro = recuperaErro(exception, "Erro desconhecido ao remover personagem");
-                liveData.postValue(new Resource<>(null, erro));
-            }
+                callback.erro(erro);
+            })
         );
-
-        return liveData;
     }
 
     public void removeOuvinte() {

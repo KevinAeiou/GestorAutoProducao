@@ -19,6 +19,7 @@ import com.kevin.gestorproducao.dao.ProfissaoDao;
 import com.kevin.gestorproducao.dao.ProfissaoPersonagemDao;
 import com.kevin.gestorproducao.model.ProfissaoBase;
 import com.kevin.gestorproducao.model.ProfissaoPersonagem;
+import com.kevin.gestorproducao.repository.helper.FirebaseTimeoutHelper;
 
 import java.util.ArrayList;
 import java.util.concurrent.Executor;
@@ -69,33 +70,32 @@ public class ProfissaoPersonagemRepository {
         ProfissaoPersonagem profissao,
         String idPersonagem
     ) {
-        MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
-
         ProfissaoPersonagem profissaoModificada = new ProfissaoPersonagem();
 
         profissaoModificada.setId(profissao.getId());
         profissaoModificada.setExperiencia(profissao.getExperiencia());
         profissaoModificada.setPrioridade(profissao.isPrioridade());
 
-        referenciaProfissoesPersonagem.child(idPersonagem).child(profissao.getId()).setValue(
-            profissaoModificada
-        ).addOnCompleteListener(backGroundExecutor, task -> {
+        return FirebaseTimeoutHelper.execute(callback -> referenciaProfissoesPersonagem
+            .child(idPersonagem)
+            .child(profissao.getId())
+            .setValue(profissaoModificada)
+            .addOnCompleteListener(backGroundExecutor, task -> {
                 if (task.isSuccessful()) {
                     try {
                         profissaoPersonagemDao.modificaProfissao(profissao, idPersonagem);
-                        liveData.postValue(new Resource<>(null, null));
+                        callback.sucesso();
                     } catch (RuntimeException e) {
-                        liveData.postValue(new Resource<>(null, e.getMessage()));
+                        callback.erro(e.getMessage());
                     }
                     return;
                 }
 
                 Exception exception = task.getException();
                 String erro = recuperaErro(exception, "Erro desconhecido ao modificar profissão");
-                liveData.postValue(new Resource<>(null, erro));
-        });
-
-        return liveData;
+                callback.erro(erro);
+            })
+        );
     }
 
     public ProfissaoPersonagem recuperaProfissaoPorNome(
