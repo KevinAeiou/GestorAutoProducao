@@ -139,8 +139,8 @@
                     android:text="@string/string_entrar"
                     android:textAllCaps="false"
                     android:textSize="16sp"
-                    android:textColor="@color/white"
-                    android:background="@drawable/bg_botao_entrar"
+                    android:textColor="@color/cor_texto_botao"
+                    android:background="@drawable/bg_botao_primario"
                     app:backgroundTint="@null"
                     android:stateListAnimator="@null"
                     android:layout_marginTop="24dp"/>
