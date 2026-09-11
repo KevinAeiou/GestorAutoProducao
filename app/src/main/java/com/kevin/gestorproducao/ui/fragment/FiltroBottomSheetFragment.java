@@ -325,4 +325,14 @@ public class FiltroBottomSheetFragment extends BottomSheetDialogFragment {
             viewModelFactory
         ).get(ProfissaoPersonagemViewModel.class);
     }
+
+    // Achado M8: diferente da maioria dos fragments (que estendem BaseFragment e zeram o
+    // binding aqui), este e o SelecaoPersonagemFragment estendem BottomSheetDialogFragment/
+    // DialogFragment direto e nunca sobrescreviam onDestroyView — o binding vazava até o
+    // fragment ser coletado.
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
 }

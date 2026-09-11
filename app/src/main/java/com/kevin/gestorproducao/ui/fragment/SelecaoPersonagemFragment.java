@@ -80,8 +80,13 @@ public class SelecaoPersonagemFragment extends DialogFragment {
     private void observarPersonagem() {
         personagemViewModel.recuperaPersonagens();
 
+        // Achado M8: observava com requireActivity() em vez de "this" — o observer ficava
+        // preso ao tempo de vida da Activity inteira (não só deste diálogo), retendo
+        // binding/radioGroup mesmo depois do diálogo fechado. DialogFragment não tem
+        // getViewLifecycleOwner() disponível aqui porque a view não é criada via
+        // onCreateView (é montada em onCreateDialog), então "this" é o LifecycleOwner certo.
         personagemViewModel.getPersonagens().observe(
-            requireActivity(),
+            this,
             resultado -> {
                 if (resultado.getErro() == null) {
                     configuraRadioGroup(resultado.getDado());
@@ -138,5 +143,11 @@ public class SelecaoPersonagemFragment extends DialogFragment {
         filtroViewModel = new ViewModelProvider(
             requireActivity()
         ).get(FiltroViewModel.class);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 }
