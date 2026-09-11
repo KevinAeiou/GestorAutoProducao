@@ -49,10 +49,16 @@ public class PlanejamentoProducaoService {
         this.context = context;
     }
 
+    private static final int LIMITE_PRODUCAO_RAROS = 6;
+
+    // Achado M4: incluirMaisVendidos() tinha ~165 linhas com 4 níveis de aninhamento
+    // (raro → melhorado → comum → recursos) num único método. Dividido em um método por
+    // nível, cada um cuidando de um trabalho e devolvendo quantos foram efetivamente
+    // incluídos na produção — a lógica e a ordem de cada verificação são as mesmas de antes,
+    // só a organização mudou.
     public void incluirMaisVendidos() throws ProducaoException {
         ArrayList<Trabalho> maisVendidos = trabalhoRepo.recuperaMaisVendidos(idPersonagem);
 
-        int LIMITE_PRODUCAO_RAROS = 6;
         int contador = 0;
         for (Trabalho raroMaisVendido : maisVendidos) {
             if (contador == LIMITE_PRODUCAO_RAROS) {
@@ -66,137 +72,152 @@ public class PlanejamentoProducaoService {
 
             if (profissaoPersonagem == null) continue;
 
-            TrabalhoEstoque raroEmEstoque = estoqueRepo.recuperaTrabalhoPorId(idPersonagem, raroMaisVendido.getId());
-            if (raroEmEstoque == null || raroEmEstoque.getQuantidade() == 0) {
-                TrabalhoProducao raroEmProducao = producaoRepo.recuperaProducaoParaProduzirProduzindoPorId(
-                    idPersonagem,
-                    raroMaisVendido.getId()
-                );
-
-                if (raroEmProducao == null) {
-                    List<String> melhoradoNecessarios = raroMaisVendido.getListaTrabalhosNecessarios();
-                    if (melhoradoNecessarios == null || melhoradoNecessarios.isEmpty()) {
-                        throw new ProducaoException(
-                            TRABALHO_SEM_DEPENDENCIA,
-                            "O trabalho raro '" + raroMaisVendido.getNome() + "' não possui requisitos para produção."
-                        );
-                    }
-
-                    List<String> melhoradosFaltantes = recuperaRecursosFaltantes(melhoradoNecessarios);
-                    if (melhoradosFaltantes.isEmpty()) {
-                        String licenca = profissaoPersonagem.getNivel() == 28 ?
-                            context.getString(R.string.licencaMestre) :
-                            context.getString(R.string.licencaIniciante);
-
-                        TrabalhoProducao novaProducao = new TrabalhoProducao();
-                        novaProducao.setIdTrabalho(raroMaisVendido.getId());
-                        novaProducao.setTipoLicenca(licenca);
-                        novaProducao.setExperiencia(raroMaisVendido.getExperiencia());
-
-                        producaoRepo.insereTrabalhoProducao(novaProducao, idPersonagem);
-
-                        contador++;
-                        continue;
-                    }
-
-                    for (String melhoradoFaltante : melhoradosFaltantes) {
-                        TrabalhoProducao melhoradoEmProducao = producaoRepo.recuperaProducaoParaProduzirProduzindoPorId(
-                            idPersonagem,
-                            melhoradoFaltante
-                        );
-
-                        if (melhoradoEmProducao == null) {
-                            Trabalho melhoradoNecessario = trabalhoRepo.recuperaTrabalhoPorId(melhoradoFaltante);
-
-                            if (melhoradoNecessario == null) continue;
-
-                            List<String> comumNecessarios = melhoradoNecessario.getListaTrabalhosNecessarios();
-                            if (comumNecessarios == null || comumNecessarios.isEmpty()) {
-                                throw new ProducaoException(
-                                    TRABALHO_SEM_DEPENDENCIA,
-                                    "O trabalho '" + melhoradoNecessario.getNome() + "' não possui recursos necessários definidos."
-                                );
-                            }
-
-                            List<String> comunsFaltantes = recuperaRecursosFaltantes(comumNecessarios);
-
-                            if (comunsFaltantes.isEmpty()) {
-                                String licenca = profissaoPersonagem.getNivel() == 28 ?
-                                    context.getString(R.string.licencaMestre) :
-                                    context.getString(R.string.licencaIniciante);
-
-                                TrabalhoProducao novaProducao = new TrabalhoProducao();
-                                novaProducao.setIdTrabalho(melhoradoNecessario.getId());
-                                novaProducao.setTipoLicenca(licenca);
-                                novaProducao.setExperiencia(melhoradoNecessario.getExperiencia());
-
-                                producaoRepo.insereTrabalhoProducao(novaProducao, idPersonagem);
-                                contador++;
-                                continue;
-                            }
-
-                            for (String comumFaltante : comunsFaltantes) {
-                                TrabalhoProducao comumEmProducao = producaoRepo.recuperaProducaoParaProduzirProduzindoPorId(
-                                    idPersonagem,
-                                    comumFaltante
-                                );
-
-                                if (comumEmProducao == null) {
-                                    Trabalho comumNecessario = trabalhoRepo.recuperaTrabalhoPorId(comumFaltante);
-
-                                    if (comumNecessario == null) continue;
-
-                                    if (temRecursosProducaoSuficientes(idPersonagem, comumNecessario)) {
-                                        String licenca = profissaoPersonagem.getNivel() == 28 ?
-                                            context.getString(R.string.licencaMestre) :
-                                            context.getString(R.string.licencaIniciante);
-
-                                        TrabalhoProducao novaProducao = new TrabalhoProducao();
-                                        novaProducao.setIdTrabalho(comumNecessario.getId());
-                                        novaProducao.setTipoLicenca(licenca);
-                                        novaProducao.setExperiencia(comumNecessario.getExperiencia());
-
-                                        producaoRepo.insereTrabalhoProducao(novaProducao, idPersonagem);
-                                        contador++;
-                                        continue;
-                                    }
-
-                                    Trabalho producaoRecursos = trabalhoRepo.recuperaTrabalhoProducaoRecursos(comumNecessario);
-                                    if (producaoRecursos == null) continue;
-
-                                    TrabalhoProducao producaoRecursosEmProducao = producaoRepo.recuperaProducaoParaProduzirProduzindoPorId(
-                                        idPersonagem,
-                                        producaoRecursos.getId()
-                                    );
-
-                                    if (producaoRecursosEmProducao == null) {
-                                        TrabalhoProducao novaProducao = new TrabalhoProducao();
-                                        novaProducao.setIdTrabalho(producaoRecursos.getId());
-                                        novaProducao.setTipoLicenca(context.getString(R.string.licencaAprendiz));
-                                        novaProducao.setExperiencia(producaoRecursos.getExperiencia());
-                                        novaProducao.setRecorrencia(true);
-
-                                        producaoRepo.insereTrabalhoProducao(novaProducao, idPersonagem);
-                                        contador++;
-                                    }
-                                    continue;
-                                }
-
-                                contador++;
-                            }
-                            continue;
-                        }
-                        contador++;
-                    }
-                    continue;
-                }
-                if (raroEmProducao.ehProduzindo()) {
-                    contador += 1;
-                }
-            }
+            contador += processaRaro(raroMaisVendido, profissaoPersonagem);
         }
     }
 
+    private int processaRaro(
+        Trabalho raroMaisVendido,
+        ProfissaoPersonagem profissaoPersonagem
+    ) throws ProducaoException {
+        TrabalhoEstoque raroEmEstoque = estoqueRepo.recuperaTrabalhoPorId(idPersonagem, raroMaisVendido.getId());
+        if (raroEmEstoque != null && raroEmEstoque.getQuantidade() > 0) {
+            return 0;
+        }
+
+        TrabalhoProducao raroEmProducao = producaoRepo.recuperaProducaoParaProduzirProduzindoPorId(
+            idPersonagem,
+            raroMaisVendido.getId()
+        );
+
+        if (raroEmProducao != null) {
+            return raroEmProducao.ehProduzindo() ? 1 : 0;
+        }
+
+        List<String> melhoradoNecessarios = raroMaisVendido.getListaTrabalhosNecessarios();
+        if (melhoradoNecessarios == null || melhoradoNecessarios.isEmpty()) {
+            throw new ProducaoException(
+                TRABALHO_SEM_DEPENDENCIA,
+                "O trabalho raro '" + raroMaisVendido.getNome() + "' não possui requisitos para produção."
+            );
+        }
+
+        List<String> melhoradosFaltantes = recuperaRecursosFaltantes(melhoradoNecessarios);
+        if (melhoradosFaltantes.isEmpty()) {
+            insereProducao(raroMaisVendido.getId(), raroMaisVendido.getExperiencia(), licencaPara(profissaoPersonagem));
+            return 1;
+        }
+
+        int contador = 0;
+        for (String melhoradoFaltante : melhoradosFaltantes) {
+            contador += processaMelhorado(melhoradoFaltante, profissaoPersonagem);
+        }
+        return contador;
+    }
+
+    private int processaMelhorado(
+        String melhoradoFaltante,
+        ProfissaoPersonagem profissaoPersonagem
+    ) throws ProducaoException {
+        TrabalhoProducao melhoradoEmProducao = producaoRepo.recuperaProducaoParaProduzirProduzindoPorId(
+            idPersonagem,
+            melhoradoFaltante
+        );
+
+        if (melhoradoEmProducao != null) {
+            return 1;
+        }
+
+        Trabalho melhoradoNecessario = trabalhoRepo.recuperaTrabalhoPorId(melhoradoFaltante);
+        if (melhoradoNecessario == null) return 0;
+
+        List<String> comumNecessarios = melhoradoNecessario.getListaTrabalhosNecessarios();
+        if (comumNecessarios == null || comumNecessarios.isEmpty()) {
+            throw new ProducaoException(
+                TRABALHO_SEM_DEPENDENCIA,
+                "O trabalho '" + melhoradoNecessario.getNome() + "' não possui recursos necessários definidos."
+            );
+        }
+
+        List<String> comunsFaltantes = recuperaRecursosFaltantes(comumNecessarios);
+        if (comunsFaltantes.isEmpty()) {
+            insereProducao(melhoradoNecessario.getId(), melhoradoNecessario.getExperiencia(), licencaPara(profissaoPersonagem));
+            return 1;
+        }
+
+        int contador = 0;
+        for (String comumFaltante : comunsFaltantes) {
+            contador += processaComum(comumFaltante, profissaoPersonagem);
+        }
+        return contador;
+    }
+
+    private int processaComum(String comumFaltante, ProfissaoPersonagem profissaoPersonagem) {
+        TrabalhoProducao comumEmProducao = producaoRepo.recuperaProducaoParaProduzirProduzindoPorId(
+            idPersonagem,
+            comumFaltante
+        );
+
+        if (comumEmProducao != null) {
+            return 1;
+        }
+
+        Trabalho comumNecessario = trabalhoRepo.recuperaTrabalhoPorId(comumFaltante);
+        if (comumNecessario == null) return 0;
+
+        if (temRecursosProducaoSuficientes(idPersonagem, comumNecessario)) {
+            insereProducao(comumNecessario.getId(), comumNecessario.getExperiencia(), licencaPara(profissaoPersonagem));
+            return 1;
+        }
+
+        return processaRecursos(comumNecessario);
+    }
+
+    private int processaRecursos(Trabalho comumNecessario) {
+        Trabalho producaoRecursos = trabalhoRepo.recuperaTrabalhoProducaoRecursos(comumNecessario);
+        if (producaoRecursos == null) return 0;
+
+        TrabalhoProducao producaoRecursosEmProducao = producaoRepo.recuperaProducaoParaProduzirProduzindoPorId(
+            idPersonagem,
+            producaoRecursos.getId()
+        );
+
+        if (producaoRecursosEmProducao != null) return 0;
+
+        TrabalhoProducao novaProducao = new TrabalhoProducao();
+        novaProducao.setIdTrabalho(producaoRecursos.getId());
+        novaProducao.setTipoLicenca(context.getString(R.string.licencaAprendiz));
+        novaProducao.setExperiencia(producaoRecursos.getExperiencia());
+        novaProducao.setRecorrencia(true);
+
+        producaoRepo.insereTrabalhoProducao(novaProducao, idPersonagem);
+        return 1;
+    }
+
+    private String licencaPara(ProfissaoPersonagem profissaoPersonagem) {
+        return profissaoPersonagem.getNivel() == 28 ?
+            context.getString(R.string.licencaMestre) :
+            context.getString(R.string.licencaIniciante);
+    }
+
+    private void insereProducao(String idTrabalho, Integer experiencia, String licenca) {
+        TrabalhoProducao novaProducao = new TrabalhoProducao();
+        novaProducao.setIdTrabalho(idTrabalho);
+        novaProducao.setTipoLicenca(licenca);
+        novaProducao.setExperiencia(experiencia);
+        producaoRepo.insereTrabalhoProducao(novaProducao, idPersonagem);
+    }
+
+    // Achado M4: este método só devolve true, sem checar nada — o nome promete uma
+    // verificação real contra o estoque de recursos que nunca foi implementada, então todo
+    // o planejamento assume "recursos sempre suficientes" para produção comum. NÃO
+    // implementei a verificação de verdade aqui: ela dependeria de comparar, para cada
+    // ingrediente do catálogo (CatalogoRecursos/CatalogoRecursosRaros — ver achado M5), a
+    // quantidade em estoque contra o custo da receita, e eu não tenho como validar as regras
+    // de negócio corretas (ex.: o que fazer quando falta só um recurso) sem arriscar mudar o
+    // comportamento de produção do app de um jeito que ninguém pediu. Mantido o
+    // comportamento atual (sempre true) e documentado aqui para que o time decida
+    // conscientemente entre implementar de verdade ou remover esta verificação do fluxo.
     private boolean temRecursosProducaoSuficientes(String idPersonagem, Trabalho trabalho) {
         return true;
     }
