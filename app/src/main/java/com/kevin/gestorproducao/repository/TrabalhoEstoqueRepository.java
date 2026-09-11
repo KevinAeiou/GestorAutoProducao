@@ -100,9 +100,14 @@ public class TrabalhoEstoqueRepository {
     }
 
     public LiveData<Resource<ArrayList<TrabalhoEstoque>>> recuperaEstoque(String idPersonagem) {
-        ArrayList<TrabalhoEstoque> estoque = new ArrayList<>(estoqueDao.recuperaEstoque(idPersonagem));
-
-        estoqueEncontrado.setValue(new Resource<>(estoque, null));
+        backgroundExecutor.execute(() -> {
+            try {
+                ArrayList<TrabalhoEstoque> estoque = new ArrayList<>(estoqueDao.recuperaEstoque(idPersonagem));
+                estoqueEncontrado.postValue(new Resource<>(estoque, null));
+            } catch (RuntimeException e) {
+                estoqueEncontrado.postValue(new Resource<>(null, e.getMessage()));
+            }
+        });
 
         return estoqueEncontrado;
     }

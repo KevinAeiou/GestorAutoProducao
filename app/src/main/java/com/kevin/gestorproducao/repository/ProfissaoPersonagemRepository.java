@@ -49,12 +49,18 @@ public class ProfissaoPersonagemRepository {
     public LiveData<Resource<ArrayList<ProfissaoPersonagem>>> recuperaProfissoesPersonagem(
         String idPersonagem
     ) {
-        ArrayList<ProfissaoPersonagem> profissoesPersonagem = new ArrayList<>(
-            profissaoPersonagemDao.recuperaProfissoes(idPersonagem)
-        );
         MutableLiveData<Resource<ArrayList<ProfissaoPersonagem>>> profissoes = new MutableLiveData<>();
 
-        profissoes.setValue(new Resource<>(profissoesPersonagem, null));
+        backGroundExecutor.execute(() -> {
+            try {
+                ArrayList<ProfissaoPersonagem> profissoesPersonagem = new ArrayList<>(
+                    profissaoPersonagemDao.recuperaProfissoes(idPersonagem)
+                );
+                profissoes.postValue(new Resource<>(profissoesPersonagem, null));
+            } catch (RuntimeException e) {
+                profissoes.postValue(new Resource<>(null, e.getMessage()));
+            }
+        });
 
         return profissoes;
     }
