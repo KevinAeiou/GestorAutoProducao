@@ -47,8 +47,6 @@ public class ProducaoDao {
         String idPersonagem,
         String idTrabalho
     ) {
-        TrabalhoProducao trabalho = null;
-
         String query =
             "SELECT " + COLUMN_NAME_ID + ", " + COLUMN_NAME_ID_TRABALHO + " " +
             "FROM " + TABLE_TRABALHOS_PRODUCAO + " " +
@@ -60,10 +58,12 @@ public class ProducaoDao {
                 ") " +
             "LIMIT 1";
 
-        Cursor cursor = db.rawQuery(query, new String[]{idPersonagem, idTrabalho});
+        try (Cursor cursor = db.rawQuery(query, new String[]{idPersonagem, idTrabalho})) {
+            if (!cursor.moveToFirst()) {
+                return null;
+            }
 
-        if (cursor.moveToFirst()) {
-            trabalho = new TrabalhoProducao();
+            TrabalhoProducao trabalho = new TrabalhoProducao();
 
             trabalho.setId(
                     cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID))
@@ -71,11 +71,9 @@ public class ProducaoDao {
             trabalho.setIdTrabalho(
                     cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID_TRABALHO))
             );
+
+            return trabalho;
         }
-
-        cursor.close();
-
-        return trabalho;
     }
 
     public void substituirTodas(
@@ -151,69 +149,68 @@ public class ProducaoDao {
                 "t." + COLUMN_NAME_NIVEL + " ASC, " +
                 "t." + COLUMN_NAME_NOME + " ASC";
 
-        Cursor cursor = db.rawQuery(query, new String[]{idPersonagem});
+        try (Cursor cursor = db.rawQuery(query, new String[]{idPersonagem})) {
+            while (cursor.moveToNext()) {
+                TrabalhoProducao trabalho = new TrabalhoProducao();
 
-        while (cursor.moveToNext()) {
-            TrabalhoProducao trabalho = new TrabalhoProducao();
+                trabalho.setId(
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID))
+                );
+                trabalho.setIdTrabalho(
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID_TRABALHO))
+                );
+                trabalho.setNome(
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME))
+                );
+                trabalho.setNomeProducao(
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME_PRODUCAO))
+                );
+                trabalho.setNivel(
+                    cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_NIVEL))
+                );
+                trabalho.setExperiencia(
+                    cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_EXPERIENCIA))
+                );
+                trabalho.setRaridade(
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_RARIDADE))
+                );
+                trabalho.setProfissao(
+                    cursor.getString(cursor.getColumnIndexOrThrow("profissao_nome"))
+                );
+                trabalho.setTipoLicenca(
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_LICENCA))
+                );
+                trabalho.setRecorrencia(
+                    cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_RECORRENCIA)) == 1
+                );
+                trabalho.setEstado(
+                    cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_ESTADO))
+                );
 
-            trabalho.setId(
-                cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID))
-            );
-            trabalho.setIdTrabalho(
-                cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID_TRABALHO))
-            );
-            trabalho.setNome(
-                cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME))
-            );
-            trabalho.setNomeProducao(
-                cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME_PRODUCAO))
-            );
-            trabalho.setNivel(
-                cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_NIVEL))
-            );
-            trabalho.setExperiencia(
-                cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_EXPERIENCIA))
-            );
-            trabalho.setRaridade(
-                cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_RARIDADE))
-            );
-            trabalho.setProfissao(
-                cursor.getString(cursor.getColumnIndexOrThrow("profissao_nome"))
-            );
-            trabalho.setTipoLicenca(
-                cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_LICENCA))
-            );
-            trabalho.setRecorrencia(
-                cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_RECORRENCIA)) == 1
-            );
-            trabalho.setEstado(
-                cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_ESTADO))
-            );
+                int indexCriado = cursor.getColumnIndexOrThrow(COLUMN_NAME_CRIADO_EM);
+                if (!cursor.isNull(indexCriado)) {
+                    trabalho.setCriadoEm(cursor.getLong(indexCriado));
+                }
 
-            int indexCriado = cursor.getColumnIndexOrThrow(COLUMN_NAME_CRIADO_EM);
-            if (!cursor.isNull(indexCriado)) {
-                trabalho.setCriadoEm(cursor.getLong(indexCriado));
+                int indexModificado = cursor.getColumnIndexOrThrow(COLUMN_NAME_MODIFICADO_EM);
+                if (!cursor.isNull(indexModificado)) {
+                    trabalho.setModificadoEm(cursor.getLong(indexModificado));
+                }
+
+                int indexIniciado = cursor.getColumnIndexOrThrow(COLUMN_NAME_INICIADO_EM);
+                if (!cursor.isNull(indexIniciado)) {
+                    trabalho.setIniciadoEm(cursor.getLong(indexIniciado));
+                }
+
+                int indexFinalizado = cursor.getColumnIndexOrThrow(COLUMN_NAME_FINALIZADO_EM);
+                if (!cursor.isNull(indexFinalizado)) {
+                    trabalho.setFinalizadoEm(cursor.getLong(indexFinalizado));
+                }
+
+                producoes.add(trabalho);
             }
-
-            int indexModificado = cursor.getColumnIndexOrThrow(COLUMN_NAME_MODIFICADO_EM);
-            if (!cursor.isNull(indexModificado)) {
-                trabalho.setModificadoEm(cursor.getLong(indexModificado));
-            }
-
-            int indexIniciado = cursor.getColumnIndexOrThrow(COLUMN_NAME_INICIADO_EM);
-            if (!cursor.isNull(indexIniciado)) {
-                trabalho.setIniciadoEm(cursor.getLong(indexIniciado));
-            }
-
-            int indexFinalizado = cursor.getColumnIndexOrThrow(COLUMN_NAME_FINALIZADO_EM);
-            if (!cursor.isNull(indexFinalizado)) {
-                trabalho.setFinalizadoEm(cursor.getLong(indexFinalizado));
-            }
-
-            producoes.add(trabalho);
         }
 
-        cursor.close();
         return producoes;
     }
 
@@ -221,8 +218,6 @@ public class ProducaoDao {
         String idPersonagem,
         String idTrabalho
     ) {
-        int quantidade = 0;
-
         String query =
             "SELECT COUNT(*) AS total " +
                 "FROM " + TABLE_TRABALHOS_PRODUCAO + " " +
@@ -230,23 +225,19 @@ public class ProducaoDao {
                 "AND " + COLUMN_NAME_ID_TRABALHO + " = ? " +
                 "AND " + COLUMN_NAME_ESTADO + " = " + CODIGO_TRABALHO_PARA_PRODUZIR;
 
-        Cursor cursor = db.rawQuery(query, new String[]{idPersonagem, idTrabalho});
-
-        if (cursor.moveToFirst()) {
-            quantidade = cursor.getInt(cursor.getColumnIndexOrThrow("total"));
+        try (Cursor cursor = db.rawQuery(query, new String[]{idPersonagem, idTrabalho})) {
+            if (cursor.moveToFirst()) {
+                return cursor.getInt(cursor.getColumnIndexOrThrow("total"));
+            }
         }
 
-        cursor.close();
-
-        return quantidade;
+        return 0;
     }
 
     public int recuperaQuantidadeProducaoProduzindoPorId(
         String idPersonagem,
         String idTrabalho
     ) {
-        int quantidade = 0;
-
         String query =
             "SELECT COUNT(*) AS total " +
                 "FROM " + TABLE_TRABALHOS_PRODUCAO + " " +
@@ -254,15 +245,13 @@ public class ProducaoDao {
                 "AND " + COLUMN_NAME_ID_TRABALHO + " = ? " +
                 "AND " + COLUMN_NAME_ESTADO + " = " + CODIGO_TRABALHO_PRODUZINDO;
 
-        Cursor cursor = db.rawQuery(query, new String[]{idPersonagem, idTrabalho});
-
-        if (cursor.moveToFirst()) {
-            quantidade = cursor.getInt(cursor.getColumnIndexOrThrow("total"));
+        try (Cursor cursor = db.rawQuery(query, new String[]{idPersonagem, idTrabalho})) {
+            if (cursor.moveToFirst()) {
+                return cursor.getInt(cursor.getColumnIndexOrThrow("total"));
+            }
         }
 
-        cursor.close();
-
-        return quantidade;
+        return 0;
     }
 
     public void insereProducao(TrabalhoProducao trabalho, String idPersonagem) {

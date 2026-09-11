@@ -94,9 +94,50 @@ public class EstoqueDao {
             "t." + COLUMN_NAME_NIVEL + " ASC, " +
             "t." + COLUMN_NAME_NOME + " ASC";
 
-        Cursor cursor = db.rawQuery(query, new String[]{idPersonagem});
+        try (Cursor cursor = db.rawQuery(query, new String[]{idPersonagem})) {
+            while (cursor.moveToNext()) {
+                TrabalhoEstoque trabalho = new TrabalhoEstoque();
 
-        while (cursor.moveToNext()) {
+                trabalho.setId(
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID))
+                );
+                trabalho.setIdTrabalho(
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID_TRABALHO))
+                );
+                trabalho.setNome(
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME))
+                );
+                trabalho.setNivel(
+                    cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_NIVEL))
+                );
+                trabalho.setProfissao(
+                    cursor.getString(cursor.getColumnIndexOrThrow("profissao_nome"))
+                );
+                trabalho.setRaridade(
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_RARIDADE))
+                );
+                trabalho.setQuantidade(
+                    cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_QUANTIDADE))
+                );
+
+                estoque.add(trabalho);
+            }
+        }
+
+        return estoque;
+    }
+
+    public TrabalhoEstoque recuperaTrabalhoPorId(String idPersonagem, String idTrabalho) {
+        String query =
+            "SELECT " + COLUMN_NAME_ID  + ", " + COLUMN_NAME_QUANTIDADE + ", " + COLUMN_NAME_ID_TRABALHO + " " +
+            "FROM " + TABLE_ESTOQUE + " " +
+            "WHERE " + COLUMN_NAME_ID_PERSONAGEM + " = ?" +  " AND " + COLUMN_NAME_ID_TRABALHO + " = ?";
+
+        try (Cursor cursor = db.rawQuery(query, new String[]{idPersonagem, idTrabalho})) {
+            if (!cursor.moveToFirst()) {
+                return null;
+            }
+
             TrabalhoEstoque trabalho = new TrabalhoEstoque();
 
             trabalho.setId(
@@ -105,54 +146,12 @@ public class EstoqueDao {
             trabalho.setIdTrabalho(
                 cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID_TRABALHO))
             );
-            trabalho.setNome(
-                cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME))
-            );
-            trabalho.setNivel(
-                cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_NIVEL))
-            );
-            trabalho.setProfissao(
-                cursor.getString(cursor.getColumnIndexOrThrow("profissao_nome"))
-            );
-            trabalho.setRaridade(
-                cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_RARIDADE))
-            );
             trabalho.setQuantidade(
                 cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_QUANTIDADE))
             );
 
-            estoque.add(trabalho);
+            return trabalho;
         }
-
-        cursor.close();
-        return estoque;
-    }
-
-    public TrabalhoEstoque recuperaTrabalhoPorId(String idPersonagem, String idTrabalho) {
-        TrabalhoEstoque trabalho = null;
-        String query =
-            "SELECT " + COLUMN_NAME_ID  + ", " + COLUMN_NAME_QUANTIDADE + ", " + COLUMN_NAME_ID_TRABALHO + " " +
-            "FROM " + TABLE_ESTOQUE + " " +
-            "WHERE " + COLUMN_NAME_ID_PERSONAGEM + " = ?" +  " AND " + COLUMN_NAME_ID_TRABALHO + " = ?";
-
-        Cursor cursor = db.rawQuery(query, new String[]{idPersonagem, idTrabalho});
-
-        if (cursor.moveToFirst()) {
-            trabalho = new TrabalhoEstoque();
-
-            trabalho.setId(
-                cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID))
-            );
-            trabalho.setIdTrabalho(
-                cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID_TRABALHO))
-            );
-            trabalho.setQuantidade(
-                cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_QUANTIDADE))
-            );
-        }
-
-        cursor.close();
-        return trabalho;
     }
 
     public void modificaEstoque(TrabalhoEstoque trabalho, String idPersonagem) {
