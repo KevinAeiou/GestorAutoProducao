@@ -6,7 +6,7 @@ import static com.kevin.gestorproducao.ui.activity.Constantes.CODIGO_REQUISICAO_
 import static com.kevin.gestorproducao.ui.fragment.ListaTodosTrabalhosFragmentDirections.vaiDeTrabalhosParaDetalhesTrabalho;
 import static com.kevin.gestorproducao.ui.fragment.ListaTodosTrabalhosFragmentDirections.vaiDeTrabalhosParaFiltro;
 import static com.kevin.gestorproducao.ui.fragment.ListaTodosTrabalhosFragmentDirections.vaiDeTrabalhosParaVisualizacaoTrabalho;
-import static com.kevin.gestorproducao.utilitario.Utilitario.stringContemString;
+import static com.kevin.gestorproducao.utilitario.Utilitario.filtrarTrabalhos;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -104,52 +104,7 @@ public class ListaTodosTrabalhosFragment
             return;
         }
 
-        trabalhosFiltrados.clear();
-
-        String descricaoFiltro = filtroAtual.getDescricao() != null
-            ? filtroAtual.getDescricao().toLowerCase()
-            : "";
-
-        Integer nivelFiltro = filtroAtual.getNivel();
-
-        boolean temDescricao = !descricaoFiltro.isEmpty();
-        boolean temProfissoes = filtroAtual.getProfissoes() != null && !filtroAtual.getProfissoes().isEmpty();
-        boolean temRaridades = filtroAtual.getRaridades() != null && !filtroAtual.getRaridades().isEmpty();
-        boolean temNivel = nivelFiltro != null;
-
-        for (Trabalho trabalho : trabalhos) {
-
-            boolean match = true;
-
-            if (temDescricao) {
-                match &= trabalho.getNome() != null &&
-                stringContemString(trabalho.getNome(), descricaoFiltro);
-            }
-
-            if (temProfissoes) {
-                match &= filtroAtual.getProfissoes().stream()
-                    .anyMatch(profissao ->
-                        trabalho.getProfissao() != null &&
-                            trabalho.getProfissao().equalsIgnoreCase(profissao.getNome())
-                    );
-            }
-
-            if (temRaridades) {
-                match &= filtroAtual.getRaridades().stream()
-                    .anyMatch(raridade ->
-                        trabalho.getRaridade() != null &&
-                            trabalho.getRaridade().equalsIgnoreCase(raridade)
-                    );
-            }
-
-            if (temNivel) {
-                match &= trabalho.getNivel().equals(nivelFiltro);
-            }
-
-            if (match) {
-                trabalhosFiltrados.add(trabalho);
-            }
-        }
+        trabalhosFiltrados = filtrarTrabalhos(trabalhos, filtroAtual);
 
         trabalhosAdapter.atualiza(trabalhosFiltrados);
         atualizaVisibilidadeListaVazia(trabalhosFiltrados.isEmpty());
