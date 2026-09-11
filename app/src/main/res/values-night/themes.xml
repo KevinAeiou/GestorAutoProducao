@@ -1,5 +1,5 @@
 <resources>
-    <style name="Theme.Ceep" parent="Theme.Material3.DayNight">
+    <style name="Theme.GestorAutoProducao" parent="Theme.Material3.DayNight">
         <!-- Primary -->
         <item name="colorPrimary">@color/cor_azul_claro</item>
         <item name="colorOnPrimary">@color/black</item>
@@ -23,7 +23,7 @@
         <item name="android:dialogTheme">@style/MaterialAlertDialog.Material3</item>
     </style>
 
-    <style name="Theme.Ceep.NoActionBar" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Theme.GestorAutoProducao.NoActionBar" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Primary -->
         <item name="colorPrimary">@color/cor_azul_claro</item>
         <item name="colorOnPrimary">@color/black</item>

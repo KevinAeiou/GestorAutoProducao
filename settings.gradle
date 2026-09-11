@@ -6,5 +6,5 @@ dependencyResolutionManagement {
         maven { url 'https://jitpack.io' }
     }
 }
-rootProject.name = "Ceep"
+rootProject.name = "GestorAutoProducao"
 include ':app'
