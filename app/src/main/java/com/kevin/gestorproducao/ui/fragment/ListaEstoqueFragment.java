@@ -6,7 +6,7 @@ import static com.kevin.gestorproducao.ui.activity.Constantes.CODIGO_REQUISICAO_
 import static com.kevin.gestorproducao.ui.fragment.ListaEstoqueFragmentDirections.vaiDeEstoqueParaFiltro;
 import static com.kevin.gestorproducao.ui.fragment.ListaEstoqueFragmentDirections.vaiDeEstoqueParaTrabalhos;
 import static com.kevin.gestorproducao.ui.fragment.ListaEstoqueFragmentDirections.vaiParaDetalhesEstoque;
-import static com.kevin.gestorproducao.utilitario.Utilitario.stringContemString;
+import static com.kevin.gestorproducao.utilitario.Utilitario.filtrarTrabalhos;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -190,52 +190,7 @@ public class ListaEstoqueFragment
             return;
         }
 
-        estoqueFiltrado.clear();
-
-        String descricaoFiltro = filtroAtual.getDescricao() != null
-            ? filtroAtual.getDescricao().toLowerCase()
-            : "";
-
-        Integer nivelFiltro = filtroAtual.getNivel();
-
-        boolean temDescricao = !descricaoFiltro.isEmpty();
-        boolean temProfissoes = filtroAtual.getProfissoes() != null && !filtroAtual.getProfissoes().isEmpty();
-        boolean temRaridades = filtroAtual.getRaridades() != null && !filtroAtual.getRaridades().isEmpty();
-        boolean temNivel = nivelFiltro != null;
-
-        for (TrabalhoEstoque trabalho : estoque) {
-
-            boolean match = true;
-
-            if (temDescricao) {
-                match &= trabalho.getNome() != null &&
-                stringContemString(trabalho.getNome(), descricaoFiltro);
-            }
-
-            if (temProfissoes) {
-                match &= filtroAtual.getProfissoes().stream()
-                    .anyMatch(profissao ->
-                        trabalho.getProfissao() != null &&
-                            trabalho.getProfissao().equalsIgnoreCase(profissao.getNome())
-                    );
-            }
-
-            if (temRaridades) {
-                match &= filtroAtual.getRaridades().stream()
-                    .anyMatch(raridade ->
-                        trabalho.getRaridade() != null &&
-                            trabalho.getRaridade().equalsIgnoreCase(raridade)
-                    );
-            }
-
-            if (temNivel) {
-                match &= trabalho.getNivel().equals(nivelFiltro);
-            }
-
-            if (match) {
-                estoqueFiltrado.add(trabalho);
-            }
-        }
+        estoqueFiltrado = filtrarTrabalhos(estoque, filtroAtual);
 
         estoqueAdapter.atualiza(estoqueFiltrado);
         atualizaVisibilidadeListaVazia(estoqueFiltrado.isEmpty());

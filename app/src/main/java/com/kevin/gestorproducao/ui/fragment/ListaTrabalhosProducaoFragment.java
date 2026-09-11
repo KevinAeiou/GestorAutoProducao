@@ -3,7 +3,7 @@ package com.kevin.gestorproducao.ui.fragment;
 import static com.kevin.gestorproducao.ui.fragment.ListaTrabalhosProducaoFragmentDirections.vaiDeProducaoParaFiltro;
 import static com.kevin.gestorproducao.ui.fragment.ListaTrabalhosProducaoFragmentDirections.vaiParaDetalhesProducao;
 import static com.kevin.gestorproducao.ui.fragment.ListaTrabalhosProducaoFragmentDirections.vaiParaNovaProducao;
-import static com.kevin.gestorproducao.utilitario.Utilitario.stringContemString;
+import static com.kevin.gestorproducao.utilitario.Utilitario.filtrarTrabalhos;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -462,56 +462,13 @@ public class ListaTrabalhosProducaoFragment
             return;
         }
 
-        trabalhosFiltrados.clear();
+        trabalhosFiltrados = filtrarTrabalhos(trabalhos, filtroAtual);
 
-        String descricaoFiltro = filtroAtual.getDescricao() != null
-            ? filtroAtual.getDescricao().toLowerCase()
-            : "";
-
-        Integer nivelFiltro = filtroAtual.getNivel();
-
-        boolean temDescricao = !descricaoFiltro.isEmpty();
-        boolean temProfissoes = filtroAtual.getProfissoes() != null && !filtroAtual.getProfissoes().isEmpty();
-        boolean temRaridades = filtroAtual.getRaridades() != null && !filtroAtual.getRaridades().isEmpty();
+        // getEstado() é específico de TrabalhoProducao (para produzir/produzindo/feito), então
+        // não faz parte do filtro genérico de Utilitario.filtrarTrabalhos — aplicado à parte.
         boolean temEstado = filtroAtual.getEstado() != -1;
-        boolean temNivel = nivelFiltro != null;
-
-        for (TrabalhoProducao trabalho : trabalhos) {
-
-            boolean match = true;
-
-            if (temDescricao) {
-                match &= trabalho.getNome() != null &&
-                stringContemString(trabalho.getNome(), descricaoFiltro);
-            }
-
-            if (temProfissoes) {
-                match &= filtroAtual.getProfissoes().stream()
-                    .anyMatch(profissao ->
-                        trabalho.getProfissao() != null &&
-                            trabalho.getProfissao().equalsIgnoreCase(profissao.getNome())
-                    );
-            }
-
-            if (temRaridades) {
-                match &= filtroAtual.getRaridades().stream()
-                    .anyMatch(raridade ->
-                        trabalho.getRaridade() != null &&
-                            trabalho.getRaridade().equalsIgnoreCase(raridade)
-                    );
-            }
-
-            if (temEstado) {
-                match &= trabalho.getEstado() == filtroAtual.getEstado();
-            }
-
-            if (temNivel) {
-                match &= trabalho.getNivel().equals(nivelFiltro);
-            }
-
-            if (match) {
-                trabalhosFiltrados.add(trabalho);
-            }
+        if (temEstado) {
+            trabalhosFiltrados.removeIf(trabalho -> trabalho.getEstado() != filtroAtual.getEstado());
         }
 
         trabalhoAdapter.atualiza(trabalhosFiltrados);
