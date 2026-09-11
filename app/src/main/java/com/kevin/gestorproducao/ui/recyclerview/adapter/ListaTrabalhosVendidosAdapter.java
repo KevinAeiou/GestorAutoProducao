@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -101,23 +100,7 @@ public class ListaTrabalhosVendidosAdapter
         }
 
         private void configuraCorNomeTrabalhoProducao(TrabalhoVendido trabalhoProducao) {
-            String raridade = trabalhoProducao.getRaridade();
-            if (raridade != null) {
-                switch (raridade) {
-                    case "Comum":
-                        itemNome.setTextColor(ContextCompat.getColor(context, R.color.cor_texto_raridade_comum));
-                        break;
-                    case "Raro":
-                        itemNome.setTextColor(ContextCompat.getColor(context, R.color.cor_texto_raridade_raro));
-                        break;
-                    case "Melhorado":
-                        itemNome.setTextColor(ContextCompat.getColor(context, R.color.cor_texto_raridade_melhorado));
-                        break;
-                    case "Especial":
-                        itemNome.setTextColor(ContextCompat.getColor(context, R.color.cor_texto_raridade_especial));
-                        break;
-                }
-            }
+            itemNome.setTextColor(Formatador.corPorRaridade(context, trabalhoProducao.getRaridade()));
         }
     }
 }

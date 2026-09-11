@@ -19,13 +19,13 @@ public class ListaProfissaoAdapter extends BaseListAdapter<
     ProfissaoBase,
     ListaProfissaoAdapter.ProfissaoViewHolder
 > {
-    private static OnItemClickListenerProfissao onItemClickListener;
+    private OnItemClickListenerProfissao onItemClickListener;
 
     public ListaProfissaoAdapter() {
     }
 
     public void setOnItemClickListener(OnItemClickListenerProfissao onItemClickListener) {
-        ListaProfissaoAdapter.onItemClickListener = onItemClickListener;
+        this.onItemClickListener = onItemClickListener;
     }
 
     @NonNull
@@ -62,7 +62,7 @@ public class ListaProfissaoAdapter extends BaseListAdapter<
         };
     }
 
-    public static class ProfissaoViewHolder extends RecyclerView.ViewHolder {
+    public class ProfissaoViewHolder extends RecyclerView.ViewHolder {
         private final TextView nome_profissao;
         private ProfissaoBase profissao;
 
