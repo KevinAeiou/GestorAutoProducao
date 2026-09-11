@@ -274,13 +274,25 @@ public class  TrabalhoProducaoRepository {
         return producaoDao.recuperaQuantidadeProducaoProduzindoPorId(idPersonagem, idTrabalho);
     }
 
-    public void removeProducoes(String idPersonagem) {
-        referenciaProducao.child(idPersonagem).removeValue().addOnCompleteListener(
-            backgroundExecutor, task -> {
+    public LiveData<Resource<Void>> removeProducoes(String idPersonagem) {
+        return FirebaseTimeoutHelper.execute(callback -> referenciaProducao
+            .child(idPersonagem)
+            .removeValue()
+            .addOnCompleteListener(backgroundExecutor, task -> {
                 if (task.isSuccessful()) {
-                    producaoDao.removeProducoes(idPersonagem);
+                    try {
+                        producaoDao.removeProducoes(idPersonagem);
+                        callback.sucesso();
+                    } catch (RuntimeException e) {
+                        callback.erro(e.getMessage());
+                    }
+                    return;
                 }
-            }
+
+                Exception exception = task.getException();
+                String erro = recuperaErro(exception, "Erro desconhecido ao remover produções");
+                callback.erro(erro);
+            })
         );
     }
 
