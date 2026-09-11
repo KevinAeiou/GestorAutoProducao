@@ -1,6 +1,5 @@
 package com.kevin.gestorproducao.repository;
 
-import static com.kevin.gestorproducao.repository.TrabalhoProducaoRepository.destroyInstance;
 import static com.kevin.gestorproducao.ui.activity.Constantes.CHAVE_ESTOQUE;
 
 import android.content.Context;
@@ -25,7 +24,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 public class TrabalhoEstoqueRepository {
-    private static TrabalhoEstoqueRepository instancia;
+    private static volatile TrabalhoEstoqueRepository instancia;
     private final DatabaseReference referenciaEstoque;
     private final DatabaseReference referenciaEstoqueIdPersonagem;
     private ValueEventListener ouvinteEstoque;
@@ -43,9 +42,8 @@ public class TrabalhoEstoqueRepository {
         this.estoqueEncontrado = new MutableLiveData<>();
     }
 
-    public static TrabalhoEstoqueRepository getInstance(Context context) {
+    public static synchronized TrabalhoEstoqueRepository getInstance(Context context) {
         if (instancia == null) {
-            destroyInstance();
             instancia = new TrabalhoEstoqueRepository(context);
         }
         return instancia;

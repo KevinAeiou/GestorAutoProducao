@@ -1,6 +1,5 @@
 package com.kevin.gestorproducao.repository;
 
-import static com.kevin.gestorproducao.repository.TrabalhoProducaoRepository.destroyInstance;
 import static com.kevin.gestorproducao.ui.activity.Constantes.CHAVE_LISTA_RECURSOS;
 import static com.kevin.gestorproducao.ui.activity.Constantes.CHAVE_RECURSO;
 
@@ -49,7 +48,6 @@ public class RecursosProducaoRepository {
 
     public static synchronized RecursosProducaoRepository getInstance(Context contexto) {
         if (instancia == null) {
-            destroyInstance();
             instancia = new RecursosProducaoRepository(contexto);
         }
         return instancia;

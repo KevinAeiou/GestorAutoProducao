@@ -1,6 +1,5 @@
 package com.kevin.gestorproducao.repository;
 
-import static com.kevin.gestorproducao.repository.TrabalhoProducaoRepository.destroyInstance;
 import static com.kevin.gestorproducao.ui.activity.Constantes.CHAVE_VENDAS;
 
 import android.content.Context;
@@ -40,8 +39,6 @@ public class TrabalhoVendaRepository {
 
     public static synchronized TrabalhoVendaRepository getInstance(Context context) {
         if (instancia == null) {
-            destroyInstance();
-
             instancia = new TrabalhoVendaRepository(context);
         }
 
