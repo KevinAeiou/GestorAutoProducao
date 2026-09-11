@@ -10,35 +10,18 @@
     <LinearLayout
         android:id="@+id/cabecalhoSelecaoPersonagem"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="72dp"
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:background="@drawable/bg_cabecalho_modal"
-        android:padding="18dp"
+        android:paddingHorizontal="18dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <FrameLayout
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:background="@drawable/bg_selo_marca">
-
-            <com.google.android.material.imageview.ShapeableImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_gravity="center"
-                android:scaleType="centerCrop"
-                app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.SeloMarcaCircular"
-                android:src="@mipmap/ic_launcher"
-                android:contentDescription="@null" />
-        </FrameLayout>
-
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="12dp"
             android:orientation="vertical">
 
             <TextView
@@ -62,17 +45,6 @@
                 android:textColor="@color/cor_texto_marca"
                 android:text="@string/stringEscolhaPersonagemContinuar" />
         </LinearLayout>
-
-        <ImageButton
-            android:id="@+id/btnFecharSelecaoPersonagem"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_marginStart="8dp"
-            android:padding="7dp"
-            android:background="@drawable/bg_botao_circular_translucido"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_fechar"
-            android:contentDescription="@string/stringFecharModal" />
     </LinearLayout>
 
     <LinearLayout

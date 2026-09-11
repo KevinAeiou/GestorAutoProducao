@@ -8,7 +8,6 @@ import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.RadioGroup;
 
 import com.google.android.material.button.MaterialButton;
@@ -30,7 +29,6 @@ public class SelecaoPersonagemFragment extends DialogFragment {
     private FiltroViewModel filtroViewModel;
     private RadioGroup radioGroup;
     private MaterialButton btnConfirmar;
-    private ImageButton btnFechar;
 
     @NonNull
     @Override
@@ -39,7 +37,6 @@ public class SelecaoPersonagemFragment extends DialogFragment {
 
         inicializaComponentes();
         observarPersonagem();
-        configuraBotaoCancelar();
         configuraBotaoConfirmar();
         return new MaterialAlertDialogBuilder(
             requireContext()
@@ -57,10 +54,6 @@ public class SelecaoPersonagemFragment extends DialogFragment {
 
             dismiss();
         });
-    }
-
-    private void configuraBotaoCancelar() {
-        btnFechar.setOnClickListener(v -> dismiss());
     }
 
     private void selecionarRadio(Personagem personagem) {
@@ -141,7 +134,6 @@ public class SelecaoPersonagemFragment extends DialogFragment {
 
     private void inicializaComponentes() {
         radioGroup = binding.radioGroupSelecaoPersonagem;
-        btnFechar = binding.btnFecharSelecaoPersonagem;
         btnConfirmar = binding.btnConfirmarSelecaoPersonagem;
 
         ViewModelFactory viewModelFactory = new ViewModelFactory(requireActivity());
