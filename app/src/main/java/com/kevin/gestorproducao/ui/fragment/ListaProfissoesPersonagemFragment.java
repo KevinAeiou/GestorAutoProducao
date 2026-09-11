@@ -193,6 +193,6 @@ public class ListaProfissoesPersonagemFragment
 
     private void removeOuvinteProfissao() {
         if (profissaoPersonagemViewModel == null) return;
-        profissaoPersonagemViewModel.removeOuvinte();
+        profissaoPersonagemViewModel.removeObservador();
     }
 }
