@@ -59,51 +59,50 @@ public class TrabalhoDao {
             "t." + COLUMN_NAME_EXPERIENCIA + " ASC, " +
             "t." + COLUMN_NAME_NOME + " ASC";
 
-        Cursor cursor = db.rawQuery(query, null);
+        try (Cursor cursor = db.rawQuery(query, null)) {
+            while (cursor.moveToNext()) {
+                Trabalho trabalho = new Trabalho();
 
-        while (cursor.moveToNext()) {
-            Trabalho trabalho = new Trabalho();
+                trabalho.setId(
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID))
+                );
+                trabalho.setNome(
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME))
+                );
+                trabalho.setNomeProducao(
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME_PRODUCAO))
+                );
+                trabalho.setExperiencia(
+                    cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_EXPERIENCIA))
+                );
+                trabalho.setNivel(
+                    cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_NIVEL))
+                );
+                trabalho.setProfissao(
+                    cursor.getString(cursor.getColumnIndexOrThrow("profissao_nome"))
+                );
+                trabalho.setRaridade(
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_RARIDADE))
+                );
+                String necessariosStr = cursor.getString(
+                        cursor.getColumnIndexOrThrow("trabalhos_necessarios")
+                );
 
-            trabalho.setId(
-                cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID))
-            );
-            trabalho.setNome(
-                cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME))
-            );
-            trabalho.setNomeProducao(
-                cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME_PRODUCAO))
-            );
-            trabalho.setExperiencia(
-                cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_EXPERIENCIA))
-            );
-            trabalho.setNivel(
-                cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_NIVEL))
-            );
-            trabalho.setProfissao(
-                cursor.getString(cursor.getColumnIndexOrThrow("profissao_nome"))
-            );
-            trabalho.setRaridade(
-                cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_RARIDADE))
-            );
-            String necessariosStr = cursor.getString(
-                    cursor.getColumnIndexOrThrow("trabalhos_necessarios")
-            );
+                Map<String, Boolean> necessariosMap = new HashMap<>();
 
-            Map<String, Boolean> necessariosMap = new HashMap<>();
+                if (necessariosStr != null && !necessariosStr.isEmpty()) {
+                    String[] ids = necessariosStr.split(",");
 
-            if (necessariosStr != null && !necessariosStr.isEmpty()) {
-                String[] ids = necessariosStr.split(",");
-
-                for (String id : ids) {
-                    necessariosMap.put(id, true);
+                    for (String id : ids) {
+                        necessariosMap.put(id, true);
+                    }
                 }
+
+                trabalho.setNecessarios(necessariosMap);
+
+                trabalhos.add(trabalho);
             }
-
-            trabalho.setNecessarios(necessariosMap);
-
-            trabalhos.add(trabalho);
         }
-        cursor.close();
 
         return trabalhos;
     }
@@ -184,34 +183,35 @@ public class TrabalhoDao {
                     "AND t." + COLUMN_NAME_RARIDADE + " = ?";
 
         String[] selectionArgs = {trabalho.getProfissao(), String.valueOf(trabalho.getNivel()), trabalho.getRaridade()};
-        Cursor cursor = db.rawQuery(selection, selectionArgs);
 
-        while (cursor.moveToNext()) {
-            Trabalho trabalhoEncontrado = new Trabalho();
+        try (Cursor cursor = db.rawQuery(selection, selectionArgs)) {
+            while (cursor.moveToNext()) {
+                Trabalho trabalhoEncontrado = new Trabalho();
 
-            trabalhoEncontrado.setId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID)));
-            trabalhoEncontrado.setNome(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME)));
+                trabalhoEncontrado.setId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID)));
+                trabalhoEncontrado.setNome(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME)));
 
-            trabalhos.add(trabalhoEncontrado);
+                trabalhos.add(trabalhoEncontrado);
+            }
         }
-
-        cursor.close();
 
         return trabalhos;
     }
 
     public Trabalho recuperaTrabalhoPorNome(String nome) {
-        Trabalho trabalho = null;
         String selection =
             "SELECT t.*, p.nome AS nome_profissao " +
             "FROM " + TABLE_TRABALHOS + " t " +
             "INNER JOIN " + TABLE_PROFISSOES + " p ON t." + COLUMN_NAME_PROFISSAO + " = p." + COLUMN_NAME_ID + " " +
             "WHERE REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(LOWER(t.nome), ' ', ''), 'ç', 'c'), 'ã', 'a'), 'ô', 'o'), 'é', 'e'), 'á', 'a'), 'â', 'a'), 'ó', 'o') = ?";
         String[] selectionArgs = {nome};
-        Cursor cursor = db.rawQuery(selection, selectionArgs);
 
-        if (cursor.moveToFirst()) {
-            trabalho = new Trabalho();
+        try (Cursor cursor = db.rawQuery(selection, selectionArgs)) {
+            if (!cursor.moveToFirst()) {
+                return null;
+            }
+
+            Trabalho trabalho = new Trabalho();
             trabalho.setId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID)));
             trabalho.setNome(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME)));
             trabalho.setNomeProducao(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME_PRODUCAO)));
@@ -219,10 +219,9 @@ public class TrabalhoDao {
             trabalho.setNivel(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_NIVEL)));
             trabalho.setProfissao(cursor.getString(cursor.getColumnIndexOrThrow("nome_profissao")));
             trabalho.setRaridade(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_RARIDADE)));
-        }
 
-        cursor.close();
-        return trabalho;
+            return trabalho;
+        }
     }
 
     public String trabalhoJaExiste(Trabalho trabalho) {
@@ -246,23 +245,16 @@ public class TrabalhoDao {
             trabalho.getRaridade()
         };
 
-        Cursor cursor = db.rawQuery(
-            selection,
-            selectionArgs
-        );
-
-        String id = null;
-        if (cursor.moveToFirst()) {
-            id = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID));
+        try (Cursor cursor = db.rawQuery(selection, selectionArgs)) {
+            if (cursor.moveToFirst()) {
+                return cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID));
+            }
         }
-        cursor.close();
 
-        return id;
+        return null;
     }
 
     public Trabalho recuperaTrabalhoPorId(String idTrabalho) {
-        Trabalho trabalho = null;
-
         String selection = "SELECT t.*, "+
             "p." + COLUMN_NAME_NOME + " AS profissao_nome, " +
             "GROUP_CONCAT(tn." + COLUMN_TRABALHO_NECESSARIO_ID + ") AS trabalhos_necessarios " +
@@ -274,10 +266,13 @@ public class TrabalhoDao {
             "WHERE t." + COLUMN_NAME_ID + " = ? " +
             "LIMIT 1";
         String[] selectionArgs = {idTrabalho};
-        Cursor cursor = db.rawQuery(selection, selectionArgs);
 
-        if (cursor.moveToFirst()) {
-            trabalho = new Trabalho();
+        try (Cursor cursor = db.rawQuery(selection, selectionArgs)) {
+            if (!cursor.moveToFirst()) {
+                return null;
+            }
+
+            Trabalho trabalho = new Trabalho();
             trabalho.setId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID)));
             trabalho.setNome(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME)));
             trabalho.setNomeProducao(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME_PRODUCAO)));
@@ -301,15 +296,12 @@ public class TrabalhoDao {
             }
 
             trabalho.setNecessarios(necessariosMap);
-        }
-        cursor.close();
 
-        return trabalho;
+            return trabalho;
+        }
     }
 
     public Trabalho recuperaTrabalhoProducaoRecursos(Trabalho trabalhoBase) {
-        Trabalho trabalho = null;
-
         String nivel = trabalhoBase.getNivel() > 14 ? "10" : "3";
         String experiencia = trabalhoBase.getNivel() > 14 ? "330" : "70";
         String profissao = trabalhoBase.getProfissao();
@@ -325,10 +317,13 @@ public class TrabalhoDao {
             "LIMIT 1";
 
         String[] selectionArgs = {nivel, profissao, experiencia};
-        Cursor cursor = db.rawQuery(selection, selectionArgs);
 
-        if (cursor.moveToFirst()) {
-            trabalho = new Trabalho();
+        try (Cursor cursor = db.rawQuery(selection, selectionArgs)) {
+            if (!cursor.moveToFirst()) {
+                return null;
+            }
+
+            Trabalho trabalho = new Trabalho();
             trabalho.setId(
                 cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID))
             );
@@ -350,10 +345,9 @@ public class TrabalhoDao {
             trabalho.setRaridade(
                 cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_RARIDADE))
             );
-        }
-        cursor.close();
 
-        return trabalho;
+            return trabalho;
+        }
     }
 
     public ArrayList<Trabalho> recuperaMaisVendidos(String idPersonagem) {
@@ -384,49 +378,48 @@ public class TrabalhoDao {
                 "total_vendas DESC, " +
                 "t." + COLUMN_NAME_NOME + " ASC ";
 
-        Cursor cursor = db.rawQuery(
+        try (Cursor cursor = db.rawQuery(
             query,
             new String[]{idPersonagem, "Raro"}
-        );
+        )) {
+            while (cursor.moveToNext()) {
+                Trabalho trabalho = new Trabalho();
+                trabalho.setId(cursor.getString(
+                    cursor.getColumnIndexOrThrow(COLUMN_NAME_ID)
+                ));
+                trabalho.setNome(cursor.getString(
+                    cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME)
+                ));
+                trabalho.setNomeProducao(cursor.getString(
+                    cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME_PRODUCAO)
+                ));
+                trabalho.setNivel(cursor.getInt(
+                    cursor.getColumnIndexOrThrow(COLUMN_NAME_NIVEL)
+                ));
+                trabalho.setExperiencia(cursor.getInt(
+                    cursor.getColumnIndexOrThrow(COLUMN_NAME_EXPERIENCIA)
+                ));
+                trabalho.setRaridade(cursor.getString(
+                    cursor.getColumnIndexOrThrow(COLUMN_NAME_RARIDADE)
+                ));
+                trabalho.setProfissao(cursor.getString(
+                    cursor.getColumnIndexOrThrow("profissao_nome")
+                ));
+                String necessariosStr = cursor.getString(cursor.getColumnIndexOrThrow("trabalhos_necessarios"));
+                Map<String, Boolean> necessariosMap = new HashMap<>();
+                if (necessariosStr != null && !necessariosStr.isEmpty()) {
+                    String[] ids = necessariosStr.split(",");
 
-        while (cursor.moveToNext()) {
-            Trabalho trabalho = new Trabalho();
-            trabalho.setId(cursor.getString(
-                cursor.getColumnIndexOrThrow(COLUMN_NAME_ID)
-            ));
-            trabalho.setNome(cursor.getString(
-                cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME)
-            ));
-            trabalho.setNomeProducao(cursor.getString(
-                cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME_PRODUCAO)
-            ));
-            trabalho.setNivel(cursor.getInt(
-                cursor.getColumnIndexOrThrow(COLUMN_NAME_NIVEL)
-            ));
-            trabalho.setExperiencia(cursor.getInt(
-                cursor.getColumnIndexOrThrow(COLUMN_NAME_EXPERIENCIA)
-            ));
-            trabalho.setRaridade(cursor.getString(
-                cursor.getColumnIndexOrThrow(COLUMN_NAME_RARIDADE)
-            ));
-            trabalho.setProfissao(cursor.getString(
-                cursor.getColumnIndexOrThrow("profissao_nome")
-            ));
-            String necessariosStr = cursor.getString(cursor.getColumnIndexOrThrow("trabalhos_necessarios"));
-            Map<String, Boolean> necessariosMap = new HashMap<>();
-            if (necessariosStr != null && !necessariosStr.isEmpty()) {
-                String[] ids = necessariosStr.split(",");
-
-                for (String id : ids) {
-                    necessariosMap.put(id, true);
+                    for (String id : ids) {
+                        necessariosMap.put(id, true);
+                    }
                 }
-            }
-            trabalho.setNecessarios(necessariosMap);
-            if (trabalho.ehProducaoDeRecursos()) continue;
+                trabalho.setNecessarios(necessariosMap);
+                if (trabalho.ehProducaoDeRecursos()) continue;
 
-            trabalhos.add(trabalho);
+                trabalhos.add(trabalho);
+            }
         }
-        cursor.close();
 
         return trabalhos;
     }
@@ -453,54 +446,51 @@ public class TrabalhoDao {
             "t." + COLUMN_NAME_NOME + " ASC";
 
         String[] selectionArgs = {String.valueOf(nivelProducao), "Comum", profissao};
-        Cursor cursor = db.rawQuery(
-            query,
-            selectionArgs
-        );
 
-        while (cursor.moveToNext()) {
-            Trabalho trabalho = new Trabalho();
+        try (Cursor cursor = db.rawQuery(query, selectionArgs)) {
+            while (cursor.moveToNext()) {
+                Trabalho trabalho = new Trabalho();
 
-            trabalho.setId(
-                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID))
-            );
-            trabalho.setNome(
-                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME))
-            );
-            trabalho.setNomeProducao(
-                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME_PRODUCAO))
-            );
-            trabalho.setExperiencia(
-                    cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_EXPERIENCIA))
-            );
-            trabalho.setNivel(
-                    cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_NIVEL))
-            );
-            trabalho.setProfissao(
-                    cursor.getString(cursor.getColumnIndexOrThrow("profissao_nome"))
-            );
-            trabalho.setRaridade(
-                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_RARIDADE))
-            );
-            String necessariosStr = cursor.getString(
-                    cursor.getColumnIndexOrThrow("trabalhos_necessarios")
-            );
+                trabalho.setId(
+                        cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID))
+                );
+                trabalho.setNome(
+                        cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME))
+                );
+                trabalho.setNomeProducao(
+                        cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME_PRODUCAO))
+                );
+                trabalho.setExperiencia(
+                        cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_EXPERIENCIA))
+                );
+                trabalho.setNivel(
+                        cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_NIVEL))
+                );
+                trabalho.setProfissao(
+                        cursor.getString(cursor.getColumnIndexOrThrow("profissao_nome"))
+                );
+                trabalho.setRaridade(
+                        cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_RARIDADE))
+                );
+                String necessariosStr = cursor.getString(
+                        cursor.getColumnIndexOrThrow("trabalhos_necessarios")
+                );
 
-            Map<String, Boolean> necessariosMap = new HashMap<>();
+                Map<String, Boolean> necessariosMap = new HashMap<>();
 
-            if (necessariosStr != null && !necessariosStr.isEmpty()) {
-                String[] ids = necessariosStr.split(",");
+                if (necessariosStr != null && !necessariosStr.isEmpty()) {
+                    String[] ids = necessariosStr.split(",");
 
-                for (String id : ids) {
-                    necessariosMap.put(id, true);
+                    for (String id : ids) {
+                        necessariosMap.put(id, true);
+                    }
                 }
+
+                trabalho.setNecessarios(necessariosMap);
+
+                trabalhos.add(trabalho);
             }
-
-            trabalho.setNecessarios(necessariosMap);
-
-            trabalhos.add(trabalho);
         }
-        cursor.close();
 
         return trabalhos;
     }
@@ -581,8 +571,6 @@ public class TrabalhoDao {
     }
 
     public Trabalho recuperaTrabalhoPorIdTrabalhoNecessario(String idTrabalho) {
-        Trabalho trabalho = null;
-
         String selection =
             "SELECT t.*, " +
                 "p." + COLUMN_NAME_NOME + " AS profissao_nome, " +
@@ -599,10 +587,13 @@ public class TrabalhoDao {
                 "LIMIT 1";
 
         String[] selectionArgs = {idTrabalho};
-        Cursor cursor = db.rawQuery(selection, selectionArgs);
 
-        if (cursor.moveToFirst()) {
-            trabalho = new Trabalho();
+        try (Cursor cursor = db.rawQuery(selection, selectionArgs)) {
+            if (!cursor.moveToFirst()) {
+                return null;
+            }
+
+            Trabalho trabalho = new Trabalho();
             trabalho.setId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID)));
             trabalho.setNome(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME)));
             trabalho.setNomeProducao(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME_PRODUCAO)));
@@ -626,10 +617,9 @@ public class TrabalhoDao {
             }
 
             trabalho.setNecessarios(necessariosMap);
-        }
-        cursor.close();
 
-        return trabalho;
+            return trabalho;
+        }
     }
 
     public ArrayList<Trabalho> recuperaTrabalhosNecessariosPorId(List<String> trabalhosNecessarios) {
@@ -643,59 +633,57 @@ public class TrabalhoDao {
 
         String[] selectionArgs = trabalhosNecessarios.toArray(new String[0]);
 
-        Cursor cursor = db.rawQuery(query, selectionArgs);
+        try (Cursor cursor = db.rawQuery(query, selectionArgs)) {
+            while (cursor.moveToNext()) {
+                Trabalho trabalho = new Trabalho();
 
-        while (cursor.moveToNext()) {
-            Trabalho trabalho = new Trabalho();
+                trabalho.setId(
+                        cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID))
+                );
 
-            trabalho.setId(
-                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID))
-            );
+                trabalho.setNome(
+                        cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME))
+                );
 
-            trabalho.setNome(
-                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME))
-            );
+                trabalho.setNomeProducao(
+                        cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME_PRODUCAO))
+                );
 
-            trabalho.setNomeProducao(
-                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME_PRODUCAO))
-            );
+                trabalho.setExperiencia(
+                        cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_EXPERIENCIA))
+                );
 
-            trabalho.setExperiencia(
-                    cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_EXPERIENCIA))
-            );
+                trabalho.setNivel(
+                        cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_NIVEL))
+                );
 
-            trabalho.setNivel(
-                    cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_NIVEL))
-            );
+                trabalho.setProfissao(
+                        cursor.getString(cursor.getColumnIndexOrThrow("profissao_nome"))
+                );
 
-            trabalho.setProfissao(
-                    cursor.getString(cursor.getColumnIndexOrThrow("profissao_nome"))
-            );
+                trabalho.setRaridade(
+                        cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_RARIDADE))
+                );
 
-            trabalho.setRaridade(
-                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_RARIDADE))
-            );
+                String necessariosStr = cursor.getString(
+                        cursor.getColumnIndexOrThrow("trabalhos_necessarios")
+                );
 
-            String necessariosStr = cursor.getString(
-                    cursor.getColumnIndexOrThrow("trabalhos_necessarios")
-            );
+                Map<String, Boolean> necessariosMap = new HashMap<>();
 
-            Map<String, Boolean> necessariosMap = new HashMap<>();
+                if (necessariosStr != null && !necessariosStr.isEmpty()) {
+                    String[] ids = necessariosStr.split(",");
 
-            if (necessariosStr != null && !necessariosStr.isEmpty()) {
-                String[] ids = necessariosStr.split(",");
-
-                for (String id : ids) {
-                    necessariosMap.put(id, true);
+                    for (String id : ids) {
+                        necessariosMap.put(id, true);
+                    }
                 }
+
+                trabalho.setNecessarios(necessariosMap);
+
+                trabalhos.add(trabalho);
             }
-
-            trabalho.setNecessarios(necessariosMap);
-
-            trabalhos.add(trabalho);
         }
-
-        cursor.close();
 
         return trabalhos;
     }

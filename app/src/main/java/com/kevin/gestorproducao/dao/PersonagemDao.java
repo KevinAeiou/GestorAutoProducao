@@ -31,28 +31,28 @@ public class PersonagemDao {
         ArrayList<Personagem> personagens = new ArrayList<>();
 
         String query = "SELECT *  FROM " + TABLE_PERSONAGENS;
-        Cursor cursor = db.rawQuery(query, null);
 
-        while (cursor.moveToNext()) {
-            Personagem personagem = new Personagem();
-            boolean estado = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_ESTADO)) == 1;
-            boolean uso = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_USO)) == 1;
-            boolean autoProducao = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_AUTO_PRODUCAO)) == 1;
+        try (Cursor cursor = db.rawQuery(query, null)) {
+            while (cursor.moveToNext()) {
+                Personagem personagem = new Personagem();
+                boolean estado = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_ESTADO)) == 1;
+                boolean uso = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_USO)) == 1;
+                boolean autoProducao = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_AUTO_PRODUCAO)) == 1;
 
-            personagem.setId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID)));
-            personagem.setNome(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME)));
-            personagem.setEmail(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_EMAIL)));
-            personagem.setSenha(
-                CriptografiaUtil.decriptar(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_SENHA)))
-            );
-            personagem.setEstado(estado);
-            personagem.setUso(uso);
-            personagem.setAutoProducao(autoProducao);
-            personagem.setEspacoProducao(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_ESPACO_PRODUCAO)));
+                personagem.setId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID)));
+                personagem.setNome(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME)));
+                personagem.setEmail(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_EMAIL)));
+                personagem.setSenha(
+                    CriptografiaUtil.decriptar(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_SENHA)))
+                );
+                personagem.setEstado(estado);
+                personagem.setUso(uso);
+                personagem.setAutoProducao(autoProducao);
+                personagem.setEspacoProducao(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_ESPACO_PRODUCAO)));
 
-            personagens.add(personagem);
+                personagens.add(personagem);
+            }
         }
-        cursor.close();
 
         return personagens;
     }

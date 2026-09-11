@@ -34,8 +34,6 @@ public class ProfissaoPersonagemDao {
         String idPersonagem,
         String nomeProfissao
     ) {
-        ProfissaoPersonagem profissao = null;
-
         String query =
             "SELECT pp." + COLUMN_NAME_EXPERIENCIA + ", " +
                 "pp." + COLUMN_NAME_PRIORIDADE + ", " +
@@ -47,19 +45,19 @@ public class ProfissaoPersonagemDao {
                 " WHERE pp." + COLUMN_NAME_ID_PERSONAGEM + " = ? " +
                 " AND p." + COLUMN_NAME_NOME + " = ?";
 
-        Cursor cursor = db.rawQuery(query, new String[]{idPersonagem, nomeProfissao});
+        try (Cursor cursor = db.rawQuery(query, new String[]{idPersonagem, nomeProfissao})) {
+            if (!cursor.moveToFirst()) {
+                return null;
+            }
 
-        if (cursor.moveToFirst()) {
-            profissao = new ProfissaoPersonagem();
+            ProfissaoPersonagem profissao = new ProfissaoPersonagem();
             profissao.setId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID)));
             profissao.setExperiencia(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_EXPERIENCIA)));
             profissao.setPrioridade(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_PRIORIDADE)) == 1);
             profissao.setNome(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME)));
 
-            cursor.close();
+            return profissao;
         }
-
-        return profissao;
     }
 
     public void substituirTodos(

@@ -31,20 +31,18 @@ public class ProfissaoDao {
     public Map<String, String> recuperaMapaProfissoes() {
         Map<String, String> mapa = new HashMap<>();
 
-        Cursor cursor = db.query(
+        try (Cursor cursor = db.query(
             TABLE_PROFISSOES,
             new String[]{COLUMN_NAME_ID, COLUMN_NAME_NOME},
             null,null,null,null,null
-        );
-
-        while (cursor.moveToNext()) {
-            mapa.put(
-                cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID)),
-                cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME))
-            );
+        )) {
+            while (cursor.moveToNext()) {
+                mapa.put(
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME))
+                );
+            }
         }
-
-        cursor.close();
 
         return mapa;
     }
@@ -141,7 +139,7 @@ public class ProfissaoDao {
     public ArrayList<ProfissaoBase> recuperaProfissoesBase() {
         ArrayList<ProfissaoBase> profissoes = new ArrayList<>();
 
-        Cursor cursor = db.query(
+        try (Cursor cursor = db.query(
             TABLE_PROFISSOES,
             new String[]{COLUMN_NAME_ID, COLUMN_NAME_NOME},
             null,
@@ -149,23 +147,21 @@ public class ProfissaoDao {
             null,
             null,
             COLUMN_NAME_NOME + " ASC"
-        );
+        )) {
+            while (cursor.moveToNext()) {
+                ProfissaoBase profissao = new ProfissaoBase();
 
-        while (cursor.moveToNext()) {
-            ProfissaoBase profissao = new ProfissaoBase();
+                profissao.setId(
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID))
+                );
 
-            profissao.setId(
-                cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID))
-            );
+                profissao.setNome(
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME))
+                );
 
-            profissao.setNome(
-                cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME))
-            );
-
-            profissoes.add(profissao);
+                profissoes.add(profissao);
+            }
         }
-
-        cursor.close();
 
         return profissoes;
     }
