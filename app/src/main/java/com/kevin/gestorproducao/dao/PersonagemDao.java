@@ -16,6 +16,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.kevin.gestorproducao.db.DbHelper;
 import com.kevin.gestorproducao.model.Personagem;
+import com.kevin.gestorproducao.utilitario.CriptografiaUtil;
 import java.util.ArrayList;
 
 public class PersonagemDao {
@@ -41,7 +42,9 @@ public class PersonagemDao {
             personagem.setId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID)));
             personagem.setNome(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME)));
             personagem.setEmail(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_EMAIL)));
-            personagem.setSenha(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_SENHA)));
+            personagem.setSenha(
+                CriptografiaUtil.decriptar(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_SENHA)))
+            );
             personagem.setEstado(estado);
             personagem.setUso(uso);
             personagem.setAutoProducao(autoProducao);
@@ -90,7 +93,10 @@ public class PersonagemDao {
         values.put(COLUMN_NAME_ID, personagem.getId());
         values.put(COLUMN_NAME_NOME, personagem.getNome());
         values.put(COLUMN_NAME_EMAIL, personagem.getEmail());
-        values.put(COLUMN_NAME_SENHA, personagem.getSenha());
+        // Cifrada com a chave do Android Keystore deste aparelho (achado C1) — por isso não
+        // é sincronizada com o Firebase (ver @Exclude em Usuario.senha): uma chave presa ao
+        // Keystore não seria decifrável em outro dispositivo.
+        values.put(COLUMN_NAME_SENHA, CriptografiaUtil.encriptar(personagem.getSenha()));
         boolean estado = personagem.getEstado();
         values.put(COLUMN_NAME_ESTADO, estado);
         values.put(COLUMN_NAME_USO, personagem.getUso());
