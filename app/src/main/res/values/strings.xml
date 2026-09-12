@@ -216,6 +216,7 @@
     <string name="stringExcluir">Excluir</string>
     <string name="stringExperienciaValor">Experiência %1$d</string>
     <string name="stringNivelValor">Nv. %1$d</string>
+    <string name="stringNivelBadge">Nv %1$d</string>
     <string name="stringOuroValor">$ %1$s</string>
     <string name="stringQuantidadeValor">x %1$d</string>
     <string name="stringQuantidadeUndidade">%1$s und</string>

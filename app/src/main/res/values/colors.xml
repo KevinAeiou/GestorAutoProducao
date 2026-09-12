@@ -42,6 +42,29 @@
     <color name="cor_background_produzindo">#6d87ca</color>
     <color name="cor_background_feito">#b5ca6d</color>
 
+    <!-- Selo de estado do card de trabalho em produção (container/on-container/tarja por estado) -->
+    <color name="cor_estado_para_produzir_container">#D6E4FF</color>
+    <color name="cor_estado_para_produzir_on_container">#1A4480</color>
+    <color name="cor_estado_para_produzir_tarja">#3B6FB0</color>
+
+    <color name="cor_estado_produzindo_container">#EADDFF</color>
+    <color name="cor_estado_produzindo_on_container">#4F2E8C</color>
+    <color name="cor_estado_produzindo_tarja">#6750A4</color>
+
+    <color name="cor_estado_feito_container">#D7F2DA</color>
+    <color name="cor_estado_feito_on_container">#1E5C25</color>
+    <color name="cor_estado_feito_tarja">#2E7D32</color>
+
+    <!-- Nome por raridade e licença do card de trabalho em produção, ajustados para contraste sobre ?attr/colorSurface -->
+    <color name="cor_producao_raridade_melhorado">#8A5A00</color>
+    <color name="cor_producao_raridade_raro">#6D28D9</color>
+    <color name="cor_producao_raridade_especial">#C62828</color>
+
+    <color name="cor_producao_licenca_novato">#2F3B52</color>
+    <color name="cor_producao_licenca_aprendiz">#2E7D32</color>
+    <color name="cor_producao_licenca_iniciante">#8A6D00</color>
+    <color name="cor_producao_licenca_mestre">#8F5400</color>
+
     <color name="light_blue_600">#FF039BE5</color>
     <color name="light_blue_900">#FF01579B</color>
     <color name="light_blue_A200">#FF40C4FF</color>
