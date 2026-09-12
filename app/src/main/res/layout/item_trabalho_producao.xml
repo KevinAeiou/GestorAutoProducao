@@ -4,17 +4,31 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     style="@style/card"
+    app:cardBackgroundColor="?attr/colorSurface"
+    android:paddingStart="0dp"
+    android:paddingEnd="0dp"
     android:id="@+id/itemCardViewTrabalho">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:paddingEnd="16dp">
+
+        <View
+            android:id="@+id/itemEstadoTarja"
+            android:layout_width="5dp"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:background="@color/cor_estado_produzindo_tarja" />
 
         <TextView
             android:id="@+id/itemNomeTrabalho"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="21dp"
+            android:layout_marginTop="16dp"
             android:textSize="16sp"
             android:textColor="?attr/colorOnSurface"
             android:textStyle="bold"
@@ -27,11 +41,11 @@
             android:id="@+id/itemNivelContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
             app:cardCornerRadius="12dp"
             app:cardBackgroundColor="@color/cor_primaria_transparente"
             app:strokeWidth="0dp"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
             <TextView
@@ -46,16 +60,56 @@
                 tools:text="10"/>
         </com.google.android.material.card.MaterialCardView>
 
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/itemEstadoBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="21dp"
+            android:layout_marginTop="8dp"
+            app:cardCornerRadius="8dp"
+            app:strokeWidth="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/itemNomeTrabalho">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="8dp"
+                android:paddingEnd="10dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp">
+
+                <ImageView
+                    android:id="@+id/itemEstadoIcone"
+                    android:layout_width="13dp"
+                    android:layout_height="13dp"
+                    android:importantForAccessibility="no"
+                    tools:src="@drawable/ic_estado_produzindo"/>
+
+                <TextView
+                    android:id="@+id/itemEstadoTexto"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    tools:text="Produzindo"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
         <TextView
             android:id="@+id/itemTipoLicenca"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:maxLines="1"
             android:textSize="13sp"
-            android:layout_marginTop="4dp"
-            app:layout_constraintEnd_toStartOf="@+id/itemNivelContainer"
-            app:layout_constraintStart_toStartOf="@id/itemNomeTrabalho"
-            app:layout_constraintTop_toBottomOf="@id/itemNomeTrabalho"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:layout_marginTop="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/itemEstadoBadge"
+            app:layout_constraintTop_toBottomOf="@id/itemEstadoBadge"
             tools:text="Licença" />
 
         <TextView
@@ -63,7 +117,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textSize="16sp"
+            android:textColor="?attr/colorOnSurfaceVariant"
             android:layout_marginTop="4dp"
+            android:layout_marginBottom="16dp"
             app:layout_constraintEnd_toEndOf="@id/itemTipoLicenca"
             app:layout_constraintStart_toStartOf="@id/itemTipoLicenca"
             app:layout_constraintTop_toBottomOf="@id/itemTipoLicenca"

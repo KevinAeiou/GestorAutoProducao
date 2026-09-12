@@ -2,6 +2,29 @@
 <resources>
     <color name="text_color">#FFF</color>
 
+    <!-- Selo de estado do card de trabalho em produção (container/on-container/tarja por estado) -->
+    <color name="cor_estado_para_produzir_container">#24344F</color>
+    <color name="cor_estado_para_produzir_on_container">#AEC6FF</color>
+    <color name="cor_estado_para_produzir_tarja">#7DA6E8</color>
+
+    <color name="cor_estado_produzindo_container">#382C4B</color>
+    <color name="cor_estado_produzindo_on_container">#D0BCFF</color>
+    <color name="cor_estado_produzindo_tarja">#B69DF8</color>
+
+    <color name="cor_estado_feito_container">#1E3A22</color>
+    <color name="cor_estado_feito_on_container">#A6D9AA</color>
+    <color name="cor_estado_feito_tarja">#6FC97B</color>
+
+    <!-- Nome por raridade e licença do card de trabalho em produção, ajustados para contraste sobre ?attr/colorSurface -->
+    <color name="cor_producao_raridade_melhorado">#F4C542</color>
+    <color name="cor_producao_raridade_raro">#C084FC</color>
+    <color name="cor_producao_raridade_especial">#FF6B6B</color>
+
+    <color name="cor_producao_licenca_novato">#C7D3EA</color>
+    <color name="cor_producao_licenca_aprendiz">#66FF66</color>
+    <color name="cor_producao_licenca_iniciante">#FFD54F</color>
+    <color name="cor_producao_licenca_mestre">#FFB300</color>
+
     <!-- Menu lateral -->
     <color name="cor_texto_menu_padrao">#AEBACB</color>
     <color name="cor_selecao_menu">#26FFFFFF</color>
