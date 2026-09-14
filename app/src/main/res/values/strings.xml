@@ -197,6 +197,7 @@
     <string name="stringNovoPersonagem">Novo personagem</string>
     <string name="stringRecorrente">Recorrente</string>
     <string name="stringExperiencia">Experiência</string>
+    <string name="stringExperienciaFracao">%1$s / %2$s</string>
     <string name="stringProfissoes">Profissões</string>
     <string name="stringNivel">Nível</string>
     <string name="stringQuantidade">Quantidade</string>
