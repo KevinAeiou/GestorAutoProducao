@@ -16,7 +16,10 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
+
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.color.MaterialColors;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.kevin.gestorproducao.R;
@@ -34,6 +37,7 @@ public class DetalhesEstoqueFragment
 {
     private TrabalhoEstoque trabalho;
     private TextView txtNomeTrabalho, txtProfissaoTrabalho, txtNivelTrabalho;
+    private View heroRaridadeTarja;
     private TextInputLayout txtQuantidadeTrabalho;
     private TextInputEditText edtQuantidadeTrabalho;
     private TrabalhoEstoqueViewModel estoqueViewModel;
@@ -198,8 +202,30 @@ public class DetalhesEstoqueFragment
     private void preencheCampos() {
         txtNomeTrabalho.setText(trabalho.getNome());
         txtProfissaoTrabalho.setText(trabalho.getProfissao());
-        txtNivelTrabalho.setText(String.valueOf(trabalho.getNivel()));
+        txtNivelTrabalho.setText(getString(R.string.stringNivelBadge, trabalho.getNivel()));
         edtQuantidadeTrabalho.setText(String.valueOf(trabalho.getQuantidade()));
+        configuraRaridadeHero(trabalho);
+    }
+
+    private void configuraRaridadeHero(TrabalhoEstoque trabalho) {
+        String raridade = trabalho.getRaridade();
+        int corRaridade;
+        int corTarja;
+        if ("Melhorado".equals(raridade)) {
+            corRaridade = ContextCompat.getColor(requireContext(), R.color.cor_producao_raridade_melhorado);
+            corTarja = corRaridade;
+        } else if ("Raro".equals(raridade)) {
+            corRaridade = ContextCompat.getColor(requireContext(), R.color.cor_producao_raridade_raro);
+            corTarja = corRaridade;
+        } else if ("Especial".equals(raridade)) {
+            corRaridade = ContextCompat.getColor(requireContext(), R.color.cor_producao_raridade_especial);
+            corTarja = corRaridade;
+        } else {
+            corRaridade = MaterialColors.getColor(txtNomeTrabalho, com.google.android.material.R.attr.colorOnSurface);
+            corTarja = MaterialColors.getColor(heroRaridadeTarja, com.google.android.material.R.attr.colorOutlineVariant);
+        }
+        txtNomeTrabalho.setTextColor(corRaridade);
+        heroRaridadeTarja.setBackgroundColor(corTarja);
     }
 
     @Nullable
@@ -234,6 +260,7 @@ public class DetalhesEstoqueFragment
         txtNomeTrabalho = binding.txtNomeTrabalho;
         txtProfissaoTrabalho = binding.txtProfissaoTrabalho;
         txtNivelTrabalho = binding.txtNivelTrabalho;
+        heroRaridadeTarja = binding.heroRaridadeTarja;
         txtQuantidadeTrabalho = binding.txtQuantidadeEstoqueFragment;
         edtQuantidadeTrabalho = binding.edtQuantidadeEstoqueFragment;
         btnExcluir = binding.btnExcluiEstoque;
