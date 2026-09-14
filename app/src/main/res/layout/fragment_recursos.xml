@@ -25,17 +25,22 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="8dp">
+            android:paddingHorizontal="12dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="24dp">
 
+            <!-- Substancias -->
             <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp">
+                style="@style/card"
+                app:cardBackgroundColor="?attr/colorSurface"
+                android:paddingStart="0dp"
+                android:paddingEnd="0dp"
+                android:layout_marginStart="0dp"
+                android:layout_marginEnd="0dp"
+                android:layout_marginTop="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -46,21 +51,24 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
                         android:text="@string/stringSubstancias"
-                        android:textStyle="bold"
+                        android:textColor="?attr/colorOnSurface"
                         android:textSize="20sp"
-                        android:layout_marginBottom="16dp"/>
+                        android:textStyle="bold"/>
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:baselineAligned="false">
 
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/txtInputSubstanciaComumRecursos"
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:layout_marginEnd="4dp"
                             android:hint="@string/stringComum">
 
                             <com.google.android.material.textfield.TextInputEditText
@@ -71,15 +79,12 @@
                                 android:inputType="number"/>
                         </com.google.android.material.textfield.TextInputLayout>
 
-                        <Space
-                            android:layout_width="8dp"
-                            android:layout_height="wrap_content"/>
-
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/txtInputSubstanciaCompostoRecursos"
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:layout_marginStart="4dp"
                             android:hint="@string/stringComposto">
 
                             <com.google.android.material.textfield.TextInputEditText
@@ -94,14 +99,16 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:orientation="horizontal">
+                        android:layout_marginTop="16dp"
+                        android:orientation="horizontal"
+                        android:baselineAligned="false">
 
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/txtInputSubstanciaEnergiaRecursos"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:layout_marginEnd="4dp"
                             android:hint="@string/stringEnergia">
 
                             <com.google.android.material.textfield.TextInputEditText
@@ -112,15 +119,12 @@
                                 android:inputType="number"/>
                         </com.google.android.material.textfield.TextInputLayout>
 
-                        <Space
-                            android:layout_width="8dp"
-                            android:layout_height="wrap_content"/>
-
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/txtInputSubstanciaEtereoRecursos"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:layout_marginStart="4dp"
                             android:hint="@string/stringEtereo">
 
                             <com.google.android.material.textfield.TextInputEditText
@@ -132,15 +136,17 @@
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
                 </LinearLayout>
-
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Essencias -->
             <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp">
+                style="@style/card"
+                app:cardBackgroundColor="?attr/colorSurface"
+                android:paddingStart="0dp"
+                android:paddingEnd="0dp"
+                android:layout_marginStart="0dp"
+                android:layout_marginEnd="0dp"
+                android:layout_marginTop="12dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -151,21 +157,24 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
                         android:text="@string/stringEssencias"
-                        android:textStyle="bold"
+                        android:textColor="?attr/colorOnSurface"
                         android:textSize="20sp"
-                        android:layout_marginBottom="16dp"/>
+                        android:textStyle="bold"/>
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:baselineAligned="false">
 
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/txtInputEssenciaComumRecursos"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:layout_marginEnd="4dp"
                             android:hint="@string/stringComum">
 
                             <com.google.android.material.textfield.TextInputEditText
@@ -176,15 +185,12 @@
                                 android:inputType="number"/>
                         </com.google.android.material.textfield.TextInputLayout>
 
-                        <Space
-                            android:layout_width="8dp"
-                            android:layout_height="wrap_content"/>
-
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/txtInputEssenciaCompostoRecursos"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:layout_marginStart="4dp"
                             android:hint="@string/stringComposto">
 
                             <com.google.android.material.textfield.TextInputEditText
@@ -199,14 +205,16 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:orientation="horizontal">
+                        android:layout_marginTop="16dp"
+                        android:orientation="horizontal"
+                        android:baselineAligned="false">
 
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/txtInputEssenciaEnergiaRecursos"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:layout_marginEnd="4dp"
                             android:hint="@string/stringEnergia">
 
                             <com.google.android.material.textfield.TextInputEditText
@@ -217,15 +225,12 @@
                                 android:inputType="number"/>
                         </com.google.android.material.textfield.TextInputLayout>
 
-                        <Space
-                            android:layout_width="8dp"
-                            android:layout_height="wrap_content"/>
-
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/txtInputEssenciaEtereoRecursos"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:layout_marginStart="4dp"
                             android:hint="@string/stringEtereo">
 
                             <com.google.android.material.textfield.TextInputEditText
@@ -239,12 +244,15 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Catalisador -->
             <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp">
+                style="@style/card"
+                app:cardBackgroundColor="?attr/colorSurface"
+                android:paddingStart="0dp"
+                android:paddingEnd="0dp"
+                android:layout_marginStart="0dp"
+                android:layout_marginEnd="0dp"
+                android:layout_marginTop="12dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -255,21 +263,24 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
                         android:text="@string/stringCatalisador"
-                        android:textStyle="bold"
+                        android:textColor="?attr/colorOnSurface"
                         android:textSize="20sp"
-                        android:layout_marginBottom="16dp"/>
+                        android:textStyle="bold"/>
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:baselineAligned="false">
 
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/txtInputCatalizadorComumRecursos"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:layout_marginEnd="4dp"
                             android:hint="@string/stringComum">
 
                             <com.google.android.material.textfield.TextInputEditText
@@ -280,15 +291,12 @@
                                 android:inputType="number"/>
                         </com.google.android.material.textfield.TextInputLayout>
 
-                        <Space
-                            android:layout_width="8dp"
-                            android:layout_height="wrap_content"/>
-
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/txtInputCatalizadorCompostoRecursos"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:layout_marginStart="4dp"
                             android:hint="@string/stringComposto">
 
                             <com.google.android.material.textfield.TextInputEditText
@@ -303,14 +311,16 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:orientation="horizontal">
+                        android:layout_marginTop="16dp"
+                        android:orientation="horizontal"
+                        android:baselineAligned="false">
 
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/txtInputCatalizadorEnergiaRecursos"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:layout_marginEnd="4dp"
                             android:hint="@string/stringEnergia">
 
                             <com.google.android.material.textfield.TextInputEditText
@@ -321,15 +331,12 @@
                                 android:inputType="number"/>
                         </com.google.android.material.textfield.TextInputLayout>
 
-                        <Space
-                            android:layout_width="8dp"
-                            android:layout_height="wrap_content"/>
-
                         <com.google.android.material.textfield.TextInputLayout
                             android:id="@+id/txtInputCatalizadorEtereoRecursos"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:layout_marginStart="4dp"
                             android:hint="@string/stringEtereo">
 
                             <com.google.android.material.textfield.TextInputEditText
