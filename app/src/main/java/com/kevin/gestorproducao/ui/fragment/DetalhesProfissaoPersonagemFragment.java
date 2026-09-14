@@ -22,7 +22,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.google.android.material.progressindicator.CircularProgressIndicator;
-import com.google.android.material.switchmaterial.SwitchMaterial;
+import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.kevin.gestorproducao.R;
@@ -46,13 +46,14 @@ public class DetalhesProfissaoPersonagemFragment
 {
     private ProfissaoPersonagem profissaoRecebida;
     private TextInputEditText edtExperiencia;
-    private SwitchMaterial swtPrioridade;
+    private MaterialSwitch swtPrioridade;
     private ProfissaoPersonagemViewModel profissaoPersonagemViewModel;
     private ArrayList<TrabalhoProducao> producao;
     private TrabalhoProducaoViewModel producaoViewModel;
     private PersonagemViewModel personagemViewModel;
     private CircularProgressIndicator indicadorAtual, indicadorMaximo, indicadorProduzindo, indicadorProduzir;
-    private TextView txtExpNecessaria, txtExpProduzir, txtExpProduzindo, txtExpRelativa;
+    private TextView txtExperienciaRingValor, txtExpProduzir, txtExpProduzindo;
+    private View linhaLegendaProduzir, linhaLegendaProduzindo;
     private TextInputLayout txtExperiencia;
     private NavController controlador;
 
@@ -173,10 +174,11 @@ public class DetalhesProfissaoPersonagemFragment
         indicadorProduzindo = binding.indicadorExperienciaProduzindo;
         indicadorProduzir = binding.indicadorExperienciaProduzir;
 
-        txtExpNecessaria = binding.txtExperienciaNecessariaProfissaoFragment;
+        txtExperienciaRingValor = binding.txtExperienciaRingValor;
         txtExpProduzir = binding.txtExperienciaProduzirProfissaoFragment;
         txtExpProduzindo = binding.txtExperienciaProduzindoProfissaoFragment;
-        txtExpRelativa = binding.txtExperienciaRelativaProfissaoFragment;
+        linhaLegendaProduzir = binding.linhaLegendaProduzir;
+        linhaLegendaProduzindo = binding.linhaLegendaProduzindo;
 
         producao = new ArrayList<>();
 
@@ -265,23 +267,17 @@ public class DetalhesProfissaoPersonagemFragment
                 }
             }
         }
-        txtExpNecessaria.setText(Formatador.formatarMilhar(xpNecessario));
-        txtExpRelativa.setText(Formatador.formatarMilhar(experienciaAtual));
+        txtExperienciaRingValor.setText(getString(
+            R.string.stringExperienciaFracao,
+            Formatador.formatarMilhar(experienciaAtual),
+            Formatador.formatarMilhar(xpNecessario)
+        ));
         txtExpProduzir.setText(Formatador.formatarMilhar(experienciaProduzir));
         txtExpProduzindo.setText(Formatador.formatarMilhar(experienciaProduzindo));
 
-        txtExpRelativa.setTextColor(getContext().getColor(R.color.cor_background_feito));
-        txtExpProduzir.setTextColor(getContext().getColor(R.color.cor_texto_licenca_principiante));
-        txtExpProduzindo.setTextColor(getContext().getColor(R.color.cor_background_produzindo));
-        configuraVisibilidadeTxt(xpNecessario, txtExpNecessaria);
-        configuraVisibilidadeTxt(experienciaAtual, txtExpRelativa);
-        configuraVisibilidadeTxt(experienciaProduzir, txtExpProduzir);
-        configuraVisibilidadeTxt(experienciaProduzindo, txtExpProduzindo);
-        configuraVisibilidadeTxt(xpNecessario, binding.txtLegendaExperienciaNecessariaProfissaoFragment);
-        configuraVisibilidadeTxt(experienciaAtual, binding.txtLegendaExperienciaRelativaProfissaoFragment);
-        configuraVisibilidadeTxt(experienciaProduzindo, binding.txtLegendaExperienciaProduzindoProfissaoFragment);
-        configuraVisibilidadeTxt(experienciaProduzir, binding.txtLegendaExperienciaProduzirProfissaoFragment);
-
+        configuraVisibilidadeView(xpNecessario, txtExperienciaRingValor);
+        configuraVisibilidadeView(experienciaProduzir, linhaLegendaProduzir);
+        configuraVisibilidadeView(experienciaProduzindo, linhaLegendaProduzindo);
 
         experienciaProduzindo += experienciaAtual;
         experienciaProduzir += experienciaProduzindo;
@@ -291,9 +287,9 @@ public class DetalhesProfissaoPersonagemFragment
         animateProgress(indicadorProduzindo, experienciaProduzindo);
     }
 
-    private void configuraVisibilidadeTxt(int experiencia, TextView txtView) {
+    private void configuraVisibilidadeView(int experiencia, View view) {
         int visibilidade = experiencia == 0 ? GONE : VISIBLE;
-        txtView.setVisibility(visibilidade);
+        view.setVisibility(visibilidade);
     }
 
     private void animateProgress(CircularProgressIndicator indicador, int experiencia) {
