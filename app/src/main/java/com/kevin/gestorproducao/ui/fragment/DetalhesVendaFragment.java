@@ -56,7 +56,7 @@ public class DetalhesVendaFragment
     private TextInputEditText edtDescricaoTrabalhoVendido,
         edtValorTrabalhoVendido, edtQuantidadeTrabalhoVendido, edtTaxaLucroTrabalhoVendido, 
         edtValorProducaoTrabalhoVendido, edtValorLucroTrabalhoVendido;
-    private LinearLayout layoutDatas;
+    private View layoutDatas;
     private AutoCompleteTextView autoCompleteNomeTrabalhoVendido;
     private TrabalhoVendido trabalhoRecebido;
     private Trabalho trabalhoSelecionado;
@@ -316,7 +316,6 @@ public class DetalhesVendaFragment
     }
 
     private boolean camposValidos() {
-        String descricao = edtDescricaoTrabalhoVendido.getText().toString().trim();
         String quantidade = edtQuantidadeTrabalhoVendido.getText().toString().trim();
         String valor = edtValorTrabalhoVendido.getText().toString().trim();
 
@@ -328,8 +327,7 @@ public class DetalhesVendaFragment
             edtValorTrabalhoVendido.setText("0");
         }
 
-        return verificaCampoDescricao(descricao) &
-            verificaCampoInteiro(edtValorTrabalhoVendido, binding.txtInputValorTrabalhoVendido) &
+        return verificaCampoInteiro(edtValorTrabalhoVendido, binding.txtInputValorTrabalhoVendido) &
             verificaCampoInteiro(edtQuantidadeTrabalhoVendido, binding.txtInputQuantidadeTrabalhoVendido);
     }
 
@@ -347,17 +345,6 @@ public class DetalhesVendaFragment
         }
     }
 
-
-    private boolean verificaCampoDescricao(String descricao) {
-        obterValorNumerico(edtValorTrabalhoVendido);
-        TextInputLayout txtDescricaoTrabalhoVendido = binding.txtInputDescricaoTrabalhoVendido;
-        txtDescricaoTrabalhoVendido.setErrorEnabled(false);
-        if (descricao.trim().isEmpty()) {
-            txtDescricaoTrabalhoVendido.setError(getString(R.string.stringCampoRequerido));
-            return false;
-        }
-        return true;
-    }
 
     @Override
     protected ComponentesVisuais fornecerComponentesVisuais() {

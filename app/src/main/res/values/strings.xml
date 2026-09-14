@@ -244,6 +244,7 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="stringDescricao">Descrição</string>
+    <string name="stringDescricaoOpcional">Descrição (opcional)</string>
     <string name="stringData">Data</string>
     <string name="stringValor">Valor</string>
     <string name="stringValorProducao">Valor de produção</string>
