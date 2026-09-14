@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.color.MaterialColors;
 import com.kevin.gestorproducao.R;
 import com.kevin.gestorproducao.model.TrabalhoEstoque;
 import com.kevin.gestorproducao.ui.recyclerview.adapter.listener.OnItemClickListenerTrabalhoEstoque;
@@ -66,15 +67,19 @@ public class ListaTrabalhoEstoqueAdapter
 
     public class TrabalhoEstoqueViewHolder extends RecyclerView.ViewHolder{
         private final TextView nomeTrabalho;
+        private final TextView profissaoTrabalho;
         private final TextView quantidadeTrabalho;
         private final TextView nivelTrabalho;
+        private final View raridadeTarja;
         private TrabalhoEstoque trabalho;
 
         public TrabalhoEstoqueViewHolder(@NonNull View itemView) {
             super(itemView);
             nomeTrabalho = itemView.findViewById(R.id.itemNomeTrabalhoEstoque);
+            profissaoTrabalho = itemView.findViewById(R.id.itemProfissaoTrabalhoEstoque);
             quantidadeTrabalho = itemView.findViewById(R.id.itemQuantidadeTrabalhoEstoque);
             nivelTrabalho = itemView.findViewById(R.id.itemNivelTrabalhoEstoque);
+            raridadeTarja = itemView.findViewById(R.id.itemRaridadeTarjaEstoque);
             itemView.setOnClickListener(v ->
                 onItemClickListener.onItemClick(trabalho, getBindingAdapterPosition())
             );
@@ -84,19 +89,36 @@ public class ListaTrabalhoEstoqueAdapter
             preencheCampos(trabalho);
         }
         private void preencheCampos(TrabalhoEstoque trabalho) {
-            configuraCorNomeTrabalho(trabalho);
+            configuraCorRaridade(trabalho);
 
             nomeTrabalho.setText(trabalho.getNome());
+            profissaoTrabalho.setText(trabalho.getProfissao());
             String quantidade = context.getString(
                 R.string.stringQuantidadeUndidade,
                 Formatador.formatarMilhar(trabalho.getQuantidade())
             );
             quantidadeTrabalho.setText(quantidade);
-            nivelTrabalho.setText(String.valueOf(this.trabalho.getNivel()));
-            nivelTrabalho.setTextColor(ContextCompat.getColor(context,R.color.cor_texto_nivel));
+            nivelTrabalho.setText(context.getString(R.string.stringNivelBadge, trabalho.getNivel()));
         }
-        private void configuraCorNomeTrabalho(TrabalhoEstoque trabalho) {
-            nomeTrabalho.setTextColor(Formatador.corPorRaridade(context, trabalho.getRaridade()));
+        private void configuraCorRaridade(TrabalhoEstoque trabalho) {
+            String raridade = trabalho.getRaridade();
+            int corRaridade;
+            int corTarja;
+            if ("Melhorado".equals(raridade)) {
+                corRaridade = ContextCompat.getColor(context, R.color.cor_producao_raridade_melhorado);
+                corTarja = corRaridade;
+            } else if ("Raro".equals(raridade)) {
+                corRaridade = ContextCompat.getColor(context, R.color.cor_producao_raridade_raro);
+                corTarja = corRaridade;
+            } else if ("Especial".equals(raridade)) {
+                corRaridade = ContextCompat.getColor(context, R.color.cor_producao_raridade_especial);
+                corTarja = corRaridade;
+            } else {
+                corRaridade = MaterialColors.getColor(nomeTrabalho, com.google.android.material.R.attr.colorOnSurface);
+                corTarja = MaterialColors.getColor(raridadeTarja, com.google.android.material.R.attr.colorOutlineVariant);
+            }
+            nomeTrabalho.setTextColor(corRaridade);
+            raridadeTarja.setBackgroundColor(corTarja);
         }
     }
 }
