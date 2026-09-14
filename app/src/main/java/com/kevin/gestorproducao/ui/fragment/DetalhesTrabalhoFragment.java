@@ -53,7 +53,7 @@ public class DetalhesTrabalhoFragment
     extends BaseFragment<FragmentDetalhesTrabalhoBinding>
 {
     private Trabalho trabalhoRecebido;
-    private LinearLayout layoutTrabalhosNecessarios;
+    private View layoutTrabalhosNecessarios;
     private TextInputEditText edtNomeTrabalho, edtNomeProducaoTrabalho, edtExperienciaTrabalho, edtNivelTrabalho;
     private TextInputLayout txtInputNome, txtInputNomeProducao, txtInputProfissao, txtInputExperiencia, txtInputNivel, txtInputRaridade;
     private AutoCompleteTextView autoCompleteProfissao, autoCompleteRaridade;

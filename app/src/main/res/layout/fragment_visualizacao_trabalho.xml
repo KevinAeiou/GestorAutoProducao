@@ -1,96 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ui.fragment.VisualizacaoTrabalhoFragment">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="12dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="24dp">
 
+        <!-- Identidade: mesmo padrao dos cards da lista de trabalhos (tarja de raridade + nome colorido + selo de nivel + profissao) -->
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardCamposDetalhesTrabalho"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="2dp"
-            android:foregroundGravity="center_vertical"
-            android:layout_gravity="center_vertical"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="12dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent">
+            style="@style/card"
+            app:cardBackgroundColor="?attr/colorSurface"
+            android:paddingStart="0dp"
+            android:paddingEnd="0dp"
+            android:layout_marginStart="0dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginTop="0dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingEnd="16dp">
+
+                <View
+                    android:id="@+id/heroRaridadeTarja"
+                    android:layout_width="5dp"
+                    android:layout_height="0dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    tools:background="@color/cor_producao_raridade_raro" />
+
+                <TextView
+                    android:id="@+id/txtNomeTrabalho"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="21dp"
+                    android:layout_marginTop="16dp"
+                    android:textStyle="bold"
+                    android:textSize="20sp"
+                    android:textColor="?attr/colorOnSurface"
+                    app:layout_constraintEnd_toStartOf="@+id/heroNivelContainer"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="Espada Longa de Aço" />
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/heroNivelContainer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    app:cardCornerRadius="12dp"
+                    app:cardBackgroundColor="@color/cor_primaria_transparente"
+                    app:strokeWidth="0dp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent">
+
+                    <TextView
+                        android:id="@+id/txtNivelTrabalho"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textStyle="bold"
+                        android:textSize="13sp"
+                        android:paddingHorizontal="16dp"
+                        android:paddingVertical="8dp"
+                        android:textColor="?attr/colorPrimary"
+                        tools:text="Nv 10" />
+                </com.google.android.material.card.MaterialCardView>
+
+                <TextView
+                    android:id="@+id/txtProfissaoTrabalho"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:layout_marginStart="21dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="16dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/txtNomeTrabalho"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    tools:text="Ferreiro" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Metadados: nome de producao, experiencia e raridade -->
+        <com.google.android.material.card.MaterialCardView
+            style="@style/card"
+            app:cardBackgroundColor="?attr/colorSurface"
+            android:paddingStart="0dp"
+            android:paddingEnd="0dp"
+            android:layout_marginStart="0dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginTop="12dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
+                android:padding="20dp">
 
-                <LinearLayout
-                    android:id="@+id/layoutNomeTrabalho"
-                    style="@style/layoutTxtField"
-                    android:background="@drawable/bg_campo_readonly">
+                <TextView
+                    style="@style/rotuloMetadado"
+                    android:text="@string/stringNomeProducao" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/string_nome"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/txtNomeProducaoTrabalho"
+                    style="@style/valorMetadado"
+                    tools:text="Espada Longa de Aço #12" />
 
-                    <TextView
-                        android:id="@+id/txtNomeTrabalho"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textSize="16sp"
-                        android:layout_marginTop="4dp"/>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/layoutNomeProducaoTrabalho"
-                    style="@style/layoutTxtField"
-                    android:background="@drawable/bg_campo_readonly">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/stringNomeProducao"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/txtNomeProducaoTrabalho"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textSize="16sp"
-                        android:layout_marginTop="4dp"/>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/layoutProfissaoTrabalho"
-                    style="@style/layoutTxtField"
-                    android:background="@drawable/bg_campo_readonly">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/stringProfissao"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/txtProfissaoTrabalho"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textSize="16sp"
-                        android:layout_marginTop="4dp"/>
-                </LinearLayout>
+                <View style="@style/divisorMetadado" />
 
                 <LinearLayout
                     android:baselineAligned="false"
@@ -99,95 +127,75 @@
                     android:layout_height="wrap_content">
 
                     <LinearLayout
-                        android:id="@+id/layoutExperienciaTrabalho"
-                        style="@style/layoutTxtField"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginEnd="4dp"
-                        android:background="@drawable/bg_campo_readonly">
+                        android:layout_marginEnd="8dp"
+                        android:orientation="vertical">
 
                         <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/stringExperiencia"
-                            android:textSize="12sp"
-                            android:textStyle="bold" />
+                            style="@style/rotuloMetadado"
+                            android:text="@string/stringExperiencia" />
 
                         <TextView
                             android:id="@+id/txtExperienciaTrabalho"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:textSize="16sp"
-                            android:layout_marginTop="4dp"/>
+                            style="@style/valorMetadado"
+                            tools:text="3.200" />
                     </LinearLayout>
 
                     <LinearLayout
-                        android:id="@+id/layoutNivelTrabalho"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginStart="4dp"
-                        style="@style/layoutTxtField"
-                        android:background="@drawable/bg_campo_readonly">
+                        android:orientation="vertical">
 
                         <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/stringNivel"
-                            android:textSize="12sp"
-                            android:textStyle="bold" />
+                            style="@style/rotuloMetadado"
+                            android:text="@string/stringRaridade" />
 
                         <TextView
-                            android:id="@+id/txtNivelTrabalho"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:textSize="16sp"
-                            android:layout_marginTop="4dp"/>
-                </LinearLayout>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/layoutRaridadeTrabalho"
-                    style="@style/layoutTxtField"
-                    android:background="@drawable/bg_campo_readonly">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/stringRaridade"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/txtRaridadeTrabalho"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textSize="16sp"
-                        android:layout_marginTop="4dp"/>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/layoutNecessarioTrabalho"
-                    style="@style/layoutTxtField"
-                    android:background="@drawable/bg_campo_readonly">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/stringTrabalhoNecessario"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
-
-                    <HorizontalScrollView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:scrollbars="none">
-
-                        <com.google.android.material.chip.ChipGroup
-                            android:id="@+id/chipGroupTrabalhosNecessarios"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            app:chipSpacing="8dp"/>
-                    </HorizontalScrollView>
+                            android:id="@+id/txtRaridadeTrabalho"
+                            style="@style/valorMetadado"
+                            tools:text="Raro" />
+                    </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Trabalhos necessarios: visivel apenas quando o trabalho depende de outros -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/layoutNecessarioTrabalho"
+            style="@style/card"
+            app:cardBackgroundColor="?attr/colorSurface"
+            android:paddingStart="0dp"
+            android:paddingEnd="0dp"
+            android:layout_marginStart="0dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginTop="12dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    style="@style/rotuloMetadado"
+                    android:text="@string/stringTrabalhoNecessario" />
+
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:scrollbars="none">
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/chipGroupTrabalhosNecessarios"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:chipSpacing="8dp" />
+                </HorizontalScrollView>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
 </androidx.core.widget.NestedScrollView>

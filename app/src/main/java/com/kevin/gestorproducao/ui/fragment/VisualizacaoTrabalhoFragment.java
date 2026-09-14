@@ -21,11 +21,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.core.content.ContextCompat;
 
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.google.android.material.color.MaterialColors;
 import com.kevin.gestorproducao.R;
 import com.kevin.gestorproducao.databinding.FragmentVisualizacaoTrabalhoBinding;
 import com.kevin.gestorproducao.model.Trabalho;
@@ -44,8 +46,9 @@ public class VisualizacaoTrabalhoFragment
 {
     private Trabalho trabalhoRecebido;
     private TextView txtNome, txtNomeProducao, txtProfissao, txtExperiencia, txtNivel, txtRaridade;
+    private View heroRaridadeTarja;
     private ChipGroup chipGroupTrabalhosNecessarios;
-    private LinearLayout layoutTrabalhosNecessarios;
+    private View layoutTrabalhosNecessarios;
     private TrabalhoViewModel trabalhoViewModel;
     private AutenticacaoViewModel autenticacaoViewModel;
     private boolean isAdministrador = false;
@@ -117,6 +120,7 @@ public class VisualizacaoTrabalhoFragment
         txtExperiencia = binding.txtExperienciaTrabalho;
         txtNivel = binding.txtNivelTrabalho;
         txtRaridade = binding.txtRaridadeTrabalho;
+        heroRaridadeTarja = binding.heroRaridadeTarja;
         chipGroupTrabalhosNecessarios = binding.chipGroupTrabalhosNecessarios;
         layoutTrabalhosNecessarios = binding.layoutNecessarioTrabalho;
         layoutTrabalhosNecessarios.setVisibility(GONE);
@@ -141,6 +145,7 @@ public class VisualizacaoTrabalhoFragment
         txtExperiencia.setText(String.valueOf(trabalhoRecebido.getExperiencia()));
         txtNivel.setText(String.valueOf(trabalhoRecebido.getNivel()));
         txtRaridade.setText(trabalhoRecebido.getRaridade());
+        configuraRaridadeHero();
 
         if (!trabalhoRecebido.getListaTrabalhosNecessarios().isEmpty()) {
             layoutTrabalhosNecessarios.setVisibility(VISIBLE);
@@ -152,6 +157,27 @@ public class VisualizacaoTrabalhoFragment
 
             popularChipsTrabalhosNecessarios(trabalhos);
         }
+    }
+
+    private void configuraRaridadeHero() {
+        String raridade = trabalhoRecebido.getRaridade();
+        int corRaridade;
+        int corTarja;
+        if ("Melhorado".equals(raridade)) {
+            corRaridade = ContextCompat.getColor(requireContext(), R.color.cor_producao_raridade_melhorado);
+            corTarja = corRaridade;
+        } else if ("Raro".equals(raridade)) {
+            corRaridade = ContextCompat.getColor(requireContext(), R.color.cor_producao_raridade_raro);
+            corTarja = corRaridade;
+        } else if ("Especial".equals(raridade)) {
+            corRaridade = ContextCompat.getColor(requireContext(), R.color.cor_producao_raridade_especial);
+            corTarja = corRaridade;
+        } else {
+            corRaridade = MaterialColors.getColor(txtNome, com.google.android.material.R.attr.colorOnSurface);
+            corTarja = MaterialColors.getColor(heroRaridadeTarja, com.google.android.material.R.attr.colorOutlineVariant);
+        }
+        txtNome.setTextColor(corRaridade);
+        heroRaridadeTarja.setBackgroundColor(corTarja);
     }
 
     private void observarUsuario() {
