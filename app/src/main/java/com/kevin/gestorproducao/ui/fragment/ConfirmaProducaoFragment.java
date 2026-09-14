@@ -5,22 +5,29 @@ import static com.kevin.gestorproducao.ui.activity.Constantes.CODIGO_TRABALHO_PA
 import static com.kevin.gestorproducao.ui.activity.Constantes.CODIGO_TRABALHO_PRODUZINDO;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.core.widget.ImageViewCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.color.MaterialColors;
+import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.textfield.TextInputLayout;
 import com.kevin.gestorproducao.R;
 import com.kevin.gestorproducao.databinding.FragmentConfirmaProducaoBinding;
@@ -42,15 +49,21 @@ import com.kevin.gestorproducao.ui.viewModel.factory.ViewModelFactory;
 public class ConfirmaProducaoFragment
     extends BaseFragment<FragmentConfirmaProducaoBinding>
 {
-    private AutoCompleteTextView autoCompleteLicenca, autoCompleteQuantidade, autoCompleteEstado;
+    private AutoCompleteTextView autoCompleteLicenca, autoCompleteQuantidade;
     private Trabalho trabalhoRecebido;
     private TrabalhoProducao producao;
     private int contador = 0;
     private PersonagemViewModel personagemViewModel;
     private TrabalhoProducaoViewModel producaoViewModel;
-    private CheckBox checkRecorrencia;
+    private MaterialSwitch checkRecorrencia;
     private int quantidadeSelecionada = 0;
-    private String[] licencas, quantidade, estados;
+    private int estadoSelecionado = CODIGO_TRABALHO_PARA_PRODUZIR;
+    private String[] licencas, quantidade;
+    private View heroRaridadeTarja;
+    private TextView txtNomeConfirmaTrabalho, txtNivelConfirmaTrabalho;
+    private MaterialCardView chipEstadoParaProduzir, chipEstadoProduzindo, chipEstadoFeito;
+    private ImageView iconeChipParaProduzir, iconeChipProduzindo, iconeChipFeito;
+    private TextView txtChipParaProduzir, txtChipProduzindo, txtChipFeito;
     private ProducaoFluxoService producaoFluxoService;
     private PlanejamentoProducaoService planejamentoProducaoService;
     private Context context;
@@ -187,15 +200,31 @@ public class ConfirmaProducaoFragment
     private void inicializaComponentes() {
         autoCompleteLicenca = binding.txtAutoCompleteLicencaConfirmaTrabalho;
         autoCompleteQuantidade = binding.txtAutoCompleteQuantidadeConfirmaTrabalho;
-        autoCompleteEstado = binding.txtAutoCompleteEstadoConfirmaTrabalho;
-        checkRecorrencia = binding.checkBoxProducaoRecorrenteConfirmaTrabalho;
+        checkRecorrencia = binding.switchProducaoRecorrenteConfirmaTrabalho;
         btnConfirmar = binding.btnConfirmarProducao;
         txtQuantidade = binding.txtInputLayoutQuantidadeConfirmaTrabalho;
         loadingBotaoConfirmar = binding.loadingDotsConfirmar.getRoot();
 
+        heroRaridadeTarja = binding.heroRaridadeTarja;
+        txtNomeConfirmaTrabalho = binding.txtNomeConfirmaTrabalho;
+        txtNivelConfirmaTrabalho = binding.txtNivelConfirmaTrabalho;
+
+        chipEstadoParaProduzir = binding.chipEstadoParaProduzir;
+        chipEstadoProduzindo = binding.chipEstadoProduzindo;
+        chipEstadoFeito = binding.chipEstadoFeito;
+        iconeChipParaProduzir = binding.iconeChipParaProduzir;
+        iconeChipProduzindo = binding.iconeChipProduzindo;
+        iconeChipFeito = binding.iconeChipFeito;
+        txtChipParaProduzir = binding.txtChipParaProduzir;
+        txtChipProduzindo = binding.txtChipProduzindo;
+        txtChipFeito = binding.txtChipFeito;
+
+        chipEstadoParaProduzir.setOnClickListener(v -> selecionaEstado(CODIGO_TRABALHO_PARA_PRODUZIR));
+        chipEstadoProduzindo.setOnClickListener(v -> selecionaEstado(CODIGO_TRABALHO_PRODUZINDO));
+        chipEstadoFeito.setOnClickListener(v -> selecionaEstado(CODIGO_TRABALHO_FEITO));
+
         licencas = getResources().getStringArray(R.array.licencas_completas);
         quantidade = getResources().getStringArray(R.array.quantidade);
-        estados = getResources().getStringArray(R.array.estados);
 
         context = requireContext().getApplicationContext();
         trabalhoRepo = TrabalhoRepository.getInstancia(context);
@@ -234,7 +263,75 @@ public class ConfirmaProducaoFragment
     private void preencheCampos() {
         if (trabalhoRecebido == null) return;
 
+        txtNomeConfirmaTrabalho.setText(trabalhoRecebido.getNome());
+        txtNivelConfirmaTrabalho.setText(context.getString(R.string.stringNivelBadge, trabalhoRecebido.getNivel()));
         binding.txtProfissaoConfirmaTrabalho.setText(trabalhoRecebido.getProfissao());
+        configuraRaridadeHero(trabalhoRecebido);
+        configuraChipsEstado();
+    }
+
+    private void configuraRaridadeHero(Trabalho trabalho) {
+        String raridade = trabalho.getRaridade();
+        int corRaridade;
+        int corTarja;
+        if ("Melhorado".equals(raridade)) {
+            corRaridade = ContextCompat.getColor(context, R.color.cor_producao_raridade_melhorado);
+            corTarja = corRaridade;
+        } else if ("Raro".equals(raridade)) {
+            corRaridade = ContextCompat.getColor(context, R.color.cor_producao_raridade_raro);
+            corTarja = corRaridade;
+        } else if ("Especial".equals(raridade)) {
+            corRaridade = ContextCompat.getColor(context, R.color.cor_producao_raridade_especial);
+            corTarja = corRaridade;
+        } else {
+            corRaridade = MaterialColors.getColor(txtNomeConfirmaTrabalho, com.google.android.material.R.attr.colorOnSurface);
+            corTarja = MaterialColors.getColor(heroRaridadeTarja, com.google.android.material.R.attr.colorOutlineVariant);
+        }
+        txtNomeConfirmaTrabalho.setTextColor(corRaridade);
+        heroRaridadeTarja.setBackgroundColor(corTarja);
+    }
+
+    private void configuraChipsEstado() {
+        configuraChipEstado(chipEstadoParaProduzir, iconeChipParaProduzir, txtChipParaProduzir, estadoSelecionado == CODIGO_TRABALHO_PARA_PRODUZIR);
+        configuraChipEstado(chipEstadoProduzindo, iconeChipProduzindo, txtChipProduzindo, estadoSelecionado == CODIGO_TRABALHO_PRODUZINDO);
+        configuraChipEstado(chipEstadoFeito, iconeChipFeito, txtChipFeito, estadoSelecionado == CODIGO_TRABALHO_FEITO);
+    }
+
+    private void configuraChipEstado(MaterialCardView chip, ImageView icone, TextView texto, boolean selecionado) {
+        if (!selecionado) {
+            chip.setCardBackgroundColor(MaterialColors.getColor(chip, com.google.android.material.R.attr.colorSurface));
+            chip.setStrokeColor(MaterialColors.getColor(chip, com.google.android.material.R.attr.colorOutlineVariant));
+            int corPadrao = MaterialColors.getColor(chip, com.google.android.material.R.attr.colorOnSurfaceVariant);
+            texto.setTextColor(corPadrao);
+            icone.setVisibility(View.GONE);
+            return;
+        }
+
+        int corContainer;
+        int corOnContainer;
+        if (chip == chipEstadoParaProduzir) {
+            corContainer = R.color.cor_estado_para_produzir_container;
+            corOnContainer = R.color.cor_estado_para_produzir_on_container;
+        } else if (chip == chipEstadoProduzindo) {
+            corContainer = R.color.cor_estado_produzindo_container;
+            corOnContainer = R.color.cor_estado_produzindo_on_container;
+        } else {
+            corContainer = R.color.cor_estado_feito_container;
+            corOnContainer = R.color.cor_estado_feito_on_container;
+        }
+
+        int corOnContainerValor = ContextCompat.getColor(context, corOnContainer);
+        chip.setCardBackgroundColor(ContextCompat.getColor(context, corContainer));
+        chip.setStrokeColor(corOnContainerValor);
+        texto.setTextColor(corOnContainerValor);
+        icone.setVisibility(View.VISIBLE);
+        icone.setImageResource(R.drawable.ic_estado_feito);
+        ImageViewCompat.setImageTintList(icone, ColorStateList.valueOf(corOnContainerValor));
+    }
+
+    private void selecionaEstado(int estado) {
+        estadoSelecionado = estado;
+        configuraChipsEstado();
     }
 
     private void configuraDropDrown() {
@@ -248,15 +345,9 @@ public class ConfirmaProducaoFragment
             R.layout.item_dropdrown,
             quantidade
         );
-        ArrayAdapter<String> adapterEstado = new ArrayAdapter<>(
-            requireContext(),
-            R.layout.item_dropdrown,
-            estados
-        );
 
         autoCompleteLicenca.setAdapter(adapterLicenca);
         autoCompleteQuantidade.setAdapter(adapterQuantidade);
-        autoCompleteEstado.setAdapter(adapterEstado);
 
         if (autoCompleteLicenca.getText().toString().isEmpty()) {
             autoCompleteLicenca.setText(licencas[3], false);
@@ -264,10 +355,6 @@ public class ConfirmaProducaoFragment
 
         if (autoCompleteQuantidade.getText().toString().isEmpty()) {
             autoCompleteQuantidade.setText(quantidade[0], false);
-        }
-
-        if (autoCompleteEstado.getText().toString().isEmpty()) {
-            autoCompleteEstado.setText(estados[0], false);
         }
     }
 
@@ -302,7 +389,7 @@ public class ConfirmaProducaoFragment
     private TrabalhoProducao defineNovoTrabalhoProducao() {
         TrabalhoProducao novaProducao = new TrabalhoProducao();
 
-        int estado = recuperaPosicaoEstadoSelecionado();
+        int estado = estadoSelecionado;
 
         if (estado == CODIGO_TRABALHO_PRODUZINDO) {
             novaProducao.marcarIniciado();
@@ -324,18 +411,6 @@ public class ConfirmaProducaoFragment
         producao.setTipoLicenca(novaProducao.getTipoLicenca());
 
         return novaProducao;
-    }
-
-    private int recuperaPosicaoEstadoSelecionado() {
-        String estadoSelecionado = autoCompleteEstado.getText().toString();
-
-        for (int i = 0; i < estados.length; i++) {
-            if (estados[i].equals(estadoSelecionado)) {
-                return i;
-            }
-        }
-
-        return 0;
     }
 
     @Override
