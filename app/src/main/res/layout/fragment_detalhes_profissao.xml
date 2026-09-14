@@ -1,73 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.fragment.DetalhesProfissaoFragment">
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/cardCamposDetalhesTrabalho"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="2dp"
-        android:foregroundGravity="center_vertical"
-        android:layout_gravity="center_vertical"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="12dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        android:paddingHorizontal="12dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="24dp">
 
+        <!-- Identificacao: nome da profissao -->
+        <com.google.android.material.card.MaterialCardView
+            style="@style/card"
+            app:cardBackgroundColor="?attr/colorSurface"
+            android:paddingStart="0dp"
+            android:paddingEnd="0dp"
+            android:layout_marginStart="0dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginTop="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/txtNomeProfissaoFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:counterEnabled="true"
+                    app:counterMaxLength="50">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/edtDescricaoProfissaoFragment"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/string_nome"
+                        android:inputType="textCapWords"
+                        android:maxLength="50"
+                        android:singleLine="true" />
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Acoes: excluir com peso secundario, confirmar como acao primaria -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingTop="16dp"
-            android:paddingHorizontal="16dp">
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/txtNomeProfissaoFragment"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:counterEnabled="true"
-                app:counterMaxLength="50" >
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/edtDescricaoProfissaoFragment"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/string_nome"
-                    android:inputType="textCapWords"
-                    android:maxLength="50"
-                    android:singleLine="true" />
-            </com.google.android.material.textfield.TextInputLayout>
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="16dp">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnExcluiProfissao"
                 style="@style/BotaoAcaoDestrutiva"
-                android:layout_gravity="end"
-                android:layout_marginTop="8dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/stringExcluir"
                 app:icon="@drawable/ic_delete" />
 
             <FrameLayout
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_marginBottom="16dp"
-                android:layout_marginTop="8dp">
+                android:layout_weight="1"
+                android:layout_marginStart="8dp">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnConfirmarProfissao"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:minWidth="140dp"
-                    android:text="@string/stringConfirmar"/>
+                    android:text="@string/stringConfirmar" />
 
                 <include
                     android:id="@+id/loadingDotsConfirmar"
@@ -75,8 +84,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:visibility="gone"/>
+                    android:visibility="gone" />
             </FrameLayout>
         </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

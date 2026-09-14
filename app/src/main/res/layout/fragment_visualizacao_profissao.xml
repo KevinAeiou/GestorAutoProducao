@@ -1,53 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<androidx.core.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ui.fragment.VisualizacaoProfissaoFragment">
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/cardCamposDetalhesTrabalho"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="2dp"
-        android:foregroundGravity="center_vertical"
-        android:layout_gravity="center_vertical"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="12dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" >
+        android:paddingHorizontal="12dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="24dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+        <!-- Identificacao: nome da profissao -->
+        <com.google.android.material.card.MaterialCardView
+            style="@style/card"
+            app:cardBackgroundColor="?attr/colorSurface"
+            android:paddingStart="0dp"
+            android:paddingEnd="0dp"
+            android:layout_marginStart="0dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginTop="0dp">
 
             <LinearLayout
-                android:id="@+id/layoutNomeProfissao"
-                style="@style/layoutTxtField"
-                android:layout_marginTop="0dp"
-                android:background="@drawable/bg_campo_readonly">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/string_nome"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
+                    style="@style/rotuloMetadado"
+                    android:text="@string/string_nome" />
 
                 <TextView
                     android:id="@+id/txtNomeProfissao"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="16sp"
-                    android:layout_marginTop="4dp"/>
+                    style="@style/valorMetadado"
+                    tools:text="Ferreiro" />
             </LinearLayout>
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
-</androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>
