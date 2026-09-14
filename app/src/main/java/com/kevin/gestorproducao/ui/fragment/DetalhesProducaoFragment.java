@@ -33,7 +33,7 @@ import android.widget.TextView;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.color.MaterialColors;
-import com.google.android.material.switchmaterial.SwitchMaterial;
+import com.google.android.material.materialswitch.MaterialSwitch;
 import com.kevin.gestorproducao.R;
 import com.kevin.gestorproducao.databinding.FragmentDetalhesProducaoBinding;
 import com.kevin.gestorproducao.model.TrabalhoProducao;
@@ -57,7 +57,7 @@ public class DetalhesProducaoFragment
     extends BaseFragment<FragmentDetalhesProducaoBinding>
 {
     private TrabalhoProducao trabalho, trabalhoModificado;
-    private SwitchMaterial recorrenciaTrabalho;
+    private MaterialSwitch recorrenciaTrabalho;
     private TextView txtNomeTrabalho, txtNomeProducaoTrabalho, txtProfissaoTrabalho,
         txtExperienciaTrabalho, txtNivelTrabalho, txtLicencaHero,
         txtCriadoEm, txtModificadoEm, txtFinalizadoEm, txtIniciadoEm;
@@ -309,7 +309,7 @@ public class DetalhesProducaoFragment
             chip.setStrokeColor(MaterialColors.getColor(chip, com.google.android.material.R.attr.colorOutlineVariant));
             int corPadrao = MaterialColors.getColor(chip, com.google.android.material.R.attr.colorOnSurfaceVariant);
             texto.setTextColor(corPadrao);
-            ImageViewCompat.setImageTintList(icone, ColorStateList.valueOf(corPadrao));
+            icone.setVisibility(GONE);
             return;
         }
 
@@ -330,6 +330,8 @@ public class DetalhesProducaoFragment
         chip.setCardBackgroundColor(ContextCompat.getColor(context, corContainer));
         chip.setStrokeColor(corOnContainerValor);
         texto.setTextColor(corOnContainerValor);
+        icone.setVisibility(VISIBLE);
+        icone.setImageResource(R.drawable.ic_estado_feito);
         ImageViewCompat.setImageTintList(icone, ColorStateList.valueOf(corOnContainerValor));
     }
 
