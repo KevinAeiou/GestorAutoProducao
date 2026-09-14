@@ -313,10 +313,12 @@
                             android:textColor="?attr/colorOnSurface"
                             android:text="@string/stringRecorrente" />
 
-                        <com.google.android.material.switchmaterial.SwitchMaterial
+                        <com.google.android.material.materialswitch.MaterialSwitch
                             android:id="@+id/switchRecorrenciaDetalhesTrabalho"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
+                            android:layout_height="wrap_content"
+                            app:thumbIcon="@drawable/ic_switch_thumb_checked"
+                            app:thumbIconTint="?attr/colorPrimary" />
                     </LinearLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
@@ -372,14 +374,15 @@
                                     android:id="@+id/iconeChipParaProduzir"
                                     android:layout_width="12dp"
                                     android:layout_height="12dp"
+                                    android:layout_marginEnd="4dp"
                                     android:importantForAccessibility="no"
-                                    android:src="@drawable/ic_estado_para_produzir" />
+                                    android:visibility="gone"
+                                    tools:src="@drawable/ic_estado_feito" />
 
                                 <TextView
                                     android:id="@+id/txtChipParaProduzir"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginStart="4dp"
                                     android:textSize="11sp"
                                     android:textStyle="bold"
                                     android:text="@string/stringFiltroParaProduzir" />
@@ -409,14 +412,15 @@
                                     android:id="@+id/iconeChipProduzindo"
                                     android:layout_width="12dp"
                                     android:layout_height="12dp"
+                                    android:layout_marginEnd="4dp"
                                     android:importantForAccessibility="no"
-                                    android:src="@drawable/ic_estado_produzindo" />
+                                    android:visibility="gone"
+                                    tools:src="@drawable/ic_estado_feito" />
 
                                 <TextView
                                     android:id="@+id/txtChipProduzindo"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginStart="4dp"
                                     android:textSize="11sp"
                                     android:textStyle="bold"
                                     android:text="@string/stringFiltroProduzindo" />
@@ -446,14 +450,15 @@
                                     android:id="@+id/iconeChipFeito"
                                     android:layout_width="12dp"
                                     android:layout_height="12dp"
+                                    android:layout_marginEnd="4dp"
                                     android:importantForAccessibility="no"
-                                    android:src="@drawable/ic_estado_feito" />
+                                    android:visibility="gone"
+                                    tools:src="@drawable/ic_estado_feito" />
 
                                 <TextView
                                     android:id="@+id/txtChipFeito"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginStart="4dp"
                                     android:textSize="11sp"
                                     android:textStyle="bold"
                                     android:text="@string/stringFiltroFeito" />
