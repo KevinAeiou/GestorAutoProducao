@@ -6,48 +6,34 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="12dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="24dp">
 
+        <!-- Identificacao: qual trabalho foi vendido -->
         <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardCamposDetalhesTrabalho"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="12dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="2dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            style="@style/card"
+            app:cardBackgroundColor="?attr/colorSurface"
+            android:paddingStart="0dp"
+            android:paddingEnd="0dp"
+            android:layout_marginStart="0dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginTop="0dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp">
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/txtInputDescricaoTrabalhoVendido"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/stringDescricao">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/edtInputDescricaoTrabalhoVendido"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        tools:text="Descrição" />
-                </com.google.android.material.textfield.TextInputLayout>
+                android:padding="20dp">
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/txtInputNomeTrabalhoVendido"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
                     android:hint="@string/string_nome"
                     app:endIconMode="dropdown_menu">
 
@@ -57,81 +43,94 @@
                         android:layout_height="wrap_content" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <LinearLayout
-                    android:id="@+id/layoutDatasVenda"
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/txtInputDescricaoTrabalhoVendido"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:baselineAligned="false"
-                    android:orientation="horizontal">
+                    android:layout_marginTop="16dp"
+                    android:hint="@string/stringDescricaoOpcional">
 
-                    <LinearLayout
-                        android:id="@+id/layoutCriadoEmTrabalho"
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/edtInputDescricaoTrabalhoVendido"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginEnd="4dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/bg_campo_readonly"
-                        android:orientation="vertical"
-                        android:paddingHorizontal="16dp"
-                        android:paddingVertical="8dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintWidth_max="320dp">
+                        tools:text="Descrição" />
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/stringCriadoEm"
-                            android:textSize="12sp"
-                            android:textStyle="bold" />
+        <!-- Metadados: so aparece ao editar uma venda ja existente -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/layoutDatasVenda"
+            style="@style/card"
+            app:cardBackgroundColor="?attr/colorSurface"
+            android:paddingStart="0dp"
+            android:paddingEnd="0dp"
+            android:layout_marginStart="0dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginTop="12dp">
 
-                        <TextView
-                            android:id="@+id/txtCriadoEmTrabalho"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:textSize="16sp" />
-                    </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="20dp"
+                android:baselineAligned="false">
 
-                    <LinearLayout
-                        android:id="@+id/layoutModificadoEmTrabalho"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="4dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/bg_campo_readonly"
-                        android:orientation="vertical"
-                        android:paddingHorizontal="16dp"
-                        android:paddingVertical="8dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintWidth_max="320dp">
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="8dp"
+                    android:orientation="vertical">
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/stringModificadoEm"
-                            android:textSize="12sp"
-                            android:textStyle="bold" />
+                    <TextView
+                        style="@style/rotuloMetadado"
+                        android:text="@string/stringCriadoEm" />
 
-                        <TextView
-                            android:id="@+id/txtModificadoEmTrabalho"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:textSize="16sp" />
-                    </LinearLayout>
+                    <TextView
+                        android:id="@+id/txtCriadoEmTrabalho"
+                        style="@style/valorMetadado"
+                        tools:text="03/09/2026 14:20" />
                 </LinearLayout>
 
                 <LinearLayout
-                    android:id="@+id/linearLayoutTrabalhoVendido"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/rotuloMetadado"
+                        android:text="@string/stringModificadoEm" />
+
+                    <TextView
+                        android:id="@+id/txtModificadoEmTrabalho"
+                        style="@style/valorMetadado"
+                        tools:text="10/09/2026 09:05" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Valores: preco de venda e precificacao sugerida -->
+        <com.google.android.material.card.MaterialCardView
+            style="@style/card"
+            app:cardBackgroundColor="?attr/colorSurface"
+            android:paddingStart="0dp"
+            android:paddingEnd="0dp"
+            android:layout_marginStart="0dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginTop="12dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
                     android:baselineAligned="false"
                     android:orientation="horizontal">
 
@@ -168,11 +167,11 @@
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
 
+                <View style="@style/divisorMetadado" />
+
                 <LinearLayout
-                    android:id="@+id/linearLayout2TrabalhoVendido"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
                     android:baselineAligned="false"
                     android:orientation="horizontal">
 
@@ -211,7 +210,7 @@
                     android:id="@+id/txtInputValorLucroTrabalhoVendido"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="16dp"
                     android:hint="@string/stringValorLucro">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -220,39 +219,45 @@
                         android:layout_height="wrap_content"
                         android:inputType="numberSigned" />
                 </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnExcluiVenda"
-                    style="@style/BotaoAcaoDestrutiva"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_marginTop="8dp"
-                    android:text="@string/stringExcluir"
-                    app:icon="@drawable/ic_delete" />
-
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:layout_marginTop="8dp">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnConfirmarVenda"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:minWidth="140dp"
-                        android:text="@string/stringConfirmar"/>
-
-                    <include
-                        android:id="@+id/loadingDotsConfirmar"
-                        layout="@layout/view_loading_dots"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:visibility="gone"/>
-                </FrameLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- Acoes: excluir com peso secundario, confirmar como acao primaria -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="16dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnExcluiVenda"
+                style="@style/BotaoAcaoDestrutiva"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:text="@string/stringExcluir"
+                app:icon="@drawable/ic_delete" />
+
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnConfirmarVenda"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/stringConfirmar" />
+
+                <include
+                    android:id="@+id/loadingDotsConfirmar"
+                    layout="@layout/view_loading_dots"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:visibility="gone" />
+            </FrameLayout>
+        </LinearLayout>
+    </LinearLayout>
 </ScrollView>
