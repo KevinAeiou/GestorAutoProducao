@@ -1,18 +1,17 @@
 package com.kevin.gestorproducao.ui.recyclerview.adapter;
 
 import android.content.Context;
-import android.graphics.drawable.GradientDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.color.MaterialColors;
 import com.kevin.gestorproducao.R;
 import com.kevin.gestorproducao.model.ProfissaoPersonagem;
 import com.kevin.gestorproducao.ui.recyclerview.adapter.listener.OnItemClickListenerProfissaoPersonagem;
@@ -74,14 +73,14 @@ public class ListaProfissaoPersonagemAdapter extends BaseListAdapter<
         private final TextView nome_profissao;
         private final TextView experiencia_profissao;
         private final TextView nivelProfissao;
-        private final CardView cardProfissao;
+        private final View prioridadeTarja;
         private ProfissaoPersonagem profissaoPersonagem;
         public ProfissaoViewHolder(@NonNull View itemView) {
             super(itemView);
             nome_profissao = itemView.findViewById(R.id.itemNomeProfissaoPersonagem);
             experiencia_profissao = itemView.findViewById(R.id.itemExperienciaProfissaoPersonagem);
             nivelProfissao = itemView.findViewById(R.id.itemNivelProfissaoPersonagem);
-            cardProfissao = itemView.findViewById(R.id.cardViewProfissaoPersonagem);
+            prioridadeTarja = itemView.findViewById(R.id.itemPrioridadeTarja);
             itemView.setOnClickListener(view ->
                 onItemClickListener.onItemClick(profissaoPersonagem, getAbsoluteAdapterPosition())
             );
@@ -101,23 +100,15 @@ public class ListaProfissaoPersonagemAdapter extends BaseListAdapter<
                 );
             experiencia_profissao.setText(barraExperiencia);
             nome_profissao.setText(profissaoPersonagem.getNome());
-            nivelProfissao.setText(String.valueOf(profissaoPersonagem.getNivel()));
-            int cor = profissaoPersonagem.isPrioridade() ?
-                ContextCompat.getColor(context, R.color.cor_background_feito) :
-                ContextCompat.getColor(context, R.color.cor_background_card);
-            cardProfissao.setCardBackgroundColor(cor);
-//            configuraCardPrioridade(profissaoPersonagem);
+            nivelProfissao.setText(context.getString(R.string.stringNivelBadge, profissaoPersonagem.getNivel()));
+            configuraTarjaPrioridade(profissaoPersonagem);
         }
 
-        private void configuraCardPrioridade(ProfissaoPersonagem profissaoPersonagem) {
-            int cor = profissaoPersonagem.isPrioridade() ?
+        private void configuraTarjaPrioridade(ProfissaoPersonagem profissaoPersonagem) {
+            int corTarja = profissaoPersonagem.isPrioridade() ?
                 ContextCompat.getColor(context, R.color.cor_background_feito) :
-                ContextCompat.getColor(context, R.color.cor_background_card);
-            GradientDrawable borda = new GradientDrawable();
-            borda.setShape(GradientDrawable.RECTANGLE);
-            borda.setCornerRadius(16f);
-            borda.setStroke(8, cor);
-            cardProfissao.setBackground(borda);
+                MaterialColors.getColor(prioridadeTarja, com.google.android.material.R.attr.colorOutlineVariant);
+            prioridadeTarja.setBackgroundColor(corTarja);
         }
     }
 }
