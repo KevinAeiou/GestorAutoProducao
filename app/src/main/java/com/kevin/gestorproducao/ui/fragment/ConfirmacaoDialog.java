@@ -2,12 +2,16 @@ package com.kevin.gestorproducao.ui.fragment;
 
 import android.app.Dialog;
 import android.os.Bundle;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
+import com.google.android.material.color.MaterialColors;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.kevin.gestorproducao.R;
 
 public class ConfirmacaoDialog extends DialogFragment {
     public interface OnConfirmarListener {
@@ -41,17 +45,28 @@ public class ConfirmacaoDialog extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        return new MaterialAlertDialogBuilder(requireContext())
+        AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
             .setTitle(titulo)
             .setMessage(mensagem)
-            .setNegativeButton(android.R.string.cancel, (dialog, which) -> {
+            .setNegativeButton(R.string.stringCancelar, (dialogInterface, which) -> {
                 if (listenerCancelar != null) listenerCancelar.onCancelar();
                 dismiss();
             })
-            .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+            .setPositiveButton(R.string.stringExcluir, (dialogInterface, which) -> {
                 if (listenerConfirmar != null) listenerConfirmar.onConfirmar();
             })
             .create();
+
+        dialog.setOnShowListener(d -> {
+            Button botaoExcluir = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+            if (botaoExcluir == null) return;
+
+            botaoExcluir.setTextColor(
+                MaterialColors.getColor(botaoExcluir, com.google.android.material.R.attr.colorError)
+            );
+        });
+
+        return dialog;
     }
 
     @Override
