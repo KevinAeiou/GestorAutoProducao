@@ -9,9 +9,11 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.color.MaterialColors;
 import com.kevin.gestorproducao.R;
 import com.kevin.gestorproducao.model.TrabalhoVendido;
 import com.kevin.gestorproducao.ui.recyclerview.adapter.listener.OnItemClickListenerTrabalhoVendido;
@@ -76,6 +78,7 @@ public class ListaVendasPorTrabalho
         private final TextView valor;
         private final TextView nivel;
         private final TextView criadoEm;
+        private final View raridadeTarja;
 
         public VendasPorTrabalhoViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -83,12 +86,14 @@ public class ListaVendasPorTrabalho
             valor = itemView.findViewById(R.id.itemValorTrabalhoVendido);
             nivel = itemView.findViewById(R.id.itemNivelVendaPorTrabalho);
             criadoEm = itemView.findViewById(R.id.itemCriadoEmVendaPorTrabalho);
+            raridadeTarja = itemView.findViewById(R.id.itemRaridadeTarjaVendaPorTrabalho);
 
             itemView.setOnClickListener(v -> onItemClickListener.onItemClick(trabalho));
         }
 
         void vincula(TrabalhoVendido venda) {
             this.trabalho = venda;
+            configuraCorRaridade(venda);
             nome.setText(venda.getNome());
             valor.setText(context.getString(
                 R.string.stringOuroValor,
@@ -99,6 +104,27 @@ public class ListaVendasPorTrabalho
                 venda.getNivel())
             );
             criadoEm.setText(formatarTimestamp(venda.getCriadoEm()));
+        }
+
+        private void configuraCorRaridade(TrabalhoVendido venda) {
+            String raridade = venda.getRaridade();
+            int corRaridade;
+            int corTarja;
+            if ("Melhorado".equals(raridade)) {
+                corRaridade = ContextCompat.getColor(context, R.color.cor_producao_raridade_melhorado);
+                corTarja = corRaridade;
+            } else if ("Raro".equals(raridade)) {
+                corRaridade = ContextCompat.getColor(context, R.color.cor_producao_raridade_raro);
+                corTarja = corRaridade;
+            } else if ("Especial".equals(raridade)) {
+                corRaridade = ContextCompat.getColor(context, R.color.cor_producao_raridade_especial);
+                corTarja = corRaridade;
+            } else {
+                corRaridade = MaterialColors.getColor(nome, com.google.android.material.R.attr.colorOnSurface);
+                corTarja = MaterialColors.getColor(raridadeTarja, com.google.android.material.R.attr.colorOutlineVariant);
+            }
+            nome.setTextColor(corRaridade);
+            raridadeTarja.setBackgroundColor(corTarja);
         }
     }
 }

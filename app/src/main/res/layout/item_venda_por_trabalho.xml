@@ -3,53 +3,90 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/itemCardViewProdutoVendido"
-    style="@style/card">
+    style="@style/card"
+    app:cardBackgroundColor="?attr/colorSurface"
+    android:paddingStart="0dp"
+    android:paddingEnd="0dp"
+    android:id="@+id/itemCardViewProdutoVendido">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:paddingEnd="16dp">
+
+        <View
+            android:id="@+id/itemRaridadeTarjaVendaPorTrabalho"
+            android:layout_width="5dp"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:background="@color/cor_producao_raridade_raro" />
 
         <TextView
             android:id="@+id/itemNomeVendaPorTrabalho"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
+            android:layout_marginStart="21dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="8dp"
             android:textStyle="bold"
-            android:textColor="@color/cor_texto_raridade_comum"
+            android:textSize="16sp"
+            android:textColor="?attr/colorOnSurface"
+            app:layout_constraintEnd_toStartOf="@+id/itemValorContainer"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="Nome" />
+            tools:text="Espada Longa de Aço" />
 
-        <TextView
-            android:id="@+id/itemValorTrabalhoVendido"
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/itemValorContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="12dp"
-            android:textSize="16sp"
-            android:textColor="?attr/colorOnPrimary"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="12dp"
+            app:cardBackgroundColor="@color/cor_primaria_transparente"
+            app:strokeWidth="0dp"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            tools:text="$ 1" />
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <TextView
+                android:id="@+id/itemValorTrabalhoVendido"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textSize="13sp"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="8dp"
+                android:textColor="?attr/colorPrimary"
+                tools:text="$ 120" />
+        </com.google.android.material.card.MaterialCardView>
 
         <TextView
             android:id="@+id/itemNivelVendaPorTrabalho"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
-            app:layout_constraintStart_toStartOf="@id/itemNomeVendaPorTrabalho"
+            android:textSize="16sp"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:layout_marginStart="21dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/itemNomeVendaPorTrabalho"
-            tools:text="Nível 1" />
+            tools:text="Nv. 10" />
 
         <TextView
             android:id="@+id/itemCriadoEmVendaPorTrabalho"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
-            app:layout_constraintStart_toStartOf="@id/itemNomeVendaPorTrabalho"
+            android:textSize="13sp"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:layout_marginStart="21dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/itemNivelVendaPorTrabalho"
-            tools:text="01/01/2026" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:text="01/01/2026 14:20" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>
