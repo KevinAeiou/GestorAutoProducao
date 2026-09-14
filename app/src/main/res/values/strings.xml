@@ -378,6 +378,14 @@
     <string name="stringFiltroParaProduzir">Para produzir</string>
     <string name="stringFiltroProduzindo">Produzindo</string>
     <string name="stringFiltroFeito">Feito</string>
+    <string name="string_periodo_dia">Dia</string>
+    <string name="string_periodo_semana">Semana</string>
+    <string name="string_periodo_mes">Mês</string>
+    <string name="string_periodo_ano">Ano</string>
+    <string name="string_periodo_personalizado">Personalizado</string>
+    <string name="string_selecionar_periodo">Selecionar período</string>
+    <string name="string_seta_anterior">‹</string>
+    <string name="string_seta_proxima">›</string>
     <string name="stringVendaRemovida">Venda removida: </string>
     <string name="stringPersonagemInseridoComSucessoValor">%1$s inserido com sucesso!</string>
     <string name="stringDesconhecido">Desconhecido</string>

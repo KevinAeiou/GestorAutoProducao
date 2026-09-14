@@ -1,11 +1,13 @@
 package com.kevin.gestorproducao.utilitario;
 
 import com.kevin.gestorproducao.model.FiltroTrabalho;
+import com.kevin.gestorproducao.model.PeriodoFiltro;
 import com.kevin.gestorproducao.model.Trabalho;
 
 import java.text.Normalizer;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -38,6 +40,72 @@ public class Utilitario {
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
         return sdf.format(new Date(timestamp));
+    }
+
+    public static String formatarData(Long timestamp) {
+        if (timestamp == null) return "";
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        return sdf.format(new Date(timestamp));
+    }
+
+    // Resolve o tipo de período (dia/semana/mês/ano/personalizado) selecionado no filtro para um
+    // intervalo [inicio, fim] em millis. dataReferencia ancora em que dia/semana/mês/ano cai o
+    // período (null = o atual, a partir de agora); ignorado no caso PERSONALIZADO, onde o
+    // intervalo já vem escolhido manualmente pelo usuário.
+    public static long[] calcularIntervaloPeriodo(
+        PeriodoFiltro tipoPeriodo,
+        Long dataReferencia,
+        Long dataInicioPersonalizada,
+        Long dataFimPersonalizada
+    ) {
+        if (tipoPeriodo == PeriodoFiltro.PERSONALIZADO) {
+            // Enquanto o usuário não confirmou um intervalo personalizado, nenhum trabalho
+            // concluído deve corresponder — evita mostrar "todos" antes da escolha (ou reaplicar
+            // um intervalo antigo ao reabrir o tipo Personalizado).
+            if (dataInicioPersonalizada == null || dataFimPersonalizada == null) {
+                return new long[]{Long.MAX_VALUE, Long.MIN_VALUE};
+            }
+
+            return new long[]{dataInicioPersonalizada, dataFimPersonalizada};
+        }
+
+        Calendar calendario = Calendar.getInstance();
+        if (dataReferencia != null) {
+            calendario.setTimeInMillis(dataReferencia);
+        }
+        zerarHora(calendario);
+
+        if (tipoPeriodo == PeriodoFiltro.SEMANA) {
+            calendario.set(Calendar.DAY_OF_WEEK, calendario.getFirstDayOfWeek());
+        } else if (tipoPeriodo == PeriodoFiltro.MES) {
+            calendario.set(Calendar.DAY_OF_MONTH, 1);
+        } else if (tipoPeriodo == PeriodoFiltro.ANO) {
+            calendario.set(Calendar.DAY_OF_YEAR, 1);
+        }
+
+        long inicio = calendario.getTimeInMillis();
+
+        if (tipoPeriodo == PeriodoFiltro.SEMANA) {
+            calendario.add(Calendar.WEEK_OF_YEAR, 1);
+        } else if (tipoPeriodo == PeriodoFiltro.MES) {
+            calendario.add(Calendar.MONTH, 1);
+        } else if (tipoPeriodo == PeriodoFiltro.ANO) {
+            calendario.add(Calendar.YEAR, 1);
+        } else {
+            calendario.add(Calendar.DAY_OF_MONTH, 1);
+        }
+
+        long fim = calendario.getTimeInMillis() - 1;
+
+        return new long[]{inicio, fim};
+    }
+
+    private static void zerarHora(Calendar calendario) {
+        calendario.set(Calendar.HOUR_OF_DAY, 0);
+        calendario.set(Calendar.MINUTE, 0);
+        calendario.set(Calendar.SECOND, 0);
+        calendario.set(Calendar.MILLISECOND, 0);
     }
     public static Integer extrairNivel(String texto) {
         String numeros = texto.replaceAll("\\D+", "");
