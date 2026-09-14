@@ -2,15 +2,21 @@ package com.kevin.gestorproducao.ui.fragment;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
+import static com.kevin.gestorproducao.ui.activity.Constantes.CODIGO_TRABALHO_FEITO;
+import static com.kevin.gestorproducao.ui.activity.Constantes.CODIGO_TRABALHO_PARA_PRODUZIR;
+import static com.kevin.gestorproducao.ui.activity.Constantes.CODIGO_TRABALHO_PRODUZINDO;
 import static com.kevin.gestorproducao.ui.fragment.DetalhesProducaoFragmentDirections.vaiParaListaTrabalhosProducao;
 import static com.kevin.gestorproducao.utilitario.Utilitario.comparaString;
 import static com.kevin.gestorproducao.utilitario.Utilitario.formatarTimestamp;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.core.widget.ImageViewCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -20,11 +26,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.color.MaterialColors;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.kevin.gestorproducao.R;
 import com.kevin.gestorproducao.databinding.FragmentDetalhesProducaoBinding;
 import com.kevin.gestorproducao.model.TrabalhoProducao;
@@ -48,14 +57,21 @@ public class DetalhesProducaoFragment
     extends BaseFragment<FragmentDetalhesProducaoBinding>
 {
     private TrabalhoProducao trabalho, trabalhoModificado;
-    private CheckBox recorrenciaTrabalho;
+    private SwitchMaterial recorrenciaTrabalho;
     private TextView txtNomeTrabalho, txtNomeProducaoTrabalho, txtProfissaoTrabalho,
-        txtExperienciaTrabalho, txtNivelTrabalho, txtRaridadeTrabalho,
+        txtExperienciaTrabalho, txtNivelTrabalho, txtLicencaHero,
         txtCriadoEm, txtModificadoEm, txtFinalizadoEm, txtIniciadoEm;
-    private AutoCompleteTextView autoCompleteLicenca, autoCompleteEstado;
+    private View heroRaridadeTarja;
+    private MaterialCardView heroEstadoSelo;
+    private ImageView heroEstadoIcone;
+    private TextView heroEstadoTexto;
+    private MaterialCardView chipEstadoParaProduzir, chipEstadoProduzindo, chipEstadoFeito;
+    private ImageView iconeChipParaProduzir, iconeChipProduzindo, iconeChipFeito;
+    private TextView txtChipParaProduzir, txtChipProduzindo, txtChipFeito;
+    private int estadoSelecionado;
+    private AutoCompleteTextView autoCompleteLicenca;
     private MaterialButton btnExcluir, btnConfirmar;
-    private String[] estadosTrabalho, licencasTrabalho;
-    private ArrayAdapter<String> adapterEstado;
+    private String[] licencasTrabalho;
     private TrabalhoProducaoViewModel producaoViewModel;
     private PersonagemViewModel personagemViewModel;
     private TrabalhoEstoqueViewModel estoqueViewModel;
@@ -188,11 +204,13 @@ public class DetalhesProducaoFragment
         txtNomeProducaoTrabalho.setText(trabalho.getNomeProducao());
         txtProfissaoTrabalho.setText(trabalho.getProfissao());
         txtExperienciaTrabalho.setText(Formatador.formatarMilhar(trabalho.getExperiencia()));
-        txtNivelTrabalho.setText(String.valueOf(trabalho.getNivel()));
-        txtRaridadeTrabalho.setText(trabalho.getRaridade());
+        txtNivelTrabalho.setText(context.getString(R.string.stringNivelBadge, trabalho.getNivel()));
+        configuraRaridadeHero(trabalho);
         recorrenciaTrabalho.setChecked(trabalho.getRecorrencia());
         autoCompleteLicenca.setText(trabalho.getTipoLicenca());
-        autoCompleteEstado.setText(estadosTrabalho[trabalho.getEstado()]);
+        configuraCorLicenca(trabalho.getTipoLicenca());
+        estadoSelecionado = trabalho.getEstado();
+        configuraEstadoVisual(estadoSelecionado);
         txtCriadoEm.setText(formatarTimestamp(trabalho.getCriadoEm()));
         txtModificadoEm.setText(formatarTimestamp(trabalho.getModificadoEm()));
 
@@ -209,6 +227,115 @@ public class DetalhesProducaoFragment
 
         txtIniciadoEm.setText(dataInicio);
         txtFinalizadoEm.setText(dataFim);
+    }
+
+    private void configuraRaridadeHero(TrabalhoProducao trabalho) {
+        String raridade = trabalho.getRaridade();
+        int cor;
+        if ("Melhorado".equals(raridade)) {
+            cor = ContextCompat.getColor(context, R.color.cor_producao_raridade_melhorado);
+        } else if ("Raro".equals(raridade)) {
+            cor = ContextCompat.getColor(context, R.color.cor_producao_raridade_raro);
+        } else if ("Especial".equals(raridade)) {
+            cor = ContextCompat.getColor(context, R.color.cor_producao_raridade_especial);
+        } else {
+            cor = MaterialColors.getColor(txtNomeTrabalho, com.google.android.material.R.attr.colorOnSurface);
+        }
+        txtNomeTrabalho.setTextColor(cor);
+    }
+
+    private void configuraCorLicenca(String licenca) {
+        if (licenca == null) return;
+
+        int cor;
+        if (licenca.equals(getString(R.string.licencaNovato))) {
+            cor = R.color.cor_producao_licenca_novato;
+        } else if (licenca.equals(getString(R.string.licencaAprendiz))) {
+            cor = R.color.cor_producao_licenca_aprendiz;
+        } else if (licenca.equals(getString(R.string.licencaIniciante))) {
+            cor = R.color.cor_producao_licenca_iniciante;
+        } else {
+            cor = R.color.cor_producao_licenca_mestre;
+        }
+
+        int corValor = ContextCompat.getColor(context, cor);
+        autoCompleteLicenca.setTextColor(corValor);
+        txtLicencaHero.setText(licenca);
+        txtLicencaHero.setTextColor(corValor);
+    }
+
+    private void configuraEstadoVisual(int estado) {
+        int corContainer;
+        int corOnContainer;
+        int corTarja;
+        int icone;
+        int textoLabel;
+        if (estado == 0) {
+            corContainer = R.color.cor_estado_para_produzir_container;
+            corOnContainer = R.color.cor_estado_para_produzir_on_container;
+            corTarja = R.color.cor_estado_para_produzir_tarja;
+            icone = R.drawable.ic_estado_para_produzir;
+            textoLabel = R.string.stringFiltroParaProduzir;
+        } else if (estado == 1) {
+            corContainer = R.color.cor_estado_produzindo_container;
+            corOnContainer = R.color.cor_estado_produzindo_on_container;
+            corTarja = R.color.cor_estado_produzindo_tarja;
+            icone = R.drawable.ic_estado_produzindo;
+            textoLabel = R.string.stringFiltroProduzindo;
+        } else {
+            corContainer = R.color.cor_estado_feito_container;
+            corOnContainer = R.color.cor_estado_feito_on_container;
+            corTarja = R.color.cor_estado_feito_tarja;
+            icone = R.drawable.ic_estado_feito;
+            textoLabel = R.string.stringFiltroFeito;
+        }
+
+        int corOnContainerValor = ContextCompat.getColor(context, corOnContainer);
+        heroRaridadeTarja.setBackgroundColor(ContextCompat.getColor(context, corTarja));
+        heroEstadoSelo.setCardBackgroundColor(ContextCompat.getColor(context, corContainer));
+        heroEstadoIcone.setImageResource(icone);
+        ImageViewCompat.setImageTintList(heroEstadoIcone, ColorStateList.valueOf(corOnContainerValor));
+        heroEstadoTexto.setText(textoLabel);
+        heroEstadoTexto.setTextColor(corOnContainerValor);
+
+        configuraChipEstado(chipEstadoParaProduzir, iconeChipParaProduzir, txtChipParaProduzir, estado == 0);
+        configuraChipEstado(chipEstadoProduzindo, iconeChipProduzindo, txtChipProduzindo, estado == 1);
+        configuraChipEstado(chipEstadoFeito, iconeChipFeito, txtChipFeito, estado == 2);
+    }
+
+    private void configuraChipEstado(MaterialCardView chip, ImageView icone, TextView texto, boolean selecionado) {
+        if (!selecionado) {
+            chip.setCardBackgroundColor(MaterialColors.getColor(chip, com.google.android.material.R.attr.colorSurface));
+            chip.setStrokeColor(MaterialColors.getColor(chip, com.google.android.material.R.attr.colorOutlineVariant));
+            int corPadrao = MaterialColors.getColor(chip, com.google.android.material.R.attr.colorOnSurfaceVariant);
+            texto.setTextColor(corPadrao);
+            ImageViewCompat.setImageTintList(icone, ColorStateList.valueOf(corPadrao));
+            return;
+        }
+
+        int corContainer;
+        int corOnContainer;
+        if (chip == chipEstadoParaProduzir) {
+            corContainer = R.color.cor_estado_para_produzir_container;
+            corOnContainer = R.color.cor_estado_para_produzir_on_container;
+        } else if (chip == chipEstadoProduzindo) {
+            corContainer = R.color.cor_estado_produzindo_container;
+            corOnContainer = R.color.cor_estado_produzindo_on_container;
+        } else {
+            corContainer = R.color.cor_estado_feito_container;
+            corOnContainer = R.color.cor_estado_feito_on_container;
+        }
+
+        int corOnContainerValor = ContextCompat.getColor(context, corOnContainer);
+        chip.setCardBackgroundColor(ContextCompat.getColor(context, corContainer));
+        chip.setStrokeColor(corOnContainerValor);
+        texto.setTextColor(corOnContainerValor);
+        ImageViewCompat.setImageTintList(icone, ColorStateList.valueOf(corOnContainerValor));
+    }
+
+    private void selecionaEstado(int estado) {
+        estadoSelecionado = estado;
+        configuraEstadoVisual(estadoSelecionado);
     }
 
     private void observarPersonagem() {
@@ -239,13 +366,12 @@ public class DetalhesProducaoFragment
         trabalhoModificado = new TrabalhoProducao();
         btnExcluir = binding.btnExcluiTrabalho;
         btnConfirmar = binding.btnConfirmarProducao;
-        recorrenciaTrabalho = binding.checkBoxRecorrenciaDetalhesTrabalho;
+        recorrenciaTrabalho = binding.switchRecorrenciaDetalhesTrabalho;
         autoCompleteLicenca = binding.txtAutoCompleteLicencaTrabalho;
-        autoCompleteEstado = binding.txtAutoCompleteEstadoTrabalho;
 
         txtNomeTrabalho = binding.txtNomeTrabalho;
         txtNomeProducaoTrabalho = binding.txtNomeProducaoTrabalho;
-        txtRaridadeTrabalho = binding.txtRaridadeTrabalho;
+        txtLicencaHero = binding.txtLicencaHero;
         txtProfissaoTrabalho = binding.txtProfissaoTrabalho;
         txtExperienciaTrabalho = binding.txtExperienciaTrabalho;
         txtNivelTrabalho = binding.txtNivelTrabalho;
@@ -257,9 +383,27 @@ public class DetalhesProducaoFragment
         layoutCamposDatas = binding.layoutDatas2Producao;
         layoutCamposDatas.setVisibility(GONE);
 
+        heroRaridadeTarja = binding.heroRaridadeTarja;
+        heroEstadoSelo = binding.heroEstadoSelo;
+        heroEstadoIcone = binding.heroEstadoIcone;
+        heroEstadoTexto = binding.heroEstadoTexto;
+
+        chipEstadoParaProduzir = binding.chipEstadoParaProduzir;
+        chipEstadoProduzindo = binding.chipEstadoProduzindo;
+        chipEstadoFeito = binding.chipEstadoFeito;
+        iconeChipParaProduzir = binding.iconeChipParaProduzir;
+        iconeChipProduzindo = binding.iconeChipProduzindo;
+        iconeChipFeito = binding.iconeChipFeito;
+        txtChipParaProduzir = binding.txtChipParaProduzir;
+        txtChipProduzindo = binding.txtChipProduzindo;
+        txtChipFeito = binding.txtChipFeito;
+
+        chipEstadoParaProduzir.setOnClickListener(v -> selecionaEstado(CODIGO_TRABALHO_PARA_PRODUZIR));
+        chipEstadoProduzindo.setOnClickListener(v -> selecionaEstado(CODIGO_TRABALHO_PRODUZINDO));
+        chipEstadoFeito.setOnClickListener(v -> selecionaEstado(CODIGO_TRABALHO_FEITO));
+
         experienciaBase = trabalho.getExperiencia();
 
-        estadosTrabalho = getResources().getStringArray(R.array.estados);
         licencasTrabalho = getResources().getStringArray(R.array.licencas_completas);
 
         context = requireContext().getApplicationContext();
@@ -328,18 +472,6 @@ public class DetalhesProducaoFragment
         });
     }
 
-    private void configurarEstados() {
-        adapterEstado= new ArrayAdapter<>(
-            context,
-            R.layout.item_dropdrown,
-            estadosTrabalho
-        );
-
-        adapterEstado.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        autoCompleteEstado.setAdapter(adapterEstado);
-    }
-
     private void aplicarLicenca(String licenca) {
         String licencaIniciante = getString(R.string.licencaIniciante);
 
@@ -355,6 +487,7 @@ public class DetalhesProducaoFragment
         }
 
         txtExperienciaTrabalho.setText(String.valueOf(novaExperiencia));
+        configuraCorLicenca(licenca);
     }
 
     @Override
@@ -366,12 +499,10 @@ public class DetalhesProducaoFragment
     }
 
     private void verificaModificacaoTrabalho() {
-        int estado = adapterEstado.getPosition(autoCompleteEstado.getText().toString());
-
         trabalhoModificado = trabalho;
         trabalhoModificado.setRecorrencia(recorrenciaTrabalho.isChecked());
         trabalhoModificado.setTipoLicenca(autoCompleteLicenca.getText().toString());
-        trabalhoModificado.atualizarEstado(estado);
+        trabalhoModificado.atualizarEstado(estadoSelecionado);
         trabalhoModificado.marcarModificacao();
 
         TrabalhoProducao producao = getTrabalhoProducao();
@@ -401,7 +532,6 @@ public class DetalhesProducaoFragment
         super.onResume();
 
         configurarLicencas();
-        configurarEstados();
     }
 
     @Override

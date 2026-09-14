@@ -158,6 +158,31 @@
         <item name="minHeight">48dp</item>
     </style>
 
+    <style name="rotuloMetadado">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.03</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+    <style name="valorMetadado">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">4dp</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+
+    <style name="divisorMetadado">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:layout_marginVertical">16dp</item>
+        <item name="android:background">?attr/colorOutlineVariant</item>
+    </style>
+
     <style name="layoutTxtField">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
