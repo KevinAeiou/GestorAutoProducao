@@ -62,7 +62,7 @@ public class ConfirmacaoDialog extends DialogFragment {
             if (botaoExcluir == null) return;
 
             botaoExcluir.setTextColor(
-                MaterialColors.getColor(botaoExcluir, com.google.android.material.R.attr.colorError)
+                MaterialColors.getColor(botaoExcluir, R.attr.colorError)
             );
         });
 
