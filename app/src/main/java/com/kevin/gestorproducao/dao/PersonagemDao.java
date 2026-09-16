@@ -17,6 +17,8 @@ import com.kevin.gestorproducao.db.DbHelper;
 import com.kevin.gestorproducao.model.Personagem;
 import com.kevin.gestorproducao.utilitario.CriptografiaUtil;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PersonagemDao extends BaseDao {
     public PersonagemDao(Context context) {
@@ -55,14 +57,42 @@ public class PersonagemDao extends BaseDao {
 
     public void substituirTodos(ArrayList<Personagem> personagens) {
         executaEmTransacao(() -> {
+            // A senha nunca vem do Firebase (Usuario.senha e @Exclude) — preserva a cifra ja
+            // gravada localmente por id, senao esta substituicao completa apaga a senha salva
+            // no aparelho a cada sincronizacao.
+            Map<String, String> senhasCifradasPorId = recuperaSenhasCifradasPorId();
+
             db.delete(TABLE_PERSONAGENS, null, null);
 
             for (Personagem personagem : personagens) {
                 ContentValues values = getValues(personagem);
 
+                String senhaCifradaExistente = senhasCifradasPorId.get(personagem.getId());
+                if (senhaCifradaExistente != null) {
+                    values.put(COLUMN_NAME_SENHA, senhaCifradaExistente);
+                }
+
                 db.insert(TABLE_PERSONAGENS, null, values);
             }
         });
+    }
+
+    private Map<String, String> recuperaSenhasCifradasPorId() {
+        Map<String, String> senhasCifradasPorId = new HashMap<>();
+
+        String query = "SELECT " + COLUMN_NAME_ID + ", " + COLUMN_NAME_SENHA +
+            " FROM " + TABLE_PERSONAGENS;
+
+        try (Cursor cursor = db.rawQuery(query, null)) {
+            while (cursor.moveToNext()) {
+                senhasCifradasPorId.put(
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_SENHA))
+                );
+            }
+        }
+
+        return senhasCifradasPorId;
     }
 
     public void inserePersonagem(Personagem personagem) {
