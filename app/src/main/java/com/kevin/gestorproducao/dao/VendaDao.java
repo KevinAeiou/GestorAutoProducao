@@ -145,10 +145,14 @@ public class VendaDao extends BaseDao {
         return vendas;
     }
 
-    public ArrayList<TrabalhoVendido> recuperaMaisVendidos(String idPersonagem) {
+    public ArrayList<TrabalhoVendido> recuperaMaisVendidos(
+        String idPersonagem,
+        Long dataInicio,
+        Long dataFim
+    ) {
         ArrayList<TrabalhoVendido> trabalhos = new ArrayList<>();
 
-        String query =
+        StringBuilder query = new StringBuilder(
             "SELECT " +
                 "t." + COLUMN_NAME_ID + ", " +
                 "t." + COLUMN_NAME_NOME + ", " +
@@ -163,11 +167,25 @@ public class VendaDao extends BaseDao {
                 COLUMN_NAME_ID_TRABALHO + " = t." + COLUMN_NAME_ID + " " +
                 "LEFT JOIN " + TABLE_PROFISSOES + " p ON t." + COLUMN_NAME_PROFISSAO +
                 " = p." + COLUMN_NAME_ID + " " +
-                "WHERE v." + COLUMN_NAME_ID_PERSONAGEM + " = ? " +
-                "GROUP BY t." + COLUMN_NAME_ID + " " +
-                "ORDER BY total_quantidade DESC, t." + COLUMN_NAME_NOME + " ASC ";
+                "WHERE v." + COLUMN_NAME_ID_PERSONAGEM + " = ? "
+        );
 
-        try (Cursor cursor = db.rawQuery(query, new String[]{idPersonagem})) {
+        ArrayList<String> argumentos = new ArrayList<>();
+        argumentos.add(idPersonagem);
+
+        // v.criadoEm é a data em que a venda foi registrada — filtra as vendas agregadas por
+        // período antes do GROUP BY, então "total_quantidade"/"total_valor" já refletem só o
+        // que foi vendido dentro do intervalo selecionado.
+        if (dataInicio != null && dataFim != null) {
+            query.append("AND v.").append(COLUMN_NAME_CRIADO_EM).append(" BETWEEN ? AND ? ");
+            argumentos.add(String.valueOf(dataInicio));
+            argumentos.add(String.valueOf(dataFim));
+        }
+
+        query.append("GROUP BY t.").append(COLUMN_NAME_ID).append(" ")
+            .append("ORDER BY total_quantidade DESC, t.").append(COLUMN_NAME_NOME).append(" ASC");
+
+        try (Cursor cursor = db.rawQuery(query.toString(), argumentos.toArray(new String[0]))) {
             if (cursor.moveToFirst()) {
                 do {
                     TrabalhoVendido trabalho = new TrabalhoVendido();

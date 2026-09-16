@@ -35,6 +35,7 @@ import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.utils.ColorTemplate;
+import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.kevin.gestorproducao.R;
@@ -75,6 +76,9 @@ public class VendasFragment
     private EstadoAppViewModel estadoAppViewModel;
     private PieChart pieChart;
     private FloatingActionButton floatingActionButton;
+    private ChipGroup chipGroupPeriodo;
+    private TextView txtValorPeriodo;
+    private ControleFiltroPeriodo controleFiltroPeriodo;
 
     public VendasFragment() {}
 
@@ -100,6 +104,7 @@ public class VendasFragment
         configuraSwipeRefreshLayout();
         configuraDeslizeItem();
         configuraBotaoInsereVenda();
+        configuraFiltroPeriodo();
         observarVendas();
         observarPersonagem();
         observarFiltros();
@@ -236,6 +241,17 @@ public class VendasFragment
                 (a, b) -> b.getValue().compareTo(a.getValue())
         );
         return listaOrdenada;
+    }
+
+    private void configuraFiltroPeriodo() {
+        controleFiltroPeriodo = new ControleFiltroPeriodo(
+            this,
+            chipGroupPeriodo,
+            txtValorPeriodo,
+            (dataInicio, dataFim, tipo) -> vendasViewModel.atualizaPeriodoVendas(dataInicio, dataFim)
+        );
+
+        controleFiltroPeriodo.configurar();
     }
 
     private void aplicarFiltros() {
@@ -396,6 +412,8 @@ public class VendasFragment
         txtListaVazia = binding.txtListaVazia;
         pieChart = binding.chartProdutosVendidos;
         floatingActionButton = binding.botaoFlutuanteVendas;
+        chipGroupPeriodo = binding.chipGroupPeriodoVendas;
+        txtValorPeriodo = binding.txtValorPeriodoVendas;
 
         controlador = Navigation.findNavController(binding.getRoot());
 
