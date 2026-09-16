@@ -301,6 +301,10 @@
         android:name="com.kevin.gestorproducao.ui.fragment.RecursosFragment"
         tools:layout="@layout/fragment_recursos" />
     <fragment
+        android:id="@+id/automacaoFragment"
+        android:name="com.kevin.gestorproducao.ui.fragment.AutomacaoFragment"
+        tools:layout="@layout/fragment_automacao" />
+    <fragment
         android:id="@+id/listaProfissoesFragment"
         android:name="com.kevin.gestorproducao.ui.fragment.ListaProfissoesFragment"
         android:label="@string/profissoes"
