@@ -2,24 +2,23 @@ package com.kevin.gestorproducao.ui.fragment;
 
 import static android.view.View.GONE;
 import static com.kevin.gestorproducao.ui.fragment.ModificaPersonagemFragmentDirections.vaiParaListaTrabalhosProducao;
-import static java.lang.Integer.parseInt;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.SwitchCompat;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.materialswitch.MaterialSwitch;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.kevin.gestorproducao.R;
 import com.kevin.gestorproducao.databinding.FragmentDetalhesPersonagemBinding;
@@ -38,8 +37,8 @@ public class InserePersonagemFragment
     extends BaseFragment<FragmentDetalhesPersonagemBinding>
 {
     private TextInputLayout personagemNomeTxt, personagemEspacoProducaoTxt, personagemEmailTxt, personagemSenhaTxt;
-    private EditText personagemNome, personagemEspacoProducao, personagemEmail, personagemSenha;
-    private SwitchCompat personagemSwUso, personagemSwEstado, personagemSwAutoProducao;
+    private TextInputEditText personagemNome, personagemEspacoProducao, personagemEmail, personagemSenha;
+    private MaterialSwitch personagemSwUso, personagemSwEstado, personagemSwAutoProducao;
     private MaterialButton btnConfirmar;
     private PersonagemViewModel personagemViewModel;
     private Personagem personagem;
@@ -181,7 +180,7 @@ public class InserePersonagemFragment
         configuraMensagem(personagemSenha, personagemSenhaTxt);
     }
 
-    private void configuraMensagem(EditText personagemNome, TextInputLayout personagemNomeTxt) {
+    private void configuraMensagem(TextInputEditText personagemNome, TextInputLayout personagemNomeTxt) {
         if (personagemNome.getText().toString().isEmpty()) {
             personagemNomeTxt.setError(getString(R.string.stringCampoRequerido));
             return;
@@ -199,7 +198,7 @@ public class InserePersonagemFragment
         personagem.setEstado(personagemSwEstado.isChecked());
         personagem.setAutoProducao(personagemSwAutoProducao.isChecked());
         personagem.setUso(personagemSwUso.isChecked());
-        personagem.setEspacoProducao(parseInt(personagemEspacoProducao.getText().toString()));
+        personagem.setEspacoProducao(obterValorNumerico(personagemEspacoProducao));
     }
 
     private boolean verificaCamposValidos() {

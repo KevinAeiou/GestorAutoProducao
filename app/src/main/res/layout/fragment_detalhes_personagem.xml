@@ -1,185 +1,237 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/constraintLayoutAtributosPersonagem"
     tools:context=".ui.fragment.ModificaPersonagemFragment">
 
-    <ScrollView
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="12dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="24dp">
 
-        <LinearLayout
-            android:padding="8dp"
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+        <!-- Identificacao: nome, email, senha e espaco de producao -->
+        <com.google.android.material.card.MaterialCardView
+            style="@style/card"
+            app:cardBackgroundColor="?attr/colorSurface"
+            android:paddingStart="0dp"
+            android:paddingEnd="0dp"
+            android:layout_marginStart="0dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginTop="0dp">
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardCamposPersonagem"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="16dp"
-                android:layout_margin="8dp"
-                app:cardElevation="4dp">
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:text="@string/stringDadosDoPersonagem"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/txtNomePersonagem"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/string_nome">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/edtNomePersonagem"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textCapWords" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/txtEmailPersonagem"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:hint="@string/string_email">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/edtEmailPersonagem"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textEmailAddress"
+                        android:textSize="16sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/txtSenhaPersonagem"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:hint="@string/string_senha"
+                    app:passwordToggleEnabled="true">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/edtSenhaPersonagem"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPassword"
+                        android:textSize="16sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/txtEspacoProducaoPersonagem"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:hint="@string/string_espaco_producao">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/edtEspacoProducaoPersonagem"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:textSize="16sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Configuracoes: uso, estado e auto producao -->
+        <com.google.android.material.card.MaterialCardView
+            style="@style/card"
+            app:cardBackgroundColor="?attr/colorSurface"
+            android:paddingStart="0dp"
+            android:paddingEnd="0dp"
+            android:layout_marginStart="0dp"
+            android:layout_marginEnd="0dp"
+            android:layout_marginTop="12dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:text="@string/stringConfiguracoes"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
 
                 <LinearLayout
-                    android:orientation="vertical"
-                    android:padding="20dp"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
 
                     <TextView
-                        android:text="@string/stringDadosDoPersonagem"
-                        android:textStyle="bold"
-                        android:textSize="18sp"
-                        android:layout_marginBottom="12dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/txtNomePersonagem"
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:hint="@string/string_nome"
-                        android:gravity="center"
-                        android:paddingHorizontal="12dp">
+                        android:layout_weight="1"
+                        android:text="@string/string_uso"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="16sp" />
 
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/edtNomePersonagem"
-                            android:inputType="textCapWords"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/txtEmailPersonagem"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:hint="@string/string_email"
-                        android:paddingHorizontal="12dp">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/edtEmailPersonagem"
-                            android:inputType="textEmailAddress"
-                            android:textSize="16sp"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"/>
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/txtSenhaPersonagem"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
-                        android:hint="@string/string_senha"
-                        app:passwordToggleEnabled="true"
-                        android:paddingHorizontal="12dp">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/edtSenhaPersonagem"
-                            android:inputType="textPassword"
-                            android:textSize="16sp"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"/>
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/txtEspacoProducaoPersonagem"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="@string/string_espaco_producao"
-                        android:layout_marginTop="12dp"
-                        android:paddingHorizontal="12dp">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/edtEspacoProducaoPersonagem"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:inputType="number"
-                            android:textSize="16sp" />
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <TextView
-                        android:text="@string/stringConfiguracoes"
-                        android:textStyle="bold"
-                        android:textSize="16sp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="20dp"
-                        android:layout_marginBottom="8dp"/>
-
-                    <LinearLayout
-                        android:orientation="vertical"
-                        android:paddingHorizontal="12dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <com.google.android.material.switchmaterial.SwitchMaterial
-                            android:id="@+id/swUsoPersonagem"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="16sp"
-                            android:text="@string/string_uso"
-                            app:useMaterialThemeColors="true"  />
-
-                        <com.google.android.material.switchmaterial.SwitchMaterial
-                            android:id="@+id/swEstadoPersonagem"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="16sp"
-                            android:text="@string/string_estado"
-                            app:useMaterialThemeColors="true" />
-
-                        <com.google.android.material.switchmaterial.SwitchMaterial
-                            android:id="@+id/swAutoProducaoPersonagem"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="16sp"
-                            android:text="@string/stringAutoProducao"
-                            app:useMaterialThemeColors="true" />
-                    </LinearLayout>
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnExcluiPersonagem"
-                        style="@style/BotaoAcaoDestrutiva"
-                        android:layout_width="wrap_content"
-                        android:layout_gravity="end"
-                        android:layout_marginTop="8dp"
-                        android:layout_height="wrap_content"
-                        android:text="@string/stringExcluir"
-                        app:icon="@drawable/ic_delete" />
-
-                    <FrameLayout
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/swUsoPersonagem"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="end"
-                        android:layout_marginTop="8dp">
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnConfirmarPersonagem"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:minWidth="140dp"
-                            android:text="@string/stringConfirmar"/>
-
-                        <include
-                            android:id="@+id/loadingDotsConfirmar"
-                            layout="@layout/view_loading_dots"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:visibility="gone"/>
-                    </FrameLayout>
+                        app:thumbIcon="@drawable/ic_switch_thumb_checked"
+                        app:thumbIconTint="?attr/colorPrimary" />
                 </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/string_estado"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="16sp" />
+
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/swEstadoPersonagem"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:thumbIcon="@drawable/ic_switch_thumb_checked"
+                        app:thumbIconTint="?attr/colorPrimary" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/stringAutoProducao"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="16sp" />
+
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/swAutoProducaoPersonagem"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:thumbIcon="@drawable/ic_switch_thumb_checked"
+                        app:thumbIconTint="?attr/colorPrimary" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Acoes: excluir com peso secundario, confirmar como acao primaria -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="16dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnExcluiPersonagem"
+                style="@style/BotaoAcaoDestrutiva"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/stringExcluir"
+                app:icon="@drawable/ic_delete" />
+
+            <FrameLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnConfirmarPersonagem"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/stringConfirmar" />
+
+                <include
+                    android:id="@+id/loadingDotsConfirmar"
+                    layout="@layout/view_loading_dots"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:visibility="gone" />
+            </FrameLayout>
         </LinearLayout>
-    </ScrollView>
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

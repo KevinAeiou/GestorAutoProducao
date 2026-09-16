@@ -3,7 +3,6 @@ package com.kevin.gestorproducao.ui.fragment;
 import static android.view.View.GONE;
 import static com.kevin.gestorproducao.ui.fragment.ModificaPersonagemFragmentDirections.vaiParaListaTrabalhosProducao;
 import static com.kevin.gestorproducao.utilitario.Utilitario.comparaString;
-import static java.lang.Integer.parseInt;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -13,16 +12,17 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.view.MenuProvider;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.google.android.material.materialswitch.MaterialSwitch;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.kevin.gestorproducao.R;
 import com.kevin.gestorproducao.databinding.FragmentDetalhesPersonagemBinding;
 import com.kevin.gestorproducao.model.Personagem;
@@ -41,8 +41,9 @@ public class ModificaPersonagemFragment
     implements MenuProvider
 {
     private Personagem personagemRecebido;
-    private EditText personagemNome, personagemEspacoProducao, personagemEmail, personagemSenha;
-    private SwitchCompat personagemSwUso, personagemSwEstado, personagemSwAutoProducao;
+    private TextInputLayout personagemNomeTxt, personagemEspacoProducaoTxt, personagemEmailTxt, personagemSenhaTxt;
+    private TextInputEditText personagemNome, personagemEspacoProducao, personagemEmail, personagemSenha;
+    private MaterialSwitch personagemSwUso, personagemSwEstado, personagemSwAutoProducao;
     private PersonagemViewModel personagemViewModel;
     private NavController controlador;
     private PersonagemFluxoService personagemFluxoService;
@@ -142,6 +143,11 @@ public class ModificaPersonagemFragment
     @Override
     public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
         if (menuItem.getItemId() == R.id.itemMenuConfirma) {
+            if (!verificaCamposValidos()) {
+                configuraMensagemCamposValidos();
+                return true;
+            }
+
             Personagem personagem = definePersonagemModificado();
             if (personagemEhModificado(personagem)) {
                 personagemViewModel.modificaPersonagem(personagem);
@@ -152,6 +158,29 @@ public class ModificaPersonagemFragment
             return true;
         }
         return false;
+    }
+
+    private boolean verificaCamposValidos() {
+        return !personagemNome.getText().toString().isEmpty() &&
+            !personagemEspacoProducao.getText().toString().isEmpty() &&
+            !personagemEmail.getText().toString().isEmpty() &&
+            !personagemSenha.getText().toString().isEmpty();
+    }
+
+    private void configuraMensagemCamposValidos() {
+        configuraMensagem(personagemNome, personagemNomeTxt);
+        configuraMensagem(personagemEspacoProducao, personagemEspacoProducaoTxt);
+        configuraMensagem(personagemEmail, personagemEmailTxt);
+        configuraMensagem(personagemSenha, personagemSenhaTxt);
+    }
+
+    private void configuraMensagem(TextInputEditText campo, TextInputLayout campoTxt) {
+        if (campo.getText().toString().isEmpty()) {
+            campoTxt.setError(getString(R.string.stringCampoRequerido));
+            return;
+        }
+
+        campoTxt.setErrorEnabled(false);
     }
 
     private void configuraBotaoExcluir() {
@@ -183,12 +212,16 @@ public class ModificaPersonagemFragment
 
     private void inicializaComponentes() {
         personagemNome = binding.edtNomePersonagem;
+        personagemNomeTxt = binding.txtNomePersonagem;
         personagemEspacoProducao = binding.edtEspacoProducaoPersonagem;
+        personagemEspacoProducaoTxt = binding.txtEspacoProducaoPersonagem;
         personagemSwUso = binding.swUsoPersonagem;
         personagemSwEstado = binding.swEstadoPersonagem;
         personagemSwAutoProducao = binding.swAutoProducaoPersonagem;
         personagemEmail = binding.edtEmailPersonagem;
+        personagemEmailTxt = binding.txtEmailPersonagem;
         personagemSenha = binding.edtSenhaPersonagem;
+        personagemSenhaTxt = binding.txtSenhaPersonagem;
 
         Context context = requireContext().getApplicationContext();
 
@@ -227,7 +260,7 @@ public class ModificaPersonagemFragment
         personagem.setEstado(personagemSwEstado.isChecked());
         personagem.setAutoProducao(personagemSwAutoProducao.isChecked());
         personagem.setUso(personagemSwUso.isChecked());
-        personagem.setEspacoProducao(parseInt(personagemEspacoProducao.getText().toString()));
+        personagem.setEspacoProducao(obterValorNumerico(personagemEspacoProducao));
 
         return personagem;
     }
