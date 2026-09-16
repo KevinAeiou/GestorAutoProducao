@@ -37,7 +37,7 @@ public class ControleFiltroPeriodo {
     private final TextView txtValorPeriodo;
     private final OnPeriodoAlteradoListener listener;
 
-    private PeriodoFiltro tipoPeriodoSelecionado = PeriodoFiltro.MES;
+    private PeriodoFiltro tipoPeriodoSelecionado;
     private Long dataReferenciaPeriodo;
     private Long dataInicioPersonalizada;
     private Long dataFimPersonalizada;
@@ -49,10 +49,28 @@ public class ControleFiltroPeriodo {
         TextView txtValorPeriodo,
         OnPeriodoAlteradoListener listener
     ) {
+        this(fragment, chipGroupPeriodo, txtValorPeriodo, listener, PeriodoFiltro.MES, null, null);
+    }
+
+    // periodoInicial (+ intervalo personalizado inicial, quando periodoInicial é PERSONALIZADO)
+    // permite abrir o controle já preenchido com um período diferente do padrão "mês atual" —
+    // ex.: a análise de "chance de venda" abre em Personalizado com os últimos 6 meses.
+    public ControleFiltroPeriodo(
+        Fragment fragment,
+        ChipGroup chipGroupPeriodo,
+        TextView txtValorPeriodo,
+        OnPeriodoAlteradoListener listener,
+        PeriodoFiltro periodoInicial,
+        Long dataInicioPersonalizadaInicial,
+        Long dataFimPersonalizadaInicial
+    ) {
         this.fragment = fragment;
         this.chipGroupPeriodo = chipGroupPeriodo;
         this.txtValorPeriodo = txtValorPeriodo;
         this.listener = listener;
+        this.tipoPeriodoSelecionado = periodoInicial;
+        this.dataInicioPersonalizada = dataInicioPersonalizadaInicial;
+        this.dataFimPersonalizada = dataFimPersonalizadaInicial;
     }
 
     public void configurar() {

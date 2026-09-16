@@ -6,6 +6,7 @@ import static com.kevin.gestorproducao.ui.activity.Constantes.CODIGO_REQUISICAO_
 import static com.kevin.gestorproducao.ui.fragment.VendasFragmentDirections.vaiDeVendasParaFiltro;
 import static com.kevin.gestorproducao.ui.fragment.VendasFragmentDirections.vaiDeVendasParaTrabalhos;
 import static com.kevin.gestorproducao.ui.fragment.VendasFragmentDirections.vaiDeVendasParaVendasPorTrabalho;
+import static com.kevin.gestorproducao.utilitario.Utilitario.calcularIntervaloUltimosMeses;
 import static com.kevin.gestorproducao.utilitario.Utilitario.filtrarTrabalhos;
 
 import android.os.Bundle;
@@ -38,12 +39,16 @@ import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.tabs.TabLayout;
 import com.kevin.gestorproducao.R;
 import com.kevin.gestorproducao.databinding.FragmentVendasBinding;
 import com.kevin.gestorproducao.model.FiltroTrabalho;
+import com.kevin.gestorproducao.model.PeriodoFiltro;
+import com.kevin.gestorproducao.model.TrabalhoChanceVenda;
 import com.kevin.gestorproducao.model.TrabalhoVendido;
 import com.kevin.gestorproducao.ui.fragment.VendasFragmentDirections.VaiDeVendasParaFiltro;
 import com.kevin.gestorproducao.ui.fragment.VendasFragmentDirections.VaiDeVendasParaTrabalhos;
+import com.kevin.gestorproducao.ui.recyclerview.adapter.ListaChanceVendaAdapter;
 import com.kevin.gestorproducao.ui.recyclerview.adapter.ListaTrabalhosVendidosAdapter;
 import com.kevin.gestorproducao.ui.viewModel.ComponentesVisuais;
 import com.kevin.gestorproducao.ui.viewModel.EstadoAppViewModel;
@@ -79,6 +84,16 @@ public class VendasFragment
     private ChipGroup chipGroupPeriodo;
     private TextView txtValorPeriodo;
     private ControleFiltroPeriodo controleFiltroPeriodo;
+    private TabLayout tabLayoutVendas;
+    private ListaChanceVendaAdapter chanceVendaAdapter;
+    private ArrayList<TrabalhoChanceVenda> chanceVenda = new ArrayList<>();
+    private ArrayList<TrabalhoChanceVenda> chanceVendaFiltrada = new ArrayList<>();
+    private RecyclerView meuRecyclerChanceVenda;
+    private SwipeRefreshLayout swipeRefreshLayoutChanceVenda;
+    private ChipGroup chipGroupPeriodoChanceVenda;
+    private TextView txtValorPeriodoChanceVenda;
+    private ControleFiltroPeriodo controleFiltroPeriodoChanceVenda;
+    private boolean abaChanceVendaSelecionada;
 
     public VendasFragment() {}
 
@@ -101,10 +116,14 @@ public class VendasFragment
 
         inicializaComponentes();
         configuraRecyclerView();
+        configuraRecyclerViewChanceVenda();
         configuraSwipeRefreshLayout();
+        configuraSwipeRefreshLayoutChanceVenda();
         configuraDeslizeItem();
         configuraBotaoInsereVenda();
         configuraFiltroPeriodo();
+        configuraFiltroPeriodoChanceVenda();
+        configuraTabs();
         observarVendas();
         observarPersonagem();
         observarFiltros();
@@ -118,6 +137,7 @@ public class VendasFragment
             filtro -> {
                 filtroAtual = filtro;
                 aplicarFiltros();
+                aplicarFiltrosChanceVenda();
             }
         );
     }
@@ -129,6 +149,7 @@ public class VendasFragment
                 if (resultado == null) return;
 
                 vendasViewModel.carregarMaisVendidos(resultado.getId());
+                vendasViewModel.carregarChanceVenda(resultado.getId());
             }
         );
     }
@@ -152,6 +173,23 @@ public class VendasFragment
             }
         );
 
+        vendasViewModel.getChanceVenda().observe(
+            getViewLifecycleOwner(),
+            resultado -> {
+                swipeRefreshLayoutChanceVenda.setRefreshing(false);
+
+                if (resultado.getDado() != null) {
+                    chanceVenda = resultado.getDado();
+
+                    aplicarFiltrosChanceVenda();
+                }
+
+                if (resultado.getErro() != null) {
+                    mostraMensagemAncorada(getString(R.string.stringErroValor, resultado.getErro()));
+                }
+            }
+        );
+
         vendasViewModel.getSincronizacaoResultado().observe(
             getViewLifecycleOwner(),
             resultado -> {
@@ -161,6 +199,7 @@ public class VendasFragment
                 }
 
                 vendasViewModel.atualizaMaisVendidos();
+                vendasViewModel.atualizaChanceVenda();
             }
         );
     }
@@ -243,6 +282,46 @@ public class VendasFragment
         return listaOrdenada;
     }
 
+    private void configuraTabs() {
+        tabLayoutVendas.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(@NonNull TabLayout.Tab tab) {
+                abaChanceVendaSelecionada = tab.getPosition() == 1;
+                atualizaVisibilidadeAbas();
+                atualizaEstadoVazio();
+            }
+
+            @Override
+            public void onTabUnselected(@NonNull TabLayout.Tab tab) {}
+
+            @Override
+            public void onTabReselected(@NonNull TabLayout.Tab tab) {}
+        });
+    }
+
+    private void atualizaVisibilidadeAbas() {
+        binding.cardCamposProdutosVendidos.setVisibility(abaChanceVendaSelecionada ? GONE : VISIBLE);
+        binding.swipeRefreshLayoutProdutosVendidos.setVisibility(abaChanceVendaSelecionada ? GONE : VISIBLE);
+        binding.cardCamposChanceVenda.setVisibility(abaChanceVendaSelecionada ? VISIBLE : GONE);
+        swipeRefreshLayoutChanceVenda.setVisibility(abaChanceVendaSelecionada ? VISIBLE : GONE);
+    }
+
+    private void configuraRecyclerViewChanceVenda() {
+        meuRecyclerChanceVenda.setHasFixedSize(true);
+        meuRecyclerChanceVenda.setLayoutManager(new LinearLayoutManager(requireContext()));
+
+        chanceVendaAdapter = new ListaChanceVendaAdapter(requireContext());
+        meuRecyclerChanceVenda.setAdapter(chanceVendaAdapter);
+    }
+
+    private void configuraSwipeRefreshLayoutChanceVenda() {
+        swipeRefreshLayoutChanceVenda.setOnRefreshListener(() -> {
+            chanceVendaAdapter.limpaLista();
+
+            vendasViewModel.sincronizaVendas();
+        });
+    }
+
     private void configuraFiltroPeriodo() {
         controleFiltroPeriodo = new ControleFiltroPeriodo(
             this,
@@ -254,6 +333,26 @@ public class VendasFragment
         controleFiltroPeriodo.configurar();
     }
 
+    // Mesmo controle de período da aba "Mais Vendidos" (Dia/Semana/Mês/Ano/Personalizado), mas
+    // já abre no chip "Personalizado" com o intervalo pré-preenchido para os últimos 6 meses —
+    // a análise de chance de venda não faz sentido sem uma janela de tempo, e isso evita obrigar
+    // o usuário a escolher o intervalo manualmente antes de ver algo.
+    private void configuraFiltroPeriodoChanceVenda() {
+        long[] ultimosSeisMeses = calcularIntervaloUltimosMeses(6);
+
+        controleFiltroPeriodoChanceVenda = new ControleFiltroPeriodo(
+            this,
+            chipGroupPeriodoChanceVenda,
+            txtValorPeriodoChanceVenda,
+            (dataInicio, dataFim, tipo) -> vendasViewModel.atualizaPeriodoChanceVenda(dataInicio, dataFim),
+            PeriodoFiltro.PERSONALIZADO,
+            ultimosSeisMeses[0],
+            ultimosSeisMeses[1]
+        );
+
+        controleFiltroPeriodoChanceVenda.configurar();
+    }
+
     private void aplicarFiltros() {
         configuraGrafico();
 
@@ -261,7 +360,7 @@ public class VendasFragment
             vendasFiltradas = (ArrayList<TrabalhoVendido>) vendas.clone();
 
             vendasAdapter.atualiza(vendasFiltradas);
-            atualizaVisibilidadeListaVazia(vendasFiltradas.isEmpty());
+            atualizaEstadoVazio();
             meuRecycler.smoothScrollToPosition(0);
             return;
         }
@@ -269,20 +368,33 @@ public class VendasFragment
         vendasFiltradas = filtrarTrabalhos(vendas, filtroAtual);
 
         vendasAdapter.atualiza(vendasFiltradas);
-        atualizaVisibilidadeListaVazia(vendasFiltradas.isEmpty());
+        atualizaEstadoVazio();
         meuRecycler.smoothScrollToPosition(0);
     }
 
-    private void atualizaVisibilidadeListaVazia(boolean listaVazia) {
-        if (listaVazia) {
-            iconeListaVazia.setVisibility(VISIBLE);
-            txtListaVazia.setVisibility(VISIBLE);
-            pieChart.setVisibility(GONE);
-            return;
+    // Mesmo filtro de descrição/profissão/raridade/nível da aba "Mais Vendidos" (FiltroTrabalho
+    // é aplicável a qualquer T extends Trabalho) — sem isso a aba "Chance de Venda" ignorava o
+    // filtro escolhido no ícone de busca da toolbar.
+    private void aplicarFiltrosChanceVenda() {
+        chanceVendaFiltrada = filtrarTrabalhos(chanceVenda, filtroAtual);
+
+        chanceVendaAdapter.atualiza(chanceVendaFiltrada);
+        atualizaEstadoVazio();
+    }
+
+    // Estado vazio (ícone + texto) é compartilhado pelas duas abas, mas reflete só a lista da
+    // aba ativa no momento — o PieChart só existe na aba "Mais Vendidos".
+    private void atualizaEstadoVazio() {
+        boolean listaVazia = abaChanceVendaSelecionada
+            ? chanceVendaFiltrada == null || chanceVendaFiltrada.isEmpty()
+            : vendasFiltradas == null || vendasFiltradas.isEmpty();
+
+        iconeListaVazia.setVisibility(listaVazia ? VISIBLE : GONE);
+        txtListaVazia.setVisibility(listaVazia ? VISIBLE : GONE);
+
+        if (!abaChanceVendaSelecionada) {
+            pieChart.setVisibility(listaVazia ? GONE : VISIBLE);
         }
-        iconeListaVazia.setVisibility(GONE);
-        txtListaVazia.setVisibility(GONE);
-        pieChart.setVisibility(VISIBLE);
     }
 
     @Override
@@ -405,6 +517,8 @@ public class VendasFragment
     private void inicializaComponentes() {
         vendas = new ArrayList<>();
         vendasFiltradas = new ArrayList<>();
+        chanceVenda = new ArrayList<>();
+        chanceVendaFiltrada = new ArrayList<>();
         meuRecycler = binding.recyclerViewListaProdutosVendidos;
         swipeRefreshLayout = binding.swipeRefreshLayoutProdutosVendidos;
         indicadorProgresso = binding.indicadorProgressoListaProdutosVendidosFragment;
@@ -414,6 +528,11 @@ public class VendasFragment
         floatingActionButton = binding.botaoFlutuanteVendas;
         chipGroupPeriodo = binding.chipGroupPeriodoVendas;
         txtValorPeriodo = binding.txtValorPeriodoVendas;
+        tabLayoutVendas = binding.tabLayoutVendas;
+        meuRecyclerChanceVenda = binding.recyclerViewListaChanceVenda;
+        swipeRefreshLayoutChanceVenda = binding.swipeRefreshLayoutChanceVenda;
+        chipGroupPeriodoChanceVenda = binding.chipGroupPeriodoChanceVenda;
+        txtValorPeriodoChanceVenda = binding.txtValorPeriodoChanceVenda;
 
         controlador = Navigation.findNavController(binding.getRoot());
 
@@ -443,6 +562,7 @@ public class VendasFragment
         super.onResume();
 
         vendasViewModel.atualizaMaisVendidos();
+        vendasViewModel.atualizaChanceVenda();
     }
 
     @Override

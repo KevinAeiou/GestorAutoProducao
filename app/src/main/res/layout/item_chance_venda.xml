@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/card"
+    app:cardBackgroundColor="?attr/colorSurface"
+    android:paddingStart="0dp"
+    android:paddingEnd="0dp"
+    android:id="@+id/itemCardViewChanceVenda">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingEnd="16dp">
+
+        <View
+            android:id="@+id/itemRaridadeTarjaChanceVenda"
+            android:layout_width="5dp"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:background="@color/cor_producao_raridade_raro" />
+
+        <TextView
+            android:id="@+id/itemPosicaoChanceVenda"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="21dp"
+            android:layout_marginTop="16dp"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="1º" />
+
+        <TextView
+            android:id="@+id/itemNomeChanceVenda"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="8dp"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="?attr/colorOnSurface"
+            app:layout_constraintStart_toEndOf="@id/itemPosicaoChanceVenda"
+            app:layout_constraintTop_toTopOf="@id/itemPosicaoChanceVenda"
+            app:layout_constraintEnd_toStartOf="@+id/itemEstoqueContainer"
+            tools:text="Trabalho" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/itemEstoqueContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="12dp"
+            app:cardBackgroundColor="?attr/colorSecondaryContainer"
+            app:strokeWidth="0dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <TextView
+                android:id="@+id/itemEstoqueChanceVenda"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:textSize="12sp"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="8dp"
+                android:textColor="?attr/colorOnSecondaryContainer"
+                tools:text="Estoque: 5" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:id="@+id/itemProfissaoChanceVenda"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:layout_marginStart="21dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/itemNomeChanceVenda"
+            tools:text="Profissão" />
+
+        <TextView
+            android:id="@+id/itemVendasPeriodoChanceVenda"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:layout_marginStart="21dp"
+            android:layout_marginTop="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/itemProfissaoChanceVenda"
+            tools:text="Vendeu 12 un. · Há 3 dias" />
+
+        <TextView
+            android:id="@+id/itemLabelScoreChanceVenda"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:layout_marginStart="21dp"
+            android:layout_marginTop="10dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/itemVendasPeriodoChanceVenda"
+            tools:text="Chance de venda: 70%" />
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/itemScoreChanceVenda"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="21dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="16dp"
+            app:trackCornerRadius="4dp"
+            app:trackThickness="6dp"
+            app:indicatorColor="?attr/colorPrimary"
+            app:trackColor="?attr/colorSurfaceVariant"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/itemLabelScoreChanceVenda"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:progress="70" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</com.google.android.material.card.MaterialCardView>
