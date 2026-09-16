@@ -101,6 +101,18 @@ public class Utilitario {
         return new long[]{inicio, fim};
     }
 
+    // Janela móvel terminando agora — usada para pré-preencher o filtro "Personalizado" com um
+    // intervalo relativo (ex.: últimos 6 meses) em vez de obrigar o usuário a escolher na mão.
+    public static long[] calcularIntervaloUltimosMeses(int meses) {
+        long fim = System.currentTimeMillis();
+
+        Calendar calendario = Calendar.getInstance();
+        calendario.setTimeInMillis(fim);
+        calendario.add(Calendar.MONTH, -meses);
+
+        return new long[]{calendario.getTimeInMillis(), fim};
+    }
+
     private static void zerarHora(Calendar calendario) {
         calendario.set(Calendar.HOUR_OF_DAY, 0);
         calendario.set(Calendar.MINUTE, 0);

@@ -15,8 +15,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.kevin.gestorproducao.dao.VendaDao;
+import com.kevin.gestorproducao.model.TrabalhoChanceVenda;
 import com.kevin.gestorproducao.model.TrabalhoVendido;
 import com.kevin.gestorproducao.repository.helper.FirebaseTimeoutHelper;
+import com.kevin.gestorproducao.service.AnaliseVendaService;
 
 import java.util.ArrayList;
 import java.util.concurrent.Executor;
@@ -150,6 +152,34 @@ public class TrabalhoVendaRepository {
         }
 
         return null;
+    }
+
+    public LiveData<Resource<ArrayList<TrabalhoChanceVenda>>> recuperaAnaliseChanceVenda(
+        String idPersonagem,
+        long dataInicio,
+        long dataFim
+    ) {
+        MutableLiveData<Resource<ArrayList<TrabalhoChanceVenda>>> analise = new MutableLiveData<>();
+
+        analise.setValue(new Resource<>(null, null));
+
+        backgroundExecutor.execute(() -> {
+            try {
+                ArrayList<TrabalhoChanceVenda> trabalhos = vendaDao.recuperaAnaliseChanceVenda(
+                    idPersonagem,
+                    dataInicio,
+                    dataFim
+                );
+
+                AnaliseVendaService.ordenarPorChanceVenda(trabalhos, System.currentTimeMillis());
+
+                analise.postValue(new Resource<>(trabalhos, null));
+            } catch (Exception e) {
+                analise.postValue(new Resource<>(null, e.getMessage()));
+            }
+        });
+
+        return analise;
     }
 
     public void removeReferenciaTrabalhoEspecfico(String idTrabalho) {

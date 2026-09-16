@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
+import com.kevin.gestorproducao.model.TrabalhoChanceVenda;
 import com.kevin.gestorproducao.model.TrabalhoVendido;
 import com.kevin.gestorproducao.model.VendaFiltro;
 import com.kevin.gestorproducao.repository.TrabalhoEstoqueRepository;
@@ -19,16 +20,20 @@ public class TrabalhosVendidosViewModel extends ViewModel {
     private final TrabalhoVendaRepository repository;
     private final LiveData<Resource<ArrayList<TrabalhoVendido>>> maisVendidos;
     private final LiveData<Resource<ArrayList<TrabalhoVendido>>> vendasPorTrabalho;
+    private final LiveData<Resource<ArrayList<TrabalhoChanceVenda>>> chanceVenda;
     private final MediatorLiveData<Resource<Void>> insercaoResultado = new MediatorLiveData<>();
     private final MediatorLiveData<Resource<Void>> modificacaoResultado = new MediatorLiveData<>();
     private final MediatorLiveData<Resource<Void>> remocaoResultado = new MediatorLiveData<>();
     private final MutableLiveData<String> idPersonagem = new MutableLiveData<>();
+    private final MutableLiveData<String> idPersonagemChanceVenda = new MutableLiveData<>();
     private final MutableLiveData<String> idTrabalho = new MutableLiveData<>();
     private final MediatorLiveData<Resource<Void>> sincronizacaoResultado = new MediatorLiveData<>();
     private final VendaService vendaService;
     private final MutableLiveData<VendaFiltro> filtroVenda = new MutableLiveData<>();
     private Long dataInicioPeriodo;
     private Long dataFimPeriodo;
+    private Long dataInicioPeriodoChanceVenda;
+    private Long dataFimPeriodoChanceVenda;
 
 
     public TrabalhosVendidosViewModel(
@@ -57,6 +62,22 @@ public class TrabalhosVendidosViewModel extends ViewModel {
                 return repository.recuperaVendasPorTrabalho(
                     filtro.getIdPersonagem(),
                     filtro.getIdTrabalho()
+                );
+            }
+        );
+
+        chanceVenda = Transformations.switchMap(
+            idPersonagemChanceVenda,
+            id -> {
+                if (id == null) return new MutableLiveData<>();
+                if (dataInicioPeriodoChanceVenda == null || dataFimPeriodoChanceVenda == null) {
+                    return new MutableLiveData<>();
+                }
+
+                return repository.recuperaAnaliseChanceVenda(
+                    id,
+                    dataInicioPeriodoChanceVenda,
+                    dataFimPeriodoChanceVenda
                 );
             }
         );
@@ -204,5 +225,36 @@ public class TrabalhosVendidosViewModel extends ViewModel {
         if (maisVendidos.getValue() == null) {
             sincronizaVendas();
         }
+    }
+
+    public LiveData<Resource<ArrayList<TrabalhoChanceVenda>>> getChanceVenda() {
+        return chanceVenda;
+    }
+
+    public void carregarChanceVenda(String idPersonagem) {
+        String atual = idPersonagemChanceVenda.getValue();
+
+        if (atual != null && atual.equals(idPersonagem)) {
+            return;
+        }
+
+        idPersonagemChanceVenda.setValue(idPersonagem);
+    }
+
+    public void atualizaChanceVenda() {
+        String id = idPersonagemChanceVenda.getValue();
+        if (id == null) return;
+
+        idPersonagemChanceVenda.setValue(id);
+    }
+
+    // Mesmo truque de atualizaPeriodoVendas(): dataInicio/dataFim são lidos por
+    // recuperaAnaliseChanceVenda (via switchMap) na próxima vez que idPersonagemChanceVenda
+    // "emitir" — forçado aqui mesmo com o id inalterado.
+    public void atualizaPeriodoChanceVenda(Long dataInicio, Long dataFim) {
+        this.dataInicioPeriodoChanceVenda = dataInicio;
+        this.dataFimPeriodoChanceVenda = dataFim;
+
+        atualizaChanceVenda();
     }
 }

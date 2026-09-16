@@ -401,6 +401,14 @@
     <string name="stringVendaRemovida">Venda removida: </string>
     <string name="stringPersonagemInseridoComSucessoValor">%1$s inserido com sucesso!</string>
     <string name="stringDesconhecido">Desconhecido</string>
+    <string name="string_aba_mais_vendidos">Mais Vendidos</string>
+    <string name="string_aba_chance_venda">Chance de Venda</string>
+    <string name="string_estoque_quantidade_valor">Estoque: %1$s</string>
+    <string name="string_vendeu_no_periodo_valor">Vendeu %1$s un.</string>
+    <string name="string_ultima_venda_dias_valor">Há %1$d dias</string>
+    <string name="string_nunca_vendido_no_periodo">Nunca vendido no período</string>
+    <string name="string_posicao_ranking_valor">%1$dº</string>
+    <string name="string_chance_venda_percentual_valor">Chance de venda: %1$d%%</string>
 
     <string name="stringEscolhaPersonagemContinuar">Escolha o personagem para continuar</string>
     <string name="stringAlterarTema">Alterar tema</string>

@@ -3,6 +3,7 @@ package com.kevin.gestorproducao.dao;
 import static com.kevin.gestorproducao.db.contracts.EstoqueDbContract.EstoqueEntry.COLUMN_NAME_ID_PERSONAGEM;
 import static com.kevin.gestorproducao.db.contracts.EstoqueDbContract.EstoqueEntry.COLUMN_NAME_ID_TRABALHO;
 import static com.kevin.gestorproducao.db.contracts.EstoqueDbContract.EstoqueEntry.COLUMN_NAME_QUANTIDADE;
+import static com.kevin.gestorproducao.db.contracts.EstoqueDbContract.EstoqueEntry.TABLE_ESTOQUE;
 import static com.kevin.gestorproducao.db.contracts.ProfissaoDbContract.ProfissaoEntry.TABLE_PROFISSOES;
 import static com.kevin.gestorproducao.db.contracts.TrabalhoDbContract.TrabalhoEntry.COLUMN_NAME_CRIADO_EM;
 import static com.kevin.gestorproducao.db.contracts.TrabalhoDbContract.TrabalhoEntry.COLUMN_NAME_EXPERIENCIA;
@@ -24,6 +25,7 @@ import android.database.Cursor;
 import androidx.annotation.NonNull;
 
 import com.kevin.gestorproducao.db.DbHelper;
+import com.kevin.gestorproducao.model.TrabalhoChanceVenda;
 import com.kevin.gestorproducao.model.TrabalhoVendido;
 
 import java.util.ArrayList;
@@ -214,6 +216,87 @@ public class VendaDao extends BaseDao {
                     trabalho.setValor(cursor.getInt(
                         cursor.getColumnIndexOrThrow("total_valor")
                     ));
+
+                    trabalhos.add(trabalho);
+                } while (cursor.moveToNext());
+            }
+        }
+
+        return trabalhos;
+    }
+
+    // Cruza estoque + trabalhos + vendas do período num único LEFT JOIN: trabalhos em estoque
+    // sem nenhuma venda no intervalo continuam aparecendo (quantidade_vendida = 0, ultima_venda
+    // nula) em vez de sumir da lista — é o que permite a AnaliseVendaService identificar itens
+    // parados, não só os mais vendidos.
+    public ArrayList<TrabalhoChanceVenda> recuperaAnaliseChanceVenda(
+        String idPersonagem,
+        long dataInicio,
+        long dataFim
+    ) {
+        ArrayList<TrabalhoChanceVenda> trabalhos = new ArrayList<>();
+
+        String query = "SELECT " +
+            "e." + COLUMN_NAME_ID_TRABALHO + ", " +
+            "e." + COLUMN_NAME_QUANTIDADE + " AS estoque_atual, " +
+            "t." + COLUMN_NAME_NOME + ", " +
+            "t." + COLUMN_NAME_NIVEL + ", " +
+            "t." + COLUMN_NAME_RARIDADE + ", " +
+            "p." + COLUMN_NAME_NOME + " AS profissao_nome, " +
+            "COALESCE(SUM(v." + COLUMN_NAME_QUANTIDADE + "), 0) AS quantidade_vendida, " +
+            "MAX(v." + COLUMN_NAME_CRIADO_EM + ") AS ultima_venda " +
+            "FROM " + TABLE_ESTOQUE + " e " +
+            "INNER JOIN " + TABLE_TRABALHOS + " t ON e." + COLUMN_NAME_ID_TRABALHO +
+            " = t." + COLUMN_NAME_ID + " " +
+            "LEFT JOIN " + TABLE_PROFISSOES + " p ON t." + COLUMN_NAME_PROFISSAO +
+            " = p." + COLUMN_NAME_ID + " " +
+            "LEFT JOIN " + TABLE_TRABALHOS_VENDIDOS + " v ON v." + COLUMN_NAME_ID_TRABALHO +
+            " = e." + COLUMN_NAME_ID_TRABALHO +
+            " AND v." + COLUMN_NAME_ID_PERSONAGEM + " = e." + COLUMN_NAME_ID_PERSONAGEM +
+            " AND v." + COLUMN_NAME_CRIADO_EM + " BETWEEN ? AND ? " +
+            "WHERE e." + COLUMN_NAME_ID_PERSONAGEM + " = ? " +
+            "AND e." + COLUMN_NAME_QUANTIDADE + " > 0 " +
+            "GROUP BY e." + COLUMN_NAME_ID_TRABALHO;
+
+        String[] argumentos = {
+            String.valueOf(dataInicio),
+            String.valueOf(dataFim),
+            idPersonagem
+        };
+
+        try (Cursor cursor = db.rawQuery(query, argumentos)) {
+            if (cursor.moveToFirst()) {
+                do {
+                    TrabalhoChanceVenda trabalho = new TrabalhoChanceVenda();
+
+                    String idTrabalho = cursor.getString(
+                        cursor.getColumnIndexOrThrow(COLUMN_NAME_ID_TRABALHO)
+                    );
+                    trabalho.setId(idTrabalho);
+                    trabalho.setIdTrabalho(idTrabalho);
+                    trabalho.setNome(
+                        cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME))
+                    );
+                    trabalho.setNivel(
+                        cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_NIVEL))
+                    );
+                    trabalho.setRaridade(
+                        cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_RARIDADE))
+                    );
+                    trabalho.setProfissao(
+                        cursor.getString(cursor.getColumnIndexOrThrow("profissao_nome"))
+                    );
+                    trabalho.setEstoqueAtual(
+                        cursor.getInt(cursor.getColumnIndexOrThrow("estoque_atual"))
+                    );
+                    trabalho.setQuantidadeVendidaPeriodo(
+                        cursor.getInt(cursor.getColumnIndexOrThrow("quantidade_vendida"))
+                    );
+
+                    int indexUltimaVenda = cursor.getColumnIndexOrThrow("ultima_venda");
+                    if (!cursor.isNull(indexUltimaVenda)) {
+                        trabalho.setUltimaVendaEm(cursor.getLong(indexUltimaVenda));
+                    }
 
                     trabalhos.add(trabalho);
                 } while (cursor.moveToNext());
