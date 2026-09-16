@@ -290,7 +290,7 @@ public class VendasFragment
 
         return new ComponentesVisuais(
             true,
-            false,
+            true,
             true,
             false,
             true,
