@@ -27,6 +27,8 @@ public class TrabalhosVendidosViewModel extends ViewModel {
     private final MediatorLiveData<Resource<Void>> sincronizacaoResultado = new MediatorLiveData<>();
     private final VendaService vendaService;
     private final MutableLiveData<VendaFiltro> filtroVenda = new MutableLiveData<>();
+    private Long dataInicioPeriodo;
+    private Long dataFimPeriodo;
 
 
     public TrabalhosVendidosViewModel(
@@ -41,7 +43,7 @@ public class TrabalhosVendidosViewModel extends ViewModel {
             id -> {
                 if (id == null) return new MutableLiveData<>();
 
-                return repository.recuperaMaisVendidos(id);
+                return repository.recuperaMaisVendidos(id, dataInicioPeriodo, dataFimPeriodo);
             }
         );
 
@@ -132,6 +134,16 @@ public class TrabalhosVendidosViewModel extends ViewModel {
         if (id == null) return;
 
         idPersonagem.setValue(id);
+    }
+
+    // dataInicio/dataFim são lidos por recuperaMaisVendidos (via switchMap) na próxima vez que
+    // idPersonagem "emitir" — reaproveita o mesmo truque de atualizaMaisVendidos() de forçar o
+    // switchMap a rodar de novo mesmo com o id inalterado.
+    public void atualizaPeriodoVendas(Long dataInicio, Long dataFim) {
+        this.dataInicioPeriodo = dataInicio;
+        this.dataFimPeriodo = dataFim;
+
+        atualizaMaisVendidos();
     }
 
     public void atualizaVendasPorTrabalho() {

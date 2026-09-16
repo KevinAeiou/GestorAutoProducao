@@ -270,7 +270,11 @@ public class TrabalhoVendaRepository {
         return liveData;
     }
 
-    public LiveData<Resource<ArrayList<TrabalhoVendido>>> recuperaMaisVendidos(String idPersonagem) {
+    public LiveData<Resource<ArrayList<TrabalhoVendido>>> recuperaMaisVendidos(
+        String idPersonagem,
+        Long dataInicio,
+        Long dataFim
+    ) {
         MutableLiveData<Resource<ArrayList<TrabalhoVendido>>> maisVendidos = new MutableLiveData<>();
 
         maisVendidos.setValue(new Resource<>(null, null));
@@ -278,7 +282,7 @@ public class TrabalhoVendaRepository {
         backgroundExecutor.execute(() -> {
             try {
                 ArrayList<TrabalhoVendido> vendas = new ArrayList<>(
-                    vendaDao.recuperaMaisVendidos(idPersonagem)
+                    vendaDao.recuperaMaisVendidos(idPersonagem, dataInicio, dataFim)
                 );
 
                 maisVendidos.postValue(new Resource<>(vendas, null));

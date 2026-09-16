@@ -30,21 +30,59 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/swipeRefreshLayoutProdutosVendidos">
 
-        <com.github.mikephil.charting.charts.PieChart
-            android:id="@+id/chartProdutosVendidos"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="250dp"
-            android:layout_margin="16dp" />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/botaoFlutuanteVendas"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="34dp"
-            android:contentDescription="@string/inserirNovaVenda"
-            android:layout_gravity="end|bottom"
-            app:srcCompat="@drawable/ic_adiciona" />
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/layoutPeriodoVendas"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="16dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="6dp">
+
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="none">
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/chipGroupPeriodoVendas"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:singleSelection="true"
+                        app:selectionRequired="true"
+                        app:chipSpacing="8dp" />
+                </HorizontalScrollView>
+
+                <TextView
+                    android:id="@+id/txtValorPeriodoVendas"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="6dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackground"
+                    android:paddingVertical="4dp"
+                    android:gravity="center_vertical"
+                    android:textStyle="bold"
+                    android:textSize="15sp"
+                    android:textColor="?attr/colorPrimary"
+                    android:drawablePadding="4dp"
+                    app:drawableEndCompat="@drawable/ic_expand_more"
+                    tools:text="Setembro de 2026" />
+            </LinearLayout>
+
+            <com.github.mikephil.charting.charts.PieChart
+                android:id="@+id/chartProdutosVendidos"
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:layout_margin="16dp" />
+        </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -88,4 +126,14 @@
         app:layout_constraintStart_toStartOf="@id/iconeVazia"
         app:layout_constraintEnd_toEndOf="@id/iconeVazia"
         app:layout_constraintTop_toBottomOf="@id/iconeVazia"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/botaoFlutuanteVendas"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:contentDescription="@string/inserirNovaVenda"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/ic_adiciona" />
 </androidx.constraintlayout.widget.ConstraintLayout>
