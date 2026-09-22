@@ -2,7 +2,9 @@ package com.kevin.gestorproducao.ui.fragment;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
+import static com.kevin.gestorproducao.ui.activity.Constantes.CODIGO_REQUISICAO_ALTERA_VENDAS;
 import static com.kevin.gestorproducao.ui.activity.Constantes.CODIGO_REQUISICAO_INSERE_TRABALHO_VENDAS;
+import static com.kevin.gestorproducao.ui.fragment.VendasFragmentDirections.vaiDeVendasParaDetalhesVenda;
 import static com.kevin.gestorproducao.ui.fragment.VendasFragmentDirections.vaiDeVendasParaFiltro;
 import static com.kevin.gestorproducao.ui.fragment.VendasFragmentDirections.vaiDeVendasParaTrabalhos;
 import static com.kevin.gestorproducao.ui.fragment.VendasFragmentDirections.vaiDeVendasParaVendasPorTrabalho;
@@ -46,6 +48,8 @@ import com.kevin.gestorproducao.model.FiltroTrabalho;
 import com.kevin.gestorproducao.model.PeriodoFiltro;
 import com.kevin.gestorproducao.model.TrabalhoChanceVenda;
 import com.kevin.gestorproducao.model.TrabalhoVendido;
+import com.kevin.gestorproducao.repository.Resource;
+import com.kevin.gestorproducao.ui.fragment.VendasFragmentDirections.VaiDeVendasParaDetalhesVenda;
 import com.kevin.gestorproducao.ui.fragment.VendasFragmentDirections.VaiDeVendasParaFiltro;
 import com.kevin.gestorproducao.ui.fragment.VendasFragmentDirections.VaiDeVendasParaTrabalhos;
 import com.kevin.gestorproducao.ui.recyclerview.adapter.ListaChanceVendaAdapter;
@@ -190,6 +194,28 @@ public class VendasFragment
             }
         );
 
+        vendasViewModel.getUltimaVendaResultado().observe(
+            getViewLifecycleOwner(),
+            evento -> {
+                Resource<TrabalhoVendido> resultado = evento.consome();
+                if (resultado == null) return;
+
+                if (resultado.getErro() != null) {
+                    mostraMensagemAncorada(getString(R.string.stringErroValor, resultado.getErro()));
+                    return;
+                }
+
+                if (resultado.getDado() == null) {
+                    mostraMensagemAncorada(getString(R.string.string_nenhuma_venda_registrada));
+                    return;
+                }
+
+                VaiDeVendasParaDetalhesVenda acao = vaiDeVendasParaDetalhesVenda(resultado.getDado());
+                acao.setCodigoRequisicao(CODIGO_REQUISICAO_ALTERA_VENDAS);
+                controlador.navigate(acao);
+            }
+        );
+
         vendasViewModel.getSincronizacaoResultado().observe(
             getViewLifecycleOwner(),
             resultado -> {
@@ -312,6 +338,11 @@ public class VendasFragment
 
         chanceVendaAdapter = new ListaChanceVendaAdapter(requireContext());
         meuRecyclerChanceVenda.setAdapter(chanceVendaAdapter);
+        chanceVendaAdapter.setOnItemClickListener(this::vaiParaDetalhesUltimaVenda);
+    }
+
+    private void vaiParaDetalhesUltimaVenda(TrabalhoChanceVenda trabalho) {
+        vendasViewModel.buscarUltimaVenda(trabalho.getIdTrabalho());
     }
 
     private void configuraSwipeRefreshLayoutChanceVenda() {
@@ -354,18 +385,18 @@ public class VendasFragment
     }
 
     private void aplicarFiltros() {
-        configuraGrafico();
-
         if (filtroAtual == null) {
             vendasFiltradas = (ArrayList<TrabalhoVendido>) vendas.clone();
-
-            vendasAdapter.atualiza(vendasFiltradas);
-            atualizaEstadoVazio();
-            meuRecycler.smoothScrollToPosition(0);
-            return;
+        } else {
+            vendasFiltradas = filtrarTrabalhos(vendas, filtroAtual);
         }
 
-        vendasFiltradas = filtrarTrabalhos(vendas, filtroAtual);
+        // configuraGrafico() precisa rodar depois de vendasFiltradas ser recalculada — antes
+        // lia o valor da chamada anterior, então ao trocar de período algumas vezes seguidas
+        // (ex.: Ano 2026 -> Ano 2025 sem vendas -> Ano 2026 de novo) o gráfico ficava "um passo
+        // atrás", podendo herdar uma lista vazia de um período anterior e mostrar "No chart
+        // data available" mesmo com a lista atual já preenchida.
+        configuraGrafico();
 
         vendasAdapter.atualiza(vendasFiltradas);
         atualizaEstadoVazio();

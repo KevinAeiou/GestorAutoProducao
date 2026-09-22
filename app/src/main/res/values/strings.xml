@@ -409,6 +409,7 @@
     <string name="string_nunca_vendido_no_periodo">Nunca vendido no período</string>
     <string name="string_posicao_ranking_valor">%1$dº</string>
     <string name="string_chance_venda_percentual_valor">Chance de venda: %1$d%%</string>
+    <string name="string_nenhuma_venda_registrada">Nenhuma venda registrada para este item</string>
 
     <string name="stringEscolhaPersonagemContinuar">Escolha o personagem para continuar</string>
     <string name="stringAlterarTema">Alterar tema</string>

@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel;
 import com.kevin.gestorproducao.model.TrabalhoChanceVenda;
 import com.kevin.gestorproducao.model.TrabalhoVendido;
 import com.kevin.gestorproducao.model.VendaFiltro;
+import com.kevin.gestorproducao.repository.Evento;
 import com.kevin.gestorproducao.repository.TrabalhoEstoqueRepository;
 import com.kevin.gestorproducao.repository.TrabalhoVendaRepository;
 import com.kevin.gestorproducao.repository.Resource;
@@ -24,6 +25,7 @@ public class TrabalhosVendidosViewModel extends ViewModel {
     private final MediatorLiveData<Resource<Void>> insercaoResultado = new MediatorLiveData<>();
     private final MediatorLiveData<Resource<Void>> modificacaoResultado = new MediatorLiveData<>();
     private final MediatorLiveData<Resource<Void>> remocaoResultado = new MediatorLiveData<>();
+    private final MediatorLiveData<Evento<Resource<TrabalhoVendido>>> ultimaVendaResultado = new MediatorLiveData<>();
     private final MutableLiveData<String> idPersonagem = new MutableLiveData<>();
     private final MutableLiveData<String> idPersonagemChanceVenda = new MutableLiveData<>();
     private final MutableLiveData<String> idTrabalho = new MutableLiveData<>();
@@ -93,6 +95,22 @@ public class TrabalhosVendidosViewModel extends ViewModel {
 
     public MediatorLiveData<Resource<Void>> getRemocaoResultado() {
         return remocaoResultado;
+    }
+
+    public MediatorLiveData<Evento<Resource<TrabalhoVendido>>> getUltimaVendaResultado() {
+        return ultimaVendaResultado;
+    }
+
+    public void buscarUltimaVenda(String idTrabalho) {
+        LiveData<Resource<TrabalhoVendido>> source = repository.recuperaUltimaVenda(
+            idPersonagem.getValue(),
+            idTrabalho
+        );
+
+        ultimaVendaResultado.addSource(source, resultado -> {
+            ultimaVendaResultado.setValue(new Evento<>(resultado));
+            ultimaVendaResultado.removeSource(source);
+        });
     }
 
     public MediatorLiveData<Resource<Void>> getSincronizacaoResultado() {

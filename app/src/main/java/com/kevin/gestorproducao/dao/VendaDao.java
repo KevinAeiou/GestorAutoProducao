@@ -147,6 +147,14 @@ public class VendaDao extends BaseDao {
         return vendas;
     }
 
+    // Reaproveita recuperaVendasPorTrabalho, que já ordena por criadoEm DESC — a primeira venda
+    // da lista é a mais recente registrada para o trabalho, sem filtro de período.
+    public TrabalhoVendido recuperaUltimaVenda(String idPersonagem, String idTrabalho) {
+        ArrayList<TrabalhoVendido> vendas = recuperaVendasPorTrabalho(idPersonagem, idTrabalho);
+
+        return vendas.isEmpty() ? null : vendas.get(0);
+    }
+
     public ArrayList<TrabalhoVendido> recuperaMaisVendidos(
         String idPersonagem,
         Long dataInicio,

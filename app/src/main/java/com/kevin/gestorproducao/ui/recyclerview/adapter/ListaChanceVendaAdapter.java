@@ -15,6 +15,7 @@ import com.google.android.material.color.MaterialColors;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.kevin.gestorproducao.R;
 import com.kevin.gestorproducao.model.TrabalhoChanceVenda;
+import com.kevin.gestorproducao.ui.recyclerview.adapter.listener.OnItemClickListenerTrabalhoChanceVenda;
 import com.kevin.gestorproducao.utilitario.Formatador;
 
 import java.util.List;
@@ -24,9 +25,14 @@ public class ListaChanceVendaAdapter
     extends BaseListAdapter<TrabalhoChanceVenda, ListaChanceVendaAdapter.ChanceVendaViewHolder>
 {
     private final Context context;
+    private OnItemClickListenerTrabalhoChanceVenda onItemClickListener;
 
     public ListaChanceVendaAdapter(Context context) {
         this.context = context;
+    }
+
+    public void setOnItemClickListener(OnItemClickListenerTrabalhoChanceVenda onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
     }
 
     @NonNull
@@ -80,6 +86,7 @@ public class ListaChanceVendaAdapter
         private final TextView itemLabelScore;
         private final LinearProgressIndicator itemScore;
         private final View raridadeTarja;
+        private TrabalhoChanceVenda trabalho;
 
         public ChanceVendaViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -91,9 +98,13 @@ public class ListaChanceVendaAdapter
             itemLabelScore = itemView.findViewById(R.id.itemLabelScoreChanceVenda);
             itemScore = itemView.findViewById(R.id.itemScoreChanceVenda);
             raridadeTarja = itemView.findViewById(R.id.itemRaridadeTarjaChanceVenda);
+            itemView.setOnClickListener(v -> {
+                if (onItemClickListener != null) onItemClickListener.onItemClick(trabalho);
+            });
         }
 
         public void vincula(TrabalhoChanceVenda trabalho, int posicao) {
+            this.trabalho = trabalho;
             preencheCampos(trabalho, posicao);
         }
 
