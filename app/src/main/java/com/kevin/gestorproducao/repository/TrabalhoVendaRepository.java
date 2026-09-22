@@ -70,6 +70,25 @@ public class TrabalhoVendaRepository {
         return liveData;
     }
 
+    public LiveData<Resource<TrabalhoVendido>> recuperaUltimaVenda(
+        String idPersonagem,
+        String idTrabalho
+    ) {
+        MutableLiveData<Resource<TrabalhoVendido>> liveData = new MutableLiveData<>();
+
+        backgroundExecutor.execute(() -> {
+            try {
+                TrabalhoVendido venda = vendaDao.recuperaUltimaVenda(idPersonagem, idTrabalho);
+
+                liveData.postValue(new Resource<>(venda, null));
+            } catch (Exception e) {
+                liveData.postValue(new Resource<>(null, e.getMessage()));
+            }
+        });
+
+        return liveData;
+    }
+
     public LiveData<Resource<Void>> removeTrabalho(
         TrabalhoVendido trabalho,
         String idPersonagem

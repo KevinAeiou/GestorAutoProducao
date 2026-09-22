@@ -108,6 +108,9 @@
         <action
             android:id="@+id/vaiDeVendasParaVendasPorTrabalho"
             app:destination="@id/vendasPorTrabalhoFragment" />
+        <action
+            android:id="@+id/vaiDeVendasParaDetalhesVenda"
+            app:destination="@id/detalhesTrabalhoVendidoFragment" />
     </fragment>
     <fragment
         android:id="@+id/listaTrabalhosProducao"
