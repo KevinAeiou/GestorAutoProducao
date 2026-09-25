@@ -290,6 +290,11 @@ public class ListaTrabalhosProducaoFragment
             }
 
             @Override
+            public float getSwipeThreshold(@NonNull RecyclerView.ViewHolder viewHolder) {
+                return 1f / 3f;
+            }
+
+            @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 int posicao = viewHolder.getBindingAdapterPosition();
                 trabalhoSelecionado = trabalhosFiltrados.get(posicao);
