@@ -74,6 +74,8 @@
             android:id="@+id/listaTrabalhoRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="@dimen/espaco_menu_inferior_flutuante"
             tools:listitem="@layout/item_trabalho_producao" />
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 

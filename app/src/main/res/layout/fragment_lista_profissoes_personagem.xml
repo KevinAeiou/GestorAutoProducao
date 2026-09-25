@@ -30,6 +30,8 @@
             android:id="@+id/recyclerViewListaProfissoesPersonagemFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="@dimen/espaco_menu_inferior_flutuante"
             tools:listitem="@layout/item_profissao_personagem" />
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
