@@ -6,11 +6,14 @@ import static android.view.View.VISIBLE;
 import static androidx.navigation.ui.NavigationUI.setupWithNavController;
 
 import android.annotation.SuppressLint;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.TextView;
 
@@ -33,6 +36,7 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -62,6 +66,8 @@ public class MainActivity extends AppCompatActivity {
     private EstadoAppViewModel estadoAppViewModel;
     private FirebaseAuth auth;
     private BottomNavigationView menuInferior;
+    private MaterialCardView cardMenuInferior;
+    private View degradeMenuInferior;
     private MaterialButton btnSair;
 
     @SuppressLint("RestrictedApi")
@@ -73,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         inicializaComponentes();
+        configuraDegradeMenuInferior();
         configuraComponentesVisuais();
         configuraMenu();
         configuraBotaoSair();
@@ -98,6 +105,17 @@ public class MainActivity extends AppCompatActivity {
         if (user == null) return;
 
         personagemViewModel.sincronizaPersonagens(user.getUid());
+    }
+
+    private void configuraDegradeMenuInferior() {
+        int corSistema = getWindow().getNavigationBarColor();
+
+        GradientDrawable degrade = new GradientDrawable(
+            GradientDrawable.Orientation.BOTTOM_TOP,
+            new int[]{corSistema, Color.TRANSPARENT}
+        );
+
+        degradeMenuInferior.setBackground(degrade);
     }
 
     private void configuraBotaoSair() {
@@ -168,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void mostraMenuNavegacaoInferior(ComponentesVisuais componentes) {
-        menuInferior.animate().cancel();
+        cardMenuInferior.animate().cancel();
 
         if (componentes.menuNavegacaoInferior) {
             mostrarMenuInferior();
@@ -178,26 +196,28 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void esconderMenuInferior() {
-        menuInferior.animate().cancel();
+        cardMenuInferior.animate().cancel();
 
-        menuInferior.animate()
-            .translationY(menuInferior.getHeight())
+        cardMenuInferior.animate()
+            .translationY(cardMenuInferior.getHeight() + ((ViewGroup.MarginLayoutParams) cardMenuInferior.getLayoutParams()).bottomMargin)
             .alpha(0.8f)
             .setDuration(200)
             .setInterpolator(new DecelerateInterpolator())
             .withEndAction(() -> {
-                menuInferior.setVisibility(GONE);
-                menuInferior.setTranslationY(0);
+                cardMenuInferior.setVisibility(GONE);
+                cardMenuInferior.setTranslationY(0);
+                degradeMenuInferior.setVisibility(GONE);
             })
             .start();
     }
 
     private void mostrarMenuInferior() {
-        menuInferior.animate().cancel();
+        cardMenuInferior.animate().cancel();
 
-        menuInferior.setVisibility(VISIBLE);
+        cardMenuInferior.setVisibility(VISIBLE);
+        degradeMenuInferior.setVisibility(VISIBLE);
 
-        menuInferior.animate()
+        cardMenuInferior.animate()
             .translationY(0)
             .alpha(1f)
             .setDuration(200)
@@ -285,6 +305,8 @@ public class MainActivity extends AppCompatActivity {
         drawerLayout = binding.drawerLayout;
         navigationView = binding.navegacaoView;
         menuInferior = binding.navegacaoInferior;
+        cardMenuInferior = binding.cardMenuInferior;
+        degradeMenuInferior = binding.degradeMenuInferior;
         btnSair = binding.btnSair;
 
         CabecalhoBinding cabecalhoBinding = CabecalhoBinding.bind(

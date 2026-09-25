@@ -6,4 +6,7 @@
     <dimen name="altura_item_personagem">52dp</dimen>
     <dimen name="espacamento_item_personagem">10dp</dimen>
     <dimen name="padding_item_personagem">14dp</dimen>
+
+    <!-- Espaco reservado no fim das listas para o menu inferior flutuante nao cobrir o ultimo item -->
+    <dimen name="espaco_menu_inferior_flutuante">112dp</dimen>
 </resources>

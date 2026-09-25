@@ -118,6 +118,8 @@
             android:id="@+id/recyclerViewListaProdutosVendidos"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="@dimen/espaco_menu_inferior_flutuante"
             tools:listitem="@layout/item_trabalho_vendido" />
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
@@ -192,6 +194,8 @@
             android:id="@+id/recyclerViewListaChanceVenda"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="@dimen/espaco_menu_inferior_flutuante"
             tools:listitem="@layout/item_chance_venda" />
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

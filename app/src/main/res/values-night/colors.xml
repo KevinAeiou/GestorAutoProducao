@@ -29,4 +29,7 @@
     <color name="cor_texto_menu_padrao">#AEBACB</color>
     <color name="cor_selecao_menu">#26FFFFFF</color>
     <color name="cor_item_menu_selecionado">@color/cor_azul_claro</color>
+
+    <!-- Menu inferior: no escuro o indicador fica azul claro, entao o icone precisa de um tom escuro para contrastar -->
+    <color name="cor_icone_navegacao_ativo">@color/cor_azul_escuro</color>
 </resources>

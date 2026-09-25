@@ -79,4 +79,7 @@
     <color name="cor_texto_menu_padrao">#475569</color>
     <color name="cor_selecao_menu">#1A115588</color>
     <color name="cor_item_menu_selecionado">@color/cor_azul</color>
+
+    <!-- Menu inferior: cor do ícone dentro do indicador ativo (precisa contrastar com o preenchimento do indicador, não com o fundo do cartão) -->
+    <color name="cor_icone_navegacao_ativo">@color/white</color>
 </resources>

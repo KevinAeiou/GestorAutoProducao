@@ -214,4 +214,39 @@
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
     </style>
+
+    <style name="Widget.MenuInferior.Cartao" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardBackgroundColor">?attr/colorSurfaceContainerHigh</item>
+        <item name="cardCornerRadius">26dp</item>
+        <item name="cardElevation">6dp</item>
+        <item name="cardPreventCornerOverlap">true</item>
+        <item name="cardUseCompatPadding">false</item>
+    </style>
+
+    <style name="Widget.MenuInferior" parent="Widget.Material3.BottomNavigationView">
+        <item name="itemIconTint">@color/cor_icone_navegacao_inferior</item>
+        <item name="itemTextColor">@color/cor_texto_navegacao_inferior</item>
+        <item name="itemActiveIndicatorStyle">@style/Widget.MenuInferior.IndicadorAtivo</item>
+        <item name="itemIconSize">22dp</item>
+        <item name="itemPaddingTop">10dp</item>
+        <item name="itemPaddingBottom">8dp</item>
+        <item name="labelVisibilityMode">labeled</item>
+        <item name="itemHorizontalTranslationEnabled">false</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:backgroundTint">?attr/colorSurfaceContainerHigh</item>
+        <item name="elevation">0dp</item>
+    </style>
+
+    <style name="Widget.MenuInferior.IndicadorAtivo" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">@color/cor_item_menu_selecionado</item>
+        <item name="android:width">64dp</item>
+        <item name="android:height">32dp</item>
+        <item name="marginHorizontal">8dp</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.IndicadorMenuInferior</item>
+    </style>
+
+    <style name="ShapeAppearance.IndicadorMenuInferior" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
 </resources>
