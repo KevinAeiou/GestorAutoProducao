@@ -56,11 +56,25 @@ import com.kevin.gestorproducao.ui.viewModel.TrabalhoViewModel;
 import com.kevin.gestorproducao.ui.viewModel.factory.ViewModelFactory;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
 public class ListaTrabalhosProducaoFragment
     extends BaseFragment<FragmentListaTrabalhosProducaoBinding>
     implements MenuProvider
 {
+    // Tempo em que o item deslizado permanece na posição atual, já com o novo estado, antes de
+    // ser reposicionado (ou removido, se não passar mais no filtro).
+    private static final long ATRASO_REORGANIZAR_LISTA_MS = 800;
+
+    // Mesma ordem de ProducaoDao.recuperaProducoes: estado, profissão, raridade, nível e nome.
+    private static final Comparator<TrabalhoProducao> ORDEM_PRODUCAO = Comparator
+        .comparing(TrabalhoProducao::getEstado, Comparator.nullsFirst(Comparator.naturalOrder()))
+        .thenComparing(TrabalhoProducao::getProfissao, Comparator.nullsFirst(Comparator.naturalOrder()))
+        .thenComparing(TrabalhoProducao::getRaridade, Comparator.nullsFirst(Comparator.naturalOrder()))
+        .thenComparing(TrabalhoProducao::getNivel, Comparator.nullsFirst(Comparator.naturalOrder()))
+        .thenComparing(TrabalhoProducao::getNome, Comparator.nullsFirst(Comparator.naturalOrder()));
+
+    private final Runnable reorganizaLista = this::reorganizaListaAposDeslize;
     private ListaTrabalhoProducaoAdapter trabalhoAdapter;
     private RecyclerView meuRecycler;
     private ArrayList<TrabalhoProducao> trabalhos, trabalhosFiltrados;
@@ -276,6 +290,8 @@ public class ListaTrabalhosProducaoFragment
                 @NonNull RecyclerView.ViewHolder viewHolder
             ) {
                 int posicao = viewHolder.getBindingAdapterPosition();
+                if (posicao == RecyclerView.NO_POSITION) return 0;
+
                 TrabalhoProducao trabalho = trabalhosFiltrados.get(posicao);
 
                 if (trabalho.ehProduzir()) {
@@ -297,12 +313,15 @@ public class ListaTrabalhosProducaoFragment
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 int posicao = viewHolder.getBindingAdapterPosition();
+                if (posicao == RecyclerView.NO_POSITION) return;
+
                 trabalhoSelecionado = trabalhosFiltrados.get(posicao);
 
                 estadoAnterior = trabalhoSelecionado.getEstado();
                 trabalhoSelecionado.atualizarEstado(defineNovoEstado(trabalhoSelecionado, direction));
                 trabalhoSelecionado.marcarModificacao();
                 meuRecycler.getAdapter().notifyItemChanged(posicao);
+                agendaReorganizacaoLista();
 
                 TrabalhoProducao producao = getTrabalhoProducao();
 
@@ -348,6 +367,18 @@ public class ListaTrabalhosProducaoFragment
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
         itemTouchHelper.attachToRecyclerView(meuRecycler);
+    }
+
+    private void agendaReorganizacaoLista() {
+        meuRecycler.removeCallbacks(reorganizaLista);
+        meuRecycler.postDelayed(reorganizaLista, ATRASO_REORGANIZAR_LISTA_MS);
+    }
+
+    private void reorganizaListaAposDeslize() {
+        if (binding == null) return;
+
+        trabalhos.sort(ORDEM_PRODUCAO);
+        aplicarFiltros(false);
     }
 
     @NonNull
@@ -466,6 +497,10 @@ public class ListaTrabalhosProducaoFragment
     }
 
     private void aplicarFiltros() {
+        aplicarFiltros(true);
+    }
+
+    private void aplicarFiltros(boolean rolarParaTopo) {
         ArrayList<TrabalhoProducao> base;
 
         if (filtroAtual == null) {
@@ -485,7 +520,10 @@ public class ListaTrabalhosProducaoFragment
 
         trabalhoAdapter.atualiza(trabalhosFiltrados);
         atualizaVisibilidadeListaVazia(trabalhosFiltrados.isEmpty());
-        meuRecycler.smoothScrollToPosition(0);
+
+        if (rolarParaTopo) {
+            meuRecycler.smoothScrollToPosition(0);
+        }
     }
 
     // Trabalhos para produzir/produzindo aparecem sempre, independentemente do período
@@ -548,6 +586,7 @@ public class ListaTrabalhosProducaoFragment
     public void onDestroyView() {
         super.onDestroyView();
 
+        meuRecycler.removeCallbacks(reorganizaLista);
         removeObservadorProducao();
         removeObservadorPersonagem();
         removeObservadorTrabalho();
