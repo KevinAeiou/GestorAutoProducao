@@ -164,14 +164,22 @@
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="string_ola">Olá</string>
-    <string name="string_entre_em_sua_conta">Entre em sua conta</string>
+    <string name="string_entre_em_sua_conta">Entre com seu e-mail e senha para continuar.</string>
     <string name="string_nome">Nome</string>
-    <string name="string_email">Email</string>
+    <string name="string_email">E-mail</string>
     <string name="string_senha">Senha</string>
     <string name="string_esqueceu_sua_senha">Esqueceu sua senha?</string>
     <string name="string_entrar">Entrar</string>
     <string name="string_nao_possui_uma_conta">Não possui uma conta?</string>
-    <string name="string_cadastre_se"><u>Cadastre-se</u></string>
+    <string name="string_cadastre_se">Cadastre-se</string>
+    <string name="string_marca_gestor">Gestor</string>
+    <string name="string_marca_de_producao">de Produção</string>
+    <string name="string_acesse_sua_conta">Acesse sua conta</string>
+    <string name="string_preencha_seus_dados">Preencha seus dados para começar.</string>
+    <string name="string_requisitos_senha" formatted="false">Mínimo de 8 caracteres, com letra maiúscula, minúscula, número e um símbolo (@ # $ %).</string>
+    <string name="string_instrucao_recuperar_senha">Informe o e-mail da sua conta. Enviaremos um link para você criar uma nova senha.</string>
+    <string name="string_enviar_link">Enviar link</string>
+    <string name="string_lembrou_a_senha">Lembrou a senha?</string>
 
     <string name="stringCasoChaMa">(.*[A-Z].*)</string>
     <string name="stringCasoCharMi">(.*[a-z].*)</string>
@@ -182,7 +190,7 @@
     <string name="string_senha_minuscula">Senha deve conter ao menos uma letra minúscula.</string>
     <string name="string_senha_maiuscula">Senha deve conter ao menos uma letra maiúscula.</string>
     <string name="string_senha_especial">Senha deve conter ao menos um caracter especial.</string>
-    <string name="string_entre"><u>Entre</u></string>
+    <string name="string_entre">Entrar</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="stringAtivo">Ativo</string>
     <string name="stringInativo">Inativo</string>
