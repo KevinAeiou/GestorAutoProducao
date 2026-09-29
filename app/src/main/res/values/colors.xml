@@ -34,7 +34,6 @@
     <color name="cor_brilho_laranja">#33FF7235</color>
     <color name="cor_brilho_branco">#1FFFFFFF</color>
     <color name="cor_selo_fundo">#1FFFFFFF</color>
-    <color name="cor_selo_borda">#47FFFFFF</color>
     <color name="cor_icone_neutro">#94A3B8</color>
     <color name="cor_texto_marca">#BFFFFFFF</color>
 
