@@ -36,6 +36,7 @@
     <color name="cor_selo_fundo">#1FFFFFFF</color>
     <color name="cor_icone_neutro">#94A3B8</color>
     <color name="cor_texto_marca">#BFFFFFFF</color>
+    <color name="cor_fundo_card_autenticacao">@color/white</color>
 
     <color name="cor_background_card">#6DB5CA</color>
     <color name="cor_background_produzindo">#6d87ca</color>

@@ -2,6 +2,9 @@
 <resources>
     <color name="text_color">#FFF</color>
 
+    <!-- Tela de login: cartao escuro para os textos e campos do tema escuro contrastarem -->
+    <color name="cor_fundo_card_autenticacao">#1A2533</color>
+
     <!-- Selo de estado do card de trabalho em produção (container/on-container/tarja por estado) -->
     <color name="cor_estado_para_produzir_container">#24344F</color>
     <color name="cor_estado_para_produzir_on_container">#AEC6FF</color>
