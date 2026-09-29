@@ -117,6 +117,7 @@ public class ModificaPersonagemFragment
                     voltaParaTrabalhosProducao();
                     return;
                 }
+                pararLoadingBotao(binding.btnExcluiPersonagem, binding.loadingDotsExcluir.getRoot());
                 mostraMensagemAncorada(getString(R.string.stringErroValor, resultado.getErro()));
             }
         );
@@ -188,7 +189,10 @@ public class ModificaPersonagemFragment
             ConfirmacaoDialog dialog = ConfirmacaoDialog.novaInstancia(
                 getString(R.string.stringPersonagemSeraRemovido),
                 getString(R.string.stringDesejaContinuar),
-                () -> personagemViewModel.removePersonagem(personagemRecebido.getId()),
+                () -> {
+                    iniciarLoadingBotao(binding.btnExcluiPersonagem, binding.loadingDotsExcluir.getRoot());
+                    personagemViewModel.removePersonagem(personagemRecebido.getId());
+                },
                 () -> {}
             );
 

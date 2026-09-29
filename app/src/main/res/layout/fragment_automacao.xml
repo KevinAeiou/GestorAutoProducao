@@ -68,11 +68,24 @@
                         android:layout_marginBottom="12dp"
                         android:text="@string/stringAtivarAcessibilidade"/>
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnIniciarPararAutomacao"
+                    <FrameLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/stringIniciarAutomacao"/>
+                        android:layout_height="wrap_content">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnIniciarPararAutomacao"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/stringIniciarAutomacao" />
+
+                        <include
+                            android:id="@+id/loadingDotsBotao"
+                            layout="@layout/view_loading_dots"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:visibility="gone" />
+                    </FrameLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

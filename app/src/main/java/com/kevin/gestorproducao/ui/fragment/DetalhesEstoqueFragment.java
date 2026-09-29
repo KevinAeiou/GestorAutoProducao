@@ -44,6 +44,7 @@ public class DetalhesEstoqueFragment
     private PersonagemViewModel personagemViewModel;
     private MaterialButton btnExcluir, btnConfirmar;
     private LinearLayout loadingBotaoConfirmar;
+    private LinearLayout loadingBotaoExcluir;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -86,7 +87,10 @@ public class DetalhesEstoqueFragment
 
     private void verificaModificacao() {
         Integer quantidadeNova = defineValorQuantidade();
-        if (quantidadeNova == null) return;
+        if (quantidadeNova == null) {
+            pararLoadingBotao(btnConfirmar, loadingBotaoConfirmar);
+            return;
+        }
 
         TrabalhoEstoque trabalho = defineTrabalhoModificado(quantidadeNova);
 
@@ -105,19 +109,14 @@ public class DetalhesEstoqueFragment
 
     private void configuraBotaoExcluir() {
         btnExcluir.setOnClickListener(v -> {
-            iniciarLoadingBotao(
-                btnConfirmar,
-                loadingBotaoConfirmar
-            );
-
             ConfirmacaoDialog dialog = ConfirmacaoDialog.novaInstancia(
                 getString(R.string.stringExcluirTrabalhoEmEstoque),
                 getString(R.string.stringConfirmaExclusaoTrabalho),
                 () -> {
-                    btnExcluir.setEnabled(false);
+                    iniciarLoadingBotao(btnExcluir, loadingBotaoExcluir);
                     estoqueViewModel.removeTrabalhoEstoque(trabalho);
                 },
-                () -> pararLoadingBotao(btnConfirmar, loadingBotaoConfirmar)
+                () -> {}
             );
 
             dialog.show(getParentFragmentManager(), "confirmacao_exclusao");
@@ -173,18 +172,13 @@ public class DetalhesEstoqueFragment
         estoqueViewModel.getRemocaoResultado().observe(
             getViewLifecycleOwner(),
             resultado -> {
-                paraProgresso();
-
                 if (resultado.getErro() == null) {
                     voltaParaEstoque();
                     mostraMensagemAncorada(getString(R.string.stringItemRemovidoComSucesso));
                     return;
                 }
 
-                pararLoadingBotao(
-                    btnConfirmar,
-                    loadingBotaoConfirmar
-                );
+                pararLoadingBotao(btnExcluir, loadingBotaoExcluir);
                 mostraMensagemAncorada(getString(R.string.stringErroValor, resultado.getErro()));
             }
         );
@@ -266,6 +260,7 @@ public class DetalhesEstoqueFragment
         btnExcluir = binding.btnExcluiEstoque;
         btnConfirmar = binding.btnConfirmarEstoque;
         loadingBotaoConfirmar = binding.loadingDotsConfirmar.getRoot();
+        loadingBotaoExcluir = binding.loadingDotsExcluir.getRoot();
 
         configurarMascaraMilhar(edtQuantidadeTrabalho);
 

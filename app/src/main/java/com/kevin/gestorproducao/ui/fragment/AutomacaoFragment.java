@@ -31,6 +31,8 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 public class AutomacaoFragment extends BaseFragment<FragmentAutomacaoBinding> {
+    private static final long LIMITE_CARREGAMENTO_AUTOMACAO_MS = 15_000;
+
     private PersonagemViewModel personagemViewModel;
     private ActivityResultLauncher<Intent> solicitacaoGravacaoTela;
     private boolean automacaoEmExecucao;
@@ -90,6 +92,7 @@ public class AutomacaoFragment extends BaseFragment<FragmentAutomacaoBinding> {
                 intentServico.putExtra(AutomacaoProducaoService.EXTRA_RESULT_CODE, resultado.getResultCode());
                 intentServico.putExtra(AutomacaoProducaoService.EXTRA_RESULT_DATA, resultado.getData());
 
+                iniciarCarregamentoAutomacao();
                 ContextCompat.startForegroundService(requireContext(), intentServico);
             }
         );
@@ -126,8 +129,22 @@ public class AutomacaoFragment extends BaseFragment<FragmentAutomacaoBinding> {
         Intent intentServico = new Intent(requireContext(), AutomacaoProducaoService.class);
         intentServico.setAction(AutomacaoProducaoService.ACAO_PARAR);
 
+        iniciarCarregamentoAutomacao();
         requireContext().startService(intentServico);
     }
+
+    // O serviço confirma início/parada pelo AutomacaoStatus; o limite evita pontos eternos se ele não responder.
+    private void iniciarCarregamentoAutomacao() {
+        iniciarLoadingBotao(binding.btnIniciarPararAutomacao, binding.loadingDotsBotao.getRoot());
+        binding.btnIniciarPararAutomacao.removeCallbacks(pararCarregamentoAutomacao);
+        binding.btnIniciarPararAutomacao.postDelayed(pararCarregamentoAutomacao, LIMITE_CARREGAMENTO_AUTOMACAO_MS);
+    }
+
+    private final Runnable pararCarregamentoAutomacao = () -> {
+        if (binding == null) return;
+        binding.btnIniciarPararAutomacao.removeCallbacks(this.pararCarregamentoAutomacao);
+        pararLoadingBotao(binding.btnIniciarPararAutomacao, binding.loadingDotsBotao.getRoot());
+    };
 
     private void observarPersonagens() {
         personagemViewModel.getPersonagens().observe(
@@ -155,6 +172,7 @@ public class AutomacaoFragment extends BaseFragment<FragmentAutomacaoBinding> {
             if (evento == null) return;
 
             automacaoEmExecucao = evento.fase == AutomacaoStatus.Fase.RODANDO;
+            pararCarregamentoAutomacao.run();
             atualizaBotaoIniciarParar();
 
             binding.txtAutomacaoStatus.setText(montaTextoStatus(evento));

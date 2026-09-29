@@ -85,7 +85,7 @@ public class DetalhesProducaoFragment
     private ProducaoFluxoService producaoFluxoService;
     private PlanejamentoProducaoService planejamentoProducaoService;
     private int experienciaBase = 0, estadoAnterior = -1;
-    private LinearLayout loadingBotaoConfirmar, layoutCamposDatas;
+    private LinearLayout loadingBotaoConfirmar, loadingBotaoExcluir, layoutCamposDatas;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -117,6 +117,7 @@ public class DetalhesProducaoFragment
             );
 
             if (!validarConexao()) {
+                pararLoadingBotao(btnConfirmar, loadingBotaoConfirmar);
                 return;
             }
 
@@ -126,19 +127,14 @@ public class DetalhesProducaoFragment
 
     private void configurarBotaoExcluir() {
         btnExcluir.setOnClickListener(v -> {
-            iniciarLoadingBotao(
-                btnConfirmar,
-                loadingBotaoConfirmar
-            );
-
             ConfirmacaoDialog dialog = ConfirmacaoDialog.novaInstancia(
                 getString(R.string.stringExcluirProducao),
                 getString(R.string.stringConfirmaExclusaoProducao),
                 () -> {
-                    btnExcluir.setEnabled(false);
+                    iniciarLoadingBotao(btnExcluir, loadingBotaoExcluir);
                     producaoViewModel.removeTrabalhoProducao(trabalho);
                 },
-                () -> pararLoadingBotao(btnConfirmar, loadingBotaoConfirmar)
+                () -> {}
             );
 
             dialog.show(getParentFragmentManager(), "confirmacao_exclusao");
@@ -176,17 +172,12 @@ public class DetalhesProducaoFragment
         producaoViewModel.getRemocaoResultado().observe(
             getViewLifecycleOwner(),
             resultado -> {
-                btnExcluir.setEnabled(true);
-
                 if (resultado.getErro() == null) {
                     vaiParaListaProducao();
                     return;
                 }
 
-                pararLoadingBotao(
-                    btnConfirmar,
-                    loadingBotaoConfirmar
-                );
+                pararLoadingBotao(btnExcluir, loadingBotaoExcluir);
 
                 mostraMensagemAncorada(getString(R.string.stringErroValor, resultado.getErro()));
             }
@@ -382,6 +373,7 @@ public class DetalhesProducaoFragment
         txtIniciadoEm = binding.txtIniciadoEmTrabalho;
         txtFinalizadoEm = binding.txtFinalizadoEmTrabalho;
         loadingBotaoConfirmar = binding.loadingDotsConfirmar.getRoot();
+        loadingBotaoExcluir = binding.loadingDotsExcluir.getRoot();
         layoutCamposDatas = binding.layoutDatas2Producao;
         layoutCamposDatas.setVisibility(GONE);
 

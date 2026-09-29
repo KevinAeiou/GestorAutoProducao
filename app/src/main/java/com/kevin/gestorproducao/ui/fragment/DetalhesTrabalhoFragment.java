@@ -420,16 +420,14 @@ public class DetalhesTrabalhoFragment
             btnExcluir.setVisibility(VISIBLE);
 
             btnExcluir.setOnClickListener(v -> {
-                iniciarLoadingBotao(
-                    btnExcluir,
-                    loadingBotaoExcluir
-                );
-
                 ConfirmacaoDialog dialog = ConfirmacaoDialog.novaInstancia(
                     getString(R.string.stringExcluirTrabalho),
                     getString(R.string.stringConfirmaExclusaoTrabalho),
-                    () -> trabalhoViewModel.removeTrabalho(trabalhoRecebido),
-                    () -> pararLoadingBotao(btnConfirmar, loadingBotaoConfirmar)
+                    () -> {
+                        iniciarLoadingBotao(btnExcluir, loadingBotaoExcluir);
+                        trabalhoViewModel.removeTrabalho(trabalhoRecebido);
+                    },
+                    () -> {}
                 );
 
                 dialog.show(getParentFragmentManager(), "confirmacao_exclusao");

@@ -1,6 +1,8 @@
 package com.kevin.gestorproducao.ui.fragment;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
@@ -331,18 +333,30 @@ public abstract class BaseFragment<T extends ViewBinding> extends Fragment {
         LinearLayout loadingDots
     ) {
 
-        if (getContext() == null) return;
+        // Chamadas repetidas não podem sobrescrever o texto guardado com "".
+        if (getContext() == null || botao.getTag(R.id.tagTextoOriginalBotao) != null) return;
 
-        botao.setTag(botao.getText());
+        botao.setTag(R.id.tagTextoOriginalBotao, botao.getText());
+        botao.setTag(R.id.tagIconeOriginalBotao, botao.getIcon());
+        botao.setTag(R.id.tagLarguraMinimaOriginalBotao, botao.getMinWidth());
 
+        // Pontos na cor do texto do botão: brancos no preenchido, vermelhos no destrutivo.
+        ColorStateList corPontos = ColorStateList.valueOf(botao.getCurrentTextColor());
+
+        // Sem texto e ícone um botão wrap_content encolheria; mantém a largura atual.
+        botao.setMinWidth(botao.getWidth());
         botao.setEnabled(false);
         botao.setText("");
+        botao.setIcon(null);
 
         loadingDots.setVisibility(View.VISIBLE);
 
         View dot1 = loadingDots.findViewById(R.id.dot1);
         View dot2 = loadingDots.findViewById(R.id.dot2);
         View dot3 = loadingDots.findViewById(R.id.dot3);
+        dot1.setBackgroundTintList(corPontos);
+        dot2.setBackgroundTintList(corPontos);
+        dot3.setBackgroundTintList(corPontos);
 
         Animation anim1 = AnimationUtils.loadAnimation(
             requireContext(),
@@ -374,9 +388,15 @@ public abstract class BaseFragment<T extends ViewBinding> extends Fragment {
 
         botao.setEnabled(true);
 
-        CharSequence textoOriginal = (CharSequence) botao.getTag();
+        Object textoOriginal = botao.getTag(R.id.tagTextoOriginalBotao);
+        if (textoOriginal == null) return;
 
-        botao.setText(textoOriginal);
+        botao.setText((CharSequence) textoOriginal);
+        botao.setIcon((Drawable) botao.getTag(R.id.tagIconeOriginalBotao));
+        botao.setMinWidth((Integer) botao.getTag(R.id.tagLarguraMinimaOriginalBotao));
+        botao.setTag(R.id.tagTextoOriginalBotao, null);
+        botao.setTag(R.id.tagIconeOriginalBotao, null);
+        botao.setTag(R.id.tagLarguraMinimaOriginalBotao, null);
 
         View dot1 = loadingDots.findViewById(R.id.dot1);
         View dot2 = loadingDots.findViewById(R.id.dot2);

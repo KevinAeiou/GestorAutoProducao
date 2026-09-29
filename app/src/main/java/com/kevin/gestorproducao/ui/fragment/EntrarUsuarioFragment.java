@@ -13,11 +13,11 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.AppCompatButton;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
@@ -38,7 +38,7 @@ public class EntrarUsuarioFragment
     private TextInputEditText edtEmail, edtSenha;
     private TextInputLayout txtEmail, txtSenha;
     private TextView txtCadastrar, txtRecuperarSenha;
-    private AppCompatButton botao_entrar;
+    private MaterialButton botao_entrar;
     private AutenticacaoViewModel autenticacaoViewModel;
     private PersonagemViewModel personagemViewModel;
     private NavController controlador;
@@ -91,7 +91,7 @@ public class EntrarUsuarioFragment
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.botaoEntrar:
-                botao_entrar.setEnabled(false);
+                iniciarLoadingBotao(botao_entrar, binding.loadingDotsBotao.getRoot());
                 entrarUsuario();
                 break;
             case R.id.txtLinkCadastro:
@@ -125,7 +125,7 @@ public class EntrarUsuarioFragment
     }
 
     private void configuraErrosCampos(Usuario usuario) {
-        botao_entrar.setEnabled(true);
+        pararLoadingBotao(botao_entrar, binding.loadingDotsBotao.getRoot());
         configuraErroCampoEmailVazio(usuario);
         configuraErroCampoSenhaVazia(usuario);
     }
@@ -167,7 +167,7 @@ public class EntrarUsuarioFragment
     }
 
     private void configuraErroExecoesCampos(String mensagem) {
-        botao_entrar.setEnabled(true);
+        pararLoadingBotao(botao_entrar, binding.loadingDotsBotao.getRoot());
         if (mensagem.equals("A network error (such as timeout, interrupted connection or unreachable host) has occurred.")) {
             mostraMensagemAncorada(getString(R.string.stringSemConexaoComInternet));
             return;

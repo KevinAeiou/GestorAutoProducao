@@ -4,7 +4,6 @@ import static com.kevin.gestorproducao.ui.fragment.RecuperarSenhaFragmentDirecti
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.AppCompatButton;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -18,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.kevin.gestorproducao.R;
@@ -32,7 +32,7 @@ public class RecuperarSenhaFragment
 {
     private TextInputLayout txtRecuperaSenha;
     private TextInputEditText edtRecuperaSenha;
-    private AppCompatButton botaoRecuperarSenha;
+    private MaterialButton botaoRecuperarSenha;
     private TextView txtLinkEntrar;
     private String email;
     private AutenticacaoViewModel autenticacaoViewModel;
@@ -58,7 +58,10 @@ public class RecuperarSenhaFragment
     }
 
     private void configuraBotaoRecuperacao() {
-        botaoRecuperarSenha.setOnClickListener(v -> autenticacaoViewModel.recuperaSenha(email));
+        botaoRecuperarSenha.setOnClickListener(v -> {
+            iniciarLoadingBotao(botaoRecuperarSenha, binding.loadingDotsBotao.getRoot());
+            autenticacaoViewModel.recuperaSenha(email);
+        });
     }
 
     private void configuraLinkEntrar() {
@@ -75,6 +78,7 @@ public class RecuperarSenhaFragment
                     return;
                 }
 
+                pararLoadingBotao(botaoRecuperarSenha, binding.loadingDotsBotao.getRoot());
                 mostraMensagemAncorada(getString(R.string.stringConfiraEmailCorretoTenteNovamente));
             }
         );

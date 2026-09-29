@@ -37,7 +37,7 @@ public class DetalhesProfissaoFragment
     private TextInputEditText edtDescricaoProfissao;
     private ProfissaoViewModel profissaoViewModel;
     private MaterialButton btnExcluiProfissao, btnConfirmarProfissao;
-    private LinearLayout loadingBotaoConfirmar;
+    private LinearLayout loadingBotaoConfirmar, loadingBotaoExcluir;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -90,17 +90,14 @@ public class DetalhesProfissaoFragment
 
     private void configuraBotaoExcluir() {
         btnExcluiProfissao.setOnClickListener(v -> {
-            btnExcluiProfissao.setEnabled(false);
-            iniciarLoadingBotao(
-                btnConfirmarProfissao,
-                loadingBotaoConfirmar
-            );
-
             ConfirmacaoDialog dialog = ConfirmacaoDialog.novaInstancia(
                 getString(R.string.stringExcluirProfissao),
                 getString(R.string.stringConfirmaExclusaoProfissao),
-                () -> profissaoViewModel.removeProfissao(profissao),
-                () -> pararLoadingBotao(btnConfirmarProfissao, loadingBotaoConfirmar)
+                () -> {
+                    iniciarLoadingBotao(btnExcluiProfissao, loadingBotaoExcluir);
+                    profissaoViewModel.removeProfissao(profissao);
+                },
+                () -> {}
             );
 
             dialog.show(getParentFragmentManager(), "confirmacao_exclusao");
@@ -120,6 +117,7 @@ public class DetalhesProfissaoFragment
                     return;
                 }
 
+                pararLoadingBotao(btnConfirmarProfissao, loadingBotaoConfirmar);
                 mostraMensagemAncorada(resultado.getErro());
             }
         );
@@ -135,7 +133,7 @@ public class DetalhesProfissaoFragment
                     return;
                 }
 
-                btnExcluiProfissao.setEnabled(true);
+                pararLoadingBotao(btnExcluiProfissao, loadingBotaoExcluir);
                 mostraMensagemAncorada(resultado.getErro());
             }
         );
@@ -152,6 +150,7 @@ public class DetalhesProfissaoFragment
                     return;
                 }
 
+                pararLoadingBotao(btnConfirmarProfissao, loadingBotaoConfirmar);
                 txtNomeProfissao.setError(resultado.getErro());
             }
         );
@@ -204,6 +203,7 @@ public class DetalhesProfissaoFragment
         btnExcluiProfissao = binding.btnExcluiProfissao;
         btnConfirmarProfissao = binding.btnConfirmarProfissao;
         loadingBotaoConfirmar = binding.loadingDotsConfirmar.getRoot();
+        loadingBotaoExcluir = binding.loadingDotsExcluir.getRoot();
 
         btnExcluiProfissao.setVisibility(GONE);
 
