@@ -2,9 +2,11 @@
 <androidx.core.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    tools:context=".ui.fragment.EntrarUsuarioFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -12,44 +14,24 @@
         android:background="@drawable/app_background"
         android:padding="24dp">
 
-        <LinearLayout
+        <include
             android:id="@+id/brandGroup"
+            layout="@layout/marca_autenticacao"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center_horizontal"
-            android:layout_marginBottom="24dp"
+            android:layout_marginBottom="32dp"
             app:layout_constraintVertical_chainStyle="packed"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@id/cardLogin"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
-
-            <ImageView
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:src="@drawable/ic_marca"
-                android:contentDescription="@null" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="@string/app_name"
-                android:textAllCaps="true"
-                android:textStyle="bold"
-                android:textSize="11sp"
-                android:letterSpacing="0.18"
-                android:textColor="@color/cor_texto_marca" />
-        </LinearLayout>
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardLogin"
+            style="@style/Widget.Autenticacao.Cartao"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="22dp"
-            app:cardElevation="10dp"
-            app:cardBackgroundColor="@color/cor_fundo_card_autenticacao"
+            app:layout_constraintWidth_max="480dp"
             app:layout_constraintTop_toBottomOf="@id/brandGroup"
             app:layout_constraintBottom_toTopOf="@id/footer"
             app:layout_constraintStart_toStartOf="parent"
@@ -59,112 +41,107 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="28dp">
+                android:paddingHorizontal="24dp"
+                android:paddingTop="28dp"
+                android:paddingBottom="24dp">
 
                 <TextView
                     android:id="@+id/txtTitulo"
+                    style="@style/TextAppearance.Autenticacao.Titulo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    style="@style/TextAppearance.Material3.HeadlineMedium"
-                    android:fontFamily="sans-serif-black"
-                    android:letterSpacing="-0.01"
-                    android:text="@string/string_ola" />
+                    android:text="@string/string_acesse_sua_conta" />
 
                 <TextView
                     android:id="@+id/txtSubTitulo"
+                    style="@style/TextAppearance.Autenticacao.Subtitulo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:layout_marginTop="8dp"
-                    style="@style/TextAppearance.Material3.BodyMedium"
-                    android:text="@string/string_entre_em_sua_conta"/>
+                    android:text="@string/string_entre_em_sua_conta" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/txtEmail"
+                    style="@style/Widget.Autenticacao.Campo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
+                    android:hint="@string/string_email"
                     app:startIconDrawable="@drawable/ic_email_outline">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/edtEmail"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/string_email"
+                        android:autofillHints="emailAddress"
+                        android:imeOptions="actionNext"
                         android:inputType="textEmailAddress"
                         android:maxLength="30" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/txtSenha"
+                    style="@style/Widget.Autenticacao.Campo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    app:passwordToggleEnabled="true"
+                    android:layout_marginTop="16dp"
+                    android:hint="@string/string_senha"
+                    app:endIconMode="password_toggle"
                     app:startIconDrawable="@drawable/ic_lock_outline">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/edtSenha"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/string_senha"
+                        android:autofillHints="password"
+                        android:imeOptions="actionDone"
                         android:inputType="textPassword"
-                        android:maxLength="20"/>
+                        android:maxLength="20" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <TextView
                     android:id="@+id/txtEsqueceuSenha"
-                    style="@style/TextAppearance.Material3.BodySmall"
+                    style="@style/TextAppearance.Autenticacao.Link"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
                     android:layout_gravity="end"
+                    android:layout_marginTop="4dp"
                     android:text="@string/string_esqueceu_sua_senha"
-                    android:textSize="17sp"
-                    android:textColor="?attr/colorPrimary"/>
+                    android:textColor="?attr/colorPrimary" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/botaoEntrar"
+                    style="@style/Widget.Autenticacao.BotaoPrimario"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:minHeight="52dp"
-                    android:text="@string/string_entrar"
-                    android:textAllCaps="false"
-                    android:textSize="16sp"
-                    android:textColor="@color/cor_texto_botao"
-                    android:background="@drawable/bg_botao_primario"
-                    app:backgroundTint="@null"
-                    android:stateListAnimator="@null"
-                    android:layout_marginTop="24dp"/>
+                    android:layout_marginTop="12dp"
+                    android:text="@string/string_entrar" />
             </LinearLayout>
-
         </com.google.android.material.card.MaterialCardView>
 
         <LinearLayout
             android:id="@+id/footer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="20dp"
             android:orientation="horizontal"
+            android:gravity="center_vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/cardLogin">
 
             <TextView
-                style="@style/TextAppearance.Material3.BodyMedium"
-                android:layout_width="match_parent"
+                style="@style/TextAppearance.Autenticacao.Rodape"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/white"
                 android:text="@string/string_nao_possui_uma_conta" />
 
             <TextView
                 android:id="@+id/txtLinkCadastro"
-                style="@style/TextAppearance.Material3.BodyMedium"
-                android:layout_width="match_parent"
+                style="@style/TextAppearance.Autenticacao.Link"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
+                android:layout_marginStart="2dp"
                 android:text="@string/string_cadastre_se"
                 android:textColor="@color/cor_azul_claro" />
         </LinearLayout>
