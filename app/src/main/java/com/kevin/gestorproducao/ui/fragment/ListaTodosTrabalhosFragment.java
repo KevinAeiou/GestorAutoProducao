@@ -16,9 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -36,6 +34,7 @@ import com.kevin.gestorproducao.databinding.FragmentListaTodosTrabalhosBinding;
 import com.kevin.gestorproducao.model.FiltroTrabalho;
 import com.kevin.gestorproducao.model.Trabalho;
 import com.kevin.gestorproducao.model.Usuario;
+import com.kevin.gestorproducao.ui.componente.EstadoVazioView;
 import com.kevin.gestorproducao.ui.fragment.ListaTodosTrabalhosFragmentDirections.VaiDeTrabalhosParaDetalhesTrabalho;
 import com.kevin.gestorproducao.ui.recyclerview.adapter.ListaTrabalhoEspecificoNovaProducaoAdapter;
 import com.kevin.gestorproducao.ui.recyclerview.adapter.listener.OnItemClickListener;
@@ -58,8 +57,7 @@ public class ListaTodosTrabalhosFragment
     private ProgressBar indicadorProgresso;
     private TrabalhoViewModel trabalhoViewModel;
     private FiltroViewModel filtroViewModel;
-    private TextView txtListaVazia;
-    private ImageView iconeListaVazia;
+    private EstadoVazioView estadoVazio;
     private NavController controlador;
     private FiltroTrabalho filtroAtual;
     private AutenticacaoViewModel autenticacaoViewModel;
@@ -191,18 +189,15 @@ public class ListaTodosTrabalhosFragment
 
     private void atualizaVisibilidadeListaVazia(boolean listaVazia) {
         if (listaVazia) {
-            iconeListaVazia.setVisibility(VISIBLE);
-            txtListaVazia.setVisibility(VISIBLE);
+            estadoVazio.setVisibility(VISIBLE);
             return;
         }
-        iconeListaVazia.setVisibility(GONE);
-        txtListaVazia.setVisibility(GONE);
+        estadoVazio.setVisibility(GONE);
     }
     private void inicializaComponentes() {
         trabalhos = new ArrayList<>();
         trabalhosFiltrados = new ArrayList<>();
-        iconeListaVazia = binding.iconeVazia;
-        txtListaVazia = binding.txtListaVazia;
+        estadoVazio = binding.estadoVazio;
         botaoNovoTrabalho = binding.floatingButtonProfissoesTrabalhos;
         indicadorProgresso = binding.indicadorProgressoTrabalhos;
         meuRecycler = binding.recyclerViewTrabalhos;

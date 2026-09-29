@@ -14,7 +14,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -45,6 +44,7 @@ import com.kevin.gestorproducao.service.PlanejamentoProducaoService;
 import com.kevin.gestorproducao.service.ProducaoFluxoService;
 import com.kevin.gestorproducao.service.ProducaoServicosFactory;
 import com.kevin.gestorproducao.service.ServicosProducaoPersonagem;
+import com.kevin.gestorproducao.ui.componente.EstadoVazioView;
 import com.kevin.gestorproducao.ui.fragment.ListaTrabalhosProducaoFragmentDirections.VaiDeProducaoParaFiltro;
 import com.kevin.gestorproducao.ui.recyclerview.adapter.ListaTrabalhoProducaoAdapter;
 import com.kevin.gestorproducao.ui.viewModel.ComponentesVisuais;
@@ -80,8 +80,7 @@ public class ListaTrabalhosProducaoFragment
     private ArrayList<TrabalhoProducao> trabalhos, trabalhosFiltrados;
     private SwipeRefreshLayout swipeRefreshLayout;
     private ProgressBar indicadorProgresso;
-    private ImageView iconeListaVazia;
-    private TextView txtListaVazia;
+    private EstadoVazioView estadoVazio;
     private FloatingActionButton floatingActionButton;
     private PersonagemViewModel personagemViewModel;
     private TrabalhoProducaoViewModel producaoViewModel;
@@ -436,8 +435,7 @@ public class ListaTrabalhosProducaoFragment
         meuRecycler = binding.listaTrabalhoRecyclerView;
         swipeRefreshLayout = binding.swipeRefreshLayoutTrabalhos;
         indicadorProgresso = binding.indicadorProgressoListaTrabalhosFragment;
-        iconeListaVazia = binding.iconeVazia;
-        txtListaVazia = binding.txtListaVazia;
+        estadoVazio = binding.estadoVazio;
         floatingActionButton = binding.floatingActionButton;
         chipGroupPeriodo = binding.chipGroupPeriodoProducao;
         txtValorPeriodo = binding.txtValorPeriodoProducao;
@@ -573,13 +571,11 @@ public class ListaTrabalhosProducaoFragment
 
     private void atualizaVisibilidadeListaVazia(boolean listaVazia) {
         if (listaVazia) {
-            iconeListaVazia.setVisibility(View.VISIBLE);
-            txtListaVazia.setVisibility(View.VISIBLE);
+            estadoVazio.setVisibility(View.VISIBLE);
             return;
         }
 
-        iconeListaVazia.setVisibility(View.GONE);
-        txtListaVazia.setVisibility(View.GONE);
+        estadoVazio.setVisibility(View.GONE);
     }
 
     @Override

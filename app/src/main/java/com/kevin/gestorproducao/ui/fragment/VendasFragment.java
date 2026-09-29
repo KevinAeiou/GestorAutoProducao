@@ -18,7 +18,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -49,6 +48,7 @@ import com.kevin.gestorproducao.model.PeriodoFiltro;
 import com.kevin.gestorproducao.model.TrabalhoChanceVenda;
 import com.kevin.gestorproducao.model.TrabalhoVendido;
 import com.kevin.gestorproducao.repository.Resource;
+import com.kevin.gestorproducao.ui.componente.EstadoVazioView;
 import com.kevin.gestorproducao.ui.fragment.VendasFragmentDirections.VaiDeVendasParaDetalhesVenda;
 import com.kevin.gestorproducao.ui.fragment.VendasFragmentDirections.VaiDeVendasParaFiltro;
 import com.kevin.gestorproducao.ui.fragment.VendasFragmentDirections.VaiDeVendasParaTrabalhos;
@@ -76,8 +76,7 @@ public class VendasFragment
     private SwipeRefreshLayout swipeRefreshLayout;
     private ProgressBar indicadorProgresso;
     private TrabalhosVendidosViewModel vendasViewModel;
-    private ImageView iconeListaVazia;
-    private TextView txtListaVazia;
+    private EstadoVazioView estadoVazio;
     private PersonagemViewModel personagemViewModel;
     private FiltroViewModel filtroViewModel;
     private FiltroTrabalho filtroAtual;
@@ -420,8 +419,13 @@ public class VendasFragment
             ? chanceVendaFiltrada == null || chanceVendaFiltrada.isEmpty()
             : vendasFiltradas == null || vendasFiltradas.isEmpty();
 
-        iconeListaVazia.setVisibility(listaVazia ? VISIBLE : GONE);
-        txtListaVazia.setVisibility(listaVazia ? VISIBLE : GONE);
+        estadoVazio.setTitulo(abaChanceVendaSelecionada
+            ? R.string.stringEstadoVazioTituloChanceVenda
+            : R.string.stringEstadoVazioTituloVendas);
+        estadoVazio.setMensagem(abaChanceVendaSelecionada
+            ? R.string.stringEstadoVazioMensagemChanceVenda
+            : R.string.stringEstadoVazioMensagemVendas);
+        estadoVazio.setVisibility(listaVazia ? VISIBLE : GONE);
 
         if (!abaChanceVendaSelecionada) {
             pieChart.setVisibility(listaVazia ? GONE : VISIBLE);
@@ -553,8 +557,7 @@ public class VendasFragment
         meuRecycler = binding.recyclerViewListaProdutosVendidos;
         swipeRefreshLayout = binding.swipeRefreshLayoutProdutosVendidos;
         indicadorProgresso = binding.indicadorProgressoListaProdutosVendidosFragment;
-        iconeListaVazia = binding.iconeVazia;
-        txtListaVazia = binding.txtListaVazia;
+        estadoVazio = binding.estadoVazio;
         pieChart = binding.chartProdutosVendidos;
         floatingActionButton = binding.botaoFlutuanteVendas;
         chipGroupPeriodo = binding.chipGroupPeriodoVendas;

@@ -15,9 +15,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -34,6 +32,7 @@ import com.kevin.gestorproducao.R;
 import com.kevin.gestorproducao.databinding.FragmentListaTrabalhosEstoqueBinding;
 import com.kevin.gestorproducao.model.FiltroTrabalho;
 import com.kevin.gestorproducao.model.TrabalhoEstoque;
+import com.kevin.gestorproducao.ui.componente.EstadoVazioView;
 import com.kevin.gestorproducao.ui.fragment.ListaEstoqueFragmentDirections.VaiDeEstoqueParaTrabalhos;
 import com.kevin.gestorproducao.ui.fragment.ListaEstoqueFragmentDirections.VaiParaDetalhesEstoque;
 import com.kevin.gestorproducao.ui.recyclerview.adapter.ListaTrabalhoEstoqueAdapter;
@@ -56,8 +55,7 @@ public class ListaEstoqueFragment
     private SwipeRefreshLayout swipeRefreshLayout;
     private ProgressBar indicadorDeProgresso;
     private TrabalhoEstoqueViewModel estoqueViewModel;
-    private ImageView iconeListaVazia;
-    private TextView txtListaVazia;
+    private EstadoVazioView estadoVazio;
     private FiltroViewModel filtroViewModel;
     private FiltroTrabalho filtroAtual;
     private PersonagemViewModel personagemViewModel;
@@ -200,13 +198,11 @@ public class ListaEstoqueFragment
 
     private void atualizaVisibilidadeListaVazia(boolean listaVazia) {
         if (listaVazia) {
-            iconeListaVazia.setVisibility(VISIBLE);
-            txtListaVazia.setVisibility(VISIBLE);
+            estadoVazio.setVisibility(VISIBLE);
             return;
         }
 
-        iconeListaVazia.setVisibility(GONE);
-        txtListaVazia.setVisibility(GONE);
+        estadoVazio.setVisibility(GONE);
     }
 
     private void inicializaComponentes() {
@@ -215,8 +211,7 @@ public class ListaEstoqueFragment
         meuRecycler = binding.listaTrabalhoEstoqueRecyclerView;
         swipeRefreshLayout = binding.swipeRefreshLayoutTrabalhosEstoque;
         indicadorDeProgresso = binding.indicadorProgressoListaEstoqueFragment;
-        iconeListaVazia = binding.iconeVazia;
-        txtListaVazia = binding.txtListaVazia;
+        estadoVazio = binding.estadoVazio;
         controlador = Navigation.findNavController(binding.getRoot());
 
         ViewModelFactory viewModelFactory = new ViewModelFactory(requireContext());

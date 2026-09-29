@@ -28,28 +28,18 @@
         app:layout_constraintBottom_toBottomOf="parent"
         tools:listitem="@layout/item_trabalho_especifico" />
 
-    <ImageView
-        android:id="@+id/iconeVazia"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginTop="200dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:alpha="0.1"
-        android:visibility="gone"
-        android:contentDescription="@string/stringListaVazia"
-        app:srcCompat="@drawable/ic_vazio" />
-
-    <TextView
-        android:id="@+id/txtListaVazia"
-        android:layout_width="wrap_content"
+    <com.kevin.gestorproducao.ui.componente.EstadoVazioView
+        android:id="@+id/estadoVazio"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/stringListaVazia"
-        android:textSize="28sp"
-        android:alpha="0.4"
+        android:paddingHorizontal="32dp"
         android:visibility="gone"
-        app:layout_constraintStart_toStartOf="@id/iconeVazia"
-        app:layout_constraintEnd_toEndOf="@id/iconeVazia"
-        app:layout_constraintTop_toBottomOf="@id/iconeVazia"/>
+        app:icone="@drawable/ic_producao"
+        app:titulo="@string/stringEstadoVazioTituloNovaProducao"
+        app:mensagem="@string/stringEstadoVazioMensagemNovaProducao"
+        app:layout_constraintVertical_bias="0.4"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
