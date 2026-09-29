@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
@@ -29,11 +30,18 @@ import com.kevin.gestorproducao.ui.viewModel.AutenticacaoViewModel;
 import com.kevin.gestorproducao.ui.viewModel.factory.ViewModelFactory;
 
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 public class CadastrarUsuarioFragment
     extends BaseFragment<FragmentCadastrarUsuarioBinding>
     implements View.OnClickListener
 {
+    private static final int TAMANHO_MINIMO_SENHA = 8;
+    private static final Pattern MAIUSCULA = Pattern.compile("[A-Z]");
+    private static final Pattern MINUSCULA = Pattern.compile("[a-z]");
+    private static final Pattern NUMERO = Pattern.compile("\\d");
+    private static final Pattern ESPECIAL = Pattern.compile("[^A-Za-z0-9\\s]");
+
     private AppCompatButton botaoCadastrarUsuario;
     private TextInputLayout txtSenha;
     private TextInputEditText edtNome;
@@ -101,63 +109,29 @@ public class CadastrarUsuarioFragment
         });
     }
 
-    @SuppressLint("ResourceAsColor")
     private void verificaSenhaRobusta() {
         String senha = Objects.requireNonNull(edtSenha.getText()).toString();
-        int tamanhoSenha = senha.length();
-        String upperCaseChars = getString(R.string.stringCasoChaMa);
-        String lowerCaseChars = getString(R.string.stringCasoCharMi);
-        String numbers = getString(R.string.stringCasoCharNum);
-        String especial = getString(R.string.stringCasoCharS);
-        if (configuraEditSenha(tamanhoSenha>=8)
-            && configuraEditSenha(senha.matches(especial))
-            && configuraEditSenha(senha.matches(numbers))
-            && configuraEditSenha(senha.matches(lowerCaseChars))
-            && configuraEditSenha(senha.matches(upperCaseChars))
-        ){
-            habilitaBotaoCadastro();
+        Integer erro = primeiroRequisitoNaoAtendido(senha);
+        if (erro == null) {
+            txtSenha.setErrorEnabled(false);
+            botaoCadastrarUsuario.setEnabled(true);
             return;
         }
 
-        configuraMenssagemAjuda(senha, tamanhoSenha, upperCaseChars, lowerCaseChars, numbers, especial);
-    }
-
-    private void habilitaBotaoCadastro() {
-        txtSenha.setErrorEnabled(false);
-        botaoCadastrarUsuario.setEnabled(true);
-    }
-
-    private void configuraMenssagemAjuda(
-        String senha,
-        int tamanhoSenha,
-        String upperCaseChars,
-        String lowerCaseChars,
-        String numbers,
-        String especial
-    ) {
-        if (!configuraEditSenha(tamanhoSenha >= 8)) {
-            txtSenha.setError(getString(R.string.string_senha_curta));
-        }
-        if (!configuraEditSenha(senha.matches(numbers))) {
-            txtSenha.setError(getString(R.string.string_senha_numerica));
-        }
-        if (!configuraEditSenha(senha.matches(lowerCaseChars))) {
-            txtSenha.setError(getString(R.string.string_senha_minuscula));
-        }
-        if (!configuraEditSenha(senha.matches(upperCaseChars))) {
-            txtSenha.setError(getString(R.string.string_senha_maiuscula));
-        }
-        if (!configuraEditSenha(senha.matches(especial))) {
-            txtSenha.setError(getString(R.string.string_senha_especial));
-        }
-    }
-
-    private boolean configuraEditSenha(boolean senha) {
-        if (senha) return true;
-
-        txtSenha.setErrorEnabled(true);
+        txtSenha.setError(getString(erro));
         botaoCadastrarUsuario.setEnabled(false);
-        return false;
+    }
+
+    // Os regex ficam no código: em strings.xml o aapt trata "\" como escape e "\d" vira "d".
+    @Nullable
+    @StringRes
+    private static Integer primeiroRequisitoNaoAtendido(String senha) {
+        if (senha.length() < TAMANHO_MINIMO_SENHA) return R.string.string_senha_curta;
+        if (!MAIUSCULA.matcher(senha).find()) return R.string.string_senha_maiuscula;
+        if (!MINUSCULA.matcher(senha).find()) return R.string.string_senha_minuscula;
+        if (!NUMERO.matcher(senha).find()) return R.string.string_senha_numerica;
+        if (!ESPECIAL.matcher(senha).find()) return R.string.string_senha_especial;
+        return null;
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -190,6 +164,7 @@ public class CadastrarUsuarioFragment
                         return;
                     }
 
+                    botaoCadastrarUsuario.setEnabled(true);
                     Snackbar snackbar = Snackbar.make(binding.getRoot(), resultado.getErro(), Snackbar.LENGTH_SHORT);
                     snackbar.setBackgroundTint(Color.WHITE);
                     snackbar.setTextColor(Color.BLACK);
@@ -198,6 +173,7 @@ public class CadastrarUsuarioFragment
             );
             return;
         }
+        botaoCadastrarUsuario.setEnabled(true);
         mostraMensagemAncorada(getString(R.string.stringPreencherTodosCampos));
     }
 
