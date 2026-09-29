@@ -3,4 +3,9 @@
         <attr name="fullscreenBackgroundColor" format="color" />
         <attr name="fullscreenTextColor" format="color" />
     </declare-styleable>
+    <declare-styleable name="EstadoVazioView">
+        <attr name="icone" format="reference" />
+        <attr name="titulo" format="string" />
+        <attr name="mensagem" format="string" />
+    </declare-styleable>
 </resources>

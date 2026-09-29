@@ -17,9 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -38,6 +36,7 @@ import com.kevin.gestorproducao.model.ProfissaoPersonagem;
 import com.kevin.gestorproducao.model.Trabalho;
 import com.kevin.gestorproducao.model.TrabalhoEstoque;
 import com.kevin.gestorproducao.model.TrabalhoVendido;
+import com.kevin.gestorproducao.ui.componente.EstadoVazioView;
 import com.kevin.gestorproducao.ui.fragment.ListaTrabalhosInsereNovoTrabalhoFragmentDirections.VaiDeNovoTrabalhoParaDetalhesVenda;
 import com.kevin.gestorproducao.ui.recyclerview.adapter.ListaTrabalhoEspecificoNovaProducaoAdapter;
 import com.kevin.gestorproducao.ui.viewModel.ComponentesVisuais;
@@ -64,8 +63,7 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment
     private PersonagemViewModel personagemViewModel;
     private TrabalhoEstoqueViewModel estoqueViewModel;
     private ProfissaoPersonagemViewModel profissaoPersonagemViewModel;
-    private TextView txtListaVazia;
-    private ImageView iconeListaVazia;
+    private EstadoVazioView estadoVazio;
     private int codigoRequisicao = CODIGO_REQUISICAO_INVALIDA;
     private NavController controlador;
     private TrabalhoEstoque trabalhoEstoqueSelecionado;
@@ -296,12 +294,10 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment
 
     private void atualizaVisibilidadeListaVazia(boolean listaVazia) {
         if (listaVazia) {
-            iconeListaVazia.setVisibility(VISIBLE);
-            txtListaVazia.setVisibility(VISIBLE);
+            estadoVazio.setVisibility(VISIBLE);
             return;
         }
-        iconeListaVazia.setVisibility(GONE);
-        txtListaVazia.setVisibility(GONE);
+        estadoVazio.setVisibility(GONE);
     }
 
     private void configuraMeuRecycler() {
@@ -356,8 +352,7 @@ public class ListaTrabalhosInsereNovoTrabalhoFragment
 
         indicadorProgresso = binding.indicadorProgressoListaNovaProducao;
         meuRecycler = binding.recyclerViewListaNovaProducao;
-        iconeListaVazia = binding.iconeVazia;
-        txtListaVazia = binding.txtListaVazia;
+        estadoVazio = binding.estadoVazio;
         controlador = Navigation.findNavController(binding.getRoot());
 
         ViewModelFactory viewModelFactory = new ViewModelFactory(requireContext());
