@@ -132,7 +132,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="18dp"
                 app:startIconDrawable="@drawable/ic_busca_outline"
-                app:boxStrokeColor="@color/cor_azul_claro"
                 app:boxStrokeWidth="1.5dp"
                 app:boxStrokeWidthFocused="2dp">
 

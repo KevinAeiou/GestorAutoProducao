@@ -119,7 +119,7 @@
 
     <style name="txtInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox.Dense">
         <item name="shapeAppearanceOverlay">@style/ShapeAppearance.CustomShapeAppearance</item>
-        <item name="boxStrokeColor">?attr/colorPrimary</item>
+        <item name="boxStrokeColor">@color/cor_borda_campo</item>
 
         <item name="hintTextColor">?attr/colorOnSurfaceVariant</item>
     </style>
@@ -254,7 +254,7 @@
 
     <style name="Widget.Autenticacao.Campo" parent="Widget.Material3.TextInputLayout.OutlinedBox">
         <item name="shapeAppearanceOverlay">@style/ShapeAppearance.Autenticacao.Campo</item>
-        <item name="boxStrokeColor">?attr/colorPrimary</item>
+        <item name="boxStrokeColor">@color/cor_borda_campo</item>
         <item name="startIconTint">?attr/colorOnSurfaceVariant</item>
         <item name="endIconTint">?attr/colorOnSurfaceVariant</item>
     </style>
@@ -297,5 +297,30 @@
 
     <style name="TextAppearance.Autenticacao.Rodape" parent="TextAppearance.Material3.BodyMedium">
         <item name="android:textColor">@color/cor_texto_rodape_autenticacao</item>
+    </style>
+
+    <!-- Tela de recursos -->
+    <style name="Widget.Recursos.Secao" parent="Widget.Material3.CardView.Filled">
+        <item name="cardBackgroundColor">?attr/colorSurfaceContainerLow</item>
+        <item name="cardCornerRadius">20dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="Widget.Recursos.Campo" parent="txtInputLayout">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.Autenticacao.Campo</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+    </style>
+
+    <style name="Widget.Recursos.Valor" parent="Widget.Material3.TextInputEditText.OutlinedBox.Dense">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:inputType">number</item>
+        <item name="android:maxLength">6</item>
+        <item name="android:selectAllOnFocus">true</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 </resources>

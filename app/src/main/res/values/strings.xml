@@ -302,6 +302,7 @@
     <string name="strngValorInvalido">Valor inválido!</string>
     <string name="stringSelecioneTrabalho">Selecione um trabalho</string>
     <string name="stringRecursos">Recursos</string>
+    <string name="stringInstrucaoRecursos">Informe a quantidade disponível de cada recurso e toque em ✓ para salvar.</string>
     <string name="stringEtereo">Etéreo</string>
     <string name="stringEnergia">Energia</string>
     <string name="stringComposto">Composto</string>
