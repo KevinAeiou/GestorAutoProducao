@@ -176,20 +176,16 @@
     <string name="string_marca_de_producao">de Produção</string>
     <string name="string_acesse_sua_conta">Acesse sua conta</string>
     <string name="string_preencha_seus_dados">Preencha seus dados para começar.</string>
-    <string name="string_requisitos_senha" formatted="false">Mínimo de 8 caracteres, com letra maiúscula, minúscula, número e um símbolo (@ # $ %).</string>
+    <string name="string_requisitos_senha">Mínimo de 8 caracteres, com letra maiúscula, minúscula, número e símbolo.</string>
     <string name="string_instrucao_recuperar_senha">Informe o e-mail da sua conta. Enviaremos um link para você criar uma nova senha.</string>
     <string name="string_enviar_link">Enviar link</string>
     <string name="string_lembrou_a_senha">Lembrou a senha?</string>
 
-    <string name="stringCasoChaMa">(.*[A-Z].*)</string>
-    <string name="stringCasoCharMi">(.*[a-z].*)</string>
-    <string name="stringCasoCharNum">(.*\d.*)</string>
-    <string name="stringCasoCharS">(.*[@,#,$,%].*$)</string>
     <string name="string_senha_curta">Senha muito curta.</string>
     <string name="string_senha_numerica">Senha deve conter ao menos um número.</string>
     <string name="string_senha_minuscula">Senha deve conter ao menos uma letra minúscula.</string>
     <string name="string_senha_maiuscula">Senha deve conter ao menos uma letra maiúscula.</string>
-    <string name="string_senha_especial">Senha deve conter ao menos um caracter especial.</string>
+    <string name="string_senha_especial">Senha deve conter ao menos um símbolo (ex.: @ # ! ?).</string>
     <string name="string_entre">Entrar</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="stringAtivo">Ativo</string>
