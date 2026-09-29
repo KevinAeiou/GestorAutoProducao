@@ -133,13 +133,26 @@
             android:gravity="center_vertical"
             android:layout_marginTop="16dp">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnExcluiEstoque"
-                style="@style/BotaoAcaoDestrutiva"
+            <FrameLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/stringExcluir"
-                app:icon="@drawable/ic_delete" />
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnExcluiEstoque"
+                    style="@style/BotaoAcaoDestrutiva"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/stringExcluir"
+                    app:icon="@drawable/ic_delete" />
+
+                <include
+                    android:id="@+id/loadingDotsExcluir"
+                    layout="@layout/view_loading_dots"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:visibility="gone" />
+            </FrameLayout>
 
             <FrameLayout
                 android:layout_width="0dp"

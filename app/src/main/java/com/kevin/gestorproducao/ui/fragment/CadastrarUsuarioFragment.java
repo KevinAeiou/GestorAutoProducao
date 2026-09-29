@@ -14,11 +14,11 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
-import androidx.appcompat.widget.AppCompatButton;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -42,7 +42,7 @@ public class CadastrarUsuarioFragment
     private static final Pattern NUMERO = Pattern.compile("\\d");
     private static final Pattern ESPECIAL = Pattern.compile("[^A-Za-z0-9\\s]");
 
-    private AppCompatButton botaoCadastrarUsuario;
+    private MaterialButton botaoCadastrarUsuario;
     private TextInputLayout txtSenha;
     private TextInputEditText edtNome;
     private TextInputEditText edtSenha;
@@ -70,6 +70,7 @@ public class CadastrarUsuarioFragment
                     return;
                 }
 
+                pararLoadingBotao(botaoCadastrarUsuario, binding.loadingDotsBotao.getRoot());
                 mostraMensagemAncorada(getString(R.string.stringErroValor, resultado.getErro()));
             }
         );
@@ -154,7 +155,7 @@ public class CadastrarUsuarioFragment
         usuario.setEmail(Objects.requireNonNull(edtEmail.getText()).toString());
         usuario.setSenha(Objects.requireNonNull(edtSenha.getText()).toString());
 
-        botaoCadastrarUsuario.setEnabled(false);
+        iniciarLoadingBotao(botaoCadastrarUsuario, binding.loadingDotsBotao.getRoot());
         if (verificaCampos(usuario)){
             autenticacaoViewModel.criaUsuario(usuario).observe(
                 getViewLifecycleOwner(),
@@ -164,7 +165,7 @@ public class CadastrarUsuarioFragment
                         return;
                     }
 
-                    botaoCadastrarUsuario.setEnabled(true);
+                    pararLoadingBotao(botaoCadastrarUsuario, binding.loadingDotsBotao.getRoot());
                     Snackbar snackbar = Snackbar.make(binding.getRoot(), resultado.getErro(), Snackbar.LENGTH_SHORT);
                     snackbar.setBackgroundTint(Color.WHITE);
                     snackbar.setTextColor(Color.BLACK);
@@ -173,7 +174,7 @@ public class CadastrarUsuarioFragment
             );
             return;
         }
-        botaoCadastrarUsuario.setEnabled(true);
+        pararLoadingBotao(botaoCadastrarUsuario, binding.loadingDotsBotao.getRoot());
         mostraMensagemAncorada(getString(R.string.stringPreencherTodosCampos));
     }
 

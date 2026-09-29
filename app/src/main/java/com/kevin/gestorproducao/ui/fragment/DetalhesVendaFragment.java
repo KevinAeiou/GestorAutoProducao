@@ -70,7 +70,7 @@ public class DetalhesVendaFragment
     private int valorProducaoMelhorado;
     private int valorProducaoRaro;
     private int codigoRequisicao;
-    private LinearLayout loadingBotaoConfirmar;
+    private LinearLayout loadingBotaoConfirmar, loadingBotaoExcluir;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -160,16 +160,14 @@ public class DetalhesVendaFragment
         if (CODIGO_REQUISICAO_ALTERA_VENDAS == codigoRequisicao) {
             btnExcluir.setVisibility(VISIBLE);
             btnExcluir.setOnClickListener(v -> {
-                iniciarLoadingBotao(
-                    btnConfirmar,
-                    loadingBotaoConfirmar
-                );
-
                 ConfirmacaoDialog dialog = ConfirmacaoDialog.novaInstancia(
                     getString(R.string.stringExcluirVenda),
                     getString(R.string.stringConfirmaExclusaoVenda),
-                    () -> vendaViewModel.removeVenda(trabalhoRecebido),
-                    () -> pararLoadingBotao(btnConfirmar, loadingBotaoConfirmar)
+                    () -> {
+                        iniciarLoadingBotao(btnExcluir, loadingBotaoExcluir);
+                        vendaViewModel.removeVenda(trabalhoRecebido);
+                    },
+                    () -> {}
                 );
 
                 dialog.show(getParentFragmentManager(), "confirmacao_exclusao");
@@ -293,10 +291,7 @@ public class DetalhesVendaFragment
                     return;
                 }
 
-                pararLoadingBotao(
-                    btnConfirmar,
-                    loadingBotaoConfirmar
-                );
+                pararLoadingBotao(btnExcluir, loadingBotaoExcluir);
 
                 mostraMensagemAncorada(getString(R.string.stringErroAoExcluirVendaValor, resultado.getErro()));
             }
@@ -548,6 +543,7 @@ public class DetalhesVendaFragment
         btnExcluir = binding.btnExcluiVenda;
         btnConfirmar = binding.btnConfirmarVenda;
         loadingBotaoConfirmar = binding.loadingDotsConfirmar.getRoot();
+        loadingBotaoExcluir = binding.loadingDotsExcluir.getRoot();
         txtCriadoEm = binding.txtCriadoEmTrabalho;
         txtModificadoEm = binding.txtModificadoEmTrabalho;
         layoutDatas = binding.layoutDatasVenda;
