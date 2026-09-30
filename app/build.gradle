@@ -16,8 +16,24 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    // Assinatura de release usada pelo GitHub Actions (variáveis de ambiente vindas dos secrets).
+    // Sem KEYSTORE_PATH (build local), o release continua sem assinatura própria.
+    signingConfigs {
+        if (System.getenv('KEYSTORE_PATH')) {
+            release {
+                storeFile file(System.getenv('KEYSTORE_PATH'))
+                storePassword System.getenv('KEYSTORE_PASSWORD')
+                keyAlias System.getenv('KEY_ALIAS')
+                keyPassword System.getenv('KEY_PASSWORD')
+            }
+        }
+    }
+
     buildTypes {
         release {
+            if (System.getenv('KEYSTORE_PATH')) {
+                signingConfig signingConfigs.release
+            }
             // proguard-rules.pro já cobre os POJOs de model/ (reflexão do Firebase) e o
             // MPAndroidChart. Antes de virar "true": gerar um release assinado localmente
             // e testar manualmente (login, CRUD de personagem/trabalho/estoque/venda via
