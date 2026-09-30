@@ -19,6 +19,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
 import androidx.core.view.MenuProvider;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
@@ -47,6 +49,7 @@ import com.kevin.gestorproducao.service.ServicosProducaoPersonagem;
 import com.kevin.gestorproducao.ui.componente.EstadoVazioView;
 import com.kevin.gestorproducao.ui.fragment.ListaTrabalhosProducaoFragmentDirections.VaiDeProducaoParaFiltro;
 import com.kevin.gestorproducao.ui.recyclerview.adapter.ListaTrabalhoProducaoAdapter;
+import com.kevin.gestorproducao.ui.recyclerview.adapter.listener.OnItemLongClickListenerTrabalhoProducao;
 import com.kevin.gestorproducao.ui.viewModel.ComponentesVisuais;
 import com.kevin.gestorproducao.ui.viewModel.EstadoAppViewModel;
 import com.kevin.gestorproducao.ui.viewModel.FiltroViewModel;
@@ -57,6 +60,7 @@ import com.kevin.gestorproducao.ui.viewModel.factory.ViewModelFactory;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 public class ListaTrabalhosProducaoFragment
     extends BaseFragment<FragmentListaTrabalhosProducaoBinding>
@@ -76,6 +80,7 @@ public class ListaTrabalhosProducaoFragment
 
     private final Runnable reorganizaLista = this::reorganizaListaAposDeslize;
     private ListaTrabalhoProducaoAdapter trabalhoAdapter;
+    private ActionMode modoSelecao;
     private RecyclerView meuRecycler;
     private ArrayList<TrabalhoProducao> trabalhos, trabalhosFiltrados;
     private SwipeRefreshLayout swipeRefreshLayout;
@@ -184,6 +189,23 @@ public class ListaTrabalhosProducaoFragment
             }
         );
 
+        producaoViewModel.getRemocaoResultado().observe(
+            getViewLifecycleOwner(),
+            resultado -> {
+                if (resultado == null) return;
+
+                producaoViewModel.limpaRemocaoResultado();
+
+                if (resultado.getErro() == null) {
+                    finalizaModoSelecao();
+                    producaoViewModel.atualizaProducao();
+                    return;
+                }
+
+                mostraMensagemAncorada(getString(R.string.stringErroValor, resultado.getErro()));
+            }
+        );
+
         producaoViewModel.getModificacaoResultado().observe(
             getViewLifecycleOwner(),
             resultado -> {
@@ -288,6 +310,8 @@ public class ListaTrabalhosProducaoFragment
                 @NonNull RecyclerView recyclerView,
                 @NonNull RecyclerView.ViewHolder viewHolder
             ) {
+                if (trabalhoAdapter.isModoSelecao()) return 0;
+
                 int posicao = viewHolder.getBindingAdapterPosition();
                 if (posicao == RecyclerView.NO_POSITION) return 0;
 
@@ -487,6 +511,91 @@ public class ListaTrabalhosProducaoFragment
         configurarHideOnScroll(meuRecycler, estadoAppViewModel);
 
         trabalhoAdapter.setOnItemClickListener(this::vaiParaDetalhesProducaoActivity);
+        trabalhoAdapter.setOnItemLongClickListener(new OnItemLongClickListenerTrabalhoProducao() {
+            @Override
+            public void onItemLongClick(int posicao) {
+                if (trabalhoAdapter.isModoSelecao()) {
+                    alternaSelecao(posicao);
+                    return;
+                }
+
+                iniciaModoSelecao(posicao);
+            }
+
+            @Override
+            public void onItemSelecaoClick(int posicao) {
+                alternaSelecao(posicao);
+            }
+        });
+    }
+
+    private void iniciaModoSelecao(int posicao) {
+        trabalhoAdapter.iniciaSelecao(posicao);
+
+        modoSelecao = ((AppCompatActivity) requireActivity()).startSupportActionMode(new ActionMode.Callback() {
+            @Override
+            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                mode.getMenuInflater().inflate(R.menu.menu_selecao_producao, menu);
+                return true;
+            }
+
+            @Override
+            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                mode.setTitle(
+                    getString(
+                        R.string.stringSelecionadosProducao,
+                        trabalhoAdapter.getQuantidadeSelecionados()
+                    )
+                );
+                return true;
+            }
+
+            @Override
+            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                if (item.getItemId() != R.id.itemMenuExcluirSelecionados) return false;
+
+                confirmaExclusaoSelecionados();
+                return true;
+            }
+
+            @Override
+            public void onDestroyActionMode(ActionMode mode) {
+                modoSelecao = null;
+                trabalhoAdapter.encerraSelecao();
+            }
+        });
+    }
+
+    private void alternaSelecao(int posicao) {
+        trabalhoAdapter.alternaSelecao(posicao);
+
+        if (trabalhoAdapter.getQuantidadeSelecionados() == 0) {
+            finalizaModoSelecao();
+            return;
+        }
+
+        if (modoSelecao != null) modoSelecao.invalidate();
+    }
+
+    private void finalizaModoSelecao() {
+        if (modoSelecao != null) modoSelecao.finish();
+    }
+
+    private void confirmaExclusaoSelecionados() {
+        List<TrabalhoProducao> selecionados = trabalhoAdapter.getSelecionados();
+        if (selecionados.isEmpty()) return;
+
+        ConfirmacaoDialog dialog = ConfirmacaoDialog.novaInstancia(
+            getString(R.string.stringExcluirProducoesSelecionadas),
+            getString(
+                R.string.stringConfirmaExclusaoProducoesSelecionadas,
+                selecionados.size()
+            ),
+            () -> producaoViewModel.removeTrabalhosProducao(selecionados),
+            () -> {}
+        );
+
+        dialog.show(getParentFragmentManager(), "confirmacao_exclusao_multipla");
     }
 
     private void vaiParaDetalhesProducaoActivity(TrabalhoProducao trabalho) {
@@ -518,6 +627,10 @@ public class ListaTrabalhosProducaoFragment
 
         trabalhoAdapter.atualiza(trabalhosFiltrados);
         atualizaVisibilidadeListaVazia(trabalhosFiltrados.isEmpty());
+
+        if (trabalhoAdapter.isModoSelecao() && trabalhoAdapter.getQuantidadeSelecionados() == 0) {
+            finalizaModoSelecao();
+        }
 
         if (rolarParaTopo) {
             meuRecycler.smoothScrollToPosition(0);
@@ -582,6 +695,7 @@ public class ListaTrabalhosProducaoFragment
     public void onDestroyView() {
         super.onDestroyView();
 
+        finalizaModoSelecao();
         meuRecycler.removeCallbacks(reorganizaLista);
         removeObservadorProducao();
         removeObservadorPersonagem();

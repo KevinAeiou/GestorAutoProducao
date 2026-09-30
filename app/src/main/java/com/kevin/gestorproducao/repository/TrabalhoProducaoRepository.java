@@ -22,6 +22,9 @@ import com.kevin.gestorproducao.repository.helper.FirebaseTimeoutHelper;
 import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -159,6 +162,50 @@ public class  TrabalhoProducaoRepository {
                     recuperaErro(
                         task.getException(),
                         "Erro desconhecido ao remover produção"
+                    )
+                );
+            })
+        );
+    }
+
+    public LiveData<Resource<Void>> removeTrabalhosProducao(
+        List<TrabalhoProducao> trabalhos,
+        String idPersonagem
+    ) {
+        Map<String, Object> remocoes = new HashMap<>();
+        List<String> ids = new ArrayList<>();
+
+        for (TrabalhoProducao trabalho : trabalhos) {
+            if (idTrabalhoInvalido(trabalho)) {
+                MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
+                liveData.postValue(new Resource<>(null, "Id produção inválido"));
+
+                return liveData;
+            }
+
+            remocoes.put(trabalho.getId(), null);
+            ids.add(trabalho.getId());
+        }
+
+        return FirebaseTimeoutHelper.execute(callback -> referenciaProducao
+            .child(idPersonagem)
+            .updateChildren(remocoes)
+            .addOnCompleteListener(backgroundExecutor, task -> {
+                if (task.isSuccessful()) {
+                    try {
+                        producaoDao.removeProducoesPorIds(ids);
+                        callback.sucesso();
+
+                    } catch (RuntimeException e) {
+                        callback.erro(e.getMessage());
+                    }
+                    return;
+                }
+
+                callback.erro(
+                    recuperaErro(
+                        task.getException(),
+                        "Erro desconhecido ao remover produções"
                     )
                 );
             })
