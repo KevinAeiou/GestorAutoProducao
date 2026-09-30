@@ -6,55 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/chipGrupId"
-        app:singleLine="true"
-        app:singleSelection="true"
-        app:selectionRequired="true"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chipFiltroTodos"
-            android:padding="8dp"
-            style="@style/Widget.MaterialComponents.Chip.Choice"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/stringTodos"/>
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chipFiltroProduzir"
-            android:checked="true"
-            android:padding="8dp"
-            style="@style/Widget.MaterialComponents.Chip.Choice"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="@string/stringProduzir"/>
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chipFiltroProduzindo"
-            android:padding="8dp"
-            style="@style/Widget.MaterialComponents.Chip.Choice"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="@string/stringProduzindo"/>
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chipFiltroPronto"
-            android:padding="8dp"
-            style="@style/Widget.MaterialComponents.Chip.Choice"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:text="@string/stringPronto"/>
-    </com.google.android.material.chip.ChipGroup>
-
     <ProgressBar
         android:id="@+id/indicadorProgressoListaTrabalhosFragment"
         android:layout_width="wrap_content"
@@ -65,47 +16,83 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+    <LinearLayout
+        android:id="@+id/layoutPeriodoProducao"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="6dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none">
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipGroupPeriodoProducao"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:singleSelection="true"
+                app:selectionRequired="true"
+                app:chipSpacing="8dp" />
+        </HorizontalScrollView>
+
+        <TextView
+            android:id="@+id/txtValorPeriodoProducao"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="6dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground"
+            android:paddingVertical="4dp"
+            android:gravity="center_vertical"
+            android:textStyle="bold"
+            android:textSize="15sp"
+            android:textColor="?attr/colorPrimary"
+            android:drawablePadding="4dp"
+            app:drawableEndCompat="@drawable/ic_expand_more"
+            tools:text="Setembro de 2026" />
+    </LinearLayout>
+
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeRefreshLayoutTrabalhos"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/chipGrupId">
+        app:layout_constraintTop_toBottomOf="@id/layoutPeriodoProducao">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/listaTrabalhoRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="@dimen/espaco_menu_inferior_flutuante"
             tools:listitem="@layout/item_trabalho_producao" />
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    <ImageView
-        android:id="@+id/iconeVazia"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginTop="200dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:alpha="0.1"
-        android:visibility="gone"
-        android:contentDescription="@string/stringListaVazia"
-        app:srcCompat="@drawable/ic_vazio" />
-
-    <TextView
-        android:id="@+id/txtListaVazia"
-        android:layout_width="wrap_content"
+    <com.kevin.gestorproducao.ui.componente.EstadoVazioView
+        android:id="@+id/estadoVazio"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/stringListaVazia"
-        android:textSize="28sp"
-        android:alpha="0.4"
+        android:paddingHorizontal="32dp"
         android:visibility="gone"
-        app:layout_constraintStart_toStartOf="@id/iconeVazia"
-        app:layout_constraintEnd_toEndOf="@id/iconeVazia"
-        app:layout_constraintTop_toBottomOf="@id/iconeVazia"/>
+        app:icone="@drawable/ic_producao"
+        app:titulo="@string/stringEstadoVazioTituloProducao"
+        app:mensagem="@string/stringEstadoVazioMensagemProducao"
+        app:layout_constraintVertical_bias="0.4"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/floatingActionButton"
@@ -113,12 +100,8 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:contentDescription="@string/cadastrar_novo_trabalho"
-        android:foregroundGravity="center"
-        app:elevation="12dp"
-        app:fabSize="auto"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/ic_adiciona"
-        tools:ignore="SpeakableTextPresentCheck" />
+        app:srcCompat="@drawable/ic_adiciona"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

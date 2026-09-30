@@ -1,352 +1,368 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".ui.fragment.RecursosFragment">
 
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="24dp">
+
+            <TextView
+                style="@style/TextAppearance.Material3.BodyMedium"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="4dp"
+                android:layout_marginBottom="16dp"
+                android:text="@string/stringInstrucaoRecursos"
+                android:textColor="?attr/colorOnSurfaceVariant" />
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Widget.Recursos.Secao">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="16dp"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="20dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <FrameLayout
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:background="@drawable/bg_icone_secao_recursos">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_recursos"
+                                android:tint="?attr/colorOnPrimaryContainer" />
+                        </FrameLayout>
+
+                        <TextView
+                            style="@style/TextAppearance.Material3.TitleMedium"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:text="@string/stringSubstancias"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:baselineAligned="false">
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/txtInputSubstanciaComumRecursos"
+                            style="@style/Widget.Recursos.Campo"
+                            android:layout_marginEnd="6dp"
+                            android:hint="@string/stringComum">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/edtInputSubstanciaComumRecurso"
+                                style="@style/Widget.Recursos.Valor"
+                                android:imeOptions="actionNext" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/txtInputSubstanciaCompostoRecursos"
+                            style="@style/Widget.Recursos.Campo"
+                            android:layout_marginStart="6dp"
+                            android:hint="@string/stringComposto">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/edtInputSubstanciaCompostoRecurso"
+                                style="@style/Widget.Recursos.Valor"
+                                android:imeOptions="actionNext" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:orientation="horizontal"
+                        android:baselineAligned="false">
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/txtInputSubstanciaEnergiaRecursos"
+                            style="@style/Widget.Recursos.Campo"
+                            android:layout_marginEnd="6dp"
+                            android:hint="@string/stringEnergia">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/edtInputSubstanciaEnergiaRecurso"
+                                style="@style/Widget.Recursos.Valor"
+                                android:imeOptions="actionNext" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/txtInputSubstanciaEtereoRecursos"
+                            style="@style/Widget.Recursos.Campo"
+                            android:layout_marginStart="6dp"
+                            android:hint="@string/stringEtereo">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/edtInputSubstanciaEtereoRecurso"
+                                style="@style/Widget.Recursos.Valor"
+                                android:imeOptions="actionNext" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Widget.Recursos.Secao"
+                android:layout_marginTop="12dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="16dp"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="20dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <FrameLayout
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:background="@drawable/bg_icone_secao_recursos">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_recursos"
+                                android:tint="?attr/colorOnPrimaryContainer" />
+                        </FrameLayout>
+
+                        <TextView
+                            style="@style/TextAppearance.Material3.TitleMedium"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:text="@string/stringEssencias"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:baselineAligned="false">
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/txtInputEssenciaComumRecursos"
+                            style="@style/Widget.Recursos.Campo"
+                            android:layout_marginEnd="6dp"
+                            android:hint="@string/stringComum">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/edtInputEssenciaComumRecurso"
+                                style="@style/Widget.Recursos.Valor"
+                                android:imeOptions="actionNext" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/txtInputEssenciaCompostoRecursos"
+                            style="@style/Widget.Recursos.Campo"
+                            android:layout_marginStart="6dp"
+                            android:hint="@string/stringComposto">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/edtInputEssenciaCompostoRecurso"
+                                style="@style/Widget.Recursos.Valor"
+                                android:imeOptions="actionNext" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:orientation="horizontal"
+                        android:baselineAligned="false">
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/txtInputEssenciaEnergiaRecursos"
+                            style="@style/Widget.Recursos.Campo"
+                            android:layout_marginEnd="6dp"
+                            android:hint="@string/stringEnergia">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/edtInputEssenciaEnergiaRecurso"
+                                style="@style/Widget.Recursos.Valor"
+                                android:imeOptions="actionNext" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/txtInputEssenciaEtereoRecursos"
+                            style="@style/Widget.Recursos.Campo"
+                            android:layout_marginStart="6dp"
+                            android:hint="@string/stringEtereo">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/edtInputEssenciaEtereoRecurso"
+                                style="@style/Widget.Recursos.Valor"
+                                android:imeOptions="actionNext" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Widget.Recursos.Secao"
+                android:layout_marginTop="12dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="16dp"
+                    android:paddingTop="16dp"
+                    android:paddingBottom="20dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <FrameLayout
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:background="@drawable/bg_icone_secao_recursos">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_recursos"
+                                android:tint="?attr/colorOnPrimaryContainer" />
+                        </FrameLayout>
+
+                        <TextView
+                            style="@style/TextAppearance.Material3.TitleMedium"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:text="@string/stringCatalisador"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:baselineAligned="false">
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/txtInputCatalizadorComumRecursos"
+                            style="@style/Widget.Recursos.Campo"
+                            android:layout_marginEnd="6dp"
+                            android:hint="@string/stringComum">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/edtInputCatalisadorComumRecurso"
+                                style="@style/Widget.Recursos.Valor"
+                                android:imeOptions="actionNext" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/txtInputCatalizadorCompostoRecursos"
+                            style="@style/Widget.Recursos.Campo"
+                            android:layout_marginStart="6dp"
+                            android:hint="@string/stringComposto">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/edtInputCatalisadorCompostoRecurso"
+                                style="@style/Widget.Recursos.Valor"
+                                android:imeOptions="actionNext" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:orientation="horizontal"
+                        android:baselineAligned="false">
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/txtInputCatalizadorEnergiaRecursos"
+                            style="@style/Widget.Recursos.Campo"
+                            android:layout_marginEnd="6dp"
+                            android:hint="@string/stringEnergia">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/edtInputCatalisadorEnergiaRecurso"
+                                style="@style/Widget.Recursos.Valor"
+                                android:imeOptions="actionNext" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/txtInputCatalizadorEtereoRecursos"
+                            style="@style/Widget.Recursos.Campo"
+                            android:layout_marginStart="6dp"
+                            android:hint="@string/stringEtereo">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/edtInputCatalisadorEtereoRecurso"
+                                style="@style/Widget.Recursos.Valor"
+                                android:imeOptions="actionDone" />
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
     <ProgressBar
         android:id="@+id/indicadorProgressoRecursosFragment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        style="?android:attr/progressBarStyle"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
-
-    <TextView
-        android:id="@+id/txtSubstanciasRecuros"
-        android:text="@string/stringSubstancias"
-        android:textSize="24sp"
-        android:layout_width="0dp"
-        android:layout_margin="20dp"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        app:layout_constraintWidth_max="380dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
-
-    <LinearLayout
-        android:id="@+id/linearLayout1Recursos"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:baselineAligned="false"
-        android:orientation="horizontal"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintStart_toStartOf="@id/txtSubstanciasRecuros"
-        app:layout_constraintEnd_toEndOf="@id/txtSubstanciasRecuros"
-        app:layout_constraintTop_toBottomOf="@id/txtSubstanciasRecuros">
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/txtInputSubstanciaComumRecursos"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginEnd="4dp"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
-            android:hint="@string/stringComum">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edtInputSubstanciaComumRecurso"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="numberSigned"
-                android:gravity="center"
-                android:textSize="24sp"/>
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/txtInputSubstanciaCompostoRecursos"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
-            android:hint="@string/stringComposto">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edtInputSubstanciaCompostoRecurso"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="numberSigned"
-                android:gravity="center"
-                android:textSize="24sp"/>
-        </com.google.android.material.textfield.TextInputLayout>
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/linearLayout2Recursos"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:baselineAligned="false"
-        android:orientation="horizontal"
-        android:layout_marginTop="8dp"
-        app:layout_constraintStart_toStartOf="@id/linearLayout1Recursos"
-        app:layout_constraintEnd_toEndOf="@id/linearLayout1Recursos"
-        app:layout_constraintTop_toBottomOf="@id/linearLayout1Recursos">
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/txtInputSubstanciaEnergiaRecursos"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginEnd="4dp"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
-            android:hint="@string/stringEnergia">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edtInputSubstanciaEnergiaRecurso"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="numberSigned"
-                android:gravity="center"
-                android:textSize="24sp"/>
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/txtInputSubstanciaEtereoRecursos"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:layout_weight="1"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
-            android:hint="@string/stringEtereo">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/edtInputSubstanciaEtereoRecurso"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="numberSigned"
-                    android:gravity="center"
-                    android:textSize="24sp"/>
-            </com.google.android.material.textfield.TextInputLayout>
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/txtEssenciasRecuros"
-        android:text="@string/stringEssencias"
-        android:textSize="24sp"
-        android:layout_width="0dp"
-        android:layout_marginTop="16dp"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        app:layout_constraintStart_toStartOf="@id/txtSubstanciasRecuros"
-        app:layout_constraintEnd_toEndOf="@id/txtSubstanciasRecuros"
-        app:layout_constraintTop_toBottomOf="@id/linearLayout2Recursos"/>
-
-    <LinearLayout
-        android:id="@+id/linearLayout3Recursos"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:baselineAligned="false"
-        android:orientation="horizontal"
-        android:layout_marginTop="8dp"
-        app:layout_constraintStart_toStartOf="@id/linearLayout2Recursos"
-        app:layout_constraintEnd_toEndOf="@id/linearLayout2Recursos"
-        app:layout_constraintTop_toBottomOf="@id/txtEssenciasRecuros">
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/txtInputEssenciaComumRecursos"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginEnd="4dp"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
-            app:layout_constraintStart_toStartOf="@id/txtEssenciasRecuros"
-            app:layout_constraintTop_toBottomOf="@id/txtEssenciasRecuros"
-            app:layout_constraintEnd_toStartOf="@id/txtInputEssenciaCompostoRecursos"
-            android:hint="@string/stringComum">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edtInputEssenciaComumRecurso"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="numberSigned"
-                android:gravity="center"
-                android:textSize="24sp"/>
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/txtInputEssenciaCompostoRecursos"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:layout_weight="1"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
-            app:layout_constraintStart_toEndOf="@id/txtInputEssenciaComumRecursos"
-            app:layout_constraintEnd_toEndOf="@+id/txtEssenciasRecuros"
-            app:layout_constraintTop_toTopOf="@id/txtInputEssenciaComumRecursos"
-            android:hint="@string/stringComposto">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edtInputEssenciaCompostoRecurso"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="numberSigned"
-                android:gravity="center"
-                android:textSize="24sp"/>
-        </com.google.android.material.textfield.TextInputLayout>
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/linearLayout4Recursos"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:baselineAligned="false"
-        android:orientation="horizontal"
-        android:layout_marginTop="8dp"
-        app:layout_constraintStart_toStartOf="@id/linearLayout3Recursos"
-        app:layout_constraintEnd_toEndOf="@id/linearLayout3Recursos"
-        app:layout_constraintTop_toBottomOf="@id/linearLayout3Recursos">
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/txtInputEssenciaEnergiaRecursos"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="4dp"
-            android:layout_weight="1"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
-            android:hint="@string/stringEnergia">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edtInputEssenciaEnergiaRecurso"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="numberSigned"
-                android:gravity="center"
-                android:textSize="24sp"/>
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/txtInputEssenciaEtereoRecursos"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:layout_weight="1"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
-            android:hint="@string/stringEtereo">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edtInputEssenciaEtereoRecurso"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="numberSigned"
-                android:gravity="center"
-                android:textSize="24sp"/>
-        </com.google.android.material.textfield.TextInputLayout>
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/txtCatalisadoresRecuros"
-        android:text="@string/stringCatalisador"
-        android:textSize="24sp"
-        android:layout_width="0dp"
-        android:layout_marginTop="16dp"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        app:layout_constraintStart_toStartOf="@id/txtEssenciasRecuros"
-        app:layout_constraintEnd_toEndOf="@id/txtSubstanciasRecuros"
-        app:layout_constraintTop_toBottomOf="@id/linearLayout4Recursos"/>
-
-    <LinearLayout
-        android:id="@+id/linearLayout5Recursos"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:baselineAligned="false"
-        android:orientation="horizontal"
-        android:layout_marginTop="8dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintStart_toStartOf="@id/txtCatalisadoresRecuros"
-        app:layout_constraintEnd_toEndOf="@id/txtCatalisadoresRecuros"
-        app:layout_constraintTop_toBottomOf="@id/txtCatalisadoresRecuros">
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/txtInputCatalizadorComumRecursos"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="4dp"
-            android:layout_weight="1"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
-            android:hint="@string/stringComum">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edtInputCatalisadorComumRecurso"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="numberSigned"
-                android:gravity="center"
-                android:textSize="24sp"/>
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/txtInputCatalizadorCompostoRecursos"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:layout_weight="1"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
-            android:hint="@string/stringComposto">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edtInputCatalisadorCompostoRecurso"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="numberSigned"
-                android:gravity="center"
-                android:textSize="24sp"/>
-        </com.google.android.material.textfield.TextInputLayout>
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/linearLayout6Recursos"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:baselineAligned="false"
-        android:orientation="horizontal"
-        android:layout_marginTop="8dp"
-        app:layout_constraintStart_toStartOf="@id/linearLayout5Recursos"
-        app:layout_constraintEnd_toEndOf="@id/linearLayout5Recursos"
-        app:layout_constraintTop_toBottomOf="@id/linearLayout5Recursos">
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/txtInputCatalizadorEnergiaRecursos"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="4dp"
-            android:layout_weight="1"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
-            android:hint="@string/stringEnergia">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edtInputCatalisadorEnergiaRecurso"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="numberSigned"
-                android:gravity="center"
-                android:textSize="24sp"/>
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/txtInputCatalizadorEtereoRecursos"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:layout_weight="1"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
-            android:hint="@string/stringEtereo">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edtInputCatalisadorEtereoRecurso"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="numberSigned"
-                android:gravity="center"
-                android:textSize="24sp"/>
-        </com.google.android.material.textfield.TextInputLayout>
-    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

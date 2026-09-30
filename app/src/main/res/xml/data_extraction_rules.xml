@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 12+ (API 31+): backup na nuvem e transferência entre dispositivos. -->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="database" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="database" />
+    </device-transfer>
+</data-extraction-rules>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Borda dos campos de texto por estado. Uma cor unica em boxStrokeColor so vale para o foco:
+     sem foco o Material usa um preto 42% fixo, invisivel no tema escuro. -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="?attr/colorPrimary" android:state_focused="true" />
+    <item android:color="?attr/colorOnSurface" android:state_hovered="true" />
+    <item android:alpha="0.38" android:color="?attr/colorOnSurface" android:state_enabled="false" />
+    <item android:color="?attr/colorOutline" />
+</selector>

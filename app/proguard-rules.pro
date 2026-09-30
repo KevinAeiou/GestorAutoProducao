@@ -19,3 +19,18 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Firebase Realtime Database (de)serializa os POJOs de model/ por reflexão, usando
+# getters/setters e o construtor sem argumentos — sem manter esses membros, o R8 pode
+# renomear ou remover campos e a leitura/escrita no Firebase passa a falhar em silêncio,
+# só no build de release. As anotações precisam sobreviver porque @Exclude (ex.: em
+# Usuario.getSenha()/setSenha(), que impede a senha cifrada de ir para o Firebase) só
+# funciona se o Firebase conseguir inspecionar essa anotação em tempo de execução.
+-keepattributes *Annotation*
+-keep class com.kevin.gestorproducao.model.** { *; }
+-keepclassmembers class com.kevin.gestorproducao.model.** { *; }
+
+# MPAndroidChart (biblioteca do gráfico de XP) usa reflexão internamente em parte dos
+# seus utilitários de formatação/renderização.
+-keep class com.github.mikephil.charting.** { *; }
+-dontwarn com.github.mikephil.charting.**

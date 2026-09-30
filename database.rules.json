@@ -1,0 +1,26 @@
+{
+  "rules": {
+    "Personagens": {
+      "$personagemId": {
+        ".read": "auth != null && root.child('Usuarios2').child(auth.uid).child('Personagens').child($personagemId).exists()",
+        ".write": "auth != null && root.child('Usuarios2').child(auth.uid).child('Personagens').child($personagemId).exists()"
+      }
+    },
+
+    "Usuarios2": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+
+    "Profissoes": { ".read": "auth != null", ".write": "auth != null" },
+    "Lista_profissoes": { ".read": "auth != null", ".write": "auth != null" },
+    "Recursos": { ".read": "auth != null", ".write": "auth != null" },
+    "Lista_recursos": { ".read": "auth != null", ".write": "auth != null" },
+    "Estoque": { ".read": "auth != null", ".write": "auth != null" },
+    "Lista_trabalhos": { ".read": "auth != null", ".write": "auth != null" },
+    "Vendas": { ".read": "auth != null", ".write": "auth != null" },
+    "Producao": { ".read": "auth != null", ".write": "auth != null" }
+  }
+}

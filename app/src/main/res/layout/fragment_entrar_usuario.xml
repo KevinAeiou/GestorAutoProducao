@@ -1,138 +1,162 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:fillViewport="true">
-
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent">
+    android:fillViewport="true"
+    tools:context=".ui.fragment.EntrarUsuarioFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/app_background"
-        tools:context=".ui.fragment.EntrarUsuarioFragment">
+        android:padding="24dp">
 
-        <View
-            android:id="@+id/conteinerComponentes"
-            style="@style/conteinerComponentes"
-            android:layout_width="match_parent"
-            android:layout_height="425dp"
-            app:layout_constraintWidth_max="500dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/txtTitulo"
-            style="@style/txtTitulo"
-            android:text="@string/string_ola"
-            app:layout_constraintEnd_toEndOf="@id/conteinerComponentes"
-            app:layout_constraintStart_toStartOf="@id/conteinerComponentes"
-            app:layout_constraintTop_toTopOf="@id/conteinerComponentes" />
-
-        <TextView
-            android:id="@+id/txtSubTitulo"
-            style="@style/txtSubTitulo"
-            android:text="@string/string_entre_em_sua_conta"
-            app:layout_constraintEnd_toEndOf="@id/conteinerComponentes"
-            app:layout_constraintStart_toStartOf="@id/conteinerComponentes"
-            app:layout_constraintTop_toBottomOf="@id/txtTitulo" />
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/txtEmail"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="40dp"
-            android:layout_marginTop="15dp"
-            android:layout_marginRight="40dp"
-            app:layout_constraintEnd_toEndOf="@id/conteinerComponentes"
-            app:layout_constraintStart_toStartOf="@id/conteinerComponentes"
-            app:layout_constraintTop_toBottomOf="@id/txtSubTitulo">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edtEmail"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/string_email"
-                android:inputType="textEmailAddress"
-                android:maxLength="30"
-                android:padding="20dp" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/txtSenha"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="40dp"
-            android:layout_marginTop="15dp"
-            android:layout_marginRight="40dp"
-            app:passwordToggleEnabled="true"
-            app:layout_constraintEnd_toEndOf="@id/conteinerComponentes"
-            app:layout_constraintStart_toStartOf="@id/conteinerComponentes"
-            app:layout_constraintTop_toBottomOf="@+id/txtEmail">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edtSenha"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/string_senha"
-                android:inputType="textPassword"
-                android:maxLength="20"
-                android:padding="20dp" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <TextView
-            android:id="@+id/txtEsqueceuSenha"
+        <include
+            android:id="@+id/brandGroup"
+            layout="@layout/marca_autenticacao"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
-            android:layout_marginEnd="40dp"
-            android:gravity="end"
-            android:text="@string/string_esqueceu_sua_senha"
-            android:textSize="17sp"
-            android:textColor="@color/black"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/txtSenha" />
+            android:layout_marginBottom="32dp"
+            app:layout_constraintVertical_chainStyle="packed"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/cardLogin"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/botaoEntrar"
-            style="@style/btn"
-            android:text="@string/string_entrar"
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardLogin"
+            style="@style/Widget.Autenticacao.Cartao"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintWidth_max="480dp"
+            app:layout_constraintTop_toBottomOf="@id/brandGroup"
+            app:layout_constraintBottom_toTopOf="@id/footer"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="24dp"
+                android:paddingTop="28dp"
+                android:paddingBottom="24dp">
+
+                <TextView
+                    android:id="@+id/txtTitulo"
+                    style="@style/TextAppearance.Autenticacao.Titulo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/string_acesse_sua_conta" />
+
+                <TextView
+                    android:id="@+id/txtSubTitulo"
+                    style="@style/TextAppearance.Autenticacao.Subtitulo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/string_entre_em_sua_conta" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/txtEmail"
+                    style="@style/Widget.Autenticacao.Campo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:hint="@string/string_email"
+                    app:startIconDrawable="@drawable/ic_email_outline">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/edtEmail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:autofillHints="emailAddress"
+                        android:imeOptions="actionNext"
+                        android:inputType="textEmailAddress"
+                        android:maxLength="30" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/txtSenha"
+                    style="@style/Widget.Autenticacao.Campo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:hint="@string/string_senha"
+                    app:endIconMode="password_toggle"
+                    app:startIconDrawable="@drawable/ic_lock_outline">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/edtSenha"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:autofillHints="password"
+                        android:imeOptions="actionDone"
+                        android:inputType="textPassword"
+                        android:maxLength="20" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView
+                    android:id="@+id/txtEsqueceuSenha"
+                    style="@style/TextAppearance.Autenticacao.Link"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/string_esqueceu_sua_senha"
+                    android:textColor="?attr/colorPrimary" />
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/botaoEntrar"
+                        style="@style/Widget.Autenticacao.BotaoPrimario"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/string_entrar" />
+
+                    <include
+                        android:id="@+id/loadingDotsBotao"
+                        layout="@layout/view_loading_dots"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:visibility="gone" />
+                </FrameLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <LinearLayout
+            android:id="@+id/footer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/txtEsqueceuSenha" />
+            app:layout_constraintTop_toBottomOf="@id/cardLogin">
 
-        <TextView
-            android:id="@+id/txtRodape"
-            style="@style/txtRodape"
-            android:gravity="end"
-            android:text="@string/string_nao_possui_uma_conta"
-            android:textSize="18sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/txtLinkCadastro"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/conteinerComponentes" />
+            <TextView
+                style="@style/TextAppearance.Autenticacao.Rodape"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/string_nao_possui_uma_conta" />
 
-        <TextView
-            android:id="@+id/txtLinkCadastro"
-            style="@style/txtRodape"
-            android:gravity="start"
-            android:text="@string/string_cadastre_se"
-            android:textColor="@color/white"
-            android:textSize="18sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/txtRodape"
-            app:layout_constraintTop_toBottomOf="@id/conteinerComponentes" />
-
+            <TextView
+                android:id="@+id/txtLinkCadastro"
+                style="@style/TextAppearance.Autenticacao.Link"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="2dp"
+                android:text="@string/string_cadastre_se"
+                android:textColor="@color/cor_azul_claro" />
+        </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
 </androidx.core.widget.NestedScrollView>

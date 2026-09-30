@@ -1,50 +1,52 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Theme.Ceep" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
-        <!-- Primary brand color. -->
+<resources>
+    <style name="Theme.GestorAutoProducao" parent="Theme.Material3.DayNight">
+        <!-- Primary -->
         <item name="colorPrimary">@color/cor_azul_claro</item>
-        <item name="colorPrimaryVariant">@color/cor_azul</item>
-        <item name="colorOnPrimary">@color/white</item>
-        <!-- Secondary brand color. -->
+        <item name="colorOnPrimary">@color/black</item>
+
+        <!-- Secondary -->
         <item name="colorSecondary">@color/cor_laranja_claro</item>
-        <item name="colorSecondaryVariant">@color/cor_laranja_claro</item>
-        <item name="colorOnSecondary">@color/white</item>
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
-        <!-- Customize your theme here. -->
-        <item name="android:windowTranslucentStatus">false</item>
+        <item name="colorOnSecondary">@color/black</item>
 
-        <!-- enable window content transitions -->
-        <item name="android:windowActivityTransitions">true</item>
+        <!-- Containers -->
+        <item name="colorPrimaryContainer">@color/cor_azul</item>
+        <item name="colorOnPrimaryContainer">@color/white</item>
 
-        <!-- specify enter and exit transitions -->
-        <item name="android:windowEnterTransition">@transition/da_direita</item>
-        <item name="android:windowExitTransition">@transition/da_esquerda</item>
+        <item name="colorSecondaryContainer">@color/cor_laranja</item>
+        <item name="colorOnSecondaryContainer">@color/white</item>
+
+        <!-- Componentes -->
+        <item name="radioButtonStyle">@style/CustomRadioButton</item>
+        <item name="floatingActionButtonStyle">@style/Widget.Material3.FloatingActionButton.Secondary</item>
+        <item name="materialButtonStyle">@style/Widget.Material3.Button</item>
+        <item name="textInputStyle">@style/txtInputLayout</item>
+        <item name="android:dialogTheme">@style/MaterialAlertDialog.Material3</item>
     </style>
 
-    <style name="ThemeOverlay.Ceep.FullscreenContainer" parent="">
-        <item name="fullscreenBackgroundColor">@color/light_blue_900</item>
-        <item name="fullscreenTextColor">@color/light_blue_A400</item>
-    </style>
-    <style name="Theme.Ceep.NoActionBar" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <!-- Primary brand color. -->
+    <style name="Theme.GestorAutoProducao.NoActionBar" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Primary -->
         <item name="colorPrimary">@color/cor_azul_claro</item>
-        <item name="colorPrimaryVariant">@color/cor_azul</item>
-        <item name="colorOnPrimary">@color/white</item>
-        <!-- Secondary brand color. -->
+        <item name="colorOnPrimary">@color/black</item>
+
+        <!-- Secondary -->
         <item name="colorSecondary">@color/cor_laranja_claro</item>
-        <item name="colorSecondaryVariant">@color/cor_laranja_claro</item>
-        <item name="colorOnSecondary">@color/white</item>
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
-        <!-- Customize your theme here. -->
-        <item name="android:windowTranslucentStatus">false</item>
+        <item name="colorOnSecondary">@color/black</item>
 
-        <!-- enable window content transitions -->
-        <item name="android:windowActivityTransitions">true</item>
+        <!-- Containers -->
+        <item name="colorPrimaryContainer">@color/cor_azul</item>
+        <item name="colorOnPrimaryContainer">@color/white</item>
 
-        <!-- specify enter and exit transitions -->
-        <item name="android:windowEnterTransition">@transition/da_direita</item>
-        <item name="android:windowExitTransition">@transition/da_esquerda</item>
+        <item name="colorSecondaryContainer">@color/cor_laranja</item>
+        <item name="colorOnSecondaryContainer">@color/white</item>
+
+        <!-- Componentes -->
+        <item name="radioButtonStyle">@style/CustomRadioButton</item>
+        <item name="floatingActionButtonStyle">@style/Widget.Material3.FloatingActionButton.Secondary</item>
+        <item name="materialButtonStyle">@style/Widget.Material3.Button</item>
+        <item name="textInputStyle">@style/txtInputLayout</item>
+        <item name="android:dialogTheme">@style/CustomAlertDialogTheme</item>
+        <item name="materialAlertDialogTheme">@style/CustomAlertDialogTheme</item>
+        <item name="bottomSheetDialogTheme">@style/ThemeOverlay.Material3.DayNight.BottomSheetDialog</item>
+        <item name="autoCompleteTextViewStyle">@style/CustomAutoCompleteTextView</item>
     </style>
 </resources>

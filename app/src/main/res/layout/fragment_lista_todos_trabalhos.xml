@@ -5,11 +5,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/constraintLayoutProfissoesTrabalhos"
+    android:id="@+id/constraintLayoutTrabalhos"
     tools:context=".ui.fragment.ListaTodosTrabalhosFragment">
 
     <ProgressBar
-        android:id="@+id/indicadorProgressoProfissoesTrabalhos"
+        android:id="@+id/indicadorProgressoTrabalhos"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         style="?android:attr/progressBarStyle"
@@ -18,8 +18,28 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
+    <HorizontalScrollView
+        android:id="@+id/linearLayoutGrupoChipsTrabalhos"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" >
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/grupoProfissoesChipTrabalhos"
+            android:visibility="gone"
+            tools:text="@string/stringProfissoes"
+            app:singleLine="true"
+            android:padding="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        </com.google.android.material.chip.ChipGroup>
+    </HorizontalScrollView>
+
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/swipeRefreshProfissoesTrabalhos"
+        android:id="@+id/swipeRefreshTrabalhos"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintStart_toStartOf="parent"
@@ -28,28 +48,36 @@
         app:layout_constraintBottom_toBottomOf="parent">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerViewProfissoesTrabalhos"
+            android:id="@+id/recyclerViewTrabalhos"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:paddingBottom="8dp"
-            tools:listitem="@layout/item_profissao_trabalho" />
+            tools:listitem="@layout/item_trabalho_especifico" />
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <com.kevin.gestorproducao.ui.componente.EstadoVazioView
+        android:id="@+id/estadoVazio"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="32dp"
+        android:visibility="gone"
+        app:icone="@drawable/ic_profissoes"
+        app:titulo="@string/stringEstadoVazioTituloTodosTrabalhos"
+        app:mensagem="@string/stringEstadoVazioMensagemTodosTrabalhos"
+        app:layout_constraintVertical_bias="0.4"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/floatingButtonProfissoesTrabalhos"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:clickable="true"
         android:contentDescription="@string/cadastrar_novo_trabalho"
-        android:focusable="true"
-        android:foregroundGravity="center"
-        app:backgroundTint="@color/cor_laranja"
-        app:elevation="20dp"
-        app:fabSize="auto"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:srcCompat="@drawable/ic_adiciona"
-        tools:ignore="SpeakableTextPresentCheck" />
+        app:srcCompat="@drawable/ic_adiciona"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

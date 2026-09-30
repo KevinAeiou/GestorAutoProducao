@@ -13,7 +13,7 @@
         android:icon="@drawable/ic_vendas"
         android:title="@string/stringVendas"/>
     <item
-        android:id="@+id/listaProfissoes"
+        android:id="@+id/listaProfissoesPersonagem"
         android:icon="@drawable/ic_profissoes"
         android:title="@string/stringProfissoes"/>
 </menu>

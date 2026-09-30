@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Estado guardado por BaseFragment.iniciarLoadingBotao enquanto o botão mostra os pontos -->
+    <item name="tagTextoOriginalBotao" type="id" />
+    <item name="tagIconeOriginalBotao" type="id" />
+    <item name="tagLarguraMinimaOriginalBotao" type="id" />
+</resources>

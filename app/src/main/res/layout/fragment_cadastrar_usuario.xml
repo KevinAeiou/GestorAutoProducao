@@ -10,121 +10,165 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/app_background">
+        android:background="@drawable/app_background"
+        android:padding="24dp">
 
-        <View
-            android:id="@+id/conteinerComponentes"
-            style="@style/conteinerComponentes"
+        <include
+            android:id="@+id/brandGroup"
+            layout="@layout/marca_autenticacao"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="32dp"
+            app:layout_constraintVertical_chainStyle="packed"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/cardCadastro"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardCadastro"
+            style="@style/Widget.Autenticacao.Cartao"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintWidth_max="480dp"
+            app:layout_constraintTop_toBottomOf="@id/brandGroup"
+            app:layout_constraintBottom_toTopOf="@id/footer"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="24dp"
+                android:paddingTop="28dp"
+                android:paddingBottom="24dp">
+
+                <TextView
+                    android:id="@+id/txtTitulo"
+                    style="@style/TextAppearance.Autenticacao.Titulo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/stringCriarConta" />
+
+                <TextView
+                    android:id="@+id/txtSubTitulo"
+                    style="@style/TextAppearance.Autenticacao.Subtitulo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/string_preencha_seus_dados" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/txtNome"
+                    style="@style/Widget.Autenticacao.Campo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:hint="@string/string_nome"
+                    app:startIconDrawable="@drawable/ic_person_outline">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/edtNome"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:autofillHints="name"
+                        android:imeOptions="actionNext"
+                        android:inputType="textPersonName|textCapWords"
+                        android:maxLength="40" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/txtEmail"
+                    style="@style/Widget.Autenticacao.Campo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:hint="@string/string_email"
+                    app:startIconDrawable="@drawable/ic_email_outline">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/edtEmail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:autofillHints="emailAddress"
+                        android:imeOptions="actionNext"
+                        android:inputType="textEmailAddress"
+                        android:maxLength="30" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/txtSenha"
+                    style="@style/Widget.Autenticacao.Campo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:hint="@string/string_senha"
+                    app:endIconMode="password_toggle"
+                    app:helperText="@string/string_requisitos_senha"
+                    app:helperTextEnabled="true"
+                    app:startIconDrawable="@drawable/ic_lock_outline">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/edtSenha"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:autofillHints="newPassword"
+                        android:imeOptions="actionDone"
+                        android:inputType="textPassword"
+                        android:maxLength="30" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/botaoCadastrarUsuario"
+                        style="@style/Widget.Autenticacao.BotaoPrimario"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:enabled="false"
+                        android:text="@string/stringCriarConta" />
+
+                    <include
+                        android:id="@+id/loadingDotsBotao"
+                        layout="@layout/view_loading_dots"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:visibility="gone" />
+                </FrameLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <LinearLayout
+            android:id="@+id/footer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/cardCadastro">
 
-        <TextView
-            android:id="@+id/txtTitulo"
-            style="@style/txtTitulo"
-            android:text="Criar conta"
-            android:layout_marginTop="15dp"
-            app:layout_constraintTop_toTopOf="@id/conteinerComponentes"
-            app:layout_constraintStart_toStartOf="@id/conteinerComponentes"
-            app:layout_constraintEnd_toEndOf="@id/conteinerComponentes"/>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/txtNome"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="40dp"
-            android:layout_marginEnd="40dp"
-            android:layout_marginTop="15dp"
-            app:layout_constraintTop_toBottomOf="@id/txtTitulo"
-            app:layout_constraintStart_toStartOf="@id/conteinerComponentes"
-            app:layout_constraintEnd_toEndOf="@id/conteinerComponentes">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edtNome"
-                android:padding="20dp"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/txtRodape"
+                style="@style/TextAppearance.Autenticacao.Rodape"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:inputType="text"
-                android:maxLength="40"
-                android:hint="Nome" />
-        </com.google.android.material.textfield.TextInputLayout>
+                android:text="@string/stringJaPossuiUmaConta" />
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/txtEmail"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="40dp"
-            android:layout_marginEnd="40dp"
-            android:layout_marginTop="8dp"
-            app:layout_constraintTop_toBottomOf="@id/txtNome"
-            app:layout_constraintStart_toStartOf="@id/conteinerComponentes"
-            app:layout_constraintEnd_toEndOf="@id/conteinerComponentes">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edtEmail"
-                android:padding="20dp"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/txtLinkEntrar"
+                style="@style/TextAppearance.Autenticacao.Link"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:inputType="textEmailAddress"
-                android:maxLength="30"
-                android:hint="Email" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/txtSenha"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="40dp"
-            android:layout_marginEnd="40dp"
-            android:layout_marginTop="8dp"
-            app:passwordToggleEnabled="true"
-            app:layout_constraintTop_toBottomOf="@id/txtEmail"
-            app:layout_constraintStart_toStartOf="@id/conteinerComponentes"
-            app:layout_constraintEnd_toEndOf="@id/conteinerComponentes">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edtSenha"
-                android:padding="20dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textPassword"
-                android:maxLength="30"
-                android:hint="Senha" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/botaoCadastrarUsuario"
-            style="@style/btn"
-            android:text="Cadastrar"
-            android:enabled="false"
-            android:layout_marginTop="16dp"
-            app:layout_constraintStart_toStartOf="@id/conteinerComponentes"
-            app:layout_constraintEnd_toEndOf="@id/conteinerComponentes"
-            app:layout_constraintTop_toBottomOf="@id/txtSenha"/>
-
-        <TextView
-            android:id="@+id/txtRodape"
-            style="@style/txtRodape"
-            android:text="Já possui uma conta?"
-            android:textSize="18sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/txtLinkEntrar"
-            app:layout_constraintTop_toBottomOf="@id/conteinerComponentes"
-            app:layout_constraintBottom_toBottomOf="parent"/>
-        <TextView
-            android:id="@+id/txtLinkEntrar"
-            style="@style/txtRodape"
-            android:text="@string/string_entre"
-            android:textSize="18sp"
-            android:textColor="@color/white"
-            app:layout_constraintStart_toEndOf="@id/txtRodape"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/conteinerComponentes"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+                android:layout_marginStart="2dp"
+                android:text="@string/string_entre"
+                android:textColor="@color/cor_azul_claro" />
+        </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>

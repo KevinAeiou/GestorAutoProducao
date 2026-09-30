@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/listaTrabalhosProducao">
+    app:startDestination="@id/splashscreenFragment">
 
     <action
         android:id="@+id/vai_para_lista_trabalhos_producao"
@@ -27,12 +27,12 @@
 
     <action
         android:id="@+id/vai_para_lista_profissoes"
-        app:destination="@+id/listaProfissoes"
+        app:destination="@+id/listaProfissoesPersonagem"
         app:enterAnim="@animator/nav_default_enter_anim"
         app:exitAnim="@animator/nav_default_exit_anim"
         app:popEnterAnim="@animator/nav_default_pop_enter_anim"
         app:popExitAnim="@animator/nav_default_pop_exit_anim"
-        app:popUpTo="@id/listaProfissoes"
+        app:popUpTo="@id/listaProfissoesPersonagem"
         app:popUpToInclusive="true" />
 
     <action
@@ -54,15 +54,28 @@
         app:popExitAnim="@animator/nav_default_pop_exit_anim"
         app:popUpTo="@id/nav_graph"
         app:popUpToInclusive="true" />
+
+    <action
+        android:id="@+id/vaiParaSelecaoPersonagem"
+        app:destination="@+id/selecaoPersonagemFragment"
+        app:enterAnim="@animator/nav_default_enter_anim"
+        app:exitAnim="@animator/nav_default_exit_anim"
+        app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+        app:popExitAnim="@animator/nav_default_pop_exit_anim"
+        app:popUpTo="@id/selecaoPersonagemFragment"
+        app:popUpToInclusive="true" />
+
     <fragment
-        android:id="@+id/listaProfissoes"
-        android:name="com.kevin.ceep.ui.fragment.ListaProfissoesFragment"
-        android:label="@string/stringProfissoes"
-        tools:layout="@layout/fragment_lista_profissoes" />
+        android:id="@+id/listaProfissoesPersonagem"
+        android:name="com.kevin.gestorproducao.ui.fragment.ListaProfissoesPersonagemFragment"
+        tools:layout="@layout/fragment_lista_profissoes_personagem" >
+        <action
+            android:id="@+id/vaiParaDetalhesProfissaoPersonagem"
+            app:destination="@id/profissaoPersonagemFragment" />
+    </fragment>
     <fragment
         android:id="@+id/listaTrabalhosEstoque"
-        android:name="com.kevin.ceep.ui.fragment.ListaEstoqueFragment"
-        android:label="@string/estoque"
+        android:name="com.kevin.gestorproducao.ui.fragment.ListaEstoqueFragment"
         tools:layout="@layout/fragment_lista_trabalhos_estoque" >
         <action
             android:id="@+id/vai_de_estoque_para_trabalhos"
@@ -71,19 +84,17 @@
             app:exitAnim="@animator/nav_default_exit_anim"
             app:popEnterAnim="@animator/nav_default_pop_enter_anim"
             app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/vai_para_detalhes_estoque"
+            app:destination="@id/estoqueFragment" />
+        <action
+            android:id="@+id/vai_de_estoque_para_filtro"
+            app:destination="@id/filtroBottomSheetFragment" />
     </fragment>
     <fragment
         android:id="@+id/listaTrabalhosVendidos"
-        android:name="com.kevin.ceep.ui.fragment.ListaTrabalhosVendidosFragment"
-        android:label="@string/stringVendas"
-        tools:layout="@layout/fragment_lista_trabalhos_vendidos" >
-        <action
-            android:id="@+id/vaiDeTrabalhosVendidosParaDetalhesTrabalhoVendido"
-            app:destination="@id/detalhesTrabalhoVendidoFragment"
-            app:enterAnim="@animator/nav_default_enter_anim"
-            app:exitAnim="@animator/nav_default_exit_anim"
-            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
-            app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+        android:name="com.kevin.gestorproducao.ui.fragment.VendasFragment"
+        tools:layout="@layout/fragment_vendas" >
         <action
             android:id="@+id/vai_de_vendas_para_trabalhos"
             app:destination="@id/listaTrabalhosInsereNovoTrabalhoFragment"
@@ -91,49 +102,44 @@
             app:exitAnim="@animator/nav_default_exit_anim"
             app:popEnterAnim="@animator/nav_default_pop_enter_anim"
             app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/vai_de_vendas_para_filtro"
+            app:destination="@id/filtroBottomSheetFragment" />
+        <action
+            android:id="@+id/vaiDeVendasParaVendasPorTrabalho"
+            app:destination="@id/vendasPorTrabalhoFragment" />
+        <action
+            android:id="@+id/vaiDeVendasParaDetalhesVenda"
+            app:destination="@id/detalhesTrabalhoVendidoFragment" />
     </fragment>
     <fragment
         android:id="@+id/listaTrabalhosProducao"
-        android:name="com.kevin.ceep.ui.fragment.ListaTrabalhosProducaoFragment"
-        android:label="@string/stringProducao"
+        android:name="com.kevin.gestorproducao.ui.fragment.ListaTrabalhosProducaoFragment"
         tools:layout="@layout/fragment_lista_trabalhos_producao" >
         <action
-            android:id="@+id/vai_para_lista_trabalhos"
-            app:destination="@id/listaTrabalhosInsereNovoTrabalhoFragment"
+            android:id="@+id/vai_para_nova_producao"
+            app:destination="@id/trabalhosNovaProducaoFragment"
             app:enterAnim="@animator/nav_default_enter_anim"
             app:exitAnim="@animator/nav_default_exit_anim"
             app:popEnterAnim="@animator/nav_default_pop_enter_anim"
-            app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+            app:popExitAnim="@animator/nav_default_pop_exit_anim"  />
         <action
-            android:id="@+id/vai_para_trabalho_especifico"
-            app:destination="@id/trabalhoEspecificoFragment"
-            app:enterAnim="@animator/nav_default_enter_anim"
-            app:exitAnim="@animator/nav_default_exit_anim"
-            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
-            app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+            android:id="@+id/vai_de_producao_para_filtro"
+            app:destination="@id/filtroBottomSheetFragment" />
+        <action
+            android:id="@+id/vai_para_detalhes_producao"
+            app:destination="@id/trabalhoProducaoFragment" />
     </fragment>
     <fragment
         android:id="@+id/listaTrabalhosInsereNovoTrabalhoFragment"
-        android:name="com.kevin.ceep.ui.fragment.ListaTrabalhosInsereNovoTrabalhoFragment"
-        android:label="Trabalhos"
+        android:name="com.kevin.gestorproducao.ui.fragment.ListaTrabalhosInsereNovoTrabalhoFragment"
         tools:layout="@layout/fragment_lista_trabalhos_insere_novo_trabalho">
 
-        <argument
-            android:name="idPersonagem"
-            app:argType="string" />
-        <action
-            android:id="@+id/vai_para_confirma_trabalho"
-            app:destination="@id/confirmaTrabalhoFragment"
-            app:enterAnim="@animator/nav_default_enter_anim"
-            app:exitAnim="@animator/nav_default_exit_anim"
-            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
-            app:popExitAnim="@animator/nav_default_pop_exit_anim"
-            app:popUpTo="@id/listaTrabalhosInsereNovoTrabalhoFragment"
-            app:popUpToInclusive="true" />
         <argument
             android:name="requisicao"
             app:argType="integer"
             android:defaultValue="-1" />
+
         <action
             android:id="@+id/vai_de_trabalhos_para_estoque"
             app:destination="@id/listaTrabalhosEstoque"
@@ -144,7 +150,7 @@
             app:popUpTo="@id/listaTrabalhosInsereNovoTrabalhoFragment"
             app:popUpToInclusive="true" />
         <action
-            android:id="@+id/vai_de_Trabalhos_para_detalhes_venda"
+            android:id="@+id/vaiDeNovoTrabalhoParaDetalhesVenda"
             app:destination="@id/detalhesTrabalhoVendidoFragment"
             app:enterAnim="@animator/nav_default_enter_anim"
             app:exitAnim="@animator/nav_default_exit_anim"
@@ -152,76 +158,65 @@
             app:popExitAnim="@animator/nav_default_pop_exit_anim"
             app:popUpTo="@id/listaTrabalhosInsereNovoTrabalhoFragment"
             app:popUpToInclusive="true"  />
+        <action
+            android:id="@+id/vai_de_novo_trabalho_para_filtro"
+            app:destination="@id/filtroBottomSheetFragment" />
     </fragment>
     <fragment
         android:id="@+id/confirmaTrabalhoFragment"
-        android:name="com.kevin.ceep.ui.fragment.ConfirmaTrabalhoFragment"
-        android:label="Detalhes nova produção"
-        tools:layout="@layout/fragment_confirma_trabalho">
-        <argument
-            android:name="idPersonagem"
-            app:argType="string" />
+        android:name="com.kevin.gestorproducao.ui.fragment.ConfirmaProducaoFragment"
+        tools:layout="@layout/fragment_confirma_producao">
         <argument
             android:name="trabalho"
             android:defaultValue="@null"
-            app:argType="com.kevin.ceep.model.Trabalho"
+            app:argType="com.kevin.gestorproducao.model.Trabalho"
             app:nullable="true" />
     </fragment>
     <fragment
-        android:id="@+id/trabalhoEspecificoFragment"
-        android:name="com.kevin.ceep.ui.fragment.TrabalhoEspecificoFragment"
-        android:label="Detalhes"
-        tools:layout="@layout/fragment_trabalho_especifico">
+        android:id="@+id/detalhesTrabalhoFragment"
+        android:name="com.kevin.gestorproducao.ui.fragment.DetalhesTrabalhoFragment"
+        tools:layout="@layout/fragment_detalhes_trabalho">
         <argument
             android:name="codigoRequisicao"
             android:defaultValue="-1"
             app:argType="integer" />
         <argument
-            android:name="idPersonagem"
-            app:argType="string"
-            app:nullable="true" />
-        <argument
             android:name="trabalho"
             android:defaultValue="@null"
-            app:argType="com.kevin.ceep.model.Trabalho"
-            app:nullable="true" />
-        <argument
-            android:name="trabalhoProducao"
-            android:defaultValue="@null"
-            app:argType="com.kevin.ceep.model.TrabalhoProducao"
+            app:argType="com.kevin.gestorproducao.model.Trabalho"
             app:nullable="true" />
         <action
-            android:id="@+id/vaiDeTrabalhoEspecficoParaTrabalhos"
-            app:destination="@id/nav_trabalhos"
+            android:id="@+id/vaiParaTrabalhos"
+            app:destination="@id/listaTrabalhos"
             app:enterAnim="@animator/nav_default_enter_anim"
             app:exitAnim="@animator/nav_default_exit_anim"
             app:popEnterAnim="@animator/nav_default_pop_enter_anim"
             app:popExitAnim="@animator/nav_default_pop_exit_anim"
-            app:popUpTo="@id/nav_trabalhos"
-            app:popUpToInclusive="false" />
+            app:popUpTo="@id/listaTrabalhos"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/atributosPersonagem"
-        android:name="com.kevin.ceep.ui.fragment.ModificaPersonagemFragment"
-        android:label="Atributos"
-        tools:layout="@layout/fragment_atributos_personagem" >
+        android:name="com.kevin.gestorproducao.ui.fragment.ModificaPersonagemFragment"
+        tools:layout="@layout/fragment_detalhes_personagem" >
     </fragment>
     <fragment
-        android:id="@+id/nav_trabalhos"
-        android:name="com.kevin.ceep.ui.fragment.ListaTodosTrabalhosFragment"
-        android:label="@string/trabalhos"
+        android:id="@+id/listaTrabalhos"
+        android:name="com.kevin.gestorproducao.ui.fragment.ListaTodosTrabalhosFragment"
         tools:layout="@layout/fragment_lista_todos_trabalhos">
         <action
-            android:id="@+id/action_listaTodosTrabalhosFragment_to_trabalhoEspecificoFragment"
-            app:destination="@id/trabalhoEspecificoFragment"
-            app:enterAnim="@animator/nav_default_enter_anim"
-            app:exitAnim="@animator/nav_default_exit_anim"
-            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
-            app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+            android:id="@+id/vai_de_trabalhos_para_filtro"
+            app:destination="@id/filtroBottomSheetFragment" />
+        <action
+            android:id="@+id/vaiDeTrabalhosParaVisualizacaoTrabalho"
+            app:destination="@id/visualizacaoTrabalhoFragment" />
+        <action
+            android:id="@+id/vaiDeTrabalhosParaDetalhesTrabalho"
+            app:destination="@id/detalhesTrabalhoFragment" />
     </fragment>
     <fragment
         android:id="@+id/entrarFragment"
-        android:name="com.kevin.ceep.ui.fragment.EntrarUsuarioFragment"
+        android:name="com.kevin.gestorproducao.ui.fragment.EntrarUsuarioFragment"
         android:label="Entrar"
         tools:layout="@layout/fragment_entrar_usuario">
         <action
@@ -238,20 +233,25 @@
             app:exitAnim="@animator/nav_default_exit_anim"
             app:popEnterAnim="@animator/nav_default_pop_enter_anim"
             app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/vaiDeEntrarParaProducao"
+            app:destination="@id/listaTrabalhosProducao"
+            app:popUpTo="@id/entrarFragment"
+            app:popUpToInclusive="true"  />
     </fragment>
     <fragment
         android:id="@+id/cadastrarUsuarioFragment"
-        android:name="com.kevin.ceep.ui.fragment.CadastrarUsuarioFragment"
+        android:name="com.kevin.gestorproducao.ui.fragment.CadastrarUsuarioFragment"
         android:label="fragment_cadastrar_usuario"
         tools:layout="@layout/fragment_cadastrar_usuario" />
     <fragment
         android:id="@+id/recuperarSenhaFragment"
-        android:name="com.kevin.ceep.ui.fragment.RecuperarSenhaFragment"
-        android:label="fragment_recuperar_senha"
+        android:name="com.kevin.gestorproducao.ui.fragment.RecuperarSenhaFragment"
+        android:label="Recuperar senha"
         tools:layout="@layout/fragment_recuperar_senha" />
     <fragment
         android:id="@+id/splashscreenFragment"
-        android:name="com.kevin.ceep.ui.fragment.SplashscreenFragment"
+        android:name="com.kevin.gestorproducao.ui.fragment.SplashscreenFragment"
         android:label="activity_splashscreen"
         tools:layout="@layout/fragment_splashscreen" >
         <action
@@ -263,12 +263,21 @@
             app:popExitAnim="@animator/nav_default_pop_exit_anim"
             app:popUpTo="@id/nav_graph"
             app:popUpToInclusive="true" />
+
+        <action
+            android:id="@+id/vaiDeSplashscreenParaProducao"
+            app:destination="@id/listaTrabalhosProducao"
+            app:enterAnim="@animator/nav_default_enter_anim"
+            app:exitAnim="@animator/nav_default_exit_anim"
+            app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+            app:popExitAnim="@animator/nav_default_pop_exit_anim"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/detalhesTrabalhoVendidoFragment"
-        android:name="com.kevin.ceep.ui.fragment.DetalhesTrabalhoVendidoFragment"
-        android:label="Detalhes da venda"
-        tools:layout="@layout/fragment_detalhes_trabalho_vendido" >
+        android:name="com.kevin.gestorproducao.ui.fragment.DetalhesVendaFragment"
+        tools:layout="@layout/fragment_detalhes_venda" >
         <action
             android:id="@+id/vaiDeDetalhesTrabalhoVendidoParaTrabalhosVendidos"
             app:destination="@id/listaTrabalhosVendidos"
@@ -280,10 +289,7 @@
             app:popUpToInclusive="true" />
         <argument
             android:name="trabalhoVendido"
-            app:argType="com.kevin.ceep.model.TrabalhoVendido" />
-        <argument
-            android:name="idPersonagem"
-            app:argType="string" />
+            app:argType="com.kevin.gestorproducao.model.TrabalhoVendido" />
         <argument
             android:name="codigoRequisicao"
             android:defaultValue="-1"
@@ -291,12 +297,125 @@
     </fragment>
     <fragment
         android:id="@+id/inserePersonagem"
-        android:name="com.kevin.ceep.ui.fragment.InserePersonagemFragment"
-        android:label="Personagem"
-        tools:layout="@layout/fragment_atributos_personagem"/>
+        android:name="com.kevin.gestorproducao.ui.fragment.InserePersonagemFragment"
+        tools:layout="@layout/fragment_detalhes_personagem"/>
     <fragment
         android:id="@+id/recursosFragment"
-        android:name="com.kevin.ceep.ui.fragment.RecursosFragment"
-        android:label="@string/stringRecursos"
+        android:name="com.kevin.gestorproducao.ui.fragment.RecursosFragment"
         tools:layout="@layout/fragment_recursos" />
+    <fragment
+        android:id="@+id/automacaoFragment"
+        android:name="com.kevin.gestorproducao.ui.fragment.AutomacaoFragment"
+        tools:layout="@layout/fragment_automacao" />
+    <fragment
+        android:id="@+id/listaProfissoesFragment"
+        android:name="com.kevin.gestorproducao.ui.fragment.ListaProfissoesFragment"
+        android:label="@string/profissoes"
+        tools:layout="@layout/fragment_lista_profissoes" >
+        <action
+            android:id="@+id/vaiDeProfissoesParaDetalhesProfissao"
+            app:destination="@id/detalhesProfissaoFragment" />
+        <action
+            android:id="@+id/vaiDeProfissoesParaVisualizacaoProfissao"
+            app:destination="@id/visualizacaoProfissaoFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/estoqueFragment"
+        android:name="com.kevin.gestorproducao.ui.fragment.DetalhesEstoqueFragment"
+        tools:layout="@layout/fragment_detalhes_estoque">
+
+        <argument
+            android:name="trabalho"
+            app:argType="com.kevin.gestorproducao.model.TrabalhoEstoque" />
+    </fragment>
+    <fragment
+        android:id="@+id/detalhesProfissaoFragment"
+        android:name="com.kevin.gestorproducao.ui.fragment.DetalhesProfissaoFragment"
+        tools:layout="@layout/fragment_detalhes_profissao">
+
+        <argument
+            android:name="profissao"
+            app:argType="com.kevin.gestorproducao.model.ProfissaoBase"
+            app:nullable="true"
+            android:defaultValue="@null" />
+        <action
+            android:id="@+id/vaiDeDetralhesParaProfissoes"
+            app:destination="@id/listaProfissoesFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/profissaoPersonagemFragment"
+        android:name="com.kevin.gestorproducao.ui.fragment.DetalhesProfissaoPersonagemFragment"
+        tools:layout="@layout/fragment_detalhes_profissao_personagem">
+
+        <argument
+            android:name="profissao"
+            app:argType="com.kevin.gestorproducao.model.ProfissaoPersonagem"
+        />
+    </fragment>
+    <fragment
+        android:id="@+id/trabalhosNovaProducaoFragment"
+        android:name="com.kevin.gestorproducao.ui.fragment.TrabalhosNovaProducaoFragment"
+        tools:layout="@layout/fragment_trabalhos_nova_producao">
+        <action
+            android:id="@+id/vai_de_nova_producao_para_confirma_trabalho"
+            app:destination="@id/confirmaTrabalhoFragment" />
+        <action
+            android:id="@+id/vai_de_nova_producao_para_filtro"
+            app:destination="@id/filtroBottomSheetFragment" />
+    </fragment>
+    <dialog
+        android:id="@+id/filtroBottomSheetFragment"
+        android:name="com.kevin.gestorproducao.ui.fragment.FiltroBottomSheetFragment"
+        tools:layout="@layout/fragment_filtro_bottom_sheet" >
+        <argument
+            android:name="eh_producao"
+            app:argType="boolean"
+            android:defaultValue="false" />
+    </dialog>
+    <fragment
+        android:id="@+id/trabalhoProducaoFragment"
+        android:name="com.kevin.gestorproducao.ui.fragment.DetalhesProducaoFragment"
+        tools:layout="@layout/fragment_detalhes_producao" >
+        <argument
+            android:name="trabalho"
+            app:argType="com.kevin.gestorproducao.model.TrabalhoProducao" />
+    </fragment>
+    <fragment
+        android:id="@+id/vendasPorTrabalhoFragment"
+        android:name="com.kevin.gestorproducao.ui.fragment.VendasPorTrabalhoFragment"
+        tools:layout="@layout/fragment_vendas_por_trabalho" >
+        <action
+            android:id="@+id/vaiDeVendasPorTrabalhoParaDetalhesVenda"
+            app:destination="@id/detalhesTrabalhoVendidoFragment" />
+        <argument
+            android:name="trabalho"
+            app:argType="com.kevin.gestorproducao.model.TrabalhoVendido" />
+    </fragment>
+    <dialog
+        android:id="@+id/selecaoPersonagemFragment"
+        android:label="Selecionar personagem"
+        android:name="com.kevin.gestorproducao.ui.fragment.SelecaoPersonagemFragment"
+        tools:layout="@layout/fragment_selecao_personagem" />
+    <fragment
+        android:id="@+id/visualizacaoTrabalhoFragment"
+        android:name="com.kevin.gestorproducao.ui.fragment.VisualizacaoTrabalhoFragment"
+        tools:layout="@layout/fragment_visualizacao_trabalho" >
+        <action
+            android:id="@+id/vaiDeVisualizacaoParaDetalhesTrabalho"
+            app:destination="@id/detalhesTrabalhoFragment" />
+        <argument
+            android:name="trabalho"
+            app:argType="com.kevin.gestorproducao.model.Trabalho" />
+    </fragment>
+    <fragment
+        android:id="@+id/visualizacaoProfissaoFragment"
+        android:name="com.kevin.gestorproducao.ui.fragment.VisualizacaoProfissaoFragment"
+        tools:layout="@layout/fragment_visualizacao_profissao" >
+        <action
+            android:id="@+id/vaiDeVisualizacaoParaDetalhesProfissao"
+            app:destination="@id/detalhesProfissaoFragment" />
+        <argument
+            android:name="profissao"
+            app:argType="com.kevin.gestorproducao.model.ProfissaoBase" />
+    </fragment>
 </navigation>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:orientation="vertical"
+    tools:gravity="center_horizontal"
+    tools:parentTag="android.widget.LinearLayout">
+
+    <FrameLayout
+        android:layout_width="88dp"
+        android:layout_height="88dp"
+        android:background="@drawable/bg_icone_estado_vazio">
+
+        <ImageView
+            android:id="@+id/iconeEstadoVazio"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_busca_outline"
+            android:tint="?attr/colorOnSurfaceVariant" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/txtTituloEstadoVazio"
+        style="@style/TextAppearance.Material3.TitleMedium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:textColor="?attr/colorOnSurface"
+        tools:text="Nenhum trabalho na produção" />
+
+    <TextView
+        android:id="@+id/txtMensagemEstadoVazio"
+        style="@style/TextAppearance.Material3.BodyMedium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:maxWidth="280dp"
+        android:gravity="center"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        tools:text="Toque em + para adicionar um trabalho à produção." />
+</merge>

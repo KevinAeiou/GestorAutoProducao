@@ -1,68 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/itemCardViewProdutoVendido"
-    style="@style/card">
+    style="@style/card"
+    app:cardBackgroundColor="?attr/colorSurface"
+    android:paddingStart="0dp"
+    android:paddingEnd="0dp"
+    android:id="@+id/itemCardViewProdutoVendido">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:paddingEnd="16dp">
+
+        <View
+            android:id="@+id/itemRaridadeTarjaVendido"
+            android:layout_width="5dp"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:background="@color/cor_producao_raridade_raro" />
 
         <TextView
             android:id="@+id/itemNomeTrabalhoVendido"
-            style="@style/txtTituloCard"
-            android:gravity="start"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="21dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="8dp"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="?attr/colorOnSurface"
+            app:layout_constraintEnd_toStartOf="@+id/itemValorContainer"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="Nome" />
+            tools:text="Trabalho" />
 
-        <TextView
-            android:id="@+id/itemDataTrabalhoVendido"
-            android:layout_width="0dp"
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/itemValorContainer"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:maxLines="1"
-            android:paddingTop="8dp"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
-            android:textSize="18sp"
-            app:layout_constraintEnd_toEndOf="@+id/itemNomeTrabalhoVendido"
-            app:layout_constraintStart_toStartOf="@id/itemNomeTrabalhoVendido"
-            app:layout_constraintTop_toBottomOf="@id/itemNomeTrabalhoVendido"
-            tools:text="Data" />
-
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/linearLayoutItemProdutoVendido"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="8dp"
-            app:layout_constraintStart_toStartOf="@id/itemDataTrabalhoVendido"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@id/itemDataTrabalhoVendido"
-            app:layout_constraintTop_toBottomOf="@id/itemDataTrabalhoVendido">
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="8dp"
+            app:cardCornerRadius="12dp"
+            app:cardBackgroundColor="@color/cor_primaria_transparente"
+            app:strokeWidth="0dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/itemQuantidadeContainer">
 
             <TextView
                 android:id="@+id/itemValorTrabalhoVendido"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:padding="8dp"
-                android:textSize="20sp"
-                tools:text="Valor" />
+                android:textStyle="bold"
+                android:textSize="12sp"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="8dp"
+                android:textColor="?attr/colorPrimary"
+                tools:text="$ 120" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/itemQuantidadeContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardCornerRadius="12dp"
+            app:cardBackgroundColor="?attr/colorSecondaryContainer"
+            app:strokeWidth="0dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
             <TextView
                 android:id="@+id/itemQuantidadeTrabalhoVendido"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="0"
-                android:textSize="20sp"
-                android:padding="8dp"
-                android:layout_marginEnd="8dp"
-                tools:text="Quantidade" />
+                android:textStyle="bold"
+                android:textSize="12sp"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="8dp"
+                android:textColor="?attr/colorOnSecondaryContainer"
+                tools:text="1 und" />
+        </com.google.android.material.card.MaterialCardView>
 
-        </androidx.appcompat.widget.LinearLayoutCompat>
+        <TextView
+            android:id="@+id/itemProfissaoTrabalhoVendido"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:layout_marginStart="21dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/itemNomeTrabalhoVendido"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:text="Profissão" />
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

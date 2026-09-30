@@ -1,11 +1,13 @@
 <vector
     android:height="50dp"
-    android:tint="#000000"
+    android:tint="?attr/colorOnSurface"
     android:viewportHeight="24"
     android:viewportWidth="24"
     android:width="50dp"
     xmlns:android="http://schemas.android.com/apk/res/android">
-    <path android:fillColor="@android:color/white"
+
+    <path
+        android:fillColor="@color/white"
         android:fillType="evenOdd"
         android:pathData="M4,11h16v2h-16z"/>
 </vector>

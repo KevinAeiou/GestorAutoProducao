@@ -3,27 +3,46 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="nav">
 
-    <group
-        android:id="@+id/grupo3">
+    <group>
         <item
             android:id="@+id/inserePersonagem"
+            android:icon="@drawable/ic_novo_personagem"
             android:title="@string/stringNovoPersonagem"/>
-
-        <item
-            android:id="@+id/nav_trabalhos"
-            android:title="@string/trabalhos" />
-
-        <item
-            android:id="@+id/recursosFragment"
-            android:title="@string/stringRecursos" />
-
-        <item
-            android:id="@+id/atributosPersonagem"
-            android:title="@string/stringConfiguracao"/>
-
-        <item
-            android:id="@+id/splashscreenFragment"
-            android:title="@string/sair"/>
     </group>
 
+    <item android:title="@string/stringGerenciamento">
+        <menu>
+            <item
+                android:id="@+id/listaTrabalhos"
+                android:icon="@drawable/ic_work"
+                android:title="@string/trabalhos"/>
+
+            <item
+                android:id="@+id/listaProfissoesFragment"
+                android:icon="@drawable/ic_profissoes"
+                android:title="@string/profissoes"/>
+
+            <item
+                android:id="@+id/automacaoFragment"
+                android:icon="@drawable/ic_producao"
+                android:title="@string/stringAutomacao"/>
+        </menu>
+    </item>
+
+    <item android:title="@string/stringConfiguracoes">
+        <menu>
+            <item
+                android:id="@+id/atributosPersonagem"
+                android:icon="@drawable/ic_config_personagem"
+                android:title="@string/stringPersonagem"/>
+            <item
+                android:id="@+id/recursosFragment"
+                android:icon="@drawable/ic_recursos"
+                android:title="@string/stringRecursos"/>
+            <item
+                android:id="@+id/itemAlterarTema"
+                android:icon="@drawable/ic_configuracoes"
+                android:title="@string/stringAlterarTema"/>
+        </menu>
+    </item>
 </menu>

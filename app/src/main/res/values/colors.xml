@@ -8,14 +8,16 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <!-- Cores de texto -->
-    <color name="cor_texto_licenca_principiante">#ffcc00</color>
-    <color name="cor_texto_licenca_novato">#c3c3c3</color>
-    <color name="cor_texto_licenca_mestre">#ffcc00</color>
-    <color name="cor_texto_licenca_aprediz">#66ff66</color>
-    <color name="cor_texto_raridade_especial">#ff6666</color>
-    <color name="cor_texto_raridade_raro">#ff66ff</color>
-    <color name="cor_texto_raridade_melhorado">#ffcc00</color>
-    <color name="cor_texto_raridade_comum">#FCF5EF</color>
+    <color name="cor_texto_licenca_principiante">#FFD54F</color>
+    <color name="cor_texto_licenca_aprediz">#66FF66</color>
+    <color name="cor_texto_licenca_novato">#2F3B52</color>
+    <color name="cor_texto_licenca_mestre">#FFB300</color>
+
+    <color name="cor_texto_raridade_comum">#F5F5F5</color>
+    <color name="cor_texto_raridade_melhorado">#F4C542</color>
+    <color name="cor_texto_raridade_raro">#C084FC</color>
+    <color name="cor_texto_raridade_especial">#FF6B6B</color>
+
     <color name="cor_texto_nivel">#00ff00</color>
     <!-- Cores de fundo -->
     <color name="cor_azul">#115588</color>
@@ -27,16 +29,57 @@
     <color name="cor_background_claro">#59D8FF</color>
     <color name="cor_background_claro_secundario">#A0E2F7</color>
     <color name="cor_background_bordo">#A71500</color>
+
+    <!-- Tela de login -->
+    <color name="cor_brilho_branco">#1FFFFFFF</color>
+    <color name="cor_selo_fundo">#1FFFFFFF</color>
+    <color name="cor_icone_neutro">#94A3B8</color>
+    <color name="cor_texto_marca">#BFFFFFFF</color>
+    <color name="cor_fundo_card_autenticacao">@color/white</color>
+    <color name="cor_texto_rodape_autenticacao">#D9FFFFFF</color>
+
     <color name="cor_background_card">#6DB5CA</color>
     <color name="cor_background_produzindo">#6d87ca</color>
     <color name="cor_background_feito">#b5ca6d</color>
+
+    <!-- Selo de estado do card de trabalho em produção (container/on-container/tarja por estado) -->
+    <color name="cor_estado_para_produzir_container">#D6E4FF</color>
+    <color name="cor_estado_para_produzir_on_container">#1A4480</color>
+    <color name="cor_estado_para_produzir_tarja">#3B6FB0</color>
+
+    <color name="cor_estado_produzindo_container">#EADDFF</color>
+    <color name="cor_estado_produzindo_on_container">#4F2E8C</color>
+    <color name="cor_estado_produzindo_tarja">#6750A4</color>
+
+    <color name="cor_estado_feito_container">#D7F2DA</color>
+    <color name="cor_estado_feito_on_container">#1E5C25</color>
+    <color name="cor_estado_feito_tarja">#2E7D32</color>
+
+    <!-- Nome por raridade e licença do card de trabalho em produção, ajustados para contraste sobre ?attr/colorSurface -->
+    <color name="cor_producao_raridade_melhorado">#8A5A00</color>
+    <color name="cor_producao_raridade_raro">#6D28D9</color>
+    <color name="cor_producao_raridade_especial">#C62828</color>
+
+    <color name="cor_producao_licenca_novato">#2F3B52</color>
+    <color name="cor_producao_licenca_aprendiz">#2E7D32</color>
+    <color name="cor_producao_licenca_iniciante">#8A6D00</color>
+    <color name="cor_producao_licenca_mestre">#8F5400</color>
 
     <color name="light_blue_600">#FF039BE5</color>
     <color name="light_blue_900">#FF01579B</color>
     <color name="light_blue_A200">#FF40C4FF</color>
     <color name="light_blue_A400">#FF00B0FF</color>
     <color name="black_overlay">#66000000</color>
-
+    <color name="cor_primaria_transparente">#33115588</color>
     <color name="skeleton">#66000000</color>
     <color name="text_color">#000</color>
+    <color name="ripple_color">#33000000</color>
+
+    <!-- Menu lateral -->
+    <color name="cor_texto_menu_padrao">#475569</color>
+    <color name="cor_selecao_menu">#1A115588</color>
+    <color name="cor_item_menu_selecionado">@color/cor_azul</color>
+
+    <!-- Menu inferior: cor do ícone dentro do indicador ativo (precisa contrastar com o preenchimento do indicador, não com o fundo do cartão) -->
+    <color name="cor_icone_navegacao_ativo">@color/white</color>
 </resources>

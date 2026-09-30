@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Produzir</string>
+    <string name="app_name">Gestor de Produção</string>
     <string name="string_desfazer">Desfacer</string>
     <string name="personagens">Personagens</string>
     <string name="sair">Sair</string>
@@ -36,10 +36,10 @@
         <item>1195000</item>
     </integer-array>
     <string-array name="raridades">
-        <item>Comum</item>
-        <item>Melhorado</item>
-        <item>Raro</item>
-        <item>Especial</item>
+        <item>@string/stringComum</item>
+        <item>@string/stringMelhorado</item>
+        <item>@string/stringRaro</item>
+        <item>@string/stringEspecial</item>
     </string-array>
     <string-array name="estados">
         <item>Produzir</item>
@@ -53,11 +53,14 @@
         <item>Licença do Novato</item>
     </string-array>
     <string name="licencaIniciante">Licença de Artesanato de Iniciante</string>
+    <string name="licencaMestre">Licença de Artesanato de Mestre</string>
+    <string name="licencaAprendiz">Licença de Artesanato de Aprendiz</string>
+    <string name="licencaNovato">Licença de Artesanato de Novato</string>
     <string-array name="licencas_completas">
-        <item>Licença de Artesanato de Iniciante</item>
-        <item>Licença de Artesanato de Mestre</item>
-        <item>Licença de Artesanato de Aprendiz</item>
-        <item>Licença de Artesanato de Novato</item>
+        <item>@string/licencaIniciante</item>
+        <item>@string/licencaMestre</item>
+        <item>@string/licencaAprendiz</item>
+        <item>@string/licencaNovato</item>
     </string-array>
     <string-array name="profissoes">
         <item>@string/stringProfissaoArmaLongoAlcance</item>
@@ -161,25 +164,29 @@
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="string_ola">Olá</string>
-    <string name="string_entre_em_sua_conta">Entre em sua conta</string>
+    <string name="string_entre_em_sua_conta">Entre com seu e-mail e senha para continuar.</string>
     <string name="string_nome">Nome</string>
-    <string name="string_email">Email</string>
+    <string name="string_email">E-mail</string>
     <string name="string_senha">Senha</string>
     <string name="string_esqueceu_sua_senha">Esqueceu sua senha?</string>
     <string name="string_entrar">Entrar</string>
     <string name="string_nao_possui_uma_conta">Não possui uma conta?</string>
-    <string name="string_cadastre_se"><u>Cadastre-se</u></string>
+    <string name="string_cadastre_se">Cadastre-se</string>
+    <string name="string_marca_gestor">Gestor</string>
+    <string name="string_marca_de_producao">de Produção</string>
+    <string name="string_acesse_sua_conta">Acesse sua conta</string>
+    <string name="string_preencha_seus_dados">Preencha seus dados para começar.</string>
+    <string name="string_requisitos_senha">Mínimo de 8 caracteres, com letra maiúscula, minúscula, número e símbolo.</string>
+    <string name="string_instrucao_recuperar_senha">Informe o e-mail da sua conta. Enviaremos um link para você criar uma nova senha.</string>
+    <string name="string_enviar_link">Enviar link</string>
+    <string name="string_lembrou_a_senha">Lembrou a senha?</string>
 
-    <string name="stringCasoChaMa">(.*[A-Z].*)</string>
-    <string name="stringCasoCharMi">(.*[a-z].*)</string>
-    <string name="stringCasoCharNum">(.*[0–9].*)</string>
-    <string name="stringCasoCharS">(.*[@,#,$,%].*$)</string>
     <string name="string_senha_curta">Senha muito curta.</string>
     <string name="string_senha_numerica">Senha deve conter ao menos um número.</string>
     <string name="string_senha_minuscula">Senha deve conter ao menos uma letra minúscula.</string>
     <string name="string_senha_maiuscula">Senha deve conter ao menos uma letra maiúscula.</string>
-    <string name="string_senha_especial">Senha deve conter ao menos um caracter especial.</string>
-    <string name="string_entre"><u>Entre</u></string>
+    <string name="string_senha_especial">Senha deve conter ao menos um símbolo (ex.: @ # ! ?).</string>
+    <string name="string_entre">Entrar</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="stringAtivo">Ativo</string>
     <string name="stringInativo">Inativo</string>
@@ -190,10 +197,11 @@
     <string name="string_espaco_producao">Espaço para produção</string>
     <string name="string_estado">Estado</string>
     <string name="string_uso">Uso</string>
-    <string name="stringConfiguracao">Configuração</string>
+    <string name="stringConfiguracoes">Configurações</string>
     <string name="stringNovoPersonagem">Novo personagem</string>
     <string name="stringRecorrente">Recorrente</string>
     <string name="stringExperiencia">Experiência</string>
+    <string name="stringExperienciaFracao">%1$s / %2$s</string>
     <string name="stringProfissoes">Profissões</string>
     <string name="stringNivel">Nível</string>
     <string name="stringQuantidade">Quantidade</string>
@@ -212,9 +220,11 @@
     <string name="stringVendas">Vendas</string>
     <string name="stringExcluir">Excluir</string>
     <string name="stringExperienciaValor">Experiência %1$d</string>
-    <string name="stringNivelValor">Nível %1$d</string>
-    <string name="stringOuroValor">%1$d ouros</string>
+    <string name="stringNivelValor">Nv. %1$d</string>
+    <string name="stringNivelBadge">Nv %1$d</string>
+    <string name="stringOuroValor">$ %1$s</string>
     <string name="stringQuantidadeValor">x %1$d</string>
+    <string name="stringQuantidadeUndidade">%1$s und</string>
     <string name="stringEstadoValor">Estado: %1$s</string>
     <string name="stringUsoValor">Uso: %1$s</string>
     <string name="stringAutoProducaoValor">Auto produção: %1$s</string>
@@ -224,13 +234,39 @@
     <string name="stringValorLucroValor">%1$d ouros</string>
     <string name="teste">teste</string>
     <string name="stringPrioridade">Prioridade</string>
-    <string name="stringListaVazia">Lista vazia</string>
+    <string name="stringEstadoVazioTituloTodosTrabalhos">Nenhum trabalho cadastrado</string>
+    <string name="stringEstadoVazioMensagemTodosTrabalhos">Toque em + para cadastrar um trabalho ou ajuste a busca.</string>
+    <string name="stringEstadoVazioTituloEstoque">Estoque vazio</string>
+    <string name="stringEstadoVazioMensagemEstoque">Toque em + para adicionar um trabalho ao estoque ou ajuste a busca.</string>
+    <string name="stringEstadoVazioTituloInsereTrabalho">Nenhum trabalho encontrado</string>
+    <string name="stringEstadoVazioMensagemInsereTrabalho">Ajuste a busca ou os filtros para ver outros trabalhos.</string>
+    <string name="stringEstadoVazioTituloProducao">Nenhum trabalho na produção</string>
+    <string name="stringEstadoVazioMensagemProducao">Toque em + para adicionar um trabalho à produção ou ajuste a busca.</string>
+    <string name="stringEstadoVazioTituloNovaProducao">Nenhum trabalho disponível</string>
+    <string name="stringEstadoVazioMensagemNovaProducao">Não há trabalhos para produzir com os filtros selecionados.</string>
+    <string name="stringEstadoVazioTituloVendas">Nenhuma venda encontrada</string>
+    <string name="stringEstadoVazioTituloChanceVenda">Nenhuma chance de venda</string>
+    <string name="stringEstadoVazioMensagemChanceVenda">Ajuste a busca ou registre vendas para calcular as chances.</string>
+    <string name="stringEstadoVazioMensagemVendas">Toque em + para registrar uma venda ou ajuste a busca.</string>
     <string name="stringNomeProducao">Nome produção</string>
     <string name="stringProducao">Produção</string>
     <string name="stringAutoProducao">Auto produção</string>
     <string name="stringBusca">Buscar</string>
+    <string name="stringAutomacao">Automação</string>
+    <string name="stringAutomacaoDescricao">Busca e inicia automaticamente, no WarSpear Online, os trabalhos pendentes dos personagens com \"Auto produção\" ativada.</string>
+    <string name="stringAutomacaoIniciando">Automação iniciando…</string>
+    <string name="stringAutomacaoErroPermissaoTela">Permissão de gravação de tela não concedida</string>
+    <string name="stringAutomacaoPersonagensIncluidos">Personagens incluídos: %1$s</string>
+    <string name="stringAutomacaoNenhumPersonagem">Nenhum personagem com \"Auto produção\" ativada</string>
+    <string name="stringAtivarAcessibilidade">Ativar serviço de acessibilidade</string>
+    <string name="stringIniciarAutomacao">Iniciar automação</string>
+    <string name="stringParar">Parar</string>
+    <string name="stringAutomacaoStatusParado">Parado</string>
+    <string name="stringAutomacaoAvisoAcessibilidade">Ative o serviço de acessibilidade do app antes de iniciar — é assim que a automação toca na tela do jogo.</string>
+    <string name="stringEstado">Estado</string>
     <string name="stringImagemIndiceConteudoExpandido">Imagem indice de conteúdo expandido</string>
     <string name="string_nao_encontrado">Não encontrado</string>
+    <string name="stringEspecial">Especial</string>
     <string name="stringMelhorado">Melhorado</string>
     <string name="stringRaro">Raro</string>
     <string name="stringComum">Comum</string>
@@ -238,11 +274,12 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="stringDescricao">Descrição</string>
+    <string name="stringDescricaoOpcional">Descrição (opcional)</string>
     <string name="stringData">Data</string>
     <string name="stringValor">Valor</string>
     <string name="stringValorProducao">Valor de produção</string>
     <string name="stringTaxaLucro">Taxa de lucro (%)</string>
-    <string name="stringValorLucro">Valor com lucro (ouro)</string>
+    <string name="stringValorLucro">Valor com lucro</string>
     <string name="stringIndefinido">Indefinido</string>
 
     <string name="stringSubstanciaComum">Substância comum</string>
@@ -259,10 +296,9 @@
     <string name="stringCatalisadorEtereo">Catalisador Etéreo</string>
     <string name="stringCampoRequerido">Campo requerido!</string>
     <string name="strngValorInvalido">Valor inválido!</string>
-    <string name="stringRaridadeRaro">Raro</string>
-    <string name="stringRaridadeMelhorado">Melhorado</string>
     <string name="stringSelecioneTrabalho">Selecione um trabalho</string>
     <string name="stringRecursos">Recursos</string>
+    <string name="stringInstrucaoRecursos">Informe a quantidade disponível de cada recurso e toque em ✓ para salvar.</string>
     <string name="stringEtereo">Etéreo</string>
     <string name="stringEnergia">Energia</string>
     <string name="stringComposto">Composto</string>
@@ -274,6 +310,39 @@
     <string name="expRelativa">Exp relativa</string>
     <string name="expProduzindo">Exp produzindo</string>
     <string name="expProduzir">Exp produzir</string>
+    <string name="profissoes">Profissões</string>
+    <string name="stringFechar">Fechar</string>
+    <string name="stringConfirmar">Confirmar</string>
+    <string name="stringFecharModal">Fechar modal</string>
+    <string name="string_filtrar_por">Filtrar por…</string>
+    <string name="strng_aplicar">Aplicar</string>
+    <string name="stringProfissao">Profissão</string>
+    <string name="stringMoldeDoAprendiz">moldedoaprendiz</string>
+    <string name="stringCriadoEm">Criado em</string>
+    <string name="stringModificadoEm">Modificado em</string>
+    <string name="stringPersonagem">Personagem</string>
+    <string name="stringDadosDoPersonagem">Dados do Personagem</string>
+    <string name="stringSelecionarPersonagem">Selecionar personagem</string>
+    <string name="stringCancelar">Cancelar</string>
+    <string name="stringRecuperarSenha">Recuperar senha</string>
+    <string name="stringCriarConta">Criar conta</string>
+    <string name="stringCadastrar">Cadastrar</string>
+    <string name="stringJaPossuiUmaConta">Já possui uma conta?</string>
+    <string name="stringEditar">Editar</string>
+    <string name="string0">0</string>
+    <string name="stringGerenciamento">Gerenciamento</string>
+    <string name="stringIniciadoEm">Iniciado em</string>
+    <string name="stringFinalizadoEm">Finalizado em</string>
+    <string name="novaProfissao">Nova profissão</string>
+    <string name="inserirNovaVenda">Inserir nova venda</string>
+    <string name="stringNovaVenda">Nova venda</string>
+    <string name="stringSemConexaoComInternet">Sem conexão com a internet</string>
+    <string name="stringNovaProfissao">Nova profissão</string>
+    <string name="stringImagem">Imagem</string>
+    <string name="stringSelecionarImagem">Selecionar imagem</string>
+    <string name="stringIconeParaAdicionarImagem">Ícone para adicionar imagem</string>
+    <string name="stringImagemPreVisualizacao">Imagem para pre visualização de imagem</string>
+    <string name="stringDetalhes">Detalhes</string>
     <string-array name="substancias">
         <item>@string/stringSubstanciaComum</item>
         <item>@string/stringSubstanciaComposta</item>
@@ -291,5 +360,87 @@
         <item>@string/stringCatalisadorComposto</item>
         <item>@string/stringCatalisadorEnergia</item>
         <item>@string/stringCatalisadorEtereo</item>
+    </string-array>
+
+    <string name="stringCampoObrigatorio">Campo obrigatório</string>
+    <string name="stringQuantidadeNaoPodeSerNegativa">A quantidade não pode ser negativa</string>
+    <string name="stringExperienciaNaoPodeSerNegativa">A experiência não pode ser negativa</string>
+    <string name="stringItemRemovidoComSucesso">Item removido com sucesso</string>
+    <string name="stringErroValor">Erro: %1$s</string>
+    <string name="stringExcluirTrabalhoEmEstoque">Excluir trabalho em estoque</string>
+    <string name="stringConfirmaExclusaoTrabalho">Tem certeza que deseja excluir este trabalho?</string>
+    <string name="stringExcluirProfissao">Excluir profissão</string>
+    <string name="stringConfirmaExclusaoProfissao">Tem certeza que deseja excluir esta profissão?</string>
+    <string name="stringSelecionadosProducao">%1$d selecionado(s)</string>
+    <string name="stringExcluirProducoesSelecionadas">Excluir produções</string>
+    <string name="stringConfirmaExclusaoProducoesSelecionadas">Tem certeza que deseja excluir as %1$d produções selecionadas?</string>
+    <string name="stringExcluirProducao">Excluir produção</string>
+    <string name="stringConfirmaExclusaoProducao">Tem certeza que deseja excluir esta produção?</string>
+    <string name="stringExcluirTrabalho">Excluir trabalho</string>
+    <string name="stringExcluirVenda">Excluir venda</string>
+    <string name="stringConfirmaExclusaoVenda">Tem certeza que deseja excluir esta venda?</string>
+    <string name="stringPersonagemSeraRemovido">Personagem será removido permanentemente</string>
+    <string name="stringDesejaContinuar">Deseja continuar?</string>
+    <string name="stringPersonagemRemovidoValor">Personagem: %1$s foi removido!</string>
+    <string name="stringInformeQuantidade">Informe uma quantidade</string>
+    <string name="stringQuantidadeMaiorQueZero">A quantidade deve ser maior que zero</string>
+    <string name="stringInseridoComSucessoValor">%1$s foi inserido com sucesso!</string>
+    <string name="stringJaExisteValor">%1$s já existe!</string>
+    <string name="stringTrabalhoInserido">Trabalho inserido!</string>
+    <string name="stringTrabalhoModificadoComSucesso">Trabalho modificado com sucesso!</string>
+    <string name="stringInvalido">Inválido!</string>
+    <string name="stringVendaInseridaComSucesso">Venda inserida com sucesso!</string>
+    <string name="stringErroAoInserirVendaValor">Erro ao inserir venda: %1$s</string>
+    <string name="stringVendaModificadaComSucesso">Venda modificada com sucesso!</string>
+    <string name="stringErroAoModificarTrabalhoValor">Erro ao modificar trabalho: %1$s</string>
+    <string name="stringVendaRemovidaComSucesso">Venda removida com sucesso!</string>
+    <string name="stringErroAoExcluirVendaValor">Erro ao excluir venda: %1$s</string>
+    <string name="stringConfiraSeuEmail">Confira seu email</string>
+    <string name="stringConfiraEmailCorretoTenteNovamente">Confira se seu email está correto e tente novamente</string>
+    <string name="stringEmailInvalidoErro">Por favor, informe um email válido!</string>
+    <string name="stringEmailInvalidoAjuda">Email inválido!</string>
+    <string name="stringSenhaInvalidaAjuda">Senha inválida!</string>
+    <string name="stringRecursosModificadosComSucesso">Recursos modificados com sucesso!</string>
+    <string name="stringPreencherTodosCampos">Preencha todos os campos</string>
+    <string name="stringUsuarioCadastradoComSucesso">Usuário cadastrado com sucesso!</string>
+    <string name="stringNovoEstoque">Novo estoque</string>
+    <string name="stringNovaProducao">Nova produção</string>
+    <string name="stringNaoIniciado">Não iniciado</string>
+    <string name="stringNaoFinalizado">Não finalizado</string>
+    <string name="stringErroConexao">Erro de conexão</string>
+    <string name="stringFiltroParaProduzir">Para produzir</string>
+    <string name="stringFiltroProduzindo">Produzindo</string>
+    <string name="stringFiltroFeito">Feito</string>
+    <string name="string_periodo_dia">Dia</string>
+    <string name="string_periodo_semana">Semana</string>
+    <string name="string_periodo_mes">Mês</string>
+    <string name="string_periodo_ano">Ano</string>
+    <string name="string_periodo_personalizado">Personalizado</string>
+    <string name="string_selecionar_periodo">Selecionar período</string>
+    <string name="string_seta_anterior">‹</string>
+    <string name="string_seta_proxima">›</string>
+    <string name="stringVendaRemovida">Venda removida: </string>
+    <string name="stringPersonagemInseridoComSucessoValor">%1$s inserido com sucesso!</string>
+    <string name="stringDesconhecido">Desconhecido</string>
+    <string name="string_aba_mais_vendidos">Mais Vendidos</string>
+    <string name="string_aba_chance_venda">Chance de Venda</string>
+    <string name="string_estoque_quantidade_valor">Estoque: %1$s</string>
+    <string name="string_vendeu_no_periodo_valor">Vendeu %1$s un.</string>
+    <string name="string_ultima_venda_dias_valor">Há %1$d dias</string>
+    <string name="string_nunca_vendido_no_periodo">Nunca vendido no período</string>
+    <string name="string_posicao_ranking_valor">%1$dº</string>
+    <string name="string_chance_venda_percentual_valor">Chance de venda: %1$d%%</string>
+    <string name="string_nenhuma_venda_registrada">Nenhuma venda registrada para este item</string>
+
+    <string name="stringEscolhaPersonagemContinuar">Escolha o personagem para continuar</string>
+    <string name="stringAlterarTema">Alterar tema</string>
+    <string name="stringEscolhaOTema">Escolha o tema</string>
+    <string name="stringTemaClaro">Claro</string>
+    <string name="stringTemaEscuro">Escuro</string>
+    <string name="stringTemaSistema">Automático (sistema)</string>
+    <string-array name="arrayOpcoesTema">
+        <item>@string/stringTemaClaro</item>
+        <item>@string/stringTemaEscuro</item>
+        <item>@string/stringTemaSistema</item>
     </string-array>
 </resources>

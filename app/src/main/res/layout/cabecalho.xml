@@ -1,64 +1,162 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="200dp"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@color/light_blue_600"
-    android:gravity="bottom"
-    android:padding="20dp"
-    android:id="@+id/linearLayoutCabecalho">
+    android:background="@drawable/bg_cabecalho"
+    android:paddingHorizontal="20dp"
+    android:paddingTop="28dp"
+    android:paddingBottom="20dp"
+    android:gravity="bottom">
 
-    <com.google.android.material.textfield.TextInputLayout
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="16dp">
+
+        <ImageView
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:src="@drawable/ic_marca"
+            android:contentDescription="@null" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="@string/app_name"
+            android:textAllCaps="true"
+            android:textStyle="bold"
+            android:textSize="11sp"
+            android:letterSpacing="0.14"
+            android:textColor="@color/cor_texto_marca" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/txtCabecalhoNomePersonagem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        >
+        android:layout_marginBottom="14dp"
+        android:textStyle="bold"
+        android:textSize="21sp"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="@color/white"
+        tools:text="Personagem"/>
 
-        <AutoCompleteTextView
-            android:id="@+id/autoCompleteCabecalhoNomePersonagem"
-            android:layout_width="match_parent"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        android:layout_marginBottom="8dp">
+
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            tools:text="Nome"
-            android:inputType="none"
-            android:textColor="@color/white"
-            android:textSize="24sp" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-    <TextView
-        android:id="@+id/txtCabecalhoEstadoPersonagem"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        tools:text="@string/string_estado"
-        android:textSize="14sp"
-        android:textColor="@color/white"/>
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_marginEnd="6dp"
+                android:src="@drawable/ic_person_outline"
+                android:tint="@color/cor_texto_marca"
+                android:contentDescription="@null" />
 
-    <TextView
-        android:id="@+id/txtCabecalhoUsoPersonagem"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        tools:text="@string/string_uso"
-        android:textSize="14sp"
-        android:textColor="@color/white"/>
+            <TextView
+                android:id="@+id/txtCabecalhoEstadoPersonagem"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:textSize="12sp"
+                android:textColor="@color/cor_texto_marca"
+                android:layout_height="wrap_content"
+                tools:text="Estado: Ativo" />
+        </LinearLayout>
 
-    <TextView
-        android:id="@+id/txtCabecalhoAutoProducaoPersonagem"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        tools:text="@string/stringAutoProducao"
-        android:textSize="14sp"
-        android:textColor="@color/white"/>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-    <TextView
-        android:id="@+id/txtCabecalhoEspacoProducaoPersonagem"
-        android:layout_width="wrap_content"
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_marginEnd="6dp"
+                android:src="@drawable/ic_work"
+                android:tint="@color/cor_texto_marca"
+                android:contentDescription="@null" />
+
+            <TextView
+                android:id="@+id/txtCabecalhoUsoPersonagem"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="12sp"
+                android:textColor="@color/cor_texto_marca"
+                tools:text="Uso: Ativo" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        tools:text="@string/string_espaco_producao"
-        android:textSize="14sp"
-        android:textColor="@color/white"/>
+        android:orientation="horizontal"
+        android:weightSum="2">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_marginEnd="6dp"
+                android:src="@drawable/ic_producao"
+                android:contentDescription="@null" />
+
+            <TextView
+                android:id="@+id/txtCabecalhoAutoProducaoPersonagem"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:textColor="@color/cor_texto_marca"
+                tools:text="Auto Produção: Ativo"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="14dp"
+                android:layout_height="14dp"
+                android:layout_marginEnd="6dp"
+                android:src="@drawable/ic_estoque"
+                android:contentDescription="@null" />
+
+            <TextView
+                android:id="@+id/txtCabecalhoEspacoProducaoPersonagem"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:textColor="@color/cor_texto_marca"
+                tools:text="Espaço: 10"/>
+        </LinearLayout>
+    </LinearLayout>
 </LinearLayout>

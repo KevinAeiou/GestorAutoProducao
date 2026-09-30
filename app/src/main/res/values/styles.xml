@@ -28,7 +28,7 @@
         <item name="android:gravity">center</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">24sp</item>
-        <item name="android:textColor">@color/black</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
         <item name="android:layout_marginTop">15dp</item>
     </style>
 
@@ -42,7 +42,7 @@
         <item name="android:paddingTop">8dp</item>
         <item name="android:paddingStart">8dp</item>
         <item name="android:paddingEnd">8dp</item>
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
 
     <style name="txtSubtituloCard">
@@ -53,7 +53,7 @@
         <item name="android:paddingTop">8dp</item>
         <item name="android:paddingStart">8dp</item>
         <item name="android:paddingEnd">8dp</item>
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
 
     <style name="txtSubTitulo">
@@ -61,7 +61,7 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:gravity">center</item>
         <item name="android:textSize">18sp</item>
-        <item name="android:textColor">@color/black</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
         <item name="android:layout_marginTop">8dp</item>
     </style>
 
@@ -69,9 +69,10 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="cardMaxElevation">1dp</item>
-        <item name="cardCornerRadius">12dp</item>
-        <item name="android:layout_marginStart">8dp</item>
-        <item name="android:layout_marginEnd">8dp</item>
+        <item name="elevation">8dp</item>
+        <item name="cardCornerRadius">16dp</item>
+        <item name="android:layout_marginStart">12dp</item>
+        <item name="android:layout_marginEnd">12dp</item>
         <item name="android:layout_marginTop">8dp</item>
         <item name="cardPreventCornerOverlap">true</item>
         <item name="android:paddingStart">16dp</item>
@@ -88,7 +89,7 @@
         <item name="android:padding">15dp</item>
         <item name="android:background">@drawable/botao_estados_background</item>
         <item name="textAllCaps">false</item>
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
         <item name="android:textSize">18sp</item>
         <item name="android:textStyle">bold</item>
         <item name="layout_constraintWidth_max">320dp</item>
@@ -101,7 +102,7 @@
         <item name="android:gravity">center</item>
         <item name="textAllCaps">false</item>
         <item name="android:text">Ok</item>
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
         <item name="android:textSize">18sp</item>
         <item name="android:textStyle">bold</item>
     </style>
@@ -113,26 +114,213 @@
         <item name="android:layout_marginTop">40dp</item>
         <item name="android:layout_marginBottom">25dp</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@color/black</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
 
-    <style name="TelaCheia" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="android:windowFullscreen">true</item>
+    <style name="txtInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox.Dense">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.CustomShapeAppearance</item>
+        <item name="boxStrokeColor">@color/cor_borda_campo</item>
+
+        <item name="hintTextColor">?attr/colorOnSurfaceVariant</item>
     </style>
 
-    <style name="estiloChip" parent="Widget.MaterialComponents.Chip.Filter">
+    <style name="ShapeAppearance.CustomShapeAppearance" parent="ShapeAppearance.Material3.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
     </style>
 
-    <style name="txtInputLayout" parent="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:padding">8dp</item>
-    </style>
-
-    <style name="edtInputLayout" parent="ThemeOverlay.Material3.TextInputEditText.OutlinedBox.Dense">
+    <style name="edtInputLayout" parent="Widget.Material3.TextInputEditText.OutlinedBox.Dense">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">24sp</item>
     </style>
 
+    <style name="CustomRadioButton" parent="Widget.Material3.CompoundButton.RadioButton">
+        <item name="buttonTint">@color/cor_azul</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:paddingStart">12dp</item>
+    </style>
+
+    <style name="CustomAlertDialogTheme" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.CustomDialog</item>
+        <item name="android:backgroundDimAmount">0.7</item>
+    </style>
+
+    <style name="ShapeAppearance.CustomDialog" parent="ShapeAppearance.Material3.MediumComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
+    </style>
+
+    <style name="CustomAutoCompleteTextView" parent="Widget.Material3.AutoCompleteTextView.OutlinedBox.Dense">
+        <item name="paddingStart">16dp</item>
+        <item name="paddingEnd">16dp</item>
+        <item name="android:inputType">none</item>
+        <item name="minHeight">48dp</item>
+    </style>
+
+    <style name="rotuloMetadado">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.03</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+    <style name="valorMetadado">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">4dp</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+
+    <style name="divisorMetadado">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:layout_marginVertical">16dp</item>
+        <item name="android:background">?attr/colorOutlineVariant</item>
+    </style>
+
+    <style name="layoutTxtField">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingBottom">8dp</item>
+        <item name="android:layout_marginTop">8dp</item>
+    </style>
+
+    <style name="BotaoAcaoDestrutiva"
+        parent="Widget.Material3.Button.TextButton">
+
+        <item name="android:textColor">?attr/colorError</item>
+        <item name="iconTint">?attr/colorError</item>
+        <item name="strokeColor">?attr/colorError</item>
+
+        <item name="android:textAllCaps">false</item>
+        <item name="iconGravity">textStart</item>
+        <item name="iconPadding">8dp</item>
+    </style>
+
+    <style name="MeuChipShape">
+        <item name="cornerSize">16dp</item>
+    </style>
+
+    <style name="Widget.MenuInferior.Cartao" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardBackgroundColor">?attr/colorSurfaceContainerHigh</item>
+        <item name="cardCornerRadius">26dp</item>
+        <item name="cardElevation">6dp</item>
+        <item name="cardPreventCornerOverlap">true</item>
+        <item name="cardUseCompatPadding">false</item>
+    </style>
+
+    <style name="Widget.MenuInferior" parent="Widget.Material3.BottomNavigationView">
+        <item name="itemIconTint">@color/cor_icone_navegacao_inferior</item>
+        <item name="itemTextColor">@color/cor_texto_navegacao_inferior</item>
+        <item name="itemActiveIndicatorStyle">@style/Widget.MenuInferior.IndicadorAtivo</item>
+        <item name="itemIconSize">22dp</item>
+        <item name="itemPaddingTop">10dp</item>
+        <item name="itemPaddingBottom">8dp</item>
+        <item name="labelVisibilityMode">labeled</item>
+        <item name="itemHorizontalTranslationEnabled">false</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:backgroundTint">?attr/colorSurfaceContainerHigh</item>
+        <item name="elevation">0dp</item>
+    </style>
+
+    <style name="Widget.MenuInferior.IndicadorAtivo" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">@color/cor_item_menu_selecionado</item>
+        <item name="android:width">64dp</item>
+        <item name="android:height">32dp</item>
+        <item name="marginHorizontal">8dp</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.IndicadorMenuInferior</item>
+    </style>
+
+    <style name="ShapeAppearance.IndicadorMenuInferior" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
+    <!-- Telas de autenticação (login, cadastro e recuperação de senha) -->
+    <style name="Widget.Autenticacao.Cartao" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardBackgroundColor">@color/cor_fundo_card_autenticacao</item>
+        <item name="cardCornerRadius">24dp</item>
+        <item name="cardElevation">12dp</item>
+    </style>
+
+    <style name="Widget.Autenticacao.Campo" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.Autenticacao.Campo</item>
+        <item name="boxStrokeColor">@color/cor_borda_campo</item>
+        <item name="startIconTint">?attr/colorOnSurfaceVariant</item>
+        <item name="endIconTint">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+    <style name="ShapeAppearance.Autenticacao.Campo" parent="ShapeAppearance.Material3.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">12dp</item>
+    </style>
+
+    <style name="Widget.Autenticacao.BotaoPrimario" parent="Widget.Material3.Button">
+        <item name="android:minHeight">56dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/cor_texto_botao</item>
+        <item name="android:background">@drawable/bg_botao_primario</item>
+        <item name="backgroundTint">@null</item>
+        <item name="android:stateListAnimator">@null</item>
+    </style>
+
+    <style name="TextAppearance.Autenticacao.Titulo" parent="TextAppearance.Material3.HeadlineSmall">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+
+    <style name="TextAppearance.Autenticacao.Subtitulo" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:layout_marginTop">6dp</item>
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+    <style name="TextAppearance.Autenticacao.Link" parent="TextAppearance.Material3.LabelLarge">
+        <item name="android:minHeight">48dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingStart">4dp</item>
+        <item name="android:paddingEnd">4dp</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+
+    <style name="TextAppearance.Autenticacao.Rodape" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textColor">@color/cor_texto_rodape_autenticacao</item>
+    </style>
+
+    <!-- Tela de recursos -->
+    <style name="Widget.Recursos.Secao" parent="Widget.Material3.CardView.Filled">
+        <item name="cardBackgroundColor">?attr/colorSurfaceContainerLow</item>
+        <item name="cardCornerRadius">20dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="Widget.Recursos.Campo" parent="txtInputLayout">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.Autenticacao.Campo</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+    </style>
+
+    <style name="Widget.Recursos.Valor" parent="Widget.Material3.TextInputEditText.OutlinedBox.Dense">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:inputType">number</item>
+        <item name="android:maxLength">6</item>
+        <item name="android:selectAllOnFocus">true</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
 </resources>
