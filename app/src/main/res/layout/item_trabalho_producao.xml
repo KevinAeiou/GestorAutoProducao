@@ -23,6 +23,18 @@
             app:layout_constraintStart_toStartOf="parent"
             tools:background="@color/cor_estado_produzindo_tarja" />
 
+        <ImageView
+            android:id="@+id/itemSelecionadoIcone"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginBottom="16dp"
+            android:importantForAccessibility="no"
+            android:visibility="gone"
+            android:src="@drawable/ic_check_circle"
+            app:tint="?attr/colorPrimary"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+
         <TextView
             android:id="@+id/itemNomeTrabalho"
             android:layout_width="0dp"

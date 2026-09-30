@@ -11,6 +11,7 @@ import com.kevin.gestorproducao.repository.Resource;
 import com.kevin.gestorproducao.repository.TrabalhoProducaoRepository;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class TrabalhoProducaoViewModel extends ViewModel {
     private final TrabalhoProducaoRepository repository;
@@ -92,6 +93,22 @@ public class TrabalhoProducaoViewModel extends ViewModel {
             remocaoResultado.setValue(resultado);
             remocaoResultado.removeSource(source);
         });
+    }
+
+    public void removeTrabalhosProducao(List<TrabalhoProducao> trabalhos) {
+        LiveData<Resource<Void>> source = repository.removeTrabalhosProducao(
+            trabalhos,
+            idPersonagem.getValue()
+        );
+
+        remocaoResultado.addSource(source, resultado -> {
+            remocaoResultado.setValue(resultado);
+            remocaoResultado.removeSource(source);
+        });
+    }
+
+    public void limpaRemocaoResultado() {
+        remocaoResultado.setValue(null);
     }
 
     public void removeObservador() {

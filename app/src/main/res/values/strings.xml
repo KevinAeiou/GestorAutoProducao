@@ -371,6 +371,9 @@
     <string name="stringConfirmaExclusaoTrabalho">Tem certeza que deseja excluir este trabalho?</string>
     <string name="stringExcluirProfissao">Excluir profissão</string>
     <string name="stringConfirmaExclusaoProfissao">Tem certeza que deseja excluir esta profissão?</string>
+    <string name="stringSelecionadosProducao">%1$d selecionado(s)</string>
+    <string name="stringExcluirProducoesSelecionadas">Excluir produções</string>
+    <string name="stringConfirmaExclusaoProducoesSelecionadas">Tem certeza que deseja excluir as %1$d produções selecionadas?</string>
     <string name="stringExcluirProducao">Excluir produção</string>
     <string name="stringConfirmaExclusaoProducao">Tem certeza que deseja excluir esta produção?</string>
     <string name="stringExcluirTrabalho">Excluir trabalho</string>

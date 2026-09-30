@@ -19,17 +19,87 @@ import com.google.android.material.color.MaterialColors;
 import com.kevin.gestorproducao.R;
 import com.kevin.gestorproducao.model.TrabalhoProducao;
 import com.kevin.gestorproducao.ui.recyclerview.adapter.listener.OnItemClickListenerTrabalhoProducao;
+import com.kevin.gestorproducao.ui.recyclerview.adapter.listener.OnItemLongClickListenerTrabalhoProducao;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ListaTrabalhoProducaoAdapter
     extends BaseListAdapter<TrabalhoProducao, ListaTrabalhoProducaoAdapter.TrabalhoProducaoViewHolder>
 {
     private final Context context;
     private OnItemClickListenerTrabalhoProducao onItemClickListener;
+    private OnItemLongClickListenerTrabalhoProducao onItemLongClickListener;
+    private final Set<String> idsSelecionados = new HashSet<>();
+    private boolean modoSelecao = false;
 
     public ListaTrabalhoProducaoAdapter(Context context) {
         this.context = context;
+    }
+
+    public void setOnItemLongClickListener(
+        OnItemLongClickListenerTrabalhoProducao onItemLongClickListener
+    ) {
+        this.onItemLongClickListener = onItemLongClickListener;
+    }
+
+    public boolean isModoSelecao() {
+        return modoSelecao;
+    }
+
+    public int getQuantidadeSelecionados() {
+        return idsSelecionados.size();
+    }
+
+    public List<TrabalhoProducao> getSelecionados() {
+        List<TrabalhoProducao> selecionados = new ArrayList<>();
+
+        for (TrabalhoProducao trabalho : lista) {
+            if (idsSelecionados.contains(trabalho.getId())) {
+                selecionados.add(trabalho);
+            }
+        }
+
+        return selecionados;
+    }
+
+    public void iniciaSelecao(int posicao) {
+        modoSelecao = true;
+        alternaSelecao(posicao);
+    }
+
+    public void alternaSelecao(int posicao) {
+        if (posicao < 0 || posicao >= lista.size()) return;
+
+        String id = lista.get(posicao).getId();
+
+        if (!idsSelecionados.remove(id)) {
+            idsSelecionados.add(id);
+        }
+
+        notifyItemChanged(posicao);
+    }
+
+    public void encerraSelecao() {
+        if (!modoSelecao && idsSelecionados.isEmpty()) return;
+
+        modoSelecao = false;
+        idsSelecionados.clear();
+        notifyItemRangeChanged(0, lista.size());
+    }
+
+    @Override
+    public void atualiza(List<TrabalhoProducao> novaLista) {
+        // Itens que saíram da lista (removidos ou filtrados) deixam de estar selecionados.
+        Set<String> idsNovos = new HashSet<>();
+        for (TrabalhoProducao trabalho : novaLista) {
+            idsNovos.add(trabalho.getId());
+        }
+        idsSelecionados.retainAll(idsNovos);
+
+        super.atualiza(novaLista);
     }
 
     public void setOnItemClickListener(OnItemClickListenerTrabalhoProducao onItemClickListener) {
@@ -83,6 +153,8 @@ public class ListaTrabalhoProducaoAdapter
         private final MaterialCardView estado_selo;
         private final ImageView estado_icone;
         private final TextView estado_texto;
+        private final ImageView selecionado_icone;
+        private final MaterialCardView card;
         private TrabalhoProducao trabalhoProducao;
         public TrabalhoProducaoViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -94,7 +166,22 @@ public class ListaTrabalhoProducaoAdapter
             estado_selo = itemView.findViewById(R.id.itemEstadoBadge);
             estado_icone = itemView.findViewById(R.id.itemEstadoIcone);
             estado_texto = itemView.findViewById(R.id.itemEstadoTexto);
-            itemView.setOnClickListener(view -> onItemClickListener.onItemClick(trabalhoProducao));
+            selecionado_icone = itemView.findViewById(R.id.itemSelecionadoIcone);
+            card = (MaterialCardView) itemView;
+            itemView.setOnClickListener(view -> {
+                if (modoSelecao && onItemLongClickListener != null) {
+                    onItemLongClickListener.onItemSelecaoClick(getBindingAdapterPosition());
+                    return;
+                }
+
+                onItemClickListener.onItemClick(trabalhoProducao);
+            });
+            itemView.setOnLongClickListener(view -> {
+                if (onItemLongClickListener == null) return false;
+
+                onItemLongClickListener.onItemLongClick(getBindingAdapterPosition());
+                return true;
+            });
         }
 
         public void vincula(TrabalhoProducao trabalhoProducao) {
@@ -110,6 +197,21 @@ public class ListaTrabalhoProducaoAdapter
             profissao_trabalho.setText(this.trabalhoProducao.getProfissao());
             nivel_trabalho.setText(context.getString(R.string.stringNivelBadge, this.trabalhoProducao.getNivel()));
             configuraEstadoTrabalho(this.trabalhoProducao);
+            configuraSelecao(trabalhoProducao);
+        }
+
+        private void configuraSelecao(TrabalhoProducao trabalhoProducao) {
+            boolean selecionado = idsSelecionados.contains(trabalhoProducao.getId());
+
+            selecionado_icone.setVisibility(selecionado ? View.VISIBLE : View.GONE);
+            card.setStrokeColor(
+                MaterialColors.getColor(card, androidx.appcompat.R.attr.colorPrimary)
+            );
+            card.setStrokeWidth(
+                selecionado
+                    ? (int) (2 * itemView.getResources().getDisplayMetrics().density)
+                    : 0
+            );
         }
 
         private void configuraEstadoTrabalho(TrabalhoProducao trabalhoProducao) {

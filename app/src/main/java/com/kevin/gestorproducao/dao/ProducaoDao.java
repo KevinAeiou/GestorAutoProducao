@@ -32,6 +32,7 @@ import com.kevin.gestorproducao.db.DbHelper;
 import com.kevin.gestorproducao.model.TrabalhoProducao;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ProducaoDao extends BaseDao {
     public ProducaoDao(Context context) {
@@ -254,6 +255,16 @@ public class ProducaoDao extends BaseDao {
         String[] selectionArgs = {trabalho.getId()};
 
         removeEmTransacao(TABLE_TRABALHOS_PRODUCAO, selection, selectionArgs);
+    }
+
+    public void removeProducoesPorIds(List<String> ids) {
+        if (ids.isEmpty()) return;
+
+        executaEmTransacao(() -> {
+            for (String id : ids) {
+                db.delete(TABLE_TRABALHOS_PRODUCAO, COLUMN_NAME_ID + " = ?", new String[]{id});
+            }
+        });
     }
 
     public void modificaProducao(TrabalhoProducao trabalho, String idPersonagem) {
