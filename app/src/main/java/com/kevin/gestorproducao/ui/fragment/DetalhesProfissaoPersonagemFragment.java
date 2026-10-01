@@ -4,6 +4,7 @@ import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
 import android.animation.ObjectAnimator;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -29,6 +30,13 @@ import com.kevin.gestorproducao.R;
 import com.kevin.gestorproducao.databinding.FragmentDetalhesProfissaoPersonagemBinding;
 import com.kevin.gestorproducao.model.ProfissaoPersonagem;
 import com.kevin.gestorproducao.model.TrabalhoProducao;
+import com.kevin.gestorproducao.repository.ProfissaoPersonagemRepository;
+import com.kevin.gestorproducao.repository.TrabalhoEstoqueRepository;
+import com.kevin.gestorproducao.repository.TrabalhoProducaoRepository;
+import com.kevin.gestorproducao.repository.TrabalhoRepository;
+import com.kevin.gestorproducao.service.PlanejamentoProducaoService;
+import com.kevin.gestorproducao.service.ProducaoServicosFactory;
+import com.kevin.gestorproducao.service.ResumoPlanejamento;
 import com.kevin.gestorproducao.ui.viewModel.ComponentesVisuais;
 import com.kevin.gestorproducao.ui.viewModel.PersonagemViewModel;
 import com.kevin.gestorproducao.ui.viewModel.ProfissaoPersonagemViewModel;
@@ -51,6 +59,7 @@ public class DetalhesProfissaoPersonagemFragment
     private ArrayList<TrabalhoProducao> producao;
     private TrabalhoProducaoViewModel producaoViewModel;
     private PersonagemViewModel personagemViewModel;
+    private String idPersonagemSelecionado;
     private CircularProgressIndicator indicadorAtual, indicadorMaximo, indicadorProduzindo, indicadorProduzir;
     private TextView txtExperienciaRingValor, txtExpProduzir, txtExpProduzindo;
     private View linhaLegendaProduzir, linhaLegendaProduzindo;
@@ -133,6 +142,7 @@ public class DetalhesProfissaoPersonagemFragment
             personagem -> {
                 if (personagem == null) return;
 
+                idPersonagemSelecionado = personagem.getId();
                 producaoViewModel.setIdPersonagem(personagem.getId());
                 profissaoPersonagemViewModel.setIdPersonagem(personagem.getId());
 
@@ -147,12 +157,39 @@ public class DetalhesProfissaoPersonagemFragment
             resultado -> {
 
                 if (resultado.getErro() == null) {
+                    if (prioridadeFoiLigada()) {
+                        atualizaProducaoPriorizada();
+                    }
                     voltaParaListaProfissoes();
                 }
 
                 txtExperiencia.setError(resultado.getErro());
             }
         );
+    }
+
+    private boolean prioridadeFoiLigada() {
+        return swtPrioridade.isChecked() && !profissaoRecebida.isPrioridade();
+    }
+
+    // Gatilho automático: ao ligar a prioridade, já completa a fila da profissão.
+    private void atualizaProducaoPriorizada() {
+        if (idPersonagemSelecionado == null) return;
+
+        Context contexto = requireContext().getApplicationContext();
+        PlanejamentoProducaoService planejamento = ProducaoServicosFactory.cria(
+            TrabalhoRepository.getInstancia(contexto),
+            TrabalhoEstoqueRepository.getInstance(contexto),
+            TrabalhoProducaoRepository.getInstance(contexto),
+            ProfissaoPersonagemRepository.getInstance(contexto),
+            idPersonagemSelecionado,
+            contexto
+        ).getPlanejamentoProducaoService();
+
+        ResumoPlanejamento resumo = planejamento.atualizaAgora();
+        if (resumo.temNovidades()) {
+            mostraMensagemAncorada(resumo.paraMensagem());
+        }
     }
 
     private void voltaParaListaProfissoes() {

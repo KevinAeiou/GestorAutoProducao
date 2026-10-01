@@ -50,6 +50,8 @@ public class ProducaoFluxoService {
             if (trabalho.ehMelhorado()) {
                 planejamentoProducaoService.incluirRaro(trabalho.getIdTrabalho());
             }
+
+            planejamentoProducaoService.agendaAtualizacaoAutomatica();
         }
     }
 }

@@ -3,6 +3,7 @@ package com.kevin.gestorproducao.service;
 import static com.kevin.gestorproducao.rules.exception.ProducaoException.TipoErroProducao.TRABALHO_SEM_DEPENDENCIA;
 
 import android.content.Context;
+import android.os.Handler;
 import android.os.Looper;
 
 import androidx.lifecycle.LiveData;
@@ -246,12 +247,43 @@ public class PlanejamentoProducaoService {
     private static final int META_POR_TRABALHO_COMUM = 1;
     private static final int INSUMO_INDISPONIVEL = -1;
 
+    // As gravações de estoque e experiência do trabalho concluído terminam de forma assíncrona;
+    // a atualização automática espera esse tempo para não planejar em cima de dados defasados.
+    private static final long ATRASO_ATUALIZACAO_AUTOMATICA_MS = 5000;
+
     private Consumer<String> ouvinteFalhaGravacao;
+    private Consumer<ResumoPlanejamento> ouvinteResumoAutomatico;
+    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Runnable atualizacaoAutomatica = this::executaAtualizacaoAutomatica;
 
     // Chamado (na thread principal) quando uma gravação feita pelo planejamento falha depois
     // de aceita, já que o resultado do Firebase só chega de forma assíncrona.
     public void setOuvinteFalhaGravacao(Consumer<String> ouvinteFalhaGravacao) {
         this.ouvinteFalhaGravacao = ouvinteFalhaGravacao;
+    }
+
+    // Chamado (na thread principal) com o resultado de uma atualização automática que trouxe novidades.
+    public void setOuvinteResumoAutomatico(Consumer<ResumoPlanejamento> ouvinteResumoAutomatico) {
+        this.ouvinteResumoAutomatico = ouvinteResumoAutomatico;
+    }
+
+    // Gatilho ao concluir uma produção: agrupa várias conclusões seguidas em uma só rodada.
+    public void agendaAtualizacaoAutomatica() {
+        handler.removeCallbacks(atualizacaoAutomatica);
+        handler.postDelayed(atualizacaoAutomatica, ATRASO_ATUALIZACAO_AUTOMATICA_MS);
+    }
+
+    // Gatilho ao ligar a prioridade de uma profissão: o banco local já está atualizado.
+    public ResumoPlanejamento atualizaAgora() {
+        handler.removeCallbacks(atualizacaoAutomatica);
+        return incluirComunsProfissoesPriorizadas();
+    }
+
+    private void executaAtualizacaoAutomatica() {
+        ResumoPlanejamento resumo = incluirComunsProfissoesPriorizadas();
+        if (resumo.temNovidades() && ouvinteResumoAutomatico != null) {
+            ouvinteResumoAutomatico.accept(resumo);
+        }
     }
 
     public ResumoPlanejamento incluirComunsProfissoesPriorizadas() {
