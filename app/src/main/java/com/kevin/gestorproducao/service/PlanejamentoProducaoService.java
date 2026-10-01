@@ -1,9 +1,12 @@
 package com.kevin.gestorproducao.service;
 
-import static com.kevin.gestorproducao.rules.exception.ProducaoException.TipoErroProducao.SEM_TRABALHO_COMUM;
 import static com.kevin.gestorproducao.rules.exception.ProducaoException.TipoErroProducao.TRABALHO_SEM_DEPENDENCIA;
 
 import android.content.Context;
+import android.os.Looper;
+
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 
 import com.kevin.gestorproducao.R;
 import com.kevin.gestorproducao.model.Profissao;
@@ -13,6 +16,7 @@ import com.kevin.gestorproducao.model.Trabalho;
 import com.kevin.gestorproducao.model.TrabalhoEstoque;
 import com.kevin.gestorproducao.model.TrabalhoProducao;
 import com.kevin.gestorproducao.repository.ProfissaoPersonagemRepository;
+import com.kevin.gestorproducao.repository.Resource;
 import com.kevin.gestorproducao.repository.TrabalhoEstoqueRepository;
 import com.kevin.gestorproducao.repository.TrabalhoProducaoRepository;
 import com.kevin.gestorproducao.repository.TrabalhoRepository;
@@ -20,10 +24,9 @@ import com.kevin.gestorproducao.rules.CatalogoRecursos;
 import com.kevin.gestorproducao.rules.exception.ProducaoException;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class PlanejamentoProducaoService {
     private final TrabalhoRepository trabalhoRepo;
@@ -238,157 +241,193 @@ public class PlanejamentoProducaoService {
         return recursosFaltantes;
     }
 
-    public void incluirComunsProfissoesPriorizadas() throws ProducaoException {
-        ArrayList<ProfissaoPersonagem> profissoes;
-        profissoes = profissaoPersonagemRepo.recuperaProfissoesPriorizadas(idPersonagem);
+    // Meta de trabalhos (estoque + fila) por trabalho comum de cada profissão priorizada.
+    // Ainda fixa em 1; ponto de partida para torná-la configurável por profissão.
+    private static final int META_POR_TRABALHO_COMUM = 1;
+    private static final int INSUMO_INDISPONIVEL = -1;
 
+    private Consumer<String> ouvinteFalhaGravacao;
+
+    // Chamado (na thread principal) quando uma gravação feita pelo planejamento falha depois
+    // de aceita, já que o resultado do Firebase só chega de forma assíncrona.
+    public void setOuvinteFalhaGravacao(Consumer<String> ouvinteFalhaGravacao) {
+        this.ouvinteFalhaGravacao = ouvinteFalhaGravacao;
+    }
+
+    public ResumoPlanejamento incluirComunsProfissoesPriorizadas() {
+        ResumoPlanejamento resumo = new ResumoPlanejamento();
+        ArrayList<ProfissaoPersonagem> profissoes =
+            profissaoPersonagemRepo.recuperaProfissoesPriorizadas(idPersonagem);
+
+        // Cada profissão roda isolada: um problema em uma não impede as demais.
         for (ProfissaoPersonagem profissao : profissoes) {
-            ArrayList<TrabalhoProducao> producoes = new ArrayList<>();
-            ArrayList<Trabalho> trabalhosComuns;
-            Map<Trabalho, Integer> mapaTotais = new HashMap<>();
-            int nivelProducao = profissao.getNivelProducao();
-
-            trabalhosComuns = trabalhoRepo.recuperaTrabalhosComuns(nivelProducao, profissao.getNome());
-
-            if (trabalhosComuns.isEmpty()) {
-                throw new ProducaoException(
-                    SEM_TRABALHO_COMUM,
-                    "Trabalho comum de ("+ profissao.getNome() + ") nível (" + nivelProducao + ") não encontrado."
-                );
-            }
-
-            int totalEmProducao = 0;
-
-            for (Trabalho trabalho : trabalhosComuns) {
-
-                int quantidadeEstoque = 0;
-                int quantidadeProducao;
-
-                TrabalhoEstoque emEstoque = estoqueRepo.recuperaTrabalhoPorId(
-                    idPersonagem,
-                    trabalho.getId()
-                );
-                if (emEstoque != null) {
-                    quantidadeEstoque = emEstoque.getQuantidade();
-                }
-
-                int emProducaoParaProduzir = producaoRepo.recuperaQuantidadeProducaoParaProduzirPorId(
-                    idPersonagem,
-                    trabalho.getId()
-                );
-                int emProducaoProduzindo = producaoRepo.recuperaQuantidadeProducaoProduzindoPorId(
-                    idPersonagem,
-                    trabalho.getId()
-                );
-                quantidadeProducao = emProducaoParaProduzir + emProducaoProduzindo;
-                totalEmProducao += emProducaoParaProduzir + emProducaoProduzindo;
-
-                int total = quantidadeEstoque + quantidadeProducao;
-
-                mapaTotais.put(trabalho, total);
-            }
-
-            int tamanhoDesejado = trabalhosComuns.size();
-
-            if (totalEmProducao >= tamanhoDesejado) continue;
-
-            int restanteParaInserir = tamanhoDesejado - totalEmProducao;
-
-            if (nivelProducao != 1 && nivelProducao != 8) {
-
-                Trabalho trabalhoComum = trabalhosComuns.get(0);
-                int nivel = trabalhoComum.getNivel();
-                String profissaoStr = trabalhoComum.getProfissao();
-
-                Profissao profissaoEnum = Profissao.fromKey(profissaoStr);
-                if (profissaoEnum == null) continue;
-
-                Map<Recurso, Integer> recursos = CatalogoRecursos.getCatalogo().get(profissaoEnum);
-                if (recursos == null || recursos.isEmpty()) continue;
-
-                List<Map.Entry<Recurso, Integer>> lista = new ArrayList<>(recursos.entrySet());
-
-                int offset = (nivel >= 16) ? 3 : 0;
-
-                int primario = 4 + (nivel > 16 ? nivel - 10 : nivel - 6);
-                int secundario = primario - 1;
-                int terciario = primario - 2;
-
-                int[] quantidadesBase = { primario, secundario, terciario };
-
-                int maxProduzivel = Integer.MAX_VALUE;
-                for (int i = 0; i < 3; i++ ) {
-                    Map.Entry<Recurso, Integer> entry = lista.get(offset + i);
-
-                    Recurso recurso = entry.getKey();
-                    Trabalho recursoProducao = trabalhoRepo.recuperaTrabalhoPorNome(recurso.getKey());
-                    if (recursoProducao == null) continue;
-
-                    TrabalhoEstoque recursoEstoque = estoqueRepo.recuperaTrabalhoPorId(idPersonagem, recursoProducao.getId());
-                    if (recursoEstoque == null) continue;
-
-                    int produzivel = recursoEstoque.getQuantidade() / quantidadesBase[i];
-                    maxProduzivel = Math.min(maxProduzivel, produzivel);
-                }
-
-                if (maxProduzivel <= 0) {
-                    Trabalho producaoEmMassaRecursos = trabalhoRepo.recuperaTrabalhoProducaoRecursos(trabalhoComum);
-                    if (producaoEmMassaRecursos == null) continue;
-
-                    int quantidadeProducaoEmMassa = producaoRepo.recuperaQuantidadeProducaoParaProduzirPorId(
-                        idPersonagem,
-                        producaoEmMassaRecursos.getId()
-                    );
-                    if (quantidadeProducaoEmMassa == 0) {
-                        TrabalhoProducao novaProducao = new TrabalhoProducao();
-                        novaProducao.setIdTrabalho(producaoEmMassaRecursos.getId());
-                        novaProducao.setExperiencia(producaoEmMassaRecursos.getExperiencia());
-                        novaProducao.setTipoLicenca(context.getString(R.string.licencaAprendiz));
-
-                        producaoRepo.insereTrabalhoProducao(novaProducao, idPersonagem);
-                    }
-                    continue;
-                }
-
-                restanteParaInserir = Math.min(restanteParaInserir, maxProduzivel);
-            }
-
-            int menorTotal;
-
-           while (producoes.size() < restanteParaInserir) {
-                menorTotal = Collections.min(mapaTotais.values());
-
-                boolean inseriu = false;
-
-                for (Map.Entry<Trabalho, Integer> entry : mapaTotais.entrySet()) {
-
-                    if (entry.getValue() == menorTotal) {
-                        Trabalho trabalho = entry.getKey();
-
-                        TrabalhoProducao nova = new TrabalhoProducao();
-                        nova.setIdTrabalho(trabalho.getId());
-                        nova.setExperiencia(trabalho.getExperiencia());
-                        nova.setTipoLicenca(
-                            context.getString(R.string.licencaIniciante)
-                        );
-
-                        producoes.add(nova);
-
-                        mapaTotais.put(trabalho, entry.getValue() + 1);
-
-                        inseriu = true;
-
-                        break;
-                    }
-                }
-
-                if (!inseriu) break;
-            }
-
-            for (TrabalhoProducao producao : producoes) {
-                producaoRepo.insereTrabalhoProducao(producao, idPersonagem);
+            try {
+                processaProfissaoPriorizada(profissao, resumo);
+            } catch (RuntimeException e) {
+                resumo.registraAviso(profissao.getNome() + ": erro inesperado (" + e.getMessage() + ")");
             }
         }
+
+        return resumo;
+    }
+
+    private void processaProfissaoPriorizada(
+        ProfissaoPersonagem profissao,
+        ResumoPlanejamento resumo
+    ) {
+        int nivelProducao = profissao.getNivelProducao();
+        ArrayList<Trabalho> trabalhosComuns =
+            trabalhoRepo.recuperaTrabalhosComuns(nivelProducao, profissao.getNome());
+
+        if (trabalhosComuns.isEmpty()) {
+            resumo.registraAviso(
+                "Trabalho comum de (" + profissao.getNome() + ") nível (" + nivelProducao + ") não encontrado"
+            );
+            return;
+        }
+
+        // Estoque e fila entram na decisão: só falta produzir o que a meta ainda não cobre.
+        int[] totais = new int[trabalhosComuns.size()];
+        int faltante = 0;
+        for (int i = 0; i < trabalhosComuns.size(); i++) {
+            totais[i] = quantidadeEmEstoqueEFila(trabalhosComuns.get(i));
+            faltante += Math.max(0, META_POR_TRABALHO_COMUM - totais[i]);
+        }
+
+        if (faltante == 0) return;
+
+        if (nivelProducao != 1 && nivelProducao != 8) {
+            Trabalho trabalhoComum = trabalhosComuns.get(0);
+            int maxProduzivel = calculaMaxProduzivel(trabalhoComum);
+
+            if (maxProduzivel == INSUMO_INDISPONIVEL) {
+                resumo.registraAviso(profissao.getNome() + ": catálogo de recursos indisponível");
+                return;
+            }
+
+            if (maxProduzivel <= 0) {
+                enfileiraProducaoDeRecursos(trabalhoComum, resumo);
+                resumo.registraAguardandoInsumo(profissao.getNome());
+                return;
+            }
+
+            faltante = Math.min(faltante, maxProduzivel);
+        }
+
+        String licenca = licencaPara(profissao);
+
+        // Sempre no trabalho de menor total; o empate segue a ordem da consulta (determinística).
+        while (faltante > 0) {
+            int escolhido = -1;
+            for (int i = 0; i < totais.length; i++) {
+                if (totais[i] >= META_POR_TRABALHO_COMUM) continue;
+                if (escolhido == -1 || totais[i] < totais[escolhido]) escolhido = i;
+            }
+
+            if (escolhido == -1) break;
+
+            Trabalho trabalho = trabalhosComuns.get(escolhido);
+            TrabalhoProducao nova = new TrabalhoProducao();
+            nova.setIdTrabalho(trabalho.getId());
+            nova.setExperiencia(trabalho.getExperiencia());
+            nova.setTipoLicenca(licenca);
+
+            if (gravaProducao(nova)) {
+                resumo.registraAdicionado();
+            } else {
+                resumo.registraAviso(profissao.getNome() + ": produção de '" + trabalho.getNome() + "' inválida");
+            }
+
+            totais[escolhido]++;
+            faltante--;
+        }
+    }
+
+    private int quantidadeEmEstoqueEFila(Trabalho trabalho) {
+        int quantidadeEstoque = 0;
+        TrabalhoEstoque emEstoque = estoqueRepo.recuperaTrabalhoPorId(idPersonagem, trabalho.getId());
+        if (emEstoque != null) {
+            quantidadeEstoque = emEstoque.getQuantidade();
+        }
+
+        return quantidadeEstoque
+            + producaoRepo.recuperaQuantidadeProducaoParaProduzirPorId(idPersonagem, trabalho.getId())
+            + producaoRepo.recuperaQuantidadeProducaoProduzindoPorId(idPersonagem, trabalho.getId());
+    }
+
+    // Quantas produções comuns o estoque de recursos comporta. Recurso sem registro no estoque
+    // conta como 0 (antes era ignorado e liberava a produção sem insumo).
+    private int calculaMaxProduzivel(Trabalho trabalhoComum) {
+        int nivel = trabalhoComum.getNivel();
+
+        Profissao profissaoEnum = Profissao.fromKey(trabalhoComum.getProfissao());
+        if (profissaoEnum == null) return INSUMO_INDISPONIVEL;
+
+        Map<Recurso, Integer> recursos = CatalogoRecursos.getCatalogo().get(profissaoEnum);
+        if (recursos == null || recursos.isEmpty()) return INSUMO_INDISPONIVEL;
+
+        List<Map.Entry<Recurso, Integer>> lista = new ArrayList<>(recursos.entrySet());
+
+        int offset = (nivel >= 16) ? 3 : 0;
+        if (lista.size() < offset + 3) return INSUMO_INDISPONIVEL;
+
+        int primario = 4 + (nivel > 16 ? nivel - 10 : nivel - 6);
+        int[] quantidadesBase = { primario, primario - 1, primario - 2 };
+
+        int maxProduzivel = Integer.MAX_VALUE;
+        for (int i = 0; i < 3; i++) {
+            Recurso recurso = lista.get(offset + i).getKey();
+            Trabalho recursoProducao = trabalhoRepo.recuperaTrabalhoPorNome(recurso.getKey());
+            if (recursoProducao == null) continue;
+
+            TrabalhoEstoque recursoEstoque = estoqueRepo.recuperaTrabalhoPorId(idPersonagem, recursoProducao.getId());
+            int emEstoque = recursoEstoque == null ? 0 : recursoEstoque.getQuantidade();
+
+            maxProduzivel = Math.min(maxProduzivel, emEstoque / quantidadesBase[i]);
+        }
+
+        return maxProduzivel;
+    }
+
+    private void enfileiraProducaoDeRecursos(Trabalho trabalhoComum, ResumoPlanejamento resumo) {
+        Trabalho producaoEmMassaRecursos = trabalhoRepo.recuperaTrabalhoProducaoRecursos(trabalhoComum);
+        if (producaoEmMassaRecursos == null) return;
+
+        int quantidadeEmMassa = producaoRepo.recuperaQuantidadeProducaoParaProduzirPorId(
+            idPersonagem,
+            producaoEmMassaRecursos.getId()
+        );
+        if (quantidadeEmMassa != 0) return;
+
+        TrabalhoProducao novaProducao = new TrabalhoProducao();
+        novaProducao.setIdTrabalho(producaoEmMassaRecursos.getId());
+        novaProducao.setExperiencia(producaoEmMassaRecursos.getExperiencia());
+        novaProducao.setTipoLicenca(context.getString(R.string.licencaAprendiz));
+
+        if (gravaProducao(novaProducao)) {
+            resumo.registraAdicionado();
+        }
+    }
+
+    // Grava e acompanha o resultado: uma falha assíncrona é repassada ao ouvinte.
+    private boolean gravaProducao(TrabalhoProducao producao) {
+        if (producao.getIdTrabalho() == null || producao.getIdTrabalho().isEmpty()) return false;
+
+        LiveData<Resource<Void>> resultado = producaoRepo.insereTrabalhoProducao(producao, idPersonagem);
+
+        if (resultado != null && Looper.myLooper() == Looper.getMainLooper()) {
+            resultado.observeForever(new Observer<Resource<Void>>() {
+                @Override
+                public void onChanged(Resource<Void> recurso) {
+                    resultado.removeObserver(this);
+                    if (recurso != null && recurso.getErro() != null && ouvinteFalhaGravacao != null) {
+                        ouvinteFalhaGravacao.accept(recurso.getErro());
+                    }
+                }
+            });
+        }
+
+        return true;
     }
 
     public void incluirRaro(String idTrabalho) {

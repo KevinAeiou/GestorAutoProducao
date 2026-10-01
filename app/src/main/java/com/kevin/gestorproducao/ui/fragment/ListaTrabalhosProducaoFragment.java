@@ -45,6 +45,7 @@ import com.kevin.gestorproducao.rules.exception.ProducaoException;
 import com.kevin.gestorproducao.service.PlanejamentoProducaoService;
 import com.kevin.gestorproducao.service.ProducaoFluxoService;
 import com.kevin.gestorproducao.service.ProducaoServicosFactory;
+import com.kevin.gestorproducao.service.ResumoPlanejamento;
 import com.kevin.gestorproducao.service.ServicosProducaoPersonagem;
 import com.kevin.gestorproducao.ui.componente.EstadoVazioView;
 import com.kevin.gestorproducao.ui.fragment.ListaTrabalhosProducaoFragmentDirections.VaiDeProducaoParaFiltro;
@@ -256,6 +257,9 @@ public class ListaTrabalhosProducaoFragment
                 );
 
                 planejamentoProducaoService = servicos.getPlanejamentoProducaoService();
+                planejamentoProducaoService.setOuvinteFalhaGravacao(erro ->
+                    mostraMensagemAncorada("Falha ao gravar produção: " + erro)
+                );
                 producaoFluxoService = servicos.getProducaoFluxoService();
             }
         );
@@ -432,14 +436,27 @@ public class ListaTrabalhosProducaoFragment
     private void configuraSwipeRefreshLayout() {
         swipeRefreshLayout.setOnRefreshListener(() -> {
             try {
+                String mensagem = null;
+
                 if (planejamentoProducaoService != null) {
-                    planejamentoProducaoService.incluirMaisVendidos();
-                    planejamentoProducaoService.incluirComunsProfissoesPriorizadas();
+                    try {
+                        planejamentoProducaoService.incluirMaisVendidos();
+                    } catch (ProducaoException e) {
+                        mensagem = e.getMessage();
+                    }
+
+                    ResumoPlanejamento resumo =
+                        planejamentoProducaoService.incluirComunsProfissoesPriorizadas();
+                    if (resumo.temNovidades()) {
+                        mensagem = mensagem == null ?
+                            resumo.paraMensagem() :
+                            mensagem + " · " + resumo.paraMensagem();
+                    }
                 }
 
                 producaoViewModel.sincronizaProducao();
-            } catch (ProducaoException e) {
-                mostraMensagemAncorada(e.getMessage());
+
+                if (mensagem != null) mostraMensagemAncorada(mensagem);
             } finally {
                 swipeRefreshLayout.setRefreshing(false);
             }
