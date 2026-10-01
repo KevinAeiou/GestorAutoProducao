@@ -242,8 +242,8 @@ public class PlanejamentoProducaoService {
         return recursosFaltantes;
     }
 
-    // Meta de trabalhos (estoque + fila) por trabalho comum de cada profissão priorizada.
-    // Ainda fixa em 1; ponto de partida para torná-la configurável por profissão.
+    // Meta de trabalhos na fila (para produzir + produzindo) por trabalho comum de cada profissão
+    // priorizada. Ainda fixa em 1; ponto de partida para torná-la configurável por profissão.
     private static final int META_POR_TRABALHO_COMUM = 1;
     private static final int INSUMO_INDISPONIVEL = -1;
 
@@ -318,15 +318,19 @@ public class PlanejamentoProducaoService {
             return;
         }
 
-        // Estoque e fila entram na decisão: só falta produzir o que a meta ainda não cobre.
+        // A fila decide quanto falta produzir; o estoque só entra em totais[] para balancear
+        // qual trabalho produzir (o de menor estoque + fila).
         int[] totais = new int[trabalhosComuns.size()];
-        int faltante = 0;
+        int totalNaFila = 0;
         for (int i = 0; i < trabalhosComuns.size(); i++) {
-            totais[i] = quantidadeEmEstoqueEFila(trabalhosComuns.get(i));
-            faltante += Math.max(0, META_POR_TRABALHO_COMUM - totais[i]);
+            Trabalho trabalho = trabalhosComuns.get(i);
+            int naFila = quantidadeNaFila(trabalho);
+            totalNaFila += naFila;
+            totais[i] = naFila + quantidadeEmEstoque(trabalho);
         }
 
-        if (faltante == 0) return;
+        int faltante = META_POR_TRABALHO_COMUM * trabalhosComuns.size() - totalNaFila;
+        if (faltante <= 0) return;
 
         if (nivelProducao != 1 && nivelProducao != 8) {
             Trabalho trabalhoComum = trabalhosComuns.get(0);
@@ -348,15 +352,12 @@ public class PlanejamentoProducaoService {
 
         String licenca = licencaPara(profissao);
 
-        // Sempre no trabalho de menor total; o empate segue a ordem da consulta (determinística).
+        // Sempre no trabalho de menor total (estoque + fila); o empate segue a ordem da consulta.
         while (faltante > 0) {
-            int escolhido = -1;
-            for (int i = 0; i < totais.length; i++) {
-                if (totais[i] >= META_POR_TRABALHO_COMUM) continue;
-                if (escolhido == -1 || totais[i] < totais[escolhido]) escolhido = i;
+            int escolhido = 0;
+            for (int i = 1; i < totais.length; i++) {
+                if (totais[i] < totais[escolhido]) escolhido = i;
             }
-
-            if (escolhido == -1) break;
 
             Trabalho trabalho = trabalhosComuns.get(escolhido);
             TrabalhoProducao nova = new TrabalhoProducao();
@@ -375,15 +376,13 @@ public class PlanejamentoProducaoService {
         }
     }
 
-    private int quantidadeEmEstoqueEFila(Trabalho trabalho) {
-        int quantidadeEstoque = 0;
+    private int quantidadeEmEstoque(Trabalho trabalho) {
         TrabalhoEstoque emEstoque = estoqueRepo.recuperaTrabalhoPorId(idPersonagem, trabalho.getId());
-        if (emEstoque != null) {
-            quantidadeEstoque = emEstoque.getQuantidade();
-        }
+        return emEstoque == null ? 0 : emEstoque.getQuantidade();
+    }
 
-        return quantidadeEstoque
-            + producaoRepo.recuperaQuantidadeProducaoParaProduzirPorId(idPersonagem, trabalho.getId())
+    private int quantidadeNaFila(Trabalho trabalho) {
+        return producaoRepo.recuperaQuantidadeProducaoParaProduzirPorId(idPersonagem, trabalho.getId())
             + producaoRepo.recuperaQuantidadeProducaoProduzindoPorId(idPersonagem, trabalho.getId());
     }
 
