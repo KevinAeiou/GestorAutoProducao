@@ -294,6 +294,10 @@ public class TrabalhoEstoqueRepository {
         return estoqueDao.recuperaTrabalhoPorId(idPersonagem, idTrabalho);
     }
 
+    public ArrayList<TrabalhoEstoque> recuperaEstoqueComNomes(String idPersonagem) {
+        return estoqueDao.recuperaEstoqueComNomes(idPersonagem);
+    }
+
     public LiveData<Resource<Void>> removeEstoque(String idPersonagem) {
         return FirebaseTimeoutHelper.execute(callback -> referenciaEstoqueIdPersonagem
             .child(idPersonagem)
