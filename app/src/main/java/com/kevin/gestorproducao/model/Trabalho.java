@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 
 import com.google.firebase.database.Exclude;
 import com.kevin.gestorproducao.R;
+import com.kevin.gestorproducao.rules.CatalogoLicencasProducao;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -149,7 +150,13 @@ public class Trabalho extends BaseEntity implements Serializable {
         this.experiencia = experiencia;
     }
     public boolean ehProducaoDeRecursos() {
-        return LISTA_PRODUCAO_RECURSOS.contains(limpaString(nomeProducao));
+        return LISTA_PRODUCAO_RECURSOS.contains(limpaString(nomeProducao)) || ehLicencaProducaoAprendiz();
+    }
+
+    // Cada tipo de profissão chama esse trabalho de um jeito; os nomes ficam em CatalogoLicencasProducao.
+    public boolean ehLicencaProducaoAprendiz() {
+        return CatalogoLicencasProducao.ehLicencaProducao(nomeProducao)
+            || CatalogoLicencasProducao.ehLicencaProducao(nome);
     }
 
     public void geraNovoId() {

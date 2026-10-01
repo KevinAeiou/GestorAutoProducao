@@ -13,6 +13,8 @@ import com.kevin.gestorproducao.repository.TrabalhoEstoqueRepository;
 import com.kevin.gestorproducao.repository.TrabalhoRepository;
 import com.kevin.gestorproducao.rules.CatalogoRecursosRaros;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class ProducaoEstoqueService {
@@ -20,6 +22,9 @@ public class ProducaoEstoqueService {
     private final TrabalhoEstoqueRepository estoqueRepository;
     private final String idPersonagem;
     private final Context context;
+
+    // Cada conclusão rende 2 unidades, independente da licença usada na produção.
+    private static final int QUANTIDADE_POR_LICENCA_PRODUCAO_APRENDIZ = 2;
 
     public ProducaoEstoqueService(
         TrabalhoRepository trabalhoRepository,
@@ -40,6 +45,11 @@ public class ProducaoEstoqueService {
         );
 
         if (trabalhoSelecionado.ehProducaoDeRecursos()) {
+            if (trabalhoSelecionado.ehLicencaProducaoAprendiz()) {
+                adicionarLicencaProducaoAprendiz(trabalhoSelecionado);
+                return;
+            }
+
             if (trabalhoSelecionado.ehComum()) {
                 if (trabalhoEstoque == null) {
                     TrabalhoEstoque novoTrabalho = new TrabalhoEstoque();
@@ -146,5 +156,36 @@ public class ProducaoEstoqueService {
 
         trabalhoEstoque.incrementaQuantidade();
         estoqueRepository.modificaEstoque(trabalhoEstoque, idPersonagem);
+    }
+
+    // A licença de produção do aprendiz existe como um trabalho por profissão, mas no jogo todas
+    // se acumulam num único item: o estoque guarda um só registro, somando o que já estava separado.
+    private void adicionarLicencaProducaoAprendiz(TrabalhoProducao trabalhoSelecionado) {
+        int quantidadeProduzida = QUANTIDADE_POR_LICENCA_PRODUCAO_APRENDIZ;
+
+        List<TrabalhoEstoque> existentes = new ArrayList<>();
+        for (TrabalhoEstoque item : estoqueRepository.recuperaEstoqueComNomes(idPersonagem)) {
+            if (item.ehLicencaProducaoAprendiz()) existentes.add(item);
+        }
+
+        if (existentes.isEmpty()) {
+            TrabalhoEstoque novo = new TrabalhoEstoque();
+            novo.setIdTrabalho(trabalhoSelecionado.getIdTrabalho());
+            novo.setQuantidade(quantidadeProduzida);
+
+            estoqueRepository.insereEstoque(novo, idPersonagem);
+            return;
+        }
+
+        TrabalhoEstoque unico = existentes.get(0);
+        int total = unico.getQuantidade() + quantidadeProduzida;
+
+        for (int i = 1; i < existentes.size(); i++) {
+            total += existentes.get(i).getQuantidade();
+            estoqueRepository.removeTrabalhoEstoque(existentes.get(i), idPersonagem);
+        }
+
+        unico.setQuantidade(total);
+        estoqueRepository.modificaEstoque(unico, idPersonagem);
     }
 }
