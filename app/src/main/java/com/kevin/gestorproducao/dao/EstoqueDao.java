@@ -8,6 +8,7 @@ import static com.kevin.gestorproducao.db.contracts.ProfissaoDbContract.Profissa
 import static com.kevin.gestorproducao.db.contracts.TrabalhoDbContract.TrabalhoEntry.COLUMN_NAME_ID;
 import static com.kevin.gestorproducao.db.contracts.TrabalhoDbContract.TrabalhoEntry.COLUMN_NAME_NIVEL;
 import static com.kevin.gestorproducao.db.contracts.TrabalhoDbContract.TrabalhoEntry.COLUMN_NAME_NOME;
+import static com.kevin.gestorproducao.db.contracts.TrabalhoDbContract.TrabalhoEntry.COLUMN_NAME_NOME_PRODUCAO;
 import static com.kevin.gestorproducao.db.contracts.TrabalhoDbContract.TrabalhoEntry.COLUMN_NAME_PROFISSAO;
 import static com.kevin.gestorproducao.db.contracts.TrabalhoDbContract.TrabalhoEntry.COLUMN_NAME_RARIDADE;
 import static com.kevin.gestorproducao.db.contracts.TrabalhoDbContract.TrabalhoEntry.TABLE_TRABALHOS;
@@ -110,6 +111,34 @@ public class EstoqueDao extends BaseDao {
                     cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_QUANTIDADE))
                 );
 
+                estoque.add(trabalho);
+            }
+        }
+
+        return estoque;
+    }
+
+    // Estoque do personagem com o nome e o nomeProducao de cada trabalho, para filtros por nome.
+    public ArrayList<TrabalhoEstoque> recuperaEstoqueComNomes(String idPersonagem) {
+        ArrayList<TrabalhoEstoque> estoque = new ArrayList<>();
+
+        String query =
+            "SELECT e." + COLUMN_NAME_ID + ", e." + COLUMN_NAME_ID_TRABALHO + ", e." + COLUMN_NAME_QUANTIDADE + ", " +
+            "t." + COLUMN_NAME_NOME + ", t." + COLUMN_NAME_NOME_PRODUCAO + " " +
+            "FROM " + TABLE_ESTOQUE + " e " +
+            "INNER JOIN " + TABLE_TRABALHOS + " t ON e." + COLUMN_NAME_ID_TRABALHO +
+            " = t." + COLUMN_NAME_ID + " " +
+            "WHERE e." + COLUMN_NAME_ID_PERSONAGEM + " = ? " +
+            "ORDER BY e." + COLUMN_NAME_ID + " ASC";
+
+        try (Cursor cursor = db.rawQuery(query, new String[]{idPersonagem})) {
+            while (cursor.moveToNext()) {
+                TrabalhoEstoque trabalho = new TrabalhoEstoque();
+                trabalho.setId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID)));
+                trabalho.setIdTrabalho(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_ID_TRABALHO)));
+                trabalho.setQuantidade(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_NAME_QUANTIDADE)));
+                trabalho.setNome(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME)));
+                trabalho.setNomeProducao(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME_NOME_PRODUCAO)));
                 estoque.add(trabalho);
             }
         }
