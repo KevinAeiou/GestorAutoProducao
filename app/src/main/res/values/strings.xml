@@ -187,7 +187,6 @@
     <string name="string_senha_maiuscula">Senha deve conter ao menos uma letra maiúscula.</string>
     <string name="string_senha_especial">Senha deve conter ao menos um símbolo (ex.: @ # ! ?).</string>
     <string name="string_entre">Entrar</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="stringAtivo">Ativo</string>
     <string name="stringInativo">Inativo</string>
     <string name="stringCarregandoDados">Carregando dados…</string>
@@ -271,13 +270,12 @@
     <string name="stringRaro">Raro</string>
     <string name="stringComum">Comum</string>
     <string name="stringNadaEncontrado">Nada encontrado</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="stringDescricao">Descrição</string>
     <string name="stringDescricaoOpcional">Descrição (opcional)</string>
     <string name="stringData">Data</string>
     <string name="stringValor">Valor</string>
     <string name="stringValorProducao">Valor de produção</string>
+    <string name="stringOfertas">Ofertas (12h cada)</string>
     <string name="stringTaxaLucro">Taxa de lucro (%)</string>
     <string name="stringValorLucro">Valor com lucro</string>
     <string name="stringIndefinido">Indefinido</string>

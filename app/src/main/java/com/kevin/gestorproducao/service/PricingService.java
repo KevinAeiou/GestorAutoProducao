@@ -1,19 +1,22 @@
 package com.kevin.gestorproducao.service;
 
+import static com.kevin.gestorproducao.utilitario.Utilitario.limpaString;
+
 import android.content.Context;
 
 import com.kevin.gestorproducao.model.RecursoComumAvancado;
+import com.kevin.gestorproducao.model.Recurso;
 import com.kevin.gestorproducao.model.Trabalho;
+import com.kevin.gestorproducao.rules.CatalogoRecursos;
+import com.kevin.gestorproducao.rules.CatalogoRecursosRaros;
 
 import java.util.List;
+import java.util.Map;
 
-// Achado M3: motor de preço extraído de DetalhesVendaFragment (era uma "God fragment" de 786
-// linhas com essas fórmulas embutidas). As fórmulas em si não mudaram — só saíram do lugar,
-// para virarem testáveis sem depender de View/Fragment.
 public class PricingService {
     private static final int MEDIA_VALOR_LICENCA_INICIANTE = 1000;
-    public static final double FATOR_PERCENTUAL_MERCADO = 1.1;
     private static final double FATOR_PERCENTUAL = 0.01;
+    private static final int LICENCA_NOVATO = 80;
 
     private PricingService() {}
 
@@ -111,6 +114,51 @@ public class PricingService {
         return valorRecursoTotal + valorLicencas;
     }
 
+    public static int quantidadeProduzidaPorTrabalho(Trabalho trabalho) {
+        if (trabalho.ehLicencaProducaoAprendiz()) return 2;
+        if (trabalho.ehRaro()) {
+            Map<Recurso, Integer> recursos = CatalogoRecursosRaros.getRecursos(
+                trabalho.getProfissao(),
+                trabalho.getNome()
+            );
+            int total = 0;
+            for (int quantidade : recursos.values()) total += quantidade;
+            return Math.max(total, 1);
+        }
+        return Math.max(CatalogoRecursos.getQuantidade(trabalho.getProfissao(), trabalho.getNome()), 1);
+    }
+
+    public static int calculaCustoMateriaisRecurso(
+        Trabalho trabalho,
+        int mediaValorRecursoUnitarioComumMercado,
+        int mediaValorRecursoUnitarioCompostoMercado
+    ) {
+        if (!trabalho.ehRaro() || trabalho.ehLicencaProducaoAprendiz()) return 0;
+        String nome = limpaString(trabalho.getNome());
+        if (nome.contains("avancados")) return 8 * mediaValorRecursoUnitarioCompostoMercado;
+        return 4 * mediaValorRecursoUnitarioComumMercado;
+    }
+
+    public static int calculaValorProducaoRecurso(
+        int quantidadePorTrabalho,
+        boolean ehLicencaAprendiz,
+        int mediaValorRecursoUnitarioComumMercado,
+        int custoMateriaisPorTrabalho,
+        int quantidadeDesejada
+    ) {
+        if (quantidadeDesejada <= 0 || quantidadePorTrabalho <= 0) return 0;
+        double custoLicencaAprendiz = (4.0 * mediaValorRecursoUnitarioComumMercado + LICENCA_NOVATO) / 2;
+        double custoUnitario;
+        if (ehLicencaAprendiz) {
+            custoUnitario = custoLicencaAprendiz;
+        } else {
+            double comNovato = (double) (LICENCA_NOVATO + custoMateriaisPorTrabalho) / quantidadePorTrabalho;
+            double comAprendiz = (custoLicencaAprendiz + custoMateriaisPorTrabalho) / (quantidadePorTrabalho * 2);
+            custoUnitario = Math.min(comNovato, comAprendiz);
+        }
+        return (int) Math.ceil(custoUnitario * quantidadeDesejada - 1e-9);
+    }
+
     public static int calculaValorProducaoMelhorado(
         Trabalho trabalhoSelecionado,
         Context context,
@@ -133,18 +181,27 @@ public class PricingService {
         return valorProducaoMelhorado + (mediaValorRecursoUnitarioEtereoMercado * quantidadeRecursoEtereo) + MEDIA_VALOR_LICENCA_INICIANTE;
     }
 
-    public static int calculaTaxa(int novoValorLucro, int valorProducao) {
-        int valorLucroSemTaxaMercado = (int) Math.round(novoValorLucro / FATOR_PERCENTUAL_MERCADO);
-        double taxa = (double) valorLucroSemTaxaMercado / valorProducao;
-        taxa = taxa >= 1 ? (taxa - 1) * 100 : (1 - taxa) * -100;
+    public static final double TAXA_VENDA = 0.10;
+    public static final double TAXA_OFERTA = 0.10;
+    public static final int OFERTAS_PADRAO = 1;
+
+    // Fração do preço anunciado que sobra ao vendedor após a venda e todas as ofertas.
+    public static double fatorLiquido(int quantidadeOfertas) {
+        int ofertas = Math.max(quantidadeOfertas, 1);
+        return Math.max(1 - TAXA_VENDA - TAXA_OFERTA * ofertas, 0);
+    }
+
+    public static int calculaTaxa(int novoValorLucro, int valorProducao, int quantidadeOfertas) {
+        if (valorProducao == 0) return 0;
+        double valorLiquido = novoValorLucro * fatorLiquido(quantidadeOfertas);
+        double taxa = (valorLiquido / valorProducao - 1) * 100;
         return (int) Math.round(taxa);
     }
 
-    public static int calculaValorLucro(int novaTaxa, int valorProducao) {
-        double v = novaTaxa * FATOR_PERCENTUAL;
-        double porcentagem = v >= 0 ? v + 1 : v + 1.0;
-        int valorProducaoTaxa = (int) (valorProducao * porcentagem);
-        int valorTotalLucro = (int) (valorProducaoTaxa * FATOR_PERCENTUAL_MERCADO);
-        return Math.max(valorTotalLucro, 0);
+    public static int calculaValorLucro(int novaTaxa, int valorProducao, int quantidadeOfertas) {
+        double fator = fatorLiquido(quantidadeOfertas);
+        if (fator <= 0) return 0;
+        double valorDesejado = valorProducao * (1 + novaTaxa * FATOR_PERCENTUAL);
+        return (int) Math.max(Math.ceil(valorDesejado / fator - 1e-9), 0);
     }
 }
