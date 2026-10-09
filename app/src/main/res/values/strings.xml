@@ -441,4 +441,16 @@
         <item>@string/stringTemaEscuro</item>
         <item>@string/stringTemaSistema</item>
     </string-array>
+    <string name="stringNivelTitulo">Nível %1$d</string>
+    <string name="stringNivelAtual">Nível atual</string>
+    <string name="stringPrioridadeAtiva">Prioridade ativa</string>
+    <string name="stringFaltamParaProximoNivel">Faltam %1$s XP para o próximo nível</string>
+    <string name="stringPercentualProgresso">%1$d%%</string>
+    <string name="stringMetricaAtual">Atual</string>
+    <string name="stringMetricaNaFila">Na fila</string>
+    <string name="stringAjustes">Ajustes</string>
+    <string name="stringExperienciaAtual">Experiência atual</string>
+    <string name="stringPriorizarProducao">Priorizar produção</string>
+    <string name="stringPriorizarProducaoDescricao">Completa a fila desta profissão automaticamente.</string>
+    <string name="stringSalvarAlteracoes">Salvar alterações</string>
 </resources>
