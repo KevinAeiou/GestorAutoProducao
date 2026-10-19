@@ -402,8 +402,10 @@ public class PlanejamentoProducaoService {
         int offset = (nivel >= 16) ? 3 : 0;
         if (lista.size() < offset + 3) return INSUMO_INDISPONIVEL;
 
-        int primario = 4 + (nivel > 16 ? nivel - 10 : nivel - 6);
-        int[] quantidadesBase = { primario, primario - 1, primario - 2 };
+        // Mesma regra do consumo real (ConsumoMateriaisService) e do PricingService: cada trabalho
+        // gasta a quantidade máxima do nível, +2 no 1º recurso e +1 no 2º do conjunto.
+        int base = trabalhoComum.recuperaQuantidadeMaximaRecursos(context);
+        int[] quantidadesBase = { base + 2, base + 1, base };
 
         int maxProduzivel = Integer.MAX_VALUE;
         for (int i = 0; i < 3; i++) {
@@ -414,7 +416,7 @@ public class PlanejamentoProducaoService {
             TrabalhoEstoque recursoEstoque = estoqueRepo.recuperaTrabalhoPorId(idPersonagem, recursoProducao.getId());
             int emEstoque = recursoEstoque == null ? 0 : recursoEstoque.getQuantidade();
 
-            maxProduzivel = Math.min(maxProduzivel, emEstoque / quantidadesBase[i]);
+            maxProduzivel = Math.min(maxProduzivel, emEstoque / Math.max(quantidadesBase[i], 1));
         }
 
         return maxProduzivel;

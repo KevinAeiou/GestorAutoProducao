@@ -69,6 +69,9 @@ public class DetalhesVendaFragment
     private int novaTaxa, valorProducaoComum, novoValorLucro;
     private int valorProducaoMelhorado;
     private int valorProducaoRaro;
+    private int valorProducaoRecurso;
+    private ArrayList<RecursoComumAvancado> recursosAvancados;
+    private TextInputEditText edtOfertasTrabalhoVendido;
     private int codigoRequisicao;
     private LinearLayout loadingBotaoConfirmar, loadingBotaoExcluir;
 
@@ -90,6 +93,8 @@ public class DetalhesVendaFragment
         inicializaComponentes();
         preencheCampos();
         configuraListenerCampoTaxaLucro();
+        configuraListenerCampoOfertas();
+        configuraListenerCampoQuantidade();
         confguraListenerCampoValorLucro();
         configuraBotaoExcluir();
         configuraBotaoConfirmar();
@@ -206,42 +211,84 @@ public class DetalhesVendaFragment
                         recursosProducaoViewModel.insereListaRecursos();
                         return;
                     }
-                    ArrayList<RecursoComumAvancado> recursosAvancados = resultado.getDado();
-                    if (trabalhoSelecionado == null) return;
-
-                    PricingService.ValoresMercadoRecursos valoresMercado = PricingService.mapeiaValoresMercado(
-                        trabalhoSelecionado,
-                        recursosAvancados,
-                        getContext()
-                    );
-                    mediaValorRecursoUnitarioComumMercado = valoresMercado.mediaComum;
-                    mediaValorRecursoUnitarioCompostoMercado = valoresMercado.mediaComposto;
-                    mediaValorRecursoUnitarioEnergiaMercado = valoresMercado.mediaEnergia;
-                    mediaValorRecursoUnitarioEtereoMercado = valoresMercado.mediaEtereo;
-
-                    if (trabalhoSelecionado.ehComum()) {
-                        calculaValorProducaoComum();
-                        edtValorProducaoTrabalhoVendido.setText(String.valueOf(valorProducaoComum));
-                        atualizaValorLucro(valorProducaoComum);
-                        return;
-                    }
-                    if (trabalhoSelecionado.ehMelhorado()) {
-                        calculaValorProducaoComum();
-                        calculcaValorProducaoMelhorado();
-                        edtValorProducaoTrabalhoVendido.setText(String.valueOf(valorProducaoMelhorado));
-                        atualizaValorLucro(valorProducaoMelhorado);
-                        return;
-                    }
-                    if (trabalhoSelecionado.ehRaro()) {
-                        calculaValorProducaoComum();
-                        calculcaValorProducaoMelhorado();
-                        calculcaValorProducaoRaro();
-                        edtValorProducaoTrabalhoVendido.setText(String.valueOf(valorProducaoRaro));
-                        atualizaValorLucro(valorProducaoRaro);
-                    }
+                    recursosAvancados = resultado.getDado();
+                    recalculaValoresProducao();
                 }
             }
         );
+    }
+
+    private void recalculaValoresProducao() {
+        if (trabalhoSelecionado == null || recursosAvancados == null) return;
+
+        PricingService.ValoresMercadoRecursos valoresMercado = PricingService.mapeiaValoresMercado(
+            trabalhoSelecionado,
+            recursosAvancados,
+            getContext()
+        );
+        mediaValorRecursoUnitarioComumMercado = valoresMercado.mediaComum;
+        mediaValorRecursoUnitarioCompostoMercado = valoresMercado.mediaComposto;
+        mediaValorRecursoUnitarioEnergiaMercado = valoresMercado.mediaEnergia;
+        mediaValorRecursoUnitarioEtereoMercado = valoresMercado.mediaEtereo;
+
+        if (trabalhoSelecionado.ehProducaoDeRecursos()) {
+            valorProducaoRecurso = PricingService.calculaValorProducaoRecurso(
+                PricingService.quantidadeProduzidaPorTrabalho(trabalhoSelecionado),
+                trabalhoSelecionado.ehLicencaProducaoAprendiz(),
+                mediaValorRecursoUnitarioComumMercado,
+                PricingService.calculaCustoMateriaisRecurso(
+                    trabalhoSelecionado,
+                    mediaValorRecursoUnitarioComumMercado,
+                    mediaValorRecursoUnitarioCompostoMercado
+                ),
+                quantidadeVendida()
+            );
+        } else if (trabalhoSelecionado.ehComum()) {
+            calculaValorProducaoComum();
+        } else if (trabalhoSelecionado.ehMelhorado()) {
+            calculaValorProducaoComum();
+            calculcaValorProducaoMelhorado();
+        } else if (trabalhoSelecionado.ehRaro()) {
+            calculaValorProducaoComum();
+            calculcaValorProducaoMelhorado();
+            calculcaValorProducaoRaro();
+        }
+
+        int valorProducao = valorProducaoAtual();
+        edtValorProducaoTrabalhoVendido.setText(String.valueOf(valorProducao));
+        atualizaValorLucro(valorProducao);
+    }
+
+    private int quantidadeVendida() {
+        try {
+            String texto = edtQuantidadeTrabalhoVendido.getText().toString().replaceAll("[^0-9]", "");
+            return Math.max(Integer.parseInt(texto), 1);
+        } catch (NumberFormatException e) {
+            return 1;
+        }
+    }
+
+    private void configuraCampoQuantidade(boolean redefinirValor) {
+        boolean ehRecurso = trabalhoSelecionado != null && trabalhoSelecionado.ehProducaoDeRecursos();
+        edtQuantidadeTrabalhoVendido.setEnabled(ehRecurso);
+        if (!ehRecurso && redefinirValor) edtQuantidadeTrabalhoVendido.setText("1");
+    }
+
+    private void configuraListenerCampoQuantidade() {
+        edtQuantidadeTrabalhoVendido.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if (!edtQuantidadeTrabalhoVendido.isFocused()) return;
+                if (trabalhoSelecionado == null || !trabalhoSelecionado.ehProducaoDeRecursos()) return;
+                recalculaValoresProducao();
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {}
+        });
     }
 
     private void observarVenda() {
@@ -385,23 +432,49 @@ public class DetalhesVendaFragment
     }
 
     private void atualizaTaxaLucro() {
-        if (trabalhoSelecionado == null) return;
-        if (trabalhoSelecionado.ehComum()) {
-            if (valorProducaoComum == 0) return;
-            calculaTaxa(valorProducaoComum);
-        }
-        if (trabalhoSelecionado.ehMelhorado()) {
-            if (valorProducaoMelhorado == 0) return;
-            calculaTaxa(valorProducaoMelhorado);
-        }
-        if (trabalhoSelecionado.ehRaro()) {
-            if (valorProducaoRaro == 0) return;
-            calculaTaxa(valorProducaoRaro);
+        int valorProducao = valorProducaoAtual();
+        if (valorProducao == 0) return;
+        calculaTaxa(valorProducao);
+    }
+
+    private int quantidadeOfertas() {
+        try {
+            String texto = edtOfertasTrabalhoVendido.getText().toString().replaceAll("[^0-9]", "");
+            return Math.max(Integer.parseInt(texto), 1);
+        } catch (NumberFormatException e) {
+            return PricingService.OFERTAS_PADRAO;
         }
     }
 
+    private int valorProducaoAtual() {
+        if (trabalhoSelecionado == null) return 0;
+        if (trabalhoSelecionado.ehProducaoDeRecursos()) return valorProducaoRecurso;
+        if (trabalhoSelecionado.ehComum()) return valorProducaoComum;
+        if (trabalhoSelecionado.ehMelhorado()) return valorProducaoMelhorado;
+        if (trabalhoSelecionado.ehRaro()) return valorProducaoRaro;
+        return 0;
+    }
+
+    private void configuraListenerCampoOfertas() {
+        edtOfertasTrabalhoVendido.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if (!edtOfertasTrabalhoVendido.isFocused()) return;
+                int valorProducao = valorProducaoAtual();
+                if (valorProducao == 0) return;
+                atualizaValorLucro(valorProducao);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {}
+        });
+    }
+
     private void calculaTaxa(int valorProducao) {
-        int porcentual = PricingService.calculaTaxa(novoValorLucro, valorProducao);
+        int porcentual = PricingService.calculaTaxa(novoValorLucro, valorProducao, quantidadeOfertas());
         edtTaxaLucroTrabalhoVendido.setText(String.valueOf(porcentual));
     }
 
@@ -419,17 +492,8 @@ public class DetalhesVendaFragment
                     strValorTaxa = strValorTaxa.replaceAll("[^0-9-]", "");
                     if (strValorTaxa.isEmpty() || strValorTaxa.equals("-")) return;
                     novaTaxa = Integer.parseInt(strValorTaxa);
-                    int valorProducao = 0;
                     if (trabalhoSelecionado == null) return;
-                    if (trabalhoSelecionado.ehComum()) {
-                        valorProducao = valorProducaoComum;
-                    }
-                    else if (trabalhoSelecionado.ehMelhorado()) {
-                        valorProducao = valorProducaoMelhorado;
-                    }
-                    else if (trabalhoSelecionado.ehRaro()) {
-                        valorProducao = valorProducaoRaro;
-                    }
+                    int valorProducao = valorProducaoAtual();
                     atualizaValorLucro(valorProducao);
                 }
             }
@@ -443,15 +507,7 @@ public class DetalhesVendaFragment
     }
 
     private void cofiguraCampoValorProducao() {
-        if (trabalhoSelecionado == null) {
-            return;
-        }
-        if (trabalhoSelecionado.ehProducaoDeRecursos()) {
-            edtTaxaLucroTrabalhoVendido.setEnabled(false);
-            edtValorLucroTrabalhoVendido.setEnabled(false);
-            edtValorLucroTrabalhoVendido.setText(R.string.stringIndefinido);
-            edtValorProducaoTrabalhoVendido.setText(R.string.stringIndefinido);
-        }
+        configuraCampoQuantidade(false);
     }
 
     private void calculcaValorProducaoRaro() {
@@ -482,7 +538,7 @@ public class DetalhesVendaFragment
     }
 
     private void atualizaValorLucro(int valorProducao) {
-        int valorTotalLucro = PricingService.calculaValorLucro(novaTaxa, valorProducao);
+        int valorTotalLucro = PricingService.calculaValorLucro(novaTaxa, valorProducao, quantidadeOfertas());
         edtValorLucroTrabalhoVendido.setText(String.valueOf(valorTotalLucro));
     }
 
@@ -540,6 +596,8 @@ public class DetalhesVendaFragment
         edtTaxaLucroTrabalhoVendido = binding.edtInputTaxaLucroTrabalhoVendido;
         edtValorProducaoTrabalhoVendido = binding.edtInputValorProducaoTrabalhoVendido;
         edtValorLucroTrabalhoVendido = binding.edtInputValorLucroTrabalhoVendido;
+        edtOfertasTrabalhoVendido = binding.edtInputOfertasTrabalhoVendido;
+        edtOfertasTrabalhoVendido.setText(String.valueOf(PricingService.OFERTAS_PADRAO));
         btnExcluir = binding.btnExcluiVenda;
         btnConfirmar = binding.btnConfirmarVenda;
         loadingBotaoConfirmar = binding.loadingDotsConfirmar.getRoot();
@@ -602,6 +660,8 @@ public class DetalhesVendaFragment
             id
         ) -> {
             trabalhoSelecionado = adapterEstado.getItem(position);
+            configuraCampoQuantidade(true);
+            recalculaValoresProducao();
         });
 
         selecionarTrabalhoRecebido(trabalhos);

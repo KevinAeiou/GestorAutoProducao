@@ -206,26 +206,50 @@
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/txtInputValorLucroTrabalhoVendido"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:hint="@string/stringValorLucro">
+                    android:baselineAligned="false"
+                    android:orientation="horizontal">
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/edtInputValorLucroTrabalhoVendido"
-                        android:layout_width="match_parent"
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/txtInputOfertasTrabalhoVendido"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:inputType="numberSigned" />
-                </com.google.android.material.textfield.TextInputLayout>
+                        android:layout_marginEnd="4dp"
+                        android:layout_weight="1"
+                        android:hint="@string/stringOfertas">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/edtInputOfertasTrabalhoVendido"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="number" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/txtInputValorLucroTrabalhoVendido"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:layout_weight="2"
+                        android:hint="@string/stringValorLucro">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/edtInputValorLucroTrabalhoVendido"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="numberSigned" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Acoes: excluir com peso secundario, confirmar como acao primaria -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:baselineAligned="false"
             android:orientation="horizontal"
             android:gravity="center_vertical"
             android:layout_marginTop="16dp">

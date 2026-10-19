@@ -1,253 +1,415 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+<LinearLayout
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <LinearLayout
-        android:orientation="vertical"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingHorizontal="12dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="24dp">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
-        <!-- Progresso: anel de experiencia da profissao -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/frameProgressoProfissaoFragment"
-            style="@style/card"
-            app:cardBackgroundColor="?attr/colorSurface"
-            android:paddingStart="0dp"
-            android:paddingEnd="0dp"
-            android:layout_marginStart="0dp"
-            android:layout_marginEnd="0dp"
-            android:layout_marginTop="0dp">
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="12dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="16dp">
 
-            <LinearLayout
-                android:orientation="vertical"
-                android:padding="20dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center">
-
-                    <com.google.android.material.progressindicator.CircularProgressIndicator
-                        android:id="@+id/indicador_experiencia_maxima"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        app:indicatorSize="180dp"
-                        app:trackThickness="26dp"
-                        android:layout_gravity="center"
-                        app:trackColor="@color/cor_texto_licenca_novato"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
-
-                    <com.google.android.material.progressindicator.CircularProgressIndicator
-                        android:id="@+id/indicador_experiencia_produzir"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        app:indicatorSize="180dp"
-                        app:trackThickness="26dp"
-                        android:layout_gravity="center"
-                        app:trackColor="@android:color/transparent"
-                        app:indicatorColor="@color/cor_texto_licenca_principiante"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
-
-                    <com.google.android.material.progressindicator.CircularProgressIndicator
-                        android:id="@+id/indicador_experiencia_produzindo"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        app:indicatorSize="180dp"
-                        app:trackThickness="26dp"
-                        android:layout_gravity="center"
-                        app:trackColor="@android:color/transparent"
-                        app:indicatorColor="@color/cor_background_produzindo"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
-
-                    <com.google.android.material.progressindicator.CircularProgressIndicator
-                        android:id="@+id/indicador_experiencia_atual"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        app:indicatorSize="180dp"
-                        app:trackThickness="26dp"
-                        android:layout_gravity="center"
-                        app:trackColor="@android:color/transparent"
-                        app:indicatorColor="@color/cor_background_feito"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:layout_margin="16dp"
-                        android:layout_gravity="center"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent">
-
-                        <TextView
-                            style="@style/rotuloMetadado"
-                            android:gravity="center"
-                            android:text="@string/stringExperiencia" />
-
-                        <TextView
-                            android:id="@+id/txtExperienciaRingValor"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:gravity="center"
-                            android:textSize="20sp"
-                            android:textStyle="bold"
-                            android:textColor="?attr/colorOnSurface"
-                            tools:text="3.200 / 5.000" />
-                    </LinearLayout>
-                </androidx.constraintlayout.widget.ConstraintLayout>
+            <!-- Progresso: nivel, anel de experiencia e metricas -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/frameProgressoProfissaoFragment"
+                style="@style/card"
+                app:cardBackgroundColor="?attr/colorSurface"
+                android:paddingStart="0dp"
+                android:paddingEnd="0dp"
+                android:layout_marginStart="0dp"
+                android:layout_marginEnd="0dp"
+                android:layout_marginTop="0dp">
 
                 <LinearLayout
-                    android:id="@+id/linearLegendaProfissaoFragment"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:layout_marginTop="16dp">
-
-                    <LinearLayout
-                        android:id="@+id/linhaLegendaProduzindo"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:paddingVertical="4dp">
-
-                        <View
-                            android:layout_width="10dp"
-                            android:layout_height="10dp"
-                            android:background="@drawable/bg_ponto_legenda"
-                            android:backgroundTint="@color/cor_background_produzindo" />
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginStart="8dp"
-                            android:textSize="14sp"
-                            android:textColor="?attr/colorOnSurfaceVariant"
-                            android:text="@string/expProduzindo" />
-
-                        <TextView
-                            android:id="@+id/txtExperienciaProduzindoProfissaoFragment"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/cor_background_produzindo"
-                            tools:text="1.200" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/linhaLegendaProduzir"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:paddingVertical="4dp">
-
-                        <View
-                            android:layout_width="10dp"
-                            android:layout_height="10dp"
-                            android:background="@drawable/bg_ponto_legenda"
-                            android:backgroundTint="@color/cor_texto_licenca_principiante" />
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginStart="8dp"
-                            android:textSize="14sp"
-                            android:textColor="?attr/colorOnSurfaceVariant"
-                            android:text="@string/expProduzir" />
-
-                        <TextView
-                            android:id="@+id/txtExperienciaProduzirProfissaoFragment"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/cor_texto_licenca_principiante"
-                            tools:text="800" />
-                    </LinearLayout>
-                </LinearLayout>
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- Configuracao: experiencia manual e prioridade -->
-        <com.google.android.material.card.MaterialCardView
-            style="@style/card"
-            app:cardBackgroundColor="?attr/colorSurface"
-            android:paddingStart="0dp"
-            android:paddingEnd="0dp"
-            android:layout_marginStart="0dp"
-            android:layout_marginEnd="0dp"
-            android:layout_marginTop="12dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="20dp">
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/txtExperienciaProfissaoFragment"
+                    android:padding="20dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/edtExperienciaProfissaoFragment"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/stringExperiencia"
-                        android:inputType="number"/>
-                </com.google.android.material.textfield.TextInputLayout>
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                style="@style/rotuloMetadado"
+                                android:text="@string/stringNivelAtual" />
+
+                            <TextView
+                                android:id="@+id/txtNivelProfissaoFragment"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:textSize="28sp"
+                                android:textStyle="bold"
+                                android:textColor="?attr/colorOnSurface"
+                                tools:text="Nível 12" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/txtSeloPrioridade"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_selo_prioridade"
+                            android:paddingHorizontal="12dp"
+                            android:paddingVertical="6dp"
+                            android:text="@string/stringPrioridadeAtiva"
+                            android:textColor="@color/cor_estado_feito_on_container"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="16dp">
+
+                        <com.google.android.material.progressindicator.CircularProgressIndicator
+                            android:id="@+id/indicador_experiencia_maxima"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            app:indicatorSize="196dp"
+                            app:trackThickness="18dp"
+                            android:layout_gravity="center"
+                            app:trackColor="?attr/colorSurfaceVariant"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
+
+                        <com.google.android.material.progressindicator.CircularProgressIndicator
+                            android:id="@+id/indicador_experiencia_produzir"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            app:indicatorSize="196dp"
+                            app:trackThickness="18dp"
+                            android:layout_gravity="center"
+                            app:trackColor="@android:color/transparent"
+                            app:indicatorColor="@color/cor_texto_licenca_principiante"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
+
+                        <com.google.android.material.progressindicator.CircularProgressIndicator
+                            android:id="@+id/indicador_experiencia_produzindo"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            app:indicatorSize="196dp"
+                            app:trackThickness="18dp"
+                            android:layout_gravity="center"
+                            app:trackColor="@android:color/transparent"
+                            app:indicatorColor="@color/cor_background_produzindo"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
+
+                        <com.google.android.material.progressindicator.CircularProgressIndicator
+                            android:id="@+id/indicador_experiencia_atual"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            app:indicatorSize="196dp"
+                            app:trackThickness="18dp"
+                            android:layout_gravity="center"
+                            app:trackColor="@android:color/transparent"
+                            app:indicatorColor="@color/cor_background_feito"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:layout_margin="16dp"
+                            android:layout_gravity="center"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent">
+
+                            <TextView
+                                android:id="@+id/txtPercentualProgresso"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center"
+                                android:textSize="36sp"
+                                android:textStyle="bold"
+                                android:textColor="?attr/colorOnSurface"
+                                tools:text="64%" />
+
+                            <TextView
+                                android:id="@+id/txtExperienciaRingValor"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:gravity="center"
+                                android:textSize="13sp"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                tools:text="3.200 / 5.000" />
+                        </LinearLayout>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <TextView
+                        android:id="@+id/txtXpFaltante"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:gravity="center"
+                        android:textSize="14sp"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        tools:text="Faltam 1.800 XP para o próximo nível" />
+
+                    <LinearLayout
+                        android:id="@+id/linearLegendaProfissaoFragment"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="16dp"
+                        android:baselineAligned="false">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:padding="12dp"
+                            android:background="@drawable/bg_metrica_profissao"
+                            android:backgroundTint="@color/cor_metrica_feito">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <View
+                                    android:layout_width="8dp"
+                                    android:layout_height="8dp"
+                                    android:background="@drawable/bg_ponto_legenda"
+                                    android:backgroundTint="@color/cor_background_feito" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="6dp"
+                                    android:text="@string/stringMetricaAtual"
+                                    android:textSize="12sp"
+                                    android:textColor="?attr/colorOnSurfaceVariant" />
+                            </LinearLayout>
+
+                            <TextView
+                                android:id="@+id/txtExperienciaAtualProfissaoFragment"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                android:textColor="?attr/colorOnSurface"
+                                tools:text="3.200" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/linhaLegendaProduzindo"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="8dp"
+                            android:orientation="vertical"
+                            android:padding="12dp"
+                            android:background="@drawable/bg_metrica_profissao"
+                            android:backgroundTint="@color/cor_metrica_produzindo">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <View
+                                    android:layout_width="8dp"
+                                    android:layout_height="8dp"
+                                    android:background="@drawable/bg_ponto_legenda"
+                                    android:backgroundTint="@color/cor_background_produzindo" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="6dp"
+                                    android:text="@string/stringProduzindo"
+                                    android:textSize="12sp"
+                                    android:textColor="?attr/colorOnSurfaceVariant" />
+                            </LinearLayout>
+
+                            <TextView
+                                android:id="@+id/txtExperienciaProduzindoProfissaoFragment"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                android:textColor="?attr/colorOnSurface"
+                                tools:text="900" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/linhaLegendaProduzir"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="8dp"
+                            android:orientation="vertical"
+                            android:padding="12dp"
+                            android:background="@drawable/bg_metrica_profissao"
+                            android:backgroundTint="@color/cor_metrica_produzir">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <View
+                                    android:layout_width="8dp"
+                                    android:layout_height="8dp"
+                                    android:background="@drawable/bg_ponto_legenda"
+                                    android:backgroundTint="@color/cor_texto_licenca_principiante" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="6dp"
+                                    android:text="@string/stringMetricaNaFila"
+                                    android:textSize="12sp"
+                                    android:textColor="?attr/colorOnSurfaceVariant" />
+                            </LinearLayout>
+
+                            <TextView
+                                android:id="@+id/txtExperienciaProduzirProfissaoFragment"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:textSize="20sp"
+                                android:textStyle="bold"
+                                android:textColor="?attr/colorOnSurface"
+                                tools:text="600" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Ajustes: experiencia manual e prioridade -->
+            <com.google.android.material.card.MaterialCardView
+                style="@style/card"
+                app:cardBackgroundColor="?attr/colorSurface"
+                android:paddingStart="0dp"
+                android:paddingEnd="0dp"
+                android:layout_marginStart="0dp"
+                android:layout_marginEnd="0dp"
+                android:layout_marginTop="12dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                    android:orientation="vertical"
+                    android:padding="20dp">
 
                     <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:textSize="16sp"
-                        android:textColor="?attr/colorOnSurface"
-                        android:text="@string/stringPrioridade" />
+                        style="@style/rotuloMetadado"
+                        android:text="@string/stringAjustes" />
 
-                    <com.google.android.material.materialswitch.MaterialSwitch
-                        android:id="@+id/swtPrioridadeProfissaoFragment"
-                        android:layout_width="wrap_content"
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/txtExperienciaProfissaoFragment"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:thumbIcon="@drawable/ic_switch_thumb_checked"
-                        app:thumbIconTint="?attr/colorPrimary" />
+                        android:layout_marginTop="12dp"
+                        app:suffixText="XP">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/edtExperienciaProfissaoFragment"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="@string/stringExperienciaAtual"
+                            android:inputType="number"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="16dp"
+                        android:background="?attr/colorOutlineVariant" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textSize="16sp"
+                                android:textColor="?attr/colorOnSurface"
+                                android:text="@string/stringPriorizarProducao" />
+
+                            <TextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:textSize="13sp"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:text="@string/stringPriorizarProducaoDescricao" />
+                        </LinearLayout>
+
+                        <com.google.android.material.materialswitch.MaterialSwitch
+                            android:id="@+id/swtPrioridadeProfissaoFragment"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:contentDescription="@string/stringPriorizarProducao"
+                            app:thumbIcon="@drawable/ic_switch_thumb_checked"
+                            app:thumbIconTint="?attr/colorPrimary" />
+                    </LinearLayout>
                 </LinearLayout>
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-    </LinearLayout>
-</androidx.core.widget.NestedScrollView>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Acao primaria fixa no rodape -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnSalvarProfissaoPersonagem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginVertical="12dp"
+        android:minHeight="52dp"
+        android:text="@string/stringSalvarAlteracoes" />
+</LinearLayout>

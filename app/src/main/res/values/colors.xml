@@ -82,4 +82,9 @@
 
     <!-- Menu inferior: cor do ícone dentro do indicador ativo (precisa contrastar com o preenchimento do indicador, não com o fundo do cartão) -->
     <color name="cor_icone_navegacao_ativo">@color/white</color>
+
+    <!-- Detalhes da profissão: fundo translúcido dos cartões de métrica -->
+    <color name="cor_metrica_feito">#26B5CA6D</color>
+    <color name="cor_metrica_produzindo">#266D87CA</color>
+    <color name="cor_metrica_produzir">#33FFD54F</color>
 </resources>

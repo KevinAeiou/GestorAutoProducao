@@ -62,7 +62,7 @@ public class DetalhesProfissaoPersonagemFragment
     private String idPersonagemSelecionado;
     private CircularProgressIndicator indicadorAtual, indicadorMaximo, indicadorProduzindo, indicadorProduzir;
     private TextView txtExperienciaRingValor, txtExpProduzir, txtExpProduzindo;
-    private View linhaLegendaProduzir, linhaLegendaProduzindo;
+    private TextView txtNivel, txtPercentual, txtXpFaltante, txtExpAtual, seloPrioridade;
     private TextInputLayout txtExperiencia;
     private NavController controlador;
 
@@ -128,7 +128,7 @@ public class DetalhesProfissaoPersonagemFragment
             true,
             false,
             false,
-            true,
+            false,
             false,
             false,
             profissaoRecebida.getNome(),
@@ -199,6 +199,12 @@ public class DetalhesProfissaoPersonagemFragment
     private void preencheCampos() {
         edtExperiencia.setText(String.valueOf(profissaoRecebida.getExperiencia()));
         swtPrioridade.setChecked(profissaoRecebida.isPrioridade());
+        seloPrioridade.setVisibility(swtPrioridade.isChecked() ? VISIBLE : GONE);
+        txtNivel.setText(getString(R.string.stringNivelTitulo, profissaoRecebida.getNivel()));
+        swtPrioridade.setOnCheckedChangeListener(
+            (botao, marcado) -> seloPrioridade.setVisibility(marcado ? VISIBLE : GONE)
+        );
+        binding.btnSalvarProfissaoPersonagem.setOnClickListener(v -> confirmarModificacao());
     }
 
     private void inicializaComponentes() {
@@ -214,8 +220,11 @@ public class DetalhesProfissaoPersonagemFragment
         txtExperienciaRingValor = binding.txtExperienciaRingValor;
         txtExpProduzir = binding.txtExperienciaProduzirProfissaoFragment;
         txtExpProduzindo = binding.txtExperienciaProduzindoProfissaoFragment;
-        linhaLegendaProduzir = binding.linhaLegendaProduzir;
-        linhaLegendaProduzindo = binding.linhaLegendaProduzindo;
+        txtNivel = binding.txtNivelProfissaoFragment;
+        txtPercentual = binding.txtPercentualProgresso;
+        txtXpFaltante = binding.txtXpFaltante;
+        txtExpAtual = binding.txtExperienciaAtualProfissaoFragment;
+        seloPrioridade = binding.txtSeloPrioridade;
 
         producao = new ArrayList<>();
 
@@ -312,9 +321,15 @@ public class DetalhesProfissaoPersonagemFragment
         txtExpProduzir.setText(Formatador.formatarMilhar(experienciaProduzir));
         txtExpProduzindo.setText(Formatador.formatarMilhar(experienciaProduzindo));
 
+        int percentual = xpNecessario == 0 ? 0 : experienciaAtual * 100 / xpNecessario;
+        txtPercentual.setText(getString(R.string.stringPercentualProgresso, percentual));
+        txtExpAtual.setText(Formatador.formatarMilhar(experienciaAtual));
+        txtXpFaltante.setText(getString(
+            R.string.stringFaltamParaProximoNivel,
+            Formatador.formatarMilhar(Math.max(xpNecessario - experienciaAtual, 0))
+        ));
+
         configuraVisibilidadeView(xpNecessario, txtExperienciaRingValor);
-        configuraVisibilidadeView(experienciaProduzir, linhaLegendaProduzir);
-        configuraVisibilidadeView(experienciaProduzindo, linhaLegendaProduzindo);
 
         experienciaProduzindo += experienciaAtual;
         experienciaProduzir += experienciaProduzindo;
