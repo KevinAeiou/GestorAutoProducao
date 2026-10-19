@@ -11,10 +11,10 @@ public class CatalogoRecursos {
 
     static {
         Map<Recurso, Integer> aneis = new LinkedHashMap<>();
-        aneis.put(Recurso.MOLDE_DO_PRINCIPIANTE, 2);
+        aneis.put(Recurso.MOLDE_DO_APRENDIZ, 2);
         aneis.put(Recurso.PEPITA_DE_COBRE, 1);
         aneis.put(Recurso.PEDRA_DE_SOMBRAS, 1);
-        aneis.put(Recurso.MOLDE_DO_APRENDIZ, 2);
+        aneis.put(Recurso.MOLDE_DO_PRINCIPIANTE, 2);
         aneis.put(Recurso.PEPITA_DE_PRATA, 2);
         aneis.put(Recurso.PEDRA_DA_LUZ, 2);
         CATALOGO.put(Profissao.ANEIS, aneis);
