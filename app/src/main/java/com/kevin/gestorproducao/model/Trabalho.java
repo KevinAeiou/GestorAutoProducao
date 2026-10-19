@@ -166,7 +166,7 @@ public class Trabalho extends BaseEntity implements Serializable {
     @NonNull
     @Override
     public String toString() {
-        return nome;
+        return id.substring(0, 5) + " | " + nome;
     }
 
     public boolean ehComum() {
