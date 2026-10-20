@@ -29,6 +29,7 @@ public class TrabalhosVendidosViewModel extends ViewModel {
     private final MutableLiveData<String> idPersonagem = new MutableLiveData<>();
     private final MutableLiveData<String> idPersonagemChanceVenda = new MutableLiveData<>();
     private final MutableLiveData<String> idTrabalho = new MutableLiveData<>();
+    private final MediatorLiveData<Resource<Void>> ofertaResultado = new MediatorLiveData<>();
     private final MediatorLiveData<Resource<Void>> sincronizacaoResultado = new MediatorLiveData<>();
     private final VendaService vendaService;
     private final MutableLiveData<VendaFiltro> filtroVenda = new MutableLiveData<>();
@@ -110,6 +111,22 @@ public class TrabalhosVendidosViewModel extends ViewModel {
         ultimaVendaResultado.addSource(source, resultado -> {
             ultimaVendaResultado.setValue(new Evento<>(resultado));
             ultimaVendaResultado.removeSource(source);
+        });
+    }
+
+    public LiveData<Resource<Void>> getOfertaResultado() {
+        return ofertaResultado;
+    }
+
+    public void defineOfertado(String idTrabalho, boolean ofertado) {
+        String id = idPersonagemChanceVenda.getValue();
+        if (id == null) return;
+
+        LiveData<Resource<Void>> source = repository.defineOfertado(id, idTrabalho, ofertado);
+
+        ofertaResultado.addSource(source, resultado -> {
+            ofertaResultado.setValue(resultado);
+            ofertaResultado.removeSource(source);
         });
     }
 

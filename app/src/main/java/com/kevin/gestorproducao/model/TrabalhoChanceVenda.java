@@ -5,16 +5,13 @@ import androidx.annotation.NonNull;
 import java.io.Serializable;
 import java.util.Objects;
 
-// Não é uma entidade persistida (não tem tabela própria) — representa o resultado, já
-// calculado, da análise de "chance de venda" de um trabalho em estoque: cruza estoque atual
-// com o histórico de vendas do período analisado (ver VendaDao.recuperaAnaliseChanceVenda e
-// AnaliseVendaService).
 public class TrabalhoChanceVenda extends Trabalho implements Serializable {
     private String idTrabalho;
     private int estoqueAtual;
     private int quantidadeVendidaPeriodo;
     private Long ultimaVendaEm;
     private double score;
+    private boolean ofertado;
 
     public String getIdTrabalho() {
         return idTrabalho;
@@ -56,6 +53,14 @@ public class TrabalhoChanceVenda extends Trabalho implements Serializable {
         this.score = score;
     }
 
+    public boolean isOfertado() {
+        return ofertado;
+    }
+
+    public void setOfertado(boolean ofertado) {
+        this.ofertado = ofertado;
+    }
+
     public boolean nuncaVendidoNoPeriodo() {
         return ultimaVendaEm == null;
     }
@@ -66,6 +71,7 @@ public class TrabalhoChanceVenda extends Trabalho implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         TrabalhoChanceVenda that = (TrabalhoChanceVenda) o;
         return estoqueAtual == that.estoqueAtual &&
+            ofertado == that.ofertado &&
             quantidadeVendidaPeriodo == that.quantidadeVendidaPeriodo &&
             Double.compare(that.score, score) == 0 &&
             Objects.equals(idTrabalho, that.idTrabalho) &&
@@ -74,7 +80,7 @@ public class TrabalhoChanceVenda extends Trabalho implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(idTrabalho, estoqueAtual, quantidadeVendidaPeriodo, ultimaVendaEm, score);
+        return Objects.hash(idTrabalho, estoqueAtual, quantidadeVendidaPeriodo, ultimaVendaEm, score, ofertado);
     }
 
     @NonNull
@@ -86,6 +92,7 @@ public class TrabalhoChanceVenda extends Trabalho implements Serializable {
             ", quantidadeVendidaPeriodo=" + quantidadeVendidaPeriodo +
             ", ultimaVendaEm=" + ultimaVendaEm +
             ", score=" + score +
+            ", ofertado=" + ofertado +
             '}';
     }
 }

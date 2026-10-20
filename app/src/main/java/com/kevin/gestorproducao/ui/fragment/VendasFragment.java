@@ -193,6 +193,17 @@ public class VendasFragment
             }
         );
 
+        vendasViewModel.getOfertaResultado().observe(
+            getViewLifecycleOwner(),
+            resultado -> {
+                if (resultado.getErro() == null) return;
+
+                mostraMensagemAncorada(getString(R.string.stringErroValor, resultado.getErro()));
+
+                vendasViewModel.atualizaChanceVenda();
+            }
+        );
+
         vendasViewModel.getUltimaVendaResultado().observe(
             getViewLifecycleOwner(),
             evento -> {
@@ -338,6 +349,9 @@ public class VendasFragment
         chanceVendaAdapter = new ListaChanceVendaAdapter(requireContext());
         meuRecyclerChanceVenda.setAdapter(chanceVendaAdapter);
         chanceVendaAdapter.setOnItemClickListener(this::vaiParaDetalhesUltimaVenda);
+        chanceVendaAdapter.setOnOfertadoChangeListener(
+            (trabalho, ofertado) -> vendasViewModel.defineOfertado(trabalho.getIdTrabalho(), ofertado)
+        );
     }
 
     private void vaiParaDetalhesUltimaVenda(TrabalhoChanceVenda trabalho) {
