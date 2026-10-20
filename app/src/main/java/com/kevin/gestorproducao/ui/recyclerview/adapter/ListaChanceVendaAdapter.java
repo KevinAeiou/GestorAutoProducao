@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.color.MaterialColors;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.kevin.gestorproducao.R;
@@ -26,6 +27,15 @@ public class ListaChanceVendaAdapter
 {
     private final Context context;
     private OnItemClickListenerTrabalhoChanceVenda onItemClickListener;
+    private OnOfertadoChangeListener onOfertadoChangeListener;
+
+    public interface OnOfertadoChangeListener {
+        void onOfertadoChange(TrabalhoChanceVenda trabalho, boolean ofertado);
+    }
+
+    public void setOnOfertadoChangeListener(OnOfertadoChangeListener listener) {
+        this.onOfertadoChangeListener = listener;
+    }
 
     public ListaChanceVendaAdapter(Context context) {
         this.context = context;
@@ -87,6 +97,7 @@ public class ListaChanceVendaAdapter
         private final TextView itemLabelScore;
         private final LinearProgressIndicator itemScore;
         private final View raridadeTarja;
+        private final MaterialButton itemOfertado;
         private TrabalhoChanceVenda trabalho;
 
         public ChanceVendaViewHolder(@NonNull View itemView) {
@@ -100,6 +111,15 @@ public class ListaChanceVendaAdapter
             itemLabelScore = itemView.findViewById(R.id.itemLabelScoreChanceVenda);
             itemScore = itemView.findViewById(R.id.itemScoreChanceVenda);
             raridadeTarja = itemView.findViewById(R.id.itemRaridadeTarjaChanceVenda);
+            itemOfertado = itemView.findViewById(R.id.itemOfertadoChanceVenda);
+            itemOfertado.setOnClickListener(v -> {
+                if (trabalho == null) return;
+                boolean marcado = itemOfertado.isChecked();
+                trabalho.setOfertado(marcado);
+                if (onOfertadoChangeListener != null) {
+                    onOfertadoChangeListener.onOfertadoChange(trabalho, marcado);
+                }
+            });
             itemView.setOnClickListener(v -> {
                 if (onItemClickListener != null) onItemClickListener.onItemClick(trabalho);
             });
@@ -133,6 +153,8 @@ public class ListaChanceVendaAdapter
                 percentualScore
             ));
             itemScore.setProgress(percentualScore);
+
+            itemOfertado.setChecked(trabalho.isOfertado());
         }
 
         private String formataVendasPeriodo(TrabalhoChanceVenda trabalho) {

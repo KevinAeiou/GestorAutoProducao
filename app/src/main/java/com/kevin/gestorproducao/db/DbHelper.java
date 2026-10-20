@@ -31,6 +31,7 @@ import static com.kevin.gestorproducao.db.contracts.TrabalhoProducaoContract.Tra
 import static com.kevin.gestorproducao.db.contracts.TrabalhoProducaoContract.TrabalhoProducaoEntry.COLUMN_NAME_LICENCA;
 import static com.kevin.gestorproducao.db.contracts.TrabalhoProducaoContract.TrabalhoProducaoEntry.COLUMN_NAME_RECORRENCIA;
 import static com.kevin.gestorproducao.db.contracts.TrabalhoProducaoContract.TrabalhoProducaoEntry.TABLE_TRABALHOS_PRODUCAO;
+import static com.kevin.gestorproducao.db.contracts.TrabalhoOfertadoContract.TrabalhoOfertadoEntry.TABLE_TRABALHOS_OFERTADOS;
 import static com.kevin.gestorproducao.db.contracts.TrabalhoVendidoContract.TrabalhoVendidoEntry.COLUMN_NAME_DESCRICAO;
 import static com.kevin.gestorproducao.db.contracts.TrabalhoVendidoContract.TrabalhoVendidoEntry.COLUMN_NAME_VALOR;
 import static com.kevin.gestorproducao.db.contracts.TrabalhoVendidoContract.TrabalhoVendidoEntry.TABLE_TRABALHOS_VENDIDOS;
@@ -40,7 +41,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class DbHelper extends SQLiteOpenHelper {
-    public static final int DATABASE_VERSION = 13;
+    public static final int DATABASE_VERSION = 14;
     public static final String DATABASE_NAME = "autoProducao.db";
     private static DbHelper minhaInstancia = null;
 
@@ -149,15 +150,18 @@ public class DbHelper extends SQLiteOpenHelper {
                 "REFERENCES " + TABLE_PERSONAGENS + "(" + COLUMN_NAME_ID + ") ON DELETE CASCADE" +
             ")"
         );
+        sqLiteDatabase.execSQL(
+            "CREATE TABLE IF NOT EXISTS " + TABLE_TRABALHOS_OFERTADOS + " (" +
+                COLUMN_NAME_ID_PERSONAGEM + " VARCHAR(30) NOT NULL, " +
+                COLUMN_NAME_ID_TRABALHO + " VARCHAR(30) NOT NULL, " +
+                "PRIMARY KEY(" + COLUMN_NAME_ID_PERSONAGEM + ", " + COLUMN_NAME_ID_TRABALHO + ")" +
+            ")"
+        );
     }
 
-    // Upgrades não derrubam mais tabelas (isso apagava os dados do usuário a cada subida de
-    // versão). onCreate agora usa CREATE TABLE IF NOT EXISTS, então repeti-lo já preserva
-    // tudo até a versão 13. Uma mudança real de schema deve ganhar seu próprio passo aqui
-    // (`if (oldVersion < N) { db.execSQL("ALTER TABLE ...") }`) — nunca um DROP TABLE.
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
-        if (oldVersion < 13) {
+        if (oldVersion < 14) {
             onCreate(sqLiteDatabase);
         }
     }

@@ -201,6 +201,26 @@ public class TrabalhoVendaRepository {
         return analise;
     }
 
+    public LiveData<Resource<Void>> defineOfertado(
+        String idPersonagem,
+        String idTrabalho,
+        boolean ofertado
+    ) {
+        MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
+
+        backgroundExecutor.execute(() -> {
+            try {
+                vendaDao.defineOfertado(idPersonagem, idTrabalho, ofertado);
+
+                liveData.postValue(new Resource<>(null, null));
+            } catch (Exception e) {
+                liveData.postValue(new Resource<>(null, e.getMessage()));
+            }
+        });
+
+        return liveData;
+    }
+
     public void removeReferenciaTrabalhoEspecfico(String idTrabalho) {
         ouvinteVenda = new ValueEventListener() {
             @Override
@@ -343,25 +363,25 @@ public class TrabalhoVendaRepository {
         return maisVendidos;
     }
 
-    public LiveData<Resource<Void>> removeVendas(String idPersoangem) {
-        return FirebaseTimeoutHelper.execute(callback -> referenciaVendas
-            .child(idPersoangem)
-            .removeValue()
-            .addOnCompleteListener(backgroundExecutor, task -> {
-                if (task.isSuccessful()) {
-                    try {
-                        vendaDao.removeVendas(idPersoangem);
-                        callback.sucesso();
-                    } catch (RuntimeException e) {
-                        callback.erro(e.getMessage());
+    public void removeVendas(String idPersoangem) {
+        FirebaseTimeoutHelper.execute(callback -> referenciaVendas
+                .child(idPersoangem)
+                .removeValue()
+                .addOnCompleteListener(backgroundExecutor, task -> {
+                    if (task.isSuccessful()) {
+                        try {
+                            vendaDao.removeVendas(idPersoangem);
+                            callback.sucesso();
+                        } catch (RuntimeException e) {
+                            callback.erro(e.getMessage());
+                        }
+                        return;
                     }
-                    return;
-                }
 
-                Exception exception = task.getException();
-                String erro = recuperaErro(exception, "Erro desconhecido ao remover vendas");
-                callback.erro(erro);
-            })
+                    Exception exception = task.getException();
+                    String erro = recuperaErro(exception, "Erro desconhecido ao remover vendas");
+                    callback.erro(erro);
+                })
         );
     }
 }
