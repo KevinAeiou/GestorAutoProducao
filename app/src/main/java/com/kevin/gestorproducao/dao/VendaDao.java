@@ -14,6 +14,7 @@ import static com.kevin.gestorproducao.db.contracts.TrabalhoDbContract.TrabalhoE
 import static com.kevin.gestorproducao.db.contracts.TrabalhoDbContract.TrabalhoEntry.COLUMN_NAME_PROFISSAO;
 import static com.kevin.gestorproducao.db.contracts.TrabalhoDbContract.TrabalhoEntry.COLUMN_NAME_RARIDADE;
 import static com.kevin.gestorproducao.db.contracts.TrabalhoDbContract.TrabalhoEntry.TABLE_TRABALHOS;
+import static com.kevin.gestorproducao.db.contracts.TrabalhoOfertadoContract.TrabalhoOfertadoEntry.TABLE_TRABALHOS_OFERTADOS;
 import static com.kevin.gestorproducao.db.contracts.TrabalhoVendidoContract.TrabalhoVendidoEntry.COLUMN_NAME_DESCRICAO;
 import static com.kevin.gestorproducao.db.contracts.TrabalhoVendidoContract.TrabalhoVendidoEntry.COLUMN_NAME_VALOR;
 import static com.kevin.gestorproducao.db.contracts.TrabalhoVendidoContract.TrabalhoVendidoEntry.TABLE_TRABALHOS_VENDIDOS;
@@ -21,6 +22,7 @@ import static com.kevin.gestorproducao.db.contracts.TrabalhoVendidoContract.Trab
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 
 import androidx.annotation.NonNull;
 
@@ -252,12 +254,16 @@ public class VendaDao extends BaseDao {
             "t." + COLUMN_NAME_RARIDADE + ", " +
             "p." + COLUMN_NAME_NOME + " AS profissao_nome, " +
             "COALESCE(SUM(v." + COLUMN_NAME_QUANTIDADE + "), 0) AS quantidade_vendida, " +
-            "MAX(v." + COLUMN_NAME_CRIADO_EM + ") AS ultima_venda " +
+            "MAX(v." + COLUMN_NAME_CRIADO_EM + ") AS ultima_venda, " +
+            "(o." + COLUMN_NAME_ID_TRABALHO + " IS NOT NULL) AS ofertado " +
             "FROM " + TABLE_ESTOQUE + " e " +
             "INNER JOIN " + TABLE_TRABALHOS + " t ON e." + COLUMN_NAME_ID_TRABALHO +
             " = t." + COLUMN_NAME_ID + " " +
             "LEFT JOIN " + TABLE_PROFISSOES + " p ON t." + COLUMN_NAME_PROFISSAO +
             " = p." + COLUMN_NAME_ID + " " +
+            "LEFT JOIN " + TABLE_TRABALHOS_OFERTADOS + " o ON o." + COLUMN_NAME_ID_TRABALHO +
+            " = e." + COLUMN_NAME_ID_TRABALHO +
+            " AND o." + COLUMN_NAME_ID_PERSONAGEM + " = e." + COLUMN_NAME_ID_PERSONAGEM + " " +
             "LEFT JOIN " + TABLE_TRABALHOS_VENDIDOS + " v ON v." + COLUMN_NAME_ID_TRABALHO +
             " = e." + COLUMN_NAME_ID_TRABALHO +
             " AND v." + COLUMN_NAME_ID_PERSONAGEM + " = e." + COLUMN_NAME_ID_PERSONAGEM +
@@ -301,6 +307,10 @@ public class VendaDao extends BaseDao {
                         cursor.getInt(cursor.getColumnIndexOrThrow("quantidade_vendida"))
                     );
 
+                    trabalho.setOfertado(
+                        cursor.getInt(cursor.getColumnIndexOrThrow("ofertado")) == 1
+                    );
+
                     int indexUltimaVenda = cursor.getColumnIndexOrThrow("ultima_venda");
                     if (!cursor.isNull(indexUltimaVenda)) {
                         trabalho.setUltimaVendaEm(cursor.getLong(indexUltimaVenda));
@@ -312,6 +322,28 @@ public class VendaDao extends BaseDao {
         }
 
         return trabalhos;
+    }
+
+    public void defineOfertado(String idPersonagem, String idTrabalho, boolean ofertado) {
+        if (ofertado) {
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_NAME_ID_PERSONAGEM, idPersonagem);
+            values.put(COLUMN_NAME_ID_TRABALHO, idTrabalho);
+
+            executaEmTransacao(() -> db.insertWithOnConflict(
+                TABLE_TRABALHOS_OFERTADOS,
+                null,
+                values,
+                SQLiteDatabase.CONFLICT_IGNORE
+            ));
+            return;
+        }
+
+        removeEmTransacao(
+            TABLE_TRABALHOS_OFERTADOS,
+            COLUMN_NAME_ID_PERSONAGEM + " = ? AND " + COLUMN_NAME_ID_TRABALHO + " = ?",
+            new String[]{idPersonagem, idTrabalho}
+        );
     }
 
     public void removeTrabalho(TrabalhoVendido trabalho) {
