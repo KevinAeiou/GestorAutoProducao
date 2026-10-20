@@ -82,6 +82,7 @@ public class ListaChanceVendaAdapter
         private final TextView itemNome;
         private final TextView itemProfissao;
         private final TextView itemEstoque;
+        private final TextView itemNivel;
         private final TextView itemVendasPeriodo;
         private final TextView itemLabelScore;
         private final LinearProgressIndicator itemScore;
@@ -94,6 +95,7 @@ public class ListaChanceVendaAdapter
             itemNome = itemView.findViewById(R.id.itemNomeChanceVenda);
             itemProfissao = itemView.findViewById(R.id.itemProfissaoChanceVenda);
             itemEstoque = itemView.findViewById(R.id.itemEstoqueChanceVenda);
+            itemNivel = itemView.findViewById(R.id.itemNivelChanceVenda);
             itemVendasPeriodo = itemView.findViewById(R.id.itemVendasPeriodoChanceVenda);
             itemLabelScore = itemView.findViewById(R.id.itemLabelScoreChanceVenda);
             itemScore = itemView.findViewById(R.id.itemScoreChanceVenda);
@@ -122,7 +124,7 @@ public class ListaChanceVendaAdapter
                 R.string.string_estoque_quantidade_valor,
                 Formatador.formatarMilhar(trabalho.getEstoqueAtual())
             ));
-
+            itemNivel.setText(context.getString(R.string.stringNivelBadge, trabalho.getNivel()));
             itemVendasPeriodo.setText(formataVendasPeriodo(trabalho));
 
             int percentualScore = (int) Math.round(trabalho.getScore() * 100);
