@@ -3,7 +3,7 @@
 Aplicativo Android para gerenciar a produção de itens (artesanato) de Warspear Online: cadastro de personagens, profissões e trabalhos, fila de produção, estoque, vendas e uma automação opcional que inicia as produções no jogo.
 
 - **Pacote:** `com.kevin.gestorproducao`
-- **Versão atual:** 1.2.0 (`versionCode` 3)
+- **Versão atual:** 1.3.0 (`versionCode` 4)
 - **SDK:** `minSdk` 24 · `targetSdk` 34 · `compileSdk` 36
 - **Linguagem:** Java 8, ViewBinding, Navigation Component (Safe Args)
 
@@ -82,8 +82,8 @@ Testes unitários (JUnit 4 + Robolectric) em `app/src/test/`, cobrindo o motor d
 O build de release é feito pelo GitHub Actions ([`.github/workflows/release.yml`](.github/workflows/release.yml)) ao enviar uma tag `v*`. A tag deve ser igual ao `versionName` de `app/build.gradle`.
 
 ```bash
-git tag -a v1.2.0 -m "Versao 1.2.0"
-git push origin v1.2.0
+git tag -a v1.3.0 -m "Versao 1.3.0"
+git push origin v1.3.0
 ```
 
 O workflow gera o APK assinado e o publica na release do GitHub. São necessários os secrets `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS` e `KEY_PASSWORD`. Localmente (sem `KEYSTORE_PATH`), o release não é assinado.
