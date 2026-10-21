@@ -67,11 +67,8 @@ public class ListaTrabalhosProducaoFragment
     extends BaseFragment<FragmentListaTrabalhosProducaoBinding>
     implements MenuProvider
 {
-    // Tempo em que o item deslizado permanece na posição atual, já com o novo estado, antes de
-    // ser reposicionado (ou removido, se não passar mais no filtro).
     private static final long ATRASO_REORGANIZAR_LISTA_MS = 800;
 
-    // Mesma ordem de ProducaoDao.recuperaProducoes: estado, profissão, raridade, nível e nome.
     private static final Comparator<TrabalhoProducao> ORDEM_PRODUCAO = Comparator
         .comparing(TrabalhoProducao::getEstado, Comparator.nullsFirst(Comparator.naturalOrder()))
         .thenComparing(TrabalhoProducao::getProfissao, Comparator.nullsFirst(Comparator.naturalOrder()))
@@ -97,7 +94,6 @@ public class ListaTrabalhosProducaoFragment
     private FiltroTrabalho filtroAtual;
     private TrabalhoProducao trabalhoSelecionado;
     private int estadoAnterior = -1;
-    private float ultimoDX = 0;
     private ProducaoFluxoService producaoFluxoService;
     private Context context;
     private TrabalhoRepository trabalhoRepo;
@@ -368,26 +364,8 @@ public class ListaTrabalhosProducaoFragment
                 int actionState,
                 boolean isCurrentlyActive
             ) {
-                View itemView = viewHolder.itemView;
-
                 if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
-
-                    if (isCurrentlyActive) {
-                        ultimoDX = dX;
-                        itemView.setTranslationX(dX);
-                        return;
-                    }
-
-                    if (ultimoDX < 0) {
-                        itemView.setTranslationX(itemView.getWidth());
-                    } else {
-                        itemView.setTranslationX(-itemView.getWidth());
-                    }
-
-                    itemView.animate()
-                        .translationX(0)
-                        .setDuration(250)
-                        .start();
+                    viewHolder.itemView.setTranslationX(dX);
                     return;
                 }
 
