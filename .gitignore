@@ -16,3 +16,6 @@
 .cxx
 local.properties
 /app/release
+
+# Config do Firebase (contém chaves do projeto)
+/app/google-services.json
