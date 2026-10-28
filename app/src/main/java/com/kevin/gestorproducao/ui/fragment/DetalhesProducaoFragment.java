@@ -350,6 +350,7 @@ public class DetalhesProducaoFragment
                 );
 
                 planejamentoProducaoService = servicos.getPlanejamentoProducaoService();
+                planejamentoProducaoService.setOuvinteAviso(this::mostraMensagemAncorada);
                 producaoFluxoService = servicos.getProducaoFluxoService();
             }
         );

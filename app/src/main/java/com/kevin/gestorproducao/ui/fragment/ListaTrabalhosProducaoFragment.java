@@ -256,6 +256,7 @@ public class ListaTrabalhosProducaoFragment
                 planejamentoProducaoService.setOuvinteFalhaGravacao(erro ->
                     mostraMensagemAncorada("Falha ao gravar produção: " + erro)
                 );
+                planejamentoProducaoService.setOuvinteAviso(this::mostraMensagemAncorada);
                 planejamentoProducaoService.setOuvinteResumoAutomatico(resumo ->
                     mostraMensagemAncorada(resumo.paraMensagem())
                 );
