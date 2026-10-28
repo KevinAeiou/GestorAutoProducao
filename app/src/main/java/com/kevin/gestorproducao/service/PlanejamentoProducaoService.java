@@ -253,6 +253,7 @@ public class PlanejamentoProducaoService {
 
     private Consumer<String> ouvinteFalhaGravacao;
     private Consumer<ResumoPlanejamento> ouvinteResumoAutomatico;
+    private Consumer<String> ouvinteAviso;
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final Runnable atualizacaoAutomatica = this::executaAtualizacaoAutomatica;
 
@@ -260,6 +261,11 @@ public class PlanejamentoProducaoService {
     // de aceita, já que o resultado do Firebase só chega de forma assíncrona.
     public void setOuvinteFalhaGravacao(Consumer<String> ouvinteFalhaGravacao) {
         this.ouvinteFalhaGravacao = ouvinteFalhaGravacao;
+    }
+
+    // Chamado quando a inclusão do trabalho raro não pôde ser feita (ex.: raro inexistente).
+    public void setOuvinteAviso(Consumer<String> ouvinteAviso) {
+        this.ouvinteAviso = ouvinteAviso;
     }
 
     // Chamado (na thread principal) com o resultado de uma atualização automática que trouxe novidades.
@@ -410,7 +416,10 @@ public class PlanejamentoProducaoService {
         int maxProduzivel = Integer.MAX_VALUE;
         for (int i = 0; i < 3; i++) {
             Recurso recurso = lista.get(offset + i).getKey();
-            Trabalho recursoProducao = trabalhoRepo.recuperaTrabalhoPorNome(recurso.getKey());
+            Trabalho recursoProducao = trabalhoRepo.recuperaTrabalhoPorNome(
+                recurso.getKey(),
+                trabalhoComum.getProfissao()
+            );
             if (recursoProducao == null) continue;
 
             TrabalhoEstoque recursoEstoque = estoqueRepo.recuperaTrabalhoPorId(idPersonagem, recursoProducao.getId());
@@ -466,14 +475,20 @@ public class PlanejamentoProducaoService {
     public void incluirRaro(String idTrabalho) {
         Trabalho trabalho = trabalhoRepo.recuperaTrabalhoPorIdTrabalhoNecessario(idTrabalho);
 
-        if (trabalho == null) return;
+        if (trabalho == null) {
+            avisa(context.getString(R.string.avisoRaroNaoEncontrado));
+            return;
+        }
 
         ProfissaoPersonagem profissao = profissaoPersonagemRepo.recuperaProfissaoPorNome(
             idPersonagem,
             trabalho.getProfissao()
         );
 
-        if (profissao == null) return;
+        if (profissao == null) {
+            avisa(context.getString(R.string.avisoRaroSemProfissao, trabalho.getNome()));
+            return;
+        }
 
         String licenca = profissao.getNivel() == 28 ?
             context.getString(R.string.licencaMestre) :
@@ -484,6 +499,10 @@ public class PlanejamentoProducaoService {
         producao.setExperiencia(trabalho.getExperiencia());
         producao.setTipoLicenca(licenca);
 
-        producaoRepo.insereTrabalhoProducao(producao, idPersonagem);
+        gravaProducao(producao);
+    }
+
+    private void avisa(String mensagem) {
+        if (ouvinteAviso != null) ouvinteAviso.accept(mensagem);
     }
 }

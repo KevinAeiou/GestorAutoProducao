@@ -34,7 +34,10 @@ public class ConsumoMateriaisService {
 
         int index = 0;
         for (Map.Entry<String, Integer> material: necessarios.entrySet()) {
-            Trabalho encontrado = trabalhoRepository.recuperaTrabalhoPorNome(material.getKey());
+            Trabalho encontrado = trabalhoRepository.recuperaTrabalhoPorNome(
+                material.getKey(),
+                trabalho.getProfissao()
+            );
 
             if (encontrado == null) continue;
 
