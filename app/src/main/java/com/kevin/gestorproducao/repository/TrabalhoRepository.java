@@ -1,4 +1,4 @@
-clearpackage com.kevin.gestorproducao.repository;
+package com.kevin.gestorproducao.repository;
 
 import static com.kevin.gestorproducao.ui.activity.Constantes.CHAVE_LISTA_TRABALHO;
 
