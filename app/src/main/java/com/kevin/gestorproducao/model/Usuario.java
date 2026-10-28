@@ -42,9 +42,6 @@ public class Usuario implements Serializable {
         this.email = email;
     }
 
-    // Excluída da (de)serialização do Firebase: a senha nunca deve trafegar nem ficar
-    // gravada no Realtime Database (achado C1) — usada só em memória (login) ou, no caso
-    // do personagem, cifrada e mantida apenas no SQLite local (ver PersonagemDao).
     @Exclude
     public String getSenha() {
         return senha;

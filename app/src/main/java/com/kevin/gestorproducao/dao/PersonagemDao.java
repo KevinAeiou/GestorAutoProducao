@@ -57,9 +57,6 @@ public class PersonagemDao extends BaseDao {
 
     public void substituirTodos(ArrayList<Personagem> personagens) {
         executaEmTransacao(() -> {
-            // A senha nunca vem do Firebase (Usuario.senha e @Exclude) — preserva a cifra ja
-            // gravada localmente por id, senao esta substituicao completa apaga a senha salva
-            // no aparelho a cada sincronizacao.
             Map<String, String> senhasCifradasPorId = recuperaSenhasCifradasPorId();
 
             db.delete(TABLE_PERSONAGENS, null, null);
@@ -106,9 +103,6 @@ public class PersonagemDao extends BaseDao {
         values.put(COLUMN_NAME_ID, personagem.getId());
         values.put(COLUMN_NAME_NOME, personagem.getNome());
         values.put(COLUMN_NAME_EMAIL, personagem.getEmail());
-        // Cifrada com a chave do Android Keystore deste aparelho (achado C1) — por isso não
-        // é sincronizada com o Firebase (ver @Exclude em Usuario.senha): uma chave presa ao
-        // Keystore não seria decifrável em outro dispositivo.
         values.put(COLUMN_NAME_SENHA, CriptografiaUtil.encriptar(personagem.getSenha()));
         boolean estado = personagem.getEstado();
         values.put(COLUMN_NAME_ESTADO, estado);
