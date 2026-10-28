@@ -60,6 +60,7 @@ public class DetalhesTrabalhoFragment
     private MaterialButton btnExcluir;
     private String[] mensagemErro;
     private int codigoRequisicao = CODIGO_REQUISICAO_INVALIDA;
+    private boolean camposConfigurados;
     private TrabalhoViewModel trabalhoViewModel;
     private TrabalhoEstoqueViewModel estoqueViewModel;
     private PersonagemViewModel personagemViewModel;
@@ -675,7 +676,7 @@ public class DetalhesTrabalhoFragment
     public void onResume() {
         super.onResume();
 
-        if (codigoRequisicao == CODIGO_REQUISICAO_INVALIDA) return;
+        if (codigoRequisicao == CODIGO_REQUISICAO_INVALIDA || camposConfigurados) return;
 
         configuraDropdownProfissoes();
         configuraDropdownRaridades();
@@ -683,12 +684,15 @@ public class DetalhesTrabalhoFragment
         if (codigoRequisicao == CODIGO_REQUISICAO_ALTERA_TRABALHO){
             preencheCamposTrabalho();
         }
+
+        camposConfigurados = true;
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
 
+        camposConfigurados = false;
         removerObservadorTrabalho();
         removerObservadorPersonagem();
         removerObservadorEstoque();
