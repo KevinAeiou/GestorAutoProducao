@@ -637,7 +637,7 @@ public class DetalhesTrabalhoFragment
     }
 
     private boolean verificaCampoModificado(String campo, String valorRecebido) {
-        return !comparaString(campo, valorRecebido);
+        return !Objects.equals(campo, valorRecebido);
     }
 
     private boolean camposNovoTrabalhoEhValido(Trabalho trabalho) {
