@@ -181,13 +181,14 @@ public class TrabalhoDao extends BaseDao {
         return trabalhos;
     }
 
-    public Trabalho recuperaTrabalhoPorNome(String nome) {
+    public Trabalho recuperaTrabalhoPorNome(String nome, String profissao) {
         String selection =
             "SELECT t.*, p.nome AS nome_profissao " +
             "FROM " + TABLE_TRABALHOS + " t " +
             "INNER JOIN " + TABLE_PROFISSOES + " p ON t." + COLUMN_NAME_PROFISSAO + " = p." + COLUMN_NAME_ID + " " +
-            "WHERE REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(LOWER(t.nome), ' ', ''), 'ç', 'c'), 'ã', 'a'), 'ô', 'o'), 'é', 'e'), 'á', 'a'), 'â', 'a'), 'ó', 'o') = ?";
-        String[] selectionArgs = {nome};
+            "WHERE REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(LOWER(t.nome), ' ', ''), 'ç', 'c'), 'ã', 'a'), 'ô', 'o'), 'é', 'e'), 'á', 'a'), 'â', 'a'), 'ó', 'o') = ? " +
+            "AND p.nome = ?";
+        String[] selectionArgs = {nome, profissao};
 
         try (Cursor cursor = db.rawQuery(selection, selectionArgs)) {
             if (!cursor.moveToFirst()) {
@@ -212,6 +213,7 @@ public class TrabalhoDao extends BaseDao {
             "SELECT t." + COLUMN_NAME_ID +
             " FROM " + TABLE_TRABALHOS + " t"+
             " INNER JOIN " + TABLE_PROFISSOES + " p" +
+            " ON t." + COLUMN_NAME_PROFISSAO + " = p." + COLUMN_NAME_ID +
             " WHERE t." + COLUMN_NAME_NOME + " = ?" +
             " AND t." + COLUMN_NAME_NOME_PRODUCAO + " = ?" +
             " AND t." + COLUMN_NAME_NIVEL + " = ?" +
