@@ -53,6 +53,8 @@
         <item>Licença do Novato</item>
     </string-array>
     <string name="licencaIniciante">Licença de Artesanato de Iniciante</string>
+    <string name="avisoRaroNaoEncontrado">Não existe um trabalho raro relacionado a este trabalho melhorado; nenhum raro foi adicionado à produção.</string>
+    <string name="avisoRaroSemProfissao">O trabalho raro \"%1$s\" não foi adicionado: o personagem não possui a profissão necessária.</string>
     <string name="licencaMestre">Licença de Artesanato de Mestre</string>
     <string name="licencaAprendiz">Licença de Artesanato de Aprendiz</string>
     <string name="licencaNovato">Licença de Artesanato de Novato</string>
