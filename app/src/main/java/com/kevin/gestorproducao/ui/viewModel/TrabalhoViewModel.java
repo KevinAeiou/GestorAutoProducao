@@ -116,8 +116,8 @@ public class TrabalhoViewModel extends ViewModel {
         repository.removeOuvinte();
     }
 
-    public Trabalho recuperaTrabalhoPorNome(String nome) {
-        return repository.recuperaTrabalhoPorNome(nome);
+    public Trabalho recuperaTrabalhoPorNome(String nome, String profissao) {
+        return repository.recuperaTrabalhoPorNome(nome, profissao);
     }
 
     public void limpaModificacaoResultado() {

@@ -1,4 +1,4 @@
-package com.kevin.gestorproducao.repository;
+clearpackage com.kevin.gestorproducao.repository;
 
 import static com.kevin.gestorproducao.ui.activity.Constantes.CHAVE_LISTA_TRABALHO;
 
@@ -233,8 +233,8 @@ public class TrabalhoRepository {
         }
     }
 
-    public Trabalho recuperaTrabalhoPorNome(String nome) {
-        return trabalhoDao.recuperaTrabalhoPorNome(nome);
+    public Trabalho recuperaTrabalhoPorNome(String nome, String profissao) {
+        return trabalhoDao.recuperaTrabalhoPorNome(nome, profissao);
     }
 
     public Trabalho recuperaTrabalhoProducaoRecursos(Trabalho trabalho) {

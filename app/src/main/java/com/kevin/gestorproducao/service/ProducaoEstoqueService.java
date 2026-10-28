@@ -107,7 +107,8 @@ public class ProducaoEstoqueService {
                     int quantidade = entry.getValue();
 
                     Trabalho trabalhoEncontrado = trabalhoRepository.recuperaTrabalhoPorNome(
-                        recurso.getKey()
+                        recurso.getKey(),
+                        trabalhoSelecionado.getProfissao()
                     );
 
                     if (trabalhoEncontrado == null) continue;
