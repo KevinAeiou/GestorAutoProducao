@@ -48,6 +48,24 @@ public class Personagem extends Usuario implements Serializable {
         this.autoProducao = autoProducao;
     }
 
+    /**
+     * Senha do personagem, enviada ao Firebase sem criptografia (será criptografada futuramente).
+     * Sobrescreve o {@code @Exclude} de {@link Usuario#getSenha()}, que segue valendo para o login.
+     */
+    @Override
+    public String getSenha() {
+        return super.getSenha();
+    }
+
+    /**
+     * Recebe a senha do personagem vinda do Firebase; sobrescreve o {@code @Exclude} de
+     * {@link Usuario#setSenha(String)}.
+     */
+    @Override
+    public void setSenha(String senha) {
+        super.setSenha(senha);
+    }
+
     @NonNull
     @Override
     public String toString() {
