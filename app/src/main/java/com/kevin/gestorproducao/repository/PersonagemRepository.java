@@ -17,6 +17,9 @@ import com.google.firebase.database.ValueEventListener;
 import com.kevin.gestorproducao.dao.PersonagemDao;
 import com.kevin.gestorproducao.model.Personagem;
 import com.kevin.gestorproducao.repository.helper.FirebaseTimeoutHelper;
+import com.kevin.gestorproducao.rules.exception.SenhaPersonagemException;
+import com.kevin.gestorproducao.utilitario.ChaveSenhaStore;
+import com.kevin.gestorproducao.utilitario.SenhaPersonagemUtil;
 
 import java.util.ArrayList;
 import java.util.concurrent.Executor;
@@ -30,8 +33,10 @@ public class PersonagemRepository {
     private static volatile PersonagemRepository instancia;
     private final Executor backgroundExecutor = Executors.newFixedThreadPool(2);
     private final PersonagemDao personagemDao;
+    private final Context context;
 
     public PersonagemRepository(Context context) {
+        this.context = context.getApplicationContext();
         this.referenciaPersonagens = FirebaseDatabase.getInstance().getReference(CHAVE_PERSONAGENS);
         this.referenciaUsuarios = FirebaseDatabase.getInstance().getReference(CHAVE_USUARIOS2);
         this.personagemDao = new PersonagemDao(context);
@@ -65,6 +70,12 @@ public class PersonagemRepository {
 
         if (personagemEhInvalido(personagem)) {
             liveData.postValue(new Resource<>(null, "Personagem inválido"));
+            return liveData;
+        }
+
+        String erroSenha = codificaSenha(personagem);
+        if (erroSenha != null) {
+            liveData.postValue(new Resource<>(null, erroSenha));
             return liveData;
         }
 
@@ -119,6 +130,13 @@ public class PersonagemRepository {
         );
     }
     public LiveData<Resource<Void>> inserePersonagem(Personagem personagem) {
+        String erroSenha = codificaSenha(personagem);
+        if (erroSenha != null) {
+            MutableLiveData<Resource<Void>> liveData = new MutableLiveData<>();
+            liveData.postValue(new Resource<>(null, erroSenha));
+            return liveData;
+        }
+
         return FirebaseTimeoutHelper.execute(callback -> referenciaPersonagens
             .child(personagem.getId())
             .setValue(personagem)
@@ -138,6 +156,23 @@ public class PersonagemRepository {
                 callback.erro(erro);
             })
         );
+    }
+
+    /**
+     * Troca a senha do personagem pela versão codificada antes de ir ao Firebase; valor que já
+     * começa com {@code enc:v1:} não é regravado. Devolve a mensagem de erro, sem dados
+     * sensíveis, ou null quando deu certo.
+     */
+    private String codificaSenha(Personagem personagem) {
+        try {
+            personagem.setSenha(SenhaPersonagemUtil.garantirCodificada(
+                personagem.getSenha(),
+                () -> ChaveSenhaStore.recuperar(context)
+            ));
+            return null;
+        } catch (SenhaPersonagemException e) {
+            return e.getMessage();
+        }
     }
 
     private boolean personagemEhInvalido(Personagem personagem) {

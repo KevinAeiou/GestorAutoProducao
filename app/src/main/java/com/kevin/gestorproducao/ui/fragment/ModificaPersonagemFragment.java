@@ -31,16 +31,23 @@ import com.kevin.gestorproducao.repository.ProfissaoPersonagemRepository;
 import com.kevin.gestorproducao.repository.TrabalhoEstoqueRepository;
 import com.kevin.gestorproducao.repository.TrabalhoProducaoRepository;
 import com.kevin.gestorproducao.repository.TrabalhoVendaRepository;
+import com.kevin.gestorproducao.rules.exception.SenhaPersonagemException;
 import com.kevin.gestorproducao.service.PersonagemFluxoService;
 import com.kevin.gestorproducao.ui.viewModel.ComponentesVisuais;
 import com.kevin.gestorproducao.ui.viewModel.PersonagemViewModel;
 import com.kevin.gestorproducao.ui.viewModel.factory.ViewModelFactory;
+import com.kevin.gestorproducao.utilitario.ChaveSenhaStore;
+import com.kevin.gestorproducao.utilitario.SenhaPersonagemUtil;
+
+import java.util.Objects;
 
 public class ModificaPersonagemFragment
     extends BaseFragment<FragmentDetalhesPersonagemBinding>
     implements MenuProvider
 {
     private Personagem personagemRecebido;
+    private String senhaRecebidaResolvida;
+    private Personagem personagemEmModificacao;
     private TextInputLayout personagemNomeTxt, personagemEspacoProducaoTxt, personagemEmailTxt, personagemSenhaTxt;
     private TextInputEditText personagemNome, personagemEspacoProducao, personagemEmail, personagemSenha;
     private MaterialSwitch personagemSwUso, personagemSwEstado, personagemSwAutoProducao;
@@ -94,6 +101,10 @@ public class ModificaPersonagemFragment
 
                 if (resultado.getErro() == null) {
                     personagemViewModel.limpaModificacaoResultado();
+
+                    if (personagemEmModificacao != null) {
+                        personagemViewModel.definePersonagemSelecionado(personagemEmModificacao);
+                    }
 
                     voltaParaTrabalhosProducao();
                     return;
@@ -151,6 +162,9 @@ public class ModificaPersonagemFragment
 
             Personagem personagem = definePersonagemModificado();
             if (personagemEhModificado(personagem)) {
+                if (!garantirChaveSenha()) return true;
+
+                personagemEmModificacao = personagem;
                 personagemViewModel.modificaPersonagem(personagem);
                 return true;
             }
@@ -208,10 +222,24 @@ public class ModificaPersonagemFragment
         personagemNome.setText(personagemRecebido.getNome());
         personagemEspacoProducao.setText(String.valueOf(personagemRecebido.getEspacoProducao()));
         personagemEmail.setText(personagemRecebido.getEmail());
-        personagemSenha.setText(personagemRecebido.getSenha());
+        preencheSenha();
         personagemSwUso.setChecked(personagemRecebido.getUso());
         personagemSwEstado.setChecked(personagemRecebido.getEstado());
         personagemSwAutoProducao.setChecked(personagemRecebido.isAutoProducao());
+    }
+
+    private void preencheSenha() {
+        try {
+            senhaRecebidaResolvida = SenhaPersonagemUtil.resolver(
+                personagemRecebido.getSenha(),
+                () -> ChaveSenhaStore.recuperar(requireContext())
+            );
+            personagemSenha.setText(senhaRecebidaResolvida);
+        } catch (SenhaPersonagemException e) {
+            senhaRecebidaResolvida = null;
+            personagemSenha.setText("");
+            tratarErroSenha(e, this::preencheSenha);
+        }
     }
 
     private void inicializaComponentes() {
@@ -276,7 +304,7 @@ public class ModificaPersonagemFragment
            personagem.isAutoProducao() == personagemRecebido.isAutoProducao() &&
            personagem.getEspacoProducao() == personagemRecebido.getEspacoProducao() &&
            comparaString(personagem.getEmail(), personagemRecebido.getEmail()) &&
-           comparaString(personagem.getSenha(), personagemRecebido.getSenha()));
+           Objects.equals(personagem.getSenha(), senhaRecebidaResolvida));
     }
 
     @Override

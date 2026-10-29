@@ -65,6 +65,8 @@ public class InserePersonagemFragment
 
     private void configuraBotaoConfirmar() {
         btnConfirmar.setOnClickListener(v -> {
+            if (!garantirChaveSenha()) return;
+
             iniciarLoadingBotao(
                 btnConfirmar,
                 loadingBotaoConfirmar

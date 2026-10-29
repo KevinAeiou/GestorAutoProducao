@@ -456,4 +456,13 @@
     <string name="stringPriorizarProducao">Priorizar produção</string>
     <string name="stringPriorizarProducaoDescricao">Completa a fila desta profissão automaticamente.</string>
     <string name="stringSalvarAlteracoes">Salvar alterações</string>
+    <string name="stringChaveSenhas">Chave de senhas</string>
+    <string name="stringChaveSenhasTitulo">Chave de senhas dos personagens</string>
+    <string name="stringChaveSenhasDescricao">Cole a chave usada para codificar as senhas. Ela fica guardada só neste aparelho.</string>
+    <string name="stringChaveSenhasSalva">Chave de senhas salva.</string>
+    <string name="stringChaveSenhasInvalida">Chave inválida: informe os 32 bytes em base64 URL-safe.</string>
+    <string name="stringErroChaveSenhaAusente">Configure a chave de senhas para continuar.</string>
+    <string name="stringErroChaveSenhaIncorreta">Chave de senhas incorreta ou senha adulterada.</string>
+    <string name="stringErroSenhaFormatoInvalido">A senha codificada está em formato inválido.</string>
+    <string name="stringErroSenhaCodificacao">Não foi possível codificar a senha.</string>
 </resources>

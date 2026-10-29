@@ -30,8 +30,10 @@ import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.kevin.gestorproducao.R;
+import com.kevin.gestorproducao.rules.exception.SenhaPersonagemException;
 import com.kevin.gestorproducao.ui.viewModel.ComponentesVisuais;
 import com.kevin.gestorproducao.ui.viewModel.EstadoAppViewModel;
+import com.kevin.gestorproducao.utilitario.ChaveSenhaStore;
 
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -154,6 +156,48 @@ public abstract class BaseFragment<T extends ViewBinding> extends Fragment {
 
     protected void aplicarComponentesVisuais() {
         estadoAppViewModel.componentes.setValue(fornecerComponentesVisuais());
+    }
+
+    /**
+     * Confirma que a chave de senhas existe neste aparelho; senão avisa e abre o diálogo para
+     * informá-la.
+     */
+    protected boolean garantirChaveSenha() {
+        if (ChaveSenhaStore.possuiChave(requireContext())) return true;
+
+        tratarErroSenha(new SenhaPersonagemException(SenhaPersonagemException.Tipo.CHAVE_AUSENTE), null);
+        return false;
+    }
+
+    /**
+     * Mostra o erro de senha sem expor senha, chave nem valor codificado e, quando o problema
+     * é a chave, abre o diálogo para informá-la de novo.
+     */
+    protected void tratarErroSenha(
+        SenhaPersonagemException erro,
+        ChaveSenhaDialog.OnChaveSalvaListener aoSalvarChave
+    ) {
+        int mensagem;
+        switch (erro.getTipo()) {
+            case CHAVE_AUSENTE:
+                mensagem = R.string.stringErroChaveSenhaAusente;
+                break;
+            case CHAVE_INVALIDA:
+            case FALHA_AUTENTICACAO:
+                mensagem = R.string.stringErroChaveSenhaIncorreta;
+                break;
+            case VALOR_INVALIDO:
+                mensagem = R.string.stringErroSenhaFormatoInvalido;
+                break;
+            default:
+                mensagem = R.string.stringErroSenhaCodificacao;
+        }
+        mostraMensagemAncorada(getString(mensagem));
+
+        if (erro.exigeConfigurarChave()) {
+            ChaveSenhaDialog.novaInstancia(aoSalvarChave)
+                .show(getParentFragmentManager(), "chave_senha");
+        }
     }
 
     protected void mostraMensagemAncorada(String mensagem) {
