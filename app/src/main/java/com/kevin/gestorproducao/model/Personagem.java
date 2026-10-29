@@ -49,7 +49,8 @@ public class Personagem extends Usuario implements Serializable {
     }
 
     /**
-     * Senha do personagem, enviada ao Firebase sem criptografia (será criptografada futuramente).
+     * Senha do personagem como gravada no Firebase: codificada ({@code enc:v1:...}, ver
+     * {@link com.kevin.gestorproducao.utilitario.SenhaPersonagemUtil}) ou crua, nos dados antigos.
      * Sobrescreve o {@code @Exclude} de {@link Usuario#getSenha()}, que segue valendo para o login.
      */
     @Override

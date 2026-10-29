@@ -45,6 +45,12 @@ Fluxo: captura → OCR → `DetectorEstadoTela` identifica a tela → `Navegador
 
 A automação **nunca digita nada**: ao encontrar a tela de login, pede intervenção manual e não guarda a senha do jogo.
 
+## Senha dos personagens
+
+A senha da conta do jogo é gravada em `Personagens/<id>/senha` no formato `enc:v1:` + base64 URL-safe (com `=`) de `nonce(12) + texto cifrado + etiqueta(16)`, AES-256-GCM sem AAD, o mesmo lido pela automação WarspearVision. Valor sem o prefixo é senha crua (dados antigos) e continua válido; não há migração em massa.
+
+A chave (32 bytes aleatórios em base64 URL-safe) nunca vai para o Firebase, o git ou o código. Em cada aparelho ela é colada uma vez no diálogo "Chave de senhas", que abre sozinho ao salvar ou abrir um personagem sem a chave (ou com chave incorreta), e fica guardada cifrada pelo Android Keystore. Um aparelho restaurado ou com o Keystore perdido pede a chave de novo.
+
 ## Configuração
 
 ### Requisitos
