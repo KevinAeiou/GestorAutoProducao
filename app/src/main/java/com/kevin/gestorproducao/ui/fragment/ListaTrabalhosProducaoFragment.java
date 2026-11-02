@@ -101,6 +101,7 @@ public class ListaTrabalhosProducaoFragment
     private TrabalhoProducaoRepository producaoRepo;
     private ProfissaoPersonagemRepository profissaoPersonagemRepo;
     private PlanejamentoProducaoService planejamentoProducaoService;
+    private boolean personagemComAutoProducao;
     private ChipGroup chipGroupPeriodo;
     private TextView txtValorPeriodo;
     private ControleFiltroPeriodo controleFiltroPeriodo;
@@ -242,6 +243,7 @@ public class ListaTrabalhosProducaoFragment
                 if (personagem == null) return;
 
                 producaoViewModel.setIdPersonagem(personagem.getId());
+                personagemComAutoProducao = personagem.isAutoProducao();
 
                 ServicosProducaoPersonagem servicos = ProducaoServicosFactory.cria(
                     trabalhoRepo,
@@ -421,10 +423,12 @@ public class ListaTrabalhosProducaoFragment
                 String mensagem = null;
 
                 if (planejamentoProducaoService != null) {
-                    try {
-                        planejamentoProducaoService.incluirMaisVendidos();
-                    } catch (ProducaoException e) {
-                        mensagem = e.getMessage();
+                    if (personagemComAutoProducao) {
+                        try {
+                            planejamentoProducaoService.incluirMaisVendidos();
+                        } catch (ProducaoException e) {
+                            mensagem = e.getMessage();
+                        }
                     }
 
                     ResumoPlanejamento resumo =
