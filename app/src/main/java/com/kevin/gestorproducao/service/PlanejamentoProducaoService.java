@@ -25,6 +25,7 @@ import com.kevin.gestorproducao.rules.CatalogoRecursos;
 import com.kevin.gestorproducao.rules.exception.ProducaoException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -324,6 +325,106 @@ public class PlanejamentoProducaoService {
             return;
         }
 
+        incluiComuns(profissao, trabalhosComuns, resumo);
+
+        if (permiteProduzirMelhorados(profissao.getNivel())) {
+            incluiMelhorados(profissao, nivelProducao, trabalhosComuns.size(), resumo);
+        }
+    }
+
+    static boolean permiteProduzirMelhorados(int nivelProfissao) {
+        if (nivelProfissao < 8) return nivelProfissao % 2 == 1;
+        return nivelProfissao % 2 == 0;
+    }
+
+    private void incluiMelhorados(
+        ProfissaoPersonagem profissao,
+        int nivelProducao,
+        int limiteNaFila,
+        ResumoPlanejamento resumo
+    ) {
+        ArrayList<Trabalho> melhorados =
+            trabalhoRepo.recuperaTrabalhosMelhorados(nivelProducao, profissao.getNome());
+        if (melhorados.isEmpty()) return;
+
+        int[] totais = new int[melhorados.size()];
+        int[] paraProduzir = new int[melhorados.size()];
+        int totalNaFila = 0;
+        Map<String, Integer> comunsDisponiveis = new HashMap<>();
+
+        for (int i = 0; i < melhorados.size(); i++) {
+            Trabalho melhorado = melhorados.get(i);
+            paraProduzir[i] = producaoRepo.recuperaQuantidadeProducaoParaProduzirPorId(
+                idPersonagem,
+                melhorado.getId()
+            );
+            int naFila = paraProduzir[i] + producaoRepo.recuperaQuantidadeProducaoProduzindoPorId(
+                idPersonagem,
+                melhorado.getId()
+            );
+            totalNaFila += naFila;
+            totais[i] = naFila + quantidadeEmEstoque(melhorado.getId());
+
+            for (String idComum : melhorado.getListaTrabalhosNecessarios()) {
+                comunsDisponiveis.computeIfAbsent(idComum, this::quantidadeEmEstoque);
+            }
+        }
+
+        for (int i = 0; i < melhorados.size(); i++) {
+            for (String idComum : melhorados.get(i).getListaTrabalhosNecessarios()) {
+                comunsDisponiveis.merge(idComum, -paraProduzir[i], Integer::sum);
+            }
+        }
+
+        int faltante = limiteNaFila - totalNaFila;
+        String licenca = licencaPara(profissao);
+
+        while (faltante > 0) {
+            int escolhido = -1;
+            for (int i = 0; i < melhorados.size(); i++) {
+                if (!temComunsDisponiveis(melhorados.get(i), comunsDisponiveis)) continue;
+                if (escolhido == -1 || totais[i] < totais[escolhido]) escolhido = i;
+            }
+            if (escolhido == -1) return;
+
+            Trabalho melhorado = melhorados.get(escolhido);
+            for (String idComum : melhorado.getListaTrabalhosNecessarios()) {
+                comunsDisponiveis.merge(idComum, -1, Integer::sum);
+            }
+
+            TrabalhoProducao nova = new TrabalhoProducao();
+            nova.setIdTrabalho(melhorado.getId());
+            nova.setExperiencia(melhorado.getExperiencia());
+            nova.setTipoLicenca(licenca);
+
+            if (gravaProducao(nova)) {
+                resumo.registraAdicionado();
+            } else {
+                resumo.registraAviso(profissao.getNome() + ": produção de '" + melhorado.getNome() + "' inválida");
+            }
+
+            totais[escolhido]++;
+            faltante--;
+        }
+    }
+
+    private boolean temComunsDisponiveis(Trabalho melhorado, Map<String, Integer> comunsDisponiveis) {
+        List<String> necessarios = melhorado.getListaTrabalhosNecessarios();
+        if (necessarios.isEmpty()) return false;
+
+        for (String idComum : necessarios) {
+            if (comunsDisponiveis.getOrDefault(idComum, 0) < 1) return false;
+        }
+        return true;
+    }
+
+    private void incluiComuns(
+        ProfissaoPersonagem profissao,
+        ArrayList<Trabalho> trabalhosComuns,
+        ResumoPlanejamento resumo
+    ) {
+        int nivelProducao = profissao.getNivelProducao();
+
         // A fila decide quanto falta produzir; o estoque só entra em totais[] para balancear
         // qual trabalho produzir (o de menor estoque + fila).
         int[] totais = new int[trabalhosComuns.size()];
@@ -383,7 +484,11 @@ public class PlanejamentoProducaoService {
     }
 
     private int quantidadeEmEstoque(Trabalho trabalho) {
-        TrabalhoEstoque emEstoque = estoqueRepo.recuperaTrabalhoPorId(idPersonagem, trabalho.getId());
+        return quantidadeEmEstoque(trabalho.getId());
+    }
+
+    private int quantidadeEmEstoque(String idTrabalho) {
+        TrabalhoEstoque emEstoque = estoqueRepo.recuperaTrabalhoPorId(idPersonagem, idTrabalho);
         return emEstoque == null ? 0 : emEstoque.getQuantidade();
     }
 
