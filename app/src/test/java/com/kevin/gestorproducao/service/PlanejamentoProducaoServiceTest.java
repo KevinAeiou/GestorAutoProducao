@@ -23,8 +23,12 @@ public class PlanejamentoProducaoServiceTest {
     }
 
     @Test
-    public void deve_PermitirMelhorados_QuandoNivelParAPartirDeOito() {
-        assertTrue(PlanejamentoProducaoService.permiteProduzirMelhorados(8));
+    public void deve_NegarMelhorados_QuandoNivelForOito() {
+        assertFalse(PlanejamentoProducaoService.permiteProduzirMelhorados(8));
+    }
+
+    @Test
+    public void deve_PermitirMelhorados_QuandoNivelParMaiorQueOito() {
         assertTrue(PlanejamentoProducaoService.permiteProduzirMelhorados(10));
         assertTrue(PlanejamentoProducaoService.permiteProduzirMelhorados(28));
     }
