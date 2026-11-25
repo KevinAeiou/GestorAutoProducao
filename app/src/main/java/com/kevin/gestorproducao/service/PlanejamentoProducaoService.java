@@ -345,7 +345,12 @@ public class PlanejamentoProducaoService {
     ) {
         ArrayList<Trabalho> melhorados =
             trabalhoRepo.recuperaTrabalhosMelhorados(nivelProducao, profissao.getNome());
-        if (melhorados.isEmpty()) return;
+        if (melhorados.isEmpty()) {
+            resumo.registraAviso(
+                "Trabalho melhorado de (" + profissao.getNome() + ") nível (" + nivelProducao + ") não encontrado"
+            );
+            return;
+        }
 
         int[] totais = new int[melhorados.size()];
         int[] paraProduzir = new int[melhorados.size()];
@@ -385,7 +390,13 @@ public class PlanejamentoProducaoService {
                 if (!temComunsDisponiveis(melhorados.get(i), comunsDisponiveis)) continue;
                 if (escolhido == -1 || totais[i] < totais[escolhido]) escolhido = i;
             }
-            if (escolhido == -1) return;
+            if (escolhido == -1) {
+                resumo.registraAviso(
+                    "Itens comuns insuficientes ou não encontrados no estoque para produzir melhorados de ("
+                        + profissao.getNome() + ") nível (" + nivelProducao + ")"
+                );
+                return;
+            }
 
             Trabalho melhorado = melhorados.get(escolhido);
             for (String idComum : melhorado.getListaTrabalhosNecessarios()) {
