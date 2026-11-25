@@ -41,6 +41,7 @@ Ao atualizar a lista de produções (deslizar para atualizar, ligar a prioridade
 - **Melhorados:** só são incluídos quando o nível da profissão permite produzi-los: nível ímpar enquanto for menor que 8 e nível par de 8 em diante. Os melhorados vêm do mesmo nível de produção dos comuns.
   - Cada melhorado consome 1 unidade de cada comum necessário. Só é incluído se todos os comuns necessários estiverem no estoque, descontando os comuns que melhorados já aguardando produção vão consumir e os já incluídos nesta rodada.
   - O total de melhorados da profissão na fila (para produzir + produzindo) não ultrapassa a quantidade de comuns do nível de produção atual.
+  - Quando não há melhorado do nível, ou os comuns necessários estão insuficientes ou ausentes do estoque (e o limite da fila ainda não foi atingido), o resumo da atualização traz um aviso com a profissão e o nível de produção dos melhorados.
   - A escolha prioriza o melhorado de menor total (estoque + fila); o empate segue a ordem da consulta.
 
 ## Automação
