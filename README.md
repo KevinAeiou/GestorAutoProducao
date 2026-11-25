@@ -38,7 +38,8 @@ Padrão geral: Fragment → ViewModel → Repository/Service → Firebase/SQLite
 Ao atualizar a lista de produções (deslizar para atualizar, ligar a prioridade de uma profissão ou concluir uma produção), `PlanejamentoProducaoService` inclui trabalhos das profissões priorizadas de cada personagem:
 
 - **Comuns:** a meta é um trabalho de cada comum do nível de produção atual na fila (para produzir + produzindo), limitada pelos recursos em estoque.
-- **Melhorados:** só são incluídos quando o nível da profissão permite produzi-los: nível ímpar enquanto for menor que 8 e nível par de 8 em diante. Os melhorados vêm do mesmo nível de produção dos comuns.
+- **Nível 8:** a profissão não produz melhorados nem comuns do nível 8. O planejamento inclui apenas o trabalho de produção de recursos (comum) necessário para produzir os comuns do nível 9 (nível de produção 16), e só quando o estoque de recursos não comporta nenhuma produção desses comuns.
+- **Melhorados:** só são incluídos quando o nível da profissão permite produzi-los: nível ímpar enquanto for menor que 8 e nível par acima de 8. Os melhorados vêm do mesmo nível de produção dos comuns.
   - Cada melhorado consome 1 unidade de cada comum necessário. Só é incluído se todos os comuns necessários estiverem no estoque, descontando os comuns que melhorados já aguardando produção vão consumir e os já incluídos nesta rodada.
   - O total de melhorados da profissão na fila (para produzir + produzindo) não ultrapassa a quantidade de comuns do nível de produção atual.
   - Quando não há melhorado do nível, ou os comuns necessários estão insuficientes ou ausentes do estoque (e o limite da fila ainda não foi atingido), o resumo da atualização traz um aviso com a profissão e o nível de produção dos melhorados.
