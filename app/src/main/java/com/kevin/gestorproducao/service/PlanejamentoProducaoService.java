@@ -247,6 +247,8 @@ public class PlanejamentoProducaoService {
     // priorizada. Ainda fixa em 1; ponto de partida para torná-la configurável por profissão.
     private static final int META_POR_TRABALHO_COMUM = 1;
     private static final int INSUMO_INDISPONIVEL = -1;
+    private static final int NIVEL_PROFISSAO_TRANSICAO = 8;
+    private static final int NIVEL_PRODUCAO_PROXIMO_NIVEL = 16;
 
     // As gravações de estoque e experiência do trabalho concluído terminam de forma assíncrona;
     // a atualização automática espera esse tempo para não planejar em cima de dados defasados.
@@ -314,6 +316,11 @@ public class PlanejamentoProducaoService {
         ProfissaoPersonagem profissao,
         ResumoPlanejamento resumo
     ) {
+        if (profissao.getNivel() == NIVEL_PROFISSAO_TRANSICAO) {
+            incluiProducaoRecursosParaProximoNivel(profissao, resumo);
+            return;
+        }
+
         int nivelProducao = profissao.getNivelProducao();
         ArrayList<Trabalho> trabalhosComuns =
             trabalhoRepo.recuperaTrabalhosComuns(nivelProducao, profissao.getNome());
@@ -333,8 +340,37 @@ public class PlanejamentoProducaoService {
     }
 
     static boolean permiteProduzirMelhorados(int nivelProfissao) {
-        if (nivelProfissao < 8) return nivelProfissao % 2 == 1;
+        if (nivelProfissao < NIVEL_PROFISSAO_TRANSICAO) return nivelProfissao % 2 == 1;
+        if (nivelProfissao == NIVEL_PROFISSAO_TRANSICAO) return false;
         return nivelProfissao % 2 == 0;
+    }
+
+    private void incluiProducaoRecursosParaProximoNivel(
+        ProfissaoPersonagem profissao,
+        ResumoPlanejamento resumo
+    ) {
+        ArrayList<Trabalho> comunsProximoNivel =
+            trabalhoRepo.recuperaTrabalhosComuns(NIVEL_PRODUCAO_PROXIMO_NIVEL, profissao.getNome());
+
+        if (comunsProximoNivel.isEmpty()) {
+            resumo.registraAviso(
+                "Trabalho comum de (" + profissao.getNome() + ") nível (" + NIVEL_PRODUCAO_PROXIMO_NIVEL
+                    + ") não encontrado"
+            );
+            return;
+        }
+
+        Trabalho trabalhoComum = comunsProximoNivel.get(0);
+        int maxProduzivel = calculaMaxProduzivel(trabalhoComum);
+
+        if (maxProduzivel == INSUMO_INDISPONIVEL) {
+            resumo.registraAviso(profissao.getNome() + ": catálogo de recursos indisponível");
+            return;
+        }
+
+        if (maxProduzivel <= 0) {
+            enfileiraProducaoDeRecursos(trabalhoComum, resumo);
+        }
     }
 
     private void incluiMelhorados(
@@ -450,7 +486,7 @@ public class PlanejamentoProducaoService {
         int faltante = META_POR_TRABALHO_COMUM * trabalhosComuns.size() - totalNaFila;
         if (faltante <= 0) return;
 
-        if (nivelProducao != 1 && nivelProducao != 8) {
+        if (nivelProducao != 1) {
             Trabalho trabalhoComum = trabalhosComuns.get(0);
             int maxProduzivel = calculaMaxProduzivel(trabalhoComum);
 
