@@ -252,6 +252,13 @@ public class TrabalhoRepository {
         return trabalhoDao.recuperaTrabalhosComuns(nivelProducao, profissao);
     }
 
+    public ArrayList<Trabalho> recuperaTrabalhosMelhorados(
+        int nivelProducao,
+        String profissao
+    ) {
+        return trabalhoDao.recuperaTrabalhosMelhorados(nivelProducao, profissao);
+    }
+
     public Trabalho recuperaTrabalhoPorIdTrabalhoNecessario(String idTrabalho) {
         return trabalhoDao.recuperaTrabalhoPorIdTrabalhoNecessario(idTrabalho);
     }

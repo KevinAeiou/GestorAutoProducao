@@ -410,6 +410,18 @@ public class TrabalhoDao extends BaseDao {
     }
 
     public ArrayList<Trabalho> recuperaTrabalhosComuns(int nivelProducao, String profissao) {
+        return recuperaTrabalhosPorRaridade(nivelProducao, "Comum", profissao);
+    }
+
+    public ArrayList<Trabalho> recuperaTrabalhosMelhorados(int nivelProducao, String profissao) {
+        return recuperaTrabalhosPorRaridade(nivelProducao, "Melhorado", profissao);
+    }
+
+    private ArrayList<Trabalho> recuperaTrabalhosPorRaridade(
+        int nivelProducao,
+        String raridade,
+        String profissao
+    ) {
         ArrayList<Trabalho> trabalhos = new ArrayList<>();
 
         String query =
@@ -430,7 +442,7 @@ public class TrabalhoDao extends BaseDao {
             "t." + COLUMN_NAME_EXPERIENCIA + " ASC, " +
             "t." + COLUMN_NAME_NOME + " ASC";
 
-        String[] selectionArgs = {String.valueOf(nivelProducao), "Comum", profissao};
+        String[] selectionArgs = {String.valueOf(nivelProducao), raridade, profissao};
 
         try (Cursor cursor = db.rawQuery(query, selectionArgs)) {
             while (cursor.moveToNext()) {
