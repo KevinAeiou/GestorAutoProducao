@@ -33,6 +33,16 @@ Camadas dentro de `app/src/main/java/com/kevin/gestorproducao/`:
 
 Padrão geral: Fragment → ViewModel → Repository/Service → Firebase/SQLite, com `LiveData` para observação.
 
+## Planejamento da produção
+
+Ao atualizar a lista de produções (deslizar para atualizar, ligar a prioridade de uma profissão ou concluir uma produção), `PlanejamentoProducaoService` inclui trabalhos das profissões priorizadas de cada personagem:
+
+- **Comuns:** a meta é um trabalho de cada comum do nível de produção atual na fila (para produzir + produzindo), limitada pelos recursos em estoque.
+- **Melhorados:** só são incluídos quando o nível da profissão permite produzi-los: nível ímpar enquanto for menor que 8 e nível par de 8 em diante. Os melhorados vêm do mesmo nível de produção dos comuns.
+  - Cada melhorado consome 1 unidade de cada comum necessário. Só é incluído se todos os comuns necessários estiverem no estoque, descontando os comuns que melhorados já aguardando produção vão consumir e os já incluídos nesta rodada.
+  - O total de melhorados da profissão na fila (para produzir + produzindo) não ultrapassa a quantidade de comuns do nível de produção atual.
+  - A escolha prioriza o melhorado de menor total (estoque + fila); o empate segue a ordem da consulta.
+
 ## Automação
 
 A automação usa três permissões/serviços que o usuário precisa conceder manualmente:
